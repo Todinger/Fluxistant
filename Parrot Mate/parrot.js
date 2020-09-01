@@ -8,6 +8,8 @@ showImage('regular');
 
 var rsp = new RandomSequencePlayer('regular', SEQUENCES, 3000, 6000);
 
+setTimeout(() => rsp.play(), 5000);
+
 // var lsp = null;
 // var lsp = new LoopingSequencePlayer('regular', SEQUENCES.dl6, 3000);
 // soundManager.onDataLoaded(function () {
