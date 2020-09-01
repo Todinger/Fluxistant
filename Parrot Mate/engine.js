@@ -4,17 +4,6 @@ class Action {
 	}
 }
 
-// class EmptyAction extends Action {
-// 	perform() {
-// 		// Do nothing
-// 	}
-	
-// 	get duration {
-// 		return 0;
-// 	}
-// }
-// const EMPTY_ACTION = new EmptyAction();
-
 function showImage(name) {
 	$('#parrot').attr("src", IMAGE_LOCATIONS[name]);
 }

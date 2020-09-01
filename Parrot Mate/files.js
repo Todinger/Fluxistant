@@ -62,14 +62,5 @@ class SoundManagerClass {
 	}
 }
 
-// (function loadSounds() {
-// 	Object.keys(SOUND_LOCATIONS).forEach(name => {
-// 		$(`<audio id="sound_${name}" src="${SOUND_LOCATIONS[name]}">`)
-// 		.on('loadeddata', )
-// 		.appendTo('#soundholder');
-// 		Sounds[name] = document.getElementById(`sound_${name}`);
-// 	});
-// })();
-
 var soundManager = new SoundManagerClass();
 soundManager.loadSounds();
