@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Channel Party</title>
+	<style>
+		.inner {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 3;
+		}
+		.shadowfilter {
+			-webkit-filter: drop-shadow(0px 0px 15px rgba(0, 0, 0, 1));
+			 filter: drop-shadow(0px 0px 15px rgba(0, 0, 0, 1));
+		}
+	</style>
+</head>
+<body id="output">
+<div id="imageholder">
+	<!-- Should contain:
+		<img class="bg" src="(Background image URL)" />
+		<img class="inner" src="(Inner image URL)" />
+	These are meant to be added from the client.js when an image display request is received. -->
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="CORS.js"></script>
+<script src="../../Images/User-Specific/_Users.js"></script>
+<script src="party.js"></script>
+</body>
+</html>
