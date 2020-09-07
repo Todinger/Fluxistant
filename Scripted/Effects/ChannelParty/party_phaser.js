@@ -1,7 +1,7 @@
 const FETCH_USERS_URL = 'https://tmi.twitch.tv/group/user/fluxistence/chatters';
 // const CORS_PROXY_URL = "http://localhost:8080/";
 const CORS_PROXY_URL = "https://cors-anywhere.herokuapp.com/";
-const USER_IMAGE_DIR = './User-Specific/';
+const USER_IMAGE_DIR = '../assets/user-images/';
 // const USER_IMAGE_DIR = '../../Images/User-Specific/';
 const USER_LIST_FILE = USER_IMAGE_DIR + '_Users.txt';
 const GLOW_SIZE = 15;
@@ -10,21 +10,32 @@ const UPDATE_INTERVAL = 1000;
 
 const FADE_DURATION = 500;
 const IMAGE_SIZE = 300;
-const VELOCITY_X = 200;
-const VELOCITY_Y = 200;
+const VELOCITY_MIN = 200;
+const VELOCITY_MAX = 800;
+const VELOCITY_X = 600;
+const VELOCITY_Y = 600;
 
+var existingUserFiles = {};
 var currentUsernames = {};
 var currentUserImages = {};
+
+var running = false;
+var showAll = true;
 
 var config = {
 	type: Phaser.AUTO,
 	transparent: true,
-	physics: {
-		default: 'arcade',
-		arcade: {
-			gravity: { y: 200 }
-		}
-	},
+	// physics: {
+	// 	default: 'arcade',
+	// 	arcade: {
+	// 		gravity: { y: 200 }
+	// 	}
+	// },
+    physics: {
+        default: 'arcade'
+    },
+	width: 1920,
+	height: 1080,
 	scene: {
 		preload: preload,
 		create: create
@@ -40,6 +51,10 @@ function randomInt(min, max) {
 	return min + Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min)));
 }
 
+function randomVelocity() {
+	return randomInt(VELOCITY_MIN, VELOCITY_MAX);
+}
+
 function getSubKeys(obj1, obj2) {
 	var k1 = Object.keys(obj1);
 	return k1.filter(function(x) {
@@ -47,27 +62,30 @@ function getSubKeys(obj1, obj2) {
 	});
 }
 
-function preload ()
+function preload()
 {
 	scene = this;
 	
 	this.load.plugin('rexfadeplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfadeplugin.min.js', true);
 	
 	// this.load.setBaseURL(USER_IMAGE_DIR);
-	
-	let _this = this;
+}
+
+function loadUserImages() {
 	Object.keys(existingUserFiles).forEach(username => {
-		_this.load.image(username, existingUserFiles[username]);
+		scene.load.image(username, existingUserFiles[username]);
 	});
 }
 
-function create ()
+function create()
 {
-	game.scale.scaleMode = Phaser.Scale.ScaleManager.RESIZE;
-	game.scale.parentIsWindow = true;
+	// game.scale.scaleMode = Phaser.Scale.ScaleManager.RESIZE;
+	// game.scale.parentIsWindow = true;
 	
-	game.physics.startSystem(Phaser.Physics.ARCADE);
-	game.physics.enable(image, Phaser.Physics.ARCADE);
+	// game.physics.startSystem(Phaser.Physics.ARCADE);
+	// game.physics.enable(image, Phaser.Physics.ARCADE);
+	
+	this.physics.world.setBoundsCollision(true, true, true, true);
 }
 
 
@@ -76,14 +94,16 @@ function userFileExists(username) {
 }
 
 function addImage(username) {
-	let xpos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.width - IMAGE_SIZE / 2);
-	let ypos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.height - IMAGE_SIZE / 2);
+	let xpos = randomInt(IMAGE_SIZE / 2, 1920 - IMAGE_SIZE / 2);
+	let ypos = randomInt(IMAGE_SIZE / 2, 1080 - IMAGE_SIZE / 2);
+	// let xpos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.width - IMAGE_SIZE / 2);
+	// let ypos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.height - IMAGE_SIZE / 2);
 	
-	let image = game.add.sprite(xpos, ypos, username);
+	let image = scene.physics.add.image(xpos, ypos, username);
 	image.displayWidth = IMAGE_SIZE;
 	image.scaleY = image.scaleX;
 	
-	image.body.velocity.setTo(VELOCITY_X, VELOCITY_Y);
+	image.body.velocity.setTo(randomVelocity(), randomVelocity());
 	image.body.collideWorldBounds = true;
 	image.body.bounce.set(1);
 	
@@ -93,6 +113,8 @@ function addImage(username) {
 		alpha: 1,
 		duration: FADE_DURATION,
 	});
+	
+	return image;
 }
 
 function updateUserImages(newUsers) {
@@ -107,24 +129,34 @@ function updateUserImages(newUsers) {
 		}
 	});
 	
+	if (showAll) {
+		newUsernames = existingUserFiles;
+	}
+	
 	let usersToRemove = getSubKeys(currentUsernames, newUsernames);
 	let usersToAdd = getSubKeys(newUsernames, currentUsernames);
 	
 	// console.log('To remove:'); console.log(usersToRemove);
 	usersToRemove.forEach(username => {
-		scene.plugins.get('rexfadeplugin').fadeOutDestroy(
-			currentUserImages[username],
-			FADE_DURATION);
-		// game.add.tween(currentUserImages[username]).to( { alpha: 1 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+		let image = currentUserImages[username];
+		scene.tweens.add({
+			targets: image,
+			alpha: 0,
+			duration: FADE_DURATION,
+			onComplete: () => {
+				image.destroy();
+			},
+		});
+		
+		delete currentUsernames[username];
+		delete currentUserImages[username];
 	});
 	
 	// console.log('To add:'); console.log(usersToAdd);
 	usersToAdd.forEach(username => {
-		newUserImages[username] = addImage(username);
+		currentUsernames[username] = newUsernames[username];
+		currentUserImages[username] = addImage(username);
 	});
-	
-	currentUsernames = newUsernames;
-	currentUserImages = newUserImages;
 }
 
 function updateUsers() {
@@ -137,4 +169,15 @@ function updateUsers() {
 	});
 }
 
-setInterval(updateUsers, UPDATE_INTERVAL);
+socket = io();
+socket.on('userImageList', userList => {
+	existingUserFiles = userList;
+	loadUserImages();
+	if (!running) {
+		running = true;
+		updateUsers();
+		setInterval(updateUsers, UPDATE_INTERVAL);
+	}
+});
+
+socket.emit('getUserImageList');

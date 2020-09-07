@@ -1,19 +1,44 @@
+const path = require('path');
+const glob = require('glob');
+
 // Basic server setup
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io').listen(server);
+var io = require('socket.io')(server);
 
-app.use('/fluxlings/client', express.static(__dirname + '/client'));
-app.use('/fluxlings/common', express.static(__dirname + '/common'));
-app.use('/fluxlings/assets', express.static(__dirname + '/assets'));
+const PORT = 3333;
 
-app.get('/fluxlings/client/', (req, res) => {
-  res.sendFile(__dirname + '/client/index.html');
+
+// Self-Images
+const USERIMAGE_DIR = '../../Images/User-Specific';
+const USERIMAGE_URL = '/assets/user-images/';
+app.use(USERIMAGE_URL,
+	express.static(path.join(__dirname, USERIMAGE_DIR)));
+
+function getUserImageList(socket) {
+	console.log('User image list requested.');
+	glob(path.join(USERIMAGE_DIR, '*.png'), {}, (err, files) => {
+		let imageList = {};
+		files.forEach(file => {
+			let username = path.parse(file).name;
+			let imageext = path.parse(file).ext;
+			let imageurl = USERIMAGE_URL + username + imageext;
+			imageList[username] = imageurl;
+		});
+		
+		socket.emit('userImageList', imageList);
+	});
+}
+
+io.on('connection', socket => {
+	socket.on('getUserImageList', () => getUserImageList(socket));
 });
 
-// Delegation to actual classes
-var ServerManager = require('./server/serverManager.js');
-ServerManager.instance.init(io, server);
+// Load all the effects we have
+var Effect = require('./effect');
+var EffectManager = require('./effectManager');
+EffectManager.loadAll(app, express, '/fx/', 'Effects');
 
-//var bgdo = require('./common/bgdo');
+server.listen(PORT);
+console.log(`Listening on port ${PORT}...`);
