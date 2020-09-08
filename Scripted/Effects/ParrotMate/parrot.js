@@ -4,10 +4,18 @@ showImage('regular');
 // var rsp = new RandomSequencePlayer('regular', SEQUENCES, 3000, 6000);
 // setTimeout(() => rsp.play(), 5000);
 
-var lsp = new LoopingSequencePlayer('regular', SEQUENCES.died, 3000);
+function newLSP(sequence) {
+	return new LoopingSequencePlayer('regular', sequence, 3000);
+}
+
+var lsp = null;
 
 function play(seqname) {
-	lsp.sequence = SEQUENCES[seqname];
+	if (lsp) {
+		lsp.stop();
+	}
+	
+	lsp = newLSP(SEQUENCES[seqname]);
 	lsp.play();
 }
 

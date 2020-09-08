@@ -14,7 +14,7 @@ const SOUND_LOCATIONS = {
 	cracker:	'./Sounds/Polly Want a Cracker.mp3',
 	dl6:		'./Sounds/Remember DL-6.mp3',
 	bigcry:		'./Sounds/SQUAAAAAAAWK!.mp3',
-	cry:		'./Sounds/SQUAWK!.mp3',
+	cry:		'./Sounds/Squawk.mp3',
 	died:		'./Sounds/Died.mp3',
 	lars:		'./Sounds/Lars.mp3',
 	law:		'./Sounds/Law.mp3',

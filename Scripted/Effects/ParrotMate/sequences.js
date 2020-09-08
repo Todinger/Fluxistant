@@ -73,15 +73,17 @@ const SEQUENCES = {
 		Event(935, [ Image('mouth') ]),
 		Event(1095, [ Image('regular') ]),
 		Event(1955, [ Image('look') ]),
-		Event(7000, [ Image('look') ]),
+		Event(7000, [ Image('regular') ]),
 	]),
 	
 	bigcry: Sequence([
 		Event(0, [ Image('wing'), Sound('bigcry') ]),
+		Event(1000, [ Image('regular') ]),
 	]),
 	
 	cry: Sequence([
 		Event(0, [ Image('wing'), Sound('cry') ]),
+		Event(450, [ Image('regular') ]),
 	]),
 	
 	died: Sequence([
