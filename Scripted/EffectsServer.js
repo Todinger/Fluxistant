@@ -31,14 +31,63 @@ function getUserImageList(socket) {
 	});
 }
 
-io.on('connection', socket => {
-	socket.on('getUserImageList', () => getUserImageList(socket));
-});
-
 // Load all the effects we have
 var Effect = require('./effect');
 var EffectManager = require('./effectManager');
-EffectManager.loadAll(app, express, '/fx/', 'Effects');
+EffectManager.loadMainEffect();
+EffectManager.loadAll('/fx/', 'Effects', app, express);
+app.use('/fx', express.static(path.join(__dirname, 'public')));
+
+var TwitchManager = require('./twitchManager');
+TwitchManager.init('fluxistence', 'fluxistant', 'oauth:luxvl6vwq0r0o9t03p7m1s3kf482lc');
+
+/* Testing Code
+
+TwitchManager.on('message', (user, message) => {
+	console.log(`${user.displayName}: ${message}`);
+});
+TwitchManager.on('action', (user, message) => {
+	console.log(`${user.displayName} ${message}`);
+});
+TwitchManager.onCommand('a', (user, x, y, z) => {
+	console.log(`Ha! ${user.displayName} does ${x} to the ${y} with the ${z}!`);
+})
+
+TwitchManager.onCommand('a', [], (user, x, y, z) => {
+	console.log(`Ha! ${user.displayName} does ${x} to the ${y} with the ${z}!`);
+});
+TwitchManager.onCommand('b', [User.isMod()], (user, x) => {
+	console.log(`b: ${user.displayName} does ${x}!`);
+});
+TwitchManager.onCommand('c', [User.isUser('fluxistence')], (user, x) => {
+	console.log(`c: ${user.displayName} does ${x}!`);
+});
+TwitchManager.onCommand('d', [User.isUser('yecatsmailbox')], (user, x) => {
+	console.log(`d: ${user.displayName} does ${x}!`);
+});
+TwitchManager.onCommand('e', [User.isAtLeastMod()], (user, x) => {
+	console.log(`e: ${user.displayName} does ${x}!`);
+});
+*/
+
+
+
+
+io.on('connection', socket => {
+	console.log('Client connected.');
+	socket.on('getUserImageList', () => getUserImageList(socket));
+	socket.on('getScripts', () => 
+		socket.emit('scriptList', EffectManager.clientEffects));
+	
+	socket.on('connectTo', scriptName => {
+		EffectManager.connectClient(scriptName, socket);
+	});
+	
+	// TODO: REMOVE!!! DEBUG ONLY!
+	socket.on('ask', request => {
+		socket.emit(request.event, request.data);
+	});
+});
 
 server.listen(PORT);
 console.log(`Listening on port ${PORT}...`);

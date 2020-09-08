@@ -20,7 +20,7 @@ var currentUsernames = {};
 var currentUserImages = {};
 
 var running = false;
-var showAll = true;
+var showAll = false;
 
 var config = {
 	type: Phaser.AUTO,
@@ -169,7 +169,7 @@ function updateUsers() {
 	});
 }
 
-socket = io();
+var socket = io();
 socket.on('userImageList', userList => {
 	existingUserFiles = userList;
 	loadUserImages();

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Scripted Effects</title>
+    <!-- This is to stop a weird "favicon" error.
+    	Solution taken from here:
+    	https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
+    <link rel="shortcut icon" href="#" />
+    
+    <style>
+    	body {
+    		margin: 0;
+    		padding: 0;
+    	}
+    	
+    	iframe {
+    		border: 0;
+    		width: 100%;
+    		height: 100%;
+    	}
+    	
+    	.frameholder {
+    		display: block;
+    		position: absolute;
+    		width: 100%;
+    		height: 100%;
+    		margin: 0;
+    		padding: 0;
+    		/*top:0px; left:0px*/
+    	}
+    	
+    	.framediv {
+    		display: block;
+    		position: absolute;
+    		width: 100%;
+    		height: 100%;
+    		margin: 0;
+    		padding: 0;
+    	}
+    </style>
+</head>
+
+<body>
+<div id="frames" class="frameholder"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="assert.js"></script>
+<script src="ScriptedEffects.js"></script>
+
+</body>
+</html>

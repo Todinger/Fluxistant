@@ -1,8 +1,12 @@
-var Effect = require('../../effect.js').Effect;
+var Effect = require('../../effect.js');
 
 class ChannelParty extends Effect {
 	constructor() {
-		super('Channel Party', 'party');
+		super({
+			name: 'Channel Party',
+			webname: 'party',
+			source: 'party.html',
+		});
 	}
 	
 	load() {
