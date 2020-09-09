@@ -34,9 +34,8 @@ function getUserImageList(socket) {
 // Load all the effects we have
 var Effect = require('./effect');
 var EffectManager = require('./effectManager');
-EffectManager.loadMainEffect();
 EffectManager.loadAll('/fx/', 'Effects', app, express);
-app.use('/fx', express.static(path.join(__dirname, 'public')));
+// app.use('/fx', express.static(path.join(__dirname, 'public')));
 
 var TwitchManager = require('./twitchManager');
 TwitchManager.init('fluxistence', 'fluxistant', 'oauth:luxvl6vwq0r0o9t03p7m1s3kf482lc');

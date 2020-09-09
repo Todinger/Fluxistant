@@ -1,9 +1,11 @@
-var Effect = require('../effect.js');
+var Effect = require('../../effect.js');
 
 class ScriptedEffects extends Effect {
 	constructor() {
 		super({
 			name: 'ScriptedEffects',
+			webname: 'ScriptedEffects',
+			source: 'ScriptedEffects.html',
 		});
 		
 		this.scriptsToShow = [

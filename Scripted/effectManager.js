@@ -54,11 +54,6 @@ class EffectManager {
 		console.log(`Loaded effect: ${effect.name}`);
 	}
 	
-	loadMainEffect() {
-		let fxfile = path.join('public', EFFECT_MAIN_FILENAME)
-		this._loadEffect('public', fxfile);
-	}
-	
 	loadAll(webPrefix, effectsdir, app, express) {
 		// Load all the effects in the given directory
 		let subdirs = getDirectories(effectsdir);
