@@ -167,6 +167,7 @@ class TwitchManager {
 	
 	_invokeEvent(eventName, ...args) {
 		assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
+		console.log(`Invoking event: ${eventName}`);
 		this._eventHandlers[eventName].forEach(callback => callback.apply(null, args));
 	}
 }
