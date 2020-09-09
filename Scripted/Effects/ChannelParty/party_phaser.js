@@ -1,9 +1,4 @@
 const FETCH_USERS_URL = 'https://tmi.twitch.tv/group/user/fluxistence/chatters';
-// const CORS_PROXY_URL = "http://localhost:8080/";
-const CORS_PROXY_URL = "https://cors-anywhere.herokuapp.com/";
-const USER_IMAGE_DIR = '../assets/user-images/';
-// const USER_IMAGE_DIR = '../../Images/User-Specific/';
-const USER_LIST_FILE = USER_IMAGE_DIR + '_Users.txt';
 const GLOW_SIZE = 15;
 const GLOW_COLOR = '#ffffcc';
 const UPDATE_INTERVAL = 1000;
@@ -26,12 +21,6 @@ var imagesLoadad = false;
 var config = {
 	type: Phaser.AUTO,
 	transparent: true,
-	// physics: {
-	// 	default: 'arcade',
-	// 	arcade: {
-	// 		gravity: { y: 200 }
-	// 	}
-	// },
 	physics: {
 		default: 'arcade'
 	},
@@ -65,22 +54,19 @@ function getSubKeys(obj1, obj2) {
 }
 
 function markAsLoaded(username) {
-	console.log(`markAsLoaded(${username})`);
 	if (!(username in existingUserFiles)) {
 		return;
 	}
 	
-	console.log(`*Fully* loaded image ${username}`);
 	existingUserFiles[username].loaded = true;
 	if (Object.values(existingUserFiles).reduce(
 		(soFar, currentUser) => soFar && currentUser.loaded, true)) {
-			console.log('Images *fully* loaded');
 			imagesLoadad = true;
 	}
 }
 
 function errorLoading(file) {
-	console.log(`Could not load file: ${file}`);
+	console.error(`Could not load file: ${file}`);
 }
 
 function preload()
@@ -90,22 +76,20 @@ function preload()
 	this.load.plugin('rexfadeplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfadeplugin.min.js', true);
 	this.load.on('filecomplete', (key, type, data) => markAsLoaded(key));
 	this.load.on('loaderror', errorLoading);
-	
-	console.log('preload finished');
 }
 
 function loadUserImages() {
 	Object.keys(existingUserFiles).forEach(username => {
 		scene.load.image(username, existingUserFiles[username].url);
-		console.log(`Loaded image ${username} from ${existingUserFiles[username].url}`);
 	});
 	
 	scene.load.start();
-	console.log('Images loaded');
 }
 
 function create()
 {
+	// TODO: Make the game scale with the window
+	
 	// game.scale.scaleMode = Phaser.Scale.ScaleManager.RESIZE;
 	// game.scale.parentIsWindow = true;
 	
@@ -126,7 +110,6 @@ function addImage(username) {
 	// let xpos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.width - IMAGE_SIZE / 2);
 	// let ypos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.height - IMAGE_SIZE / 2);
 	
-	console.log(`Adding image ${username}`);
 	let image = scene.physics.add.image(xpos, ypos, username);
 	image.displayWidth = IMAGE_SIZE;
 	image.scaleY = image.scaleX;
@@ -150,12 +133,9 @@ function addImage(username) {
 }
 
 function updateUserImages(newUsers) {
-	// console.log('New users:'); console.log(newUsers);
-	console.log('Users images update');
 	let newUsernames = {};
 	let newUserImages = {};
 	
-	// console.log('New users Images:'); console.log(newUserImages);
 	newUsers.forEach(username => {
 		if (userFileExists(username)) {
 			newUsernames[username] = existingUserFiles[username].url;
@@ -171,7 +151,6 @@ function updateUserImages(newUsers) {
 	let usersToRemove = getSubKeys(currentUsernames, newUsernames);
 	let usersToAdd = getSubKeys(newUsernames, currentUsernames);
 	
-	// console.log('To remove:'); console.log(usersToRemove);
 	usersToRemove.forEach(username => {
 		let image = currentUserImages[username];
 		scene.tweens.add({
@@ -187,7 +166,6 @@ function updateUserImages(newUsers) {
 		delete currentUserImages[username];
 	});
 	
-	// console.log('To add:'); console.log(usersToAdd);
 	usersToAdd.forEach(username => {
 		currentUsernames[username] = newUsernames[username];
 		currentUserImages[username] = addImage(username);
@@ -195,17 +173,6 @@ function updateUserImages(newUsers) {
 }
 
 function updateUsers() {
-	// doCORSGet(FETCH_USERS_URL, function(data) {
-	// 	if (!imagesLoadad) {
-	// 		return;
-	// 	}
-		
-	// 	chattersData = JSON.parse(data);
-	// 	let newUsers = [];
-	// 	Object.values(chattersData.chatters).forEach(
-	// 		groupUsers => newUsers.push(...groupUsers));
-	// 	updateUserImages(newUsers);
-	// });
 	$.ajax({
 		url: FETCH_USERS_URL,
 		dataType: "jsonp",
@@ -227,7 +194,6 @@ socket.on('userImageList', userList => {
 		};
 	});
 	
-	// existingUserFiles = userList;
 	loadUserImages();
 	if (!running) {
 		running = true;
