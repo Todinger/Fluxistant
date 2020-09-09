@@ -79,8 +79,9 @@ io.on('connection', socket => {
 	socket.on('getScripts', () => 
 		socket.emit('scriptList', EffectManager.clientEffects));
 	
-	socket.on('connectTo', scriptName => {
-		EffectManager.connectClient(scriptName, socket);
+	socket.on('attachTo', scriptName => {
+		console.log(`Attaching client to ${scriptName}`);
+		EffectManager.attachClient(scriptName, socket);
 	});
 	
 	// TODO: REMOVE!!! DEBUG ONLY!

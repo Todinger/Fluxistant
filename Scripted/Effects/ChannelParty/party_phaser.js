@@ -288,7 +288,7 @@ class ChannelParty {
 			this.loadUserImages();
 		});
 
-		this.socket.emit('connectTo', 'Channel Party');
+		this.socket.emit('attachTo', 'Channel Party');
 
 		this.socket.on('hide', () => {
 			$('#gameContainer').fadeOut(ChannelParty.FADE_DURATION);

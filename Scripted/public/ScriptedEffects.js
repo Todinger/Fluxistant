@@ -43,9 +43,9 @@ socket.on('show', scriptName => {
 	getScript(scriptName).frame.fadeIn(FADE_TIME);
 });
 
-socket.emit('connectTo', 'ScriptedEffects');
+socket.emit('attachTo', 'ScriptedEffects');
 
-socket.emit('getScripts');
+// socket.emit('getScripts');
 
 function ask(event, data) {
 	socket.emit('ask', { event, data });

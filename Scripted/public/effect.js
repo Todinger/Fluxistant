@@ -8,11 +8,23 @@ class ScriptedEffects extends Effect {
 		
 		this.scriptsToShow = [
 			'Channel Party',
-			'Parrot Mate',
+			// 'Parrot Mate',
 		];
+		
+		this.scriptsData = {};
 	}
 	
-	load() {
+	postload() {
+		Object.keys(this.effectManager.clientEffects).forEach(effectName => {
+			if (this.scriptsToShow.includes(effectName)) {
+				this.scriptsData[effectName] =
+					this.effectManager.clientEffects[effectName];
+			}
+		});
+		
+		this._onClientAttached(socket => {
+			socket.emit('scriptList', this.scriptsData);
+		});
 	}
 }
 

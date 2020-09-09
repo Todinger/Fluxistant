@@ -7,31 +7,36 @@ class Effect {
 		this.webname = description.webname;
 		this.source = description.source;
 		this.zindex = description.zindex;
+		this.effectManager = null;
 		
-		this._clientConnectedHandlers = [];
+		this._clientAttachedHandlers = [];
 		this._clientDisconnectedHandlers = [];
 		this._connectedClients = {};
 	}
 	
 	load() {
-		throw "Abstract effect loaded.";
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	postload() {
+		// Do nothing by default (for overriding where needed)
 	}
 	
 	registerCommand(cmdname, filters, callback) {
 		TwitchManager.onCommand(cmdname, filters, callback);
 	}
 	
-	clientConnected(socket) {
+	attachClient(socket) {
 		this._connectedClients[socket.id] = socket;
 		socket.on('disconnect', () => {
 			this._clientDisconnectedHandlers.forEach(handler => handler(socket));
 			delete this._connectedClients[socket.id];
 		});
-		this._clientConnectedHandlers.forEach(handler => handler(socket));
+		this._clientAttachedHandlers.forEach(handler => handler(socket));
 	}
 	
-	_onClientConnected(handler) {
-		this._clientConnectedHandlers.push(handler);
+	_onClientAttached(handler) {
+		this._clientAttachedHandlers.push(handler);
 	}
 	
 	_onClientDisconnected(handler) {

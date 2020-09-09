@@ -48,6 +48,7 @@ class EffectManager {
 		}
 		
 		effect.load();
+		effect.effectManager = this;
 		this.effects[effect.name] = effect;
 		
 		console.log(`Loaded effect: ${effect.name}`);
@@ -59,7 +60,6 @@ class EffectManager {
 	}
 	
 	loadAll(webPrefix, effectsdir, app, express) {
-		
 		// Load all the effects in the given directory
 		let subdirs = getDirectories(effectsdir);
 		subdirs.forEach(subdir => {
@@ -69,11 +69,19 @@ class EffectManager {
 				this._loadEffect(fxdir, fxfile, webPrefix, app, express);
 			}
 		});
+		
+		this.postloadAll();
 	}
 	
-	connectClient(effectName, socket) {
+	postloadAll() {
+		Object.values(this.effects).forEach(effect => {
+			effect.postload();
+		});
+	}
+	
+	attachClient(effectName, socket) {
 		assert(this.nameExists(effectName), `Unknown effect: ${effectName}`);
-		this.effects[effectName].clientConnected(socket);
+		this.effects[effectName].attachClient(socket);
 	}
 }
 
