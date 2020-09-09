@@ -7,28 +7,38 @@ const COMMAND_PREFIX = '!';
 class TwitchManager {
 	constructor() {
 		this._eventHandlers = {
-			message: [],	// (user, message)
-			command: [],	// (user, cmdname, args)
-			action: [],		// (user, message)
-			follow: [],
-			cheer: [],
-			tip: [],
-			host: [],
-			raid: [],
-			channelReward: [],
-			userJoin: [],
-			userLeave: [],
-			userFirstMessage: [],
-			userReturnMessage: [],
-			streamStart: [],
-			streamEnd: [],
-			userInactive: [],
-			userActiveAgain: [],
-			sub: [],
-			resub: [],
-			giftSub: [],
-			kick: [],
-			ban: [],
+			// On the right are the arguments that handlers of
+			// each event should accept
+			// Their types and meaning are denoted by their names:
+			// - user:		User object, which contains their data as well as a
+			// 				full userstate object from which the data was taken
+			// - message:	Text message (string)
+			// - cmdname:	The name of a command (string, doesn't include the
+			// 				command character)
+			// - args:		Additional arguments, used in commands
+			
+			message: [],			// (user, message)
+			command: [],			// (user, cmdname, args)
+			action: [],				// (user, message)
+			follow: [],				// 
+			cheer: [],				// 
+			tip: [],				// 
+			host: [],				// 
+			raid: [],				// 
+			channelReward: [],		// 
+			userJoined: [],			// (username)
+			userLeft: [],			// (username)
+			userFirstMessage: [],	// 
+			userReturnMessage: [],	// 
+			streamStart: [],		// 
+			streamEnd: [],			// 
+			userInactive: [],		// 
+			userActiveAgain: [],	// 
+			sub: [],				// 
+			resub: [],				// 
+			giftSub: [],			// 
+			kick: [],				// 
+			ban: [],				// 
 		}
 		
 		this._commandHandlers = {};
@@ -55,14 +65,22 @@ class TwitchManager {
 		
 		this.client.connect().catch(console.error);
 		
+		this._registerAllEvents();
+	}
+	
+	_registerAllEvents() {
 		let _this = this;
 		
 		this.client.on('message', (channel, userstate, message, self) => {
 			this._processMessage(userstate, message, self);
 		});
+		this.client.on('join', (channel, username, self) => {
+			this._invokeEvent('userJoined', username);
+		});
+		this.client.on('part', (channel, username, self) => {
+			this._invokeEvent('userLeft', username);
+		});
 	}
-	
-	
 	
 	say(msg) {
 		this.client.say(this.channel, msg);

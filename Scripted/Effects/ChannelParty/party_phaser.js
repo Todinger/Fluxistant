@@ -11,12 +11,14 @@ const VELOCITY_X = 600;
 const VELOCITY_Y = 600;
 
 var existingUserFiles = {};
-var currentUsernames = {};
 var currentUserImages = {};
 
 var running = false;
 var showAll = false;
 var imagesLoadad = false;
+var userlistLoadad = false;
+var allReady = false;
+var socket = io();
 
 var config = {
 	type: Phaser.AUTO,
@@ -53,6 +55,54 @@ function getSubKeys(obj1, obj2) {
 	});
 }
 
+function updateAllReady() {
+	// This is to make sure we don't mark ourselves as ready more than once
+	if (allReady) {
+		return;
+	}
+	
+	allReady = imagesLoadad && userlistLoadad;
+	if (allReady) {
+		socket.on('userJoined', username => {
+			console.log(`User joined: ${username}; present = ${username in currentUserImages}`);
+			if (username in currentUserImages) {
+				return;
+			}
+			
+			currentUserImages[username] = addImage(username);
+		});
+		
+		socket.on('userLeft', username => {
+			console.log(`User left: ${username}; present = ${username in currentUserImages}`);
+			if (!(username in currentUserImages)) {
+				return;
+			}
+			
+			let image = currentUserImages[username];
+			scene.tweens.add({
+				targets: image,
+				alpha: 0,
+				duration: FADE_DURATION,
+				onComplete: () => {
+					image.destroy();
+				},
+			});
+			
+			delete currentUserImages[username];
+		});
+	}
+}
+
+function markUserlistLoaded() {
+	userlistLoadad = true;
+	updateAllReady();
+}
+
+function markImagesLoaded() {
+	imagesLoadad = true;
+	updateAllReady();
+}
+
 function markAsLoaded(username) {
 	if (!(username in existingUserFiles)) {
 		return;
@@ -61,7 +111,7 @@ function markAsLoaded(username) {
 	existingUserFiles[username].loaded = true;
 	if (Object.values(existingUserFiles).reduce(
 		(soFar, currentUser) => soFar && currentUser.loaded, true)) {
-			imagesLoadad = true;
+			markImagesLoaded();
 	}
 }
 
@@ -148,8 +198,8 @@ function updateUserImages(newUsers) {
 		});
 	}
 	
-	let usersToRemove = getSubKeys(currentUsernames, newUsernames);
-	let usersToAdd = getSubKeys(newUsernames, currentUsernames);
+	let usersToRemove = getSubKeys(currentUserImages, newUsernames);
+	let usersToAdd = getSubKeys(newUsernames, currentUserImages);
 	
 	usersToRemove.forEach(username => {
 		let image = currentUserImages[username];
@@ -162,12 +212,10 @@ function updateUserImages(newUsers) {
 			},
 		});
 		
-		delete currentUsernames[username];
 		delete currentUserImages[username];
 	});
 	
 	usersToAdd.forEach(username => {
-		currentUsernames[username] = newUsernames[username];
 		currentUserImages[username] = addImage(username);
 	});
 }
@@ -177,6 +225,10 @@ function updateUsers() {
 		url: FETCH_USERS_URL,
 		dataType: "jsonp",
 		success: function( response ) {
+			if (!allReady) {
+				return;
+			}
+			
 			let newUsers = [];
 			Object.values(response.data.chatters).forEach(
 				groupUsers => newUsers.push(...groupUsers));
@@ -185,7 +237,9 @@ function updateUsers() {
 	});
 }
 
-var socket = io();
+
+// Start all the network stuff
+
 socket.on('userImageList', userList => {
 	Object.keys(userList).forEach(user => {
 		existingUserFiles[user] = {
@@ -194,11 +248,12 @@ socket.on('userImageList', userList => {
 		};
 	});
 	
+	markUserlistLoaded();
 	loadUserImages();
 	if (!running) {
 		running = true;
 		updateUsers();
-		setInterval(updateUsers, UPDATE_INTERVAL);
+		// setInterval(updateUsers, UPDATE_INTERVAL);
 	}
 });
 
