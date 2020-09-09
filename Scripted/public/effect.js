@@ -5,15 +5,14 @@ class ScriptedEffects extends Effect {
 		super({
 			name: 'ScriptedEffects',
 		});
+		
+		this.scriptsToShow = [
+			'Channel Party',
+			'Parrot Mate',
+		];
 	}
 	
 	load() {
-		this.registerCommand('s', [Effect.Filters.isAtLeastMod()], user => {
-			this._broadcastEvent('show', 'Channel Party');
-		});
-		this.registerCommand('h', [Effect.Filters.isAtLeastMod()], user => {
-			this._broadcastEvent('hide', 'Channel Party');
-		});
 	}
 }
 

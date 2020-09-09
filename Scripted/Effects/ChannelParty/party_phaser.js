@@ -21,6 +21,7 @@ var currentUserImages = {};
 
 var running = false;
 var showAll = false;
+var imagesLoadad = false;
 
 var config = {
 	type: Phaser.AUTO,
@@ -34,6 +35,7 @@ var config = {
     physics: {
         default: 'arcade'
     },
+    parent: 'gameContainer',
 	width: 1920,
 	height: 1080,
 	scene: {
@@ -42,7 +44,8 @@ var config = {
 	}
 };
 
-var game = new Phaser.Game(config);
+// var game = new Phaser.Game(config);
+var game = null;
 
 var scene = null;
 
@@ -62,19 +65,58 @@ function getSubKeys(obj1, obj2) {
 	});
 }
 
+function markAsLoaded(username) {
+	console.log(`markAsLoaded(${username})`);
+	if (!(username in existingUserFiles)) {
+		return;
+	}
+	
+	console.log(`*Fully* loaded image ${username}`);
+	existingUserFiles[username].loaded = true;
+	if (Object.values(existingUserFiles).reduce(
+		(soFar, currentUser) => soFar && currentUser.loaded, true)) {
+			console.log('Images *fully* loaded');
+			imagesLoadad = true;
+	}
+}
+
+function errorLoading(file) {
+	console.log(`Could not load file: ${file}`);
+}
+
 function preload()
 {
 	scene = this;
 	
 	this.load.plugin('rexfadeplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfadeplugin.min.js', true);
+	this.load.on('filecomplete', (key, type, data) => markAsLoaded(key));
+	this.load.on('loaderror', errorLoading);
 	
+	
+	Object.keys(existingUserFiles).forEach(username => {
+		// scene.load.on(`filecomplete-image-${username}`, (key, type, data) => {
+		// 	markAsLoaded(username);
+		// });
+		
+		scene.load.image(username, existingUserFiles[username].url);
+		console.log(`Loaded image ${username} from ${existingUserFiles[username].url}`);
+	});
+	
+	console.log('preload finished');
 	// this.load.setBaseURL(USER_IMAGE_DIR);
 }
 
 function loadUserImages() {
 	Object.keys(existingUserFiles).forEach(username => {
-		scene.load.image(username, existingUserFiles[username]);
+		// scene.load.on(`filecomplete-image-${username}`, (key, type, data) => {
+		// 	markAsLoaded(username);
+		// });
+		
+		scene.load.image(username, existingUserFiles[username].url);
+		console.log(`Loaded image ${username} from ${existingUserFiles[username].url}`);
 	});
+	
+	console.log('Images loaded');
 }
 
 function create()
@@ -99,9 +141,14 @@ function addImage(username) {
 	// let xpos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.width - IMAGE_SIZE / 2);
 	// let ypos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.height - IMAGE_SIZE / 2);
 	
+	console.log(`Adding image ${username}`);
 	let image = scene.physics.add.image(xpos, ypos, username);
 	image.displayWidth = IMAGE_SIZE;
 	image.scaleY = image.scaleX;
+	
+	if (image.texture.key == "__MISSING") {
+		console.log(`Image missing for ${username}`);
+	}
 	
 	image.body.velocity.setTo(randomVelocity(), randomVelocity());
 	image.body.collideWorldBounds = true;
@@ -119,18 +166,21 @@ function addImage(username) {
 
 function updateUserImages(newUsers) {
 	// console.log('New users:'); console.log(newUsers);
+	console.log('Users images update');
 	let newUsernames = {};
 	let newUserImages = {};
 	
 	// console.log('New users Images:'); console.log(newUserImages);
 	newUsers.forEach(username => {
 		if (userFileExists(username)) {
-			newUsernames[username] = existingUserFiles[username];
+			newUsernames[username] = existingUserFiles[username].url;
 		}
 	});
 	
 	if (showAll) {
-		newUsernames = existingUserFiles;
+		Object.keys(existingUserFiles).forEach(user => {
+			newUsernames[user] = existingUserFiles[user].url;
+		});
 	}
 	
 	let usersToRemove = getSubKeys(currentUsernames, newUsernames);
@@ -161,6 +211,10 @@ function updateUserImages(newUsers) {
 
 function updateUsers() {
 	doCORSGet(FETCH_USERS_URL, function(data) {
+		if (!imagesLoadad) {
+			return;
+		}
+		
 		chattersData = JSON.parse(data);
 		let newUsers = [];
 		Object.values(chattersData.chatters).forEach(
@@ -169,15 +223,45 @@ function updateUsers() {
 	});
 }
 
-var socket = io();
-socket.on('userImageList', userList => {
-	existingUserFiles = userList;
-	loadUserImages();
+function startAll() {
 	if (!running) {
 		running = true;
 		updateUsers();
 		setInterval(updateUsers, UPDATE_INTERVAL);
 	}
+}
+
+var socket = io();
+socket.on('userImageList', userList => {
+	Object.keys(userList).forEach(user => {
+		existingUserFiles[user] = {
+			url: userList[user],
+			loaded: false,
+		};
+	});
+	
+	var game = new Phaser.Game(config);
+	setTimeout(startAll, 1000);
+	
+	// existingUserFiles = userList;
+	// loadUserImages();
+	// if (!running) {
+	// 	running = true;
+	// 	updateUsers();
+	// 	setInterval(updateUsers, UPDATE_INTERVAL);
+	// }
+});
+
+socket.emit('connectTo', 'Channel Party');
+
+socket.on('hide', () => {
+	console.log('Hiding');
+	$('#gameContainer').fadeOut(FADE_DURATION);
+});
+
+socket.on('show', () => {
+	console.log('Showing');
+	$('#gameContainer').fadeIn(FADE_DURATION);
 });
 
 socket.emit('getUserImageList');

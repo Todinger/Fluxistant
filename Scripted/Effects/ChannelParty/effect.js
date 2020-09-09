@@ -10,6 +10,12 @@ class ChannelParty extends Effect {
 	}
 	
 	load() {
+		this.registerCommand('a', [Effect.Filters.isUser('fluxistence')], user => {
+			this._broadcastEvent('show', 'Channel Party');
+		});
+		this.registerCommand('b', [Effect.Filters.isUser('fluxistence')], user => {
+			this._broadcastEvent('hide', 'Channel Party');
+		});
 	}
 }
 
