@@ -32,10 +32,10 @@ var config = {
 	// 		gravity: { y: 200 }
 	// 	}
 	// },
-    physics: {
-        default: 'arcade'
-    },
-    parent: 'gameContainer',
+	physics: {
+		default: 'arcade'
+	},
+	parent: 'gameContainer',
 	width: 1920,
 	height: 1080,
 	scene: {
@@ -195,16 +195,26 @@ function updateUserImages(newUsers) {
 }
 
 function updateUsers() {
-	doCORSGet(FETCH_USERS_URL, function(data) {
-		if (!imagesLoadad) {
-			return;
-		}
+	// doCORSGet(FETCH_USERS_URL, function(data) {
+	// 	if (!imagesLoadad) {
+	// 		return;
+	// 	}
 		
-		chattersData = JSON.parse(data);
-		let newUsers = [];
-		Object.values(chattersData.chatters).forEach(
-			groupUsers => newUsers.push(...groupUsers));
-		updateUserImages(newUsers);
+	// 	chattersData = JSON.parse(data);
+	// 	let newUsers = [];
+	// 	Object.values(chattersData.chatters).forEach(
+	// 		groupUsers => newUsers.push(...groupUsers));
+	// 	updateUserImages(newUsers);
+	// });
+	$.ajax({
+		url: FETCH_USERS_URL,
+		dataType: "jsonp",
+		success: function( response ) {
+			let newUsers = [];
+			Object.values(response.data.chatters).forEach(
+				groupUsers => newUsers.push(...groupUsers));
+			updateUserImages(newUsers);
+		}
 	});
 }
 
