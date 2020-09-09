@@ -1,7 +1,6 @@
 const FETCH_USERS_URL = 'https://tmi.twitch.tv/group/user/fluxistence/chatters';
 const GLOW_SIZE = 15;
 const GLOW_COLOR = '#ffffcc';
-const UPDATE_INTERVAL = 1000;
 
 // Assumes Math.floor(max) >= Math.ceil(min)
 function randomInt(min, max) {
@@ -66,7 +65,6 @@ class ChannelParty {
 		};
 		
 		this.game = new Phaser.Game(config);
-		console.log('Phaser game started.');
 	}
 	
 	preload(scene) {
@@ -89,8 +87,6 @@ class ChannelParty {
 		
 		this.allReady = this.imagesLoadad && this.userlistLoadad;
 		if (this.allReady) {
-			console.log('All ready');
-			console.log(this.currentUserImages);
 			this.processInitialUsers();
 			
 			this.socket.on('userJoined', username => {
@@ -132,13 +128,11 @@ class ChannelParty {
 	}
 	
 	markUserlistLoaded() {
-		console.log('Userlist loaded');
 		this.userlistLoadad = true;
 		this.updateAllReady();
 	}
 
 	markImagesLoaded() {
-		console.log('Images loaded');
 		this.imagesLoadad = true;
 		this.updateAllReady();
 	}
@@ -213,13 +207,10 @@ class ChannelParty {
 	}
 	
 	processInitialUsers() {
-		console.log('Adding all initial images.');
 		Object.keys(this.currentUsersInChat).forEach(username => {
-			console.log(`Processing ${username}`);
 			let hasImage = username in this.existingUserFiles;
 			this.currentUsersInChat[username] = hasImage;
 			if (hasImage) {
-				console.log(`${username} has an image!`);
 				this.currentUserImages[username] = this.addImage(username);
 			}
 		});
@@ -272,8 +263,6 @@ class ChannelParty {
 				let newUsers = [];
 				Object.values(response.data.chatters).forEach(
 					groupUsers => newUsers.push(...groupUsers));
-				console.log('Initial users:');
-				console.log(newUsers);
 				newUsers.forEach(username => {
 					_this.currentUsersInChat[username] = null;
 				});
@@ -297,28 +286,19 @@ class ChannelParty {
 			});
 			
 			this.loadUserImages();
-			// if (!this.running) {
-			// 	this.running = true;
-			// 	this.updateUsers();
-			// 	// setInterval(updateUsers, UPDATE_INTERVAL);
-			// }
 		});
 
 		this.socket.emit('connectTo', 'Channel Party');
 
 		this.socket.on('hide', () => {
-			console.log('Hiding');
 			$('#gameContainer').fadeOut(ChannelParty.FADE_DURATION);
 		});
 
 		this.socket.on('show', () => {
-			console.log('Showing');
 			$('#gameContainer').fadeIn(ChannelParty.FADE_DURATION);
 		});
 
 		this.socket.emit('getUserImageList');
-		
-		console.log('Network started.');
 	}
 	
 	start() {
