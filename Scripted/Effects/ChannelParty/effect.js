@@ -10,6 +10,12 @@ class ChannelParty extends Effect {
 	}
 	
 	load() {
+		this._onTwitchEvent('userJoined', username => {
+			this._broadcastEvent('userJoined', username);
+		});
+		this._onTwitchEvent('userLeft', username => {
+			this._broadcastEvent('userLeft', username);
+		});
 		this.registerCommand('a', [Effect.Filters.isUser('fluxistence')], user => {
 			this._broadcastEvent('show', 'Channel Party');
 		});

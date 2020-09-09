@@ -13,12 +13,6 @@ class ScriptedEffects extends Effect {
 	}
 	
 	load() {
-		this._onTwitchEvent('userJoined', username => {
-			this._broadcastEvent('userJoined', username);
-		});
-		this._onTwitchEvent('userLeft', username => {
-			this._broadcastEvent('userLeft', username);
-		});
 	}
 }
 
