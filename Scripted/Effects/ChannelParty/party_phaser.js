@@ -44,8 +44,7 @@ var config = {
 	}
 };
 
-// var game = new Phaser.Game(config);
-var game = null;
+var game = new Phaser.Game(config);
 
 var scene = null;
 
@@ -92,30 +91,16 @@ function preload()
 	this.load.on('filecomplete', (key, type, data) => markAsLoaded(key));
 	this.load.on('loaderror', errorLoading);
 	
-	
-	Object.keys(existingUserFiles).forEach(username => {
-		// scene.load.on(`filecomplete-image-${username}`, (key, type, data) => {
-		// 	markAsLoaded(username);
-		// });
-		
-		scene.load.image(username, existingUserFiles[username].url);
-		console.log(`Loaded image ${username} from ${existingUserFiles[username].url}`);
-	});
-	
 	console.log('preload finished');
-	// this.load.setBaseURL(USER_IMAGE_DIR);
 }
 
 function loadUserImages() {
 	Object.keys(existingUserFiles).forEach(username => {
-		// scene.load.on(`filecomplete-image-${username}`, (key, type, data) => {
-		// 	markAsLoaded(username);
-		// });
-		
 		scene.load.image(username, existingUserFiles[username].url);
 		console.log(`Loaded image ${username} from ${existingUserFiles[username].url}`);
 	});
 	
+	scene.load.start();
 	console.log('Images loaded');
 }
 
@@ -223,14 +208,6 @@ function updateUsers() {
 	});
 }
 
-function startAll() {
-	if (!running) {
-		running = true;
-		updateUsers();
-		setInterval(updateUsers, UPDATE_INTERVAL);
-	}
-}
-
 var socket = io();
 socket.on('userImageList', userList => {
 	Object.keys(userList).forEach(user => {
@@ -240,16 +217,13 @@ socket.on('userImageList', userList => {
 		};
 	});
 	
-	var game = new Phaser.Game(config);
-	setTimeout(startAll, 1000);
-	
 	// existingUserFiles = userList;
-	// loadUserImages();
-	// if (!running) {
-	// 	running = true;
-	// 	updateUsers();
-	// 	setInterval(updateUsers, UPDATE_INTERVAL);
-	// }
+	loadUserImages();
+	if (!running) {
+		running = true;
+		updateUsers();
+		setInterval(updateUsers, UPDATE_INTERVAL);
+	}
 });
 
 socket.emit('connectTo', 'Channel Party');
