@@ -193,6 +193,8 @@ class ChannelParty extends EffectClient {
 		this.socket = null;
 		this.game = null;
 		this.scene = null;
+		this.useParticles = true;
+		this.particles = null;
 		
 		this.sounds.loadSounds(soundData, true);
 		
@@ -233,11 +235,69 @@ class ChannelParty extends EffectClient {
 		
 		scene.load.on('filecomplete', (key, type, data) => this.markAsLoaded(key));
 		scene.load.on('loaderror', this.errorLoading);
+		scene.load.atlas(
+			'flares',
+			'assets/flares.png',
+			'assets/flares.json');
+	}
+	
+	create(scene)
+	{
+		// TODO: Make the game scale with the window
+		
+		// game.scale.scaleMode = Phaser.Scale.ScaleManager.RESIZE;
+		// game.scale.parentIsWindow = true;
+		
+		// game.physics.startSystem(Phaser.Physics.ARCADE);
+		// game.physics.enable(image, Phaser.Physics.ARCADE);
+		
+		scene.physics.world.setBoundsCollision(true, true, true, true);
+		this.particles = scene.add.particles('flares');
 	}
 	
 	randomVelocity() {
 		return randomSign() *
 			randomInt(ChannelParty.VELOCITY_MIN, ChannelParty.VELOCITY_MAX);
+	}
+	
+	addUser(username) {
+		let hasImage = username in this.existingUserFiles;
+		this.currentUsersInChat[username] = hasImage;
+		if ((username in this.currentUserImages) || !hasImage) {
+			return;
+		}
+		
+		this.currentUserImages[username] = this.addImage(username);
+	}
+	
+	removeUser(username) {
+		if (!(username in this.currentUsersInChat)) {
+			return;
+		}
+		
+		delete this.currentUsersInChat[username];
+		
+		if (!(username in this.currentUserImages)) {
+			return;
+		}
+		
+		let image = this.currentUserImages[username];
+		
+		if (image.emitter) {
+			image.emitter.on = false;
+			setTimeout(() => this.particles.emitters.remove(image.emitter), 2000);
+		}
+		
+		this.scene.tweens.add({
+			targets: image,
+			alpha: 0,
+			duration: ChannelParty.FADE_DURATION,
+			onComplete: () => {
+				image.destroy();
+			},
+		});
+		
+		delete this.currentUserImages[username];
 	}
 	
 	updateAllReady() {
@@ -254,41 +314,8 @@ class ChannelParty extends EffectClient {
 				this.processInitialUsers();
 			}
 			
-			this.server.on('userJoined', username => {
-				console.log(`User joined: ${username}; present = ${username in this.currentUserImages}`);
-				let hasImage = username in this.existingUserFiles;
-				this.currentUsersInChat[username] = hasImage;
-				if ((username in this.currentUserImages) || !hasImage) {
-					return;
-				}
-				
-				this.currentUserImages[username] = this.addImage(username);
-			});
-			
-			this.server.on('userLeft', username => {
-				console.log(`User left: ${username}; present = ${username in this.currentUserImages}`);
-				if (!(username in this.currentUsersInChat)) {
-					return;
-				}
-				
-				delete this.currentUsersInChat[username];
-				
-				if (!(username in this.currentUserImages)) {
-					return;
-				}
-				
-				let image = this.currentUserImages[username];
-				this.scene.tweens.add({
-					targets: image,
-					alpha: 0,
-					duration: ChannelParty.FADE_DURATION,
-					onComplete: () => {
-						image.destroy();
-					},
-				});
-				
-				delete this.currentUserImages[username];
-			});
+			this.server.on('userJoined', username => this.addUser(username));
+			this.server.on('userLeft', username => this.removeUser(username));
 		}
 	}
 	
@@ -296,12 +323,12 @@ class ChannelParty extends EffectClient {
 		this.userlistLoadad = true;
 		this.updateAllReady();
 	}
-
+	
 	markImagesLoaded() {
 		this.imagesLoadad = true;
 		this.updateAllReady();
 	}
-
+	
 	markAsLoaded(username) {
 		if (!(username in this.existingUserFiles)) {
 			return;
@@ -313,7 +340,7 @@ class ChannelParty extends EffectClient {
 				this.markImagesLoaded();
 		}
 	}
-
+	
 	errorLoading(file) {
 		console.error(`Could not load file: ${file}`);
 	}
@@ -324,19 +351,6 @@ class ChannelParty extends EffectClient {
 		});
 		
 		this.scene.load.start();
-	}
-
-	create()
-	{
-		// TODO: Make the game scale with the window
-		
-		// game.scale.scaleMode = Phaser.Scale.ScaleManager.RESIZE;
-		// game.scale.parentIsWindow = true;
-		
-		// game.physics.startSystem(Phaser.Physics.ARCADE);
-		// game.physics.enable(image, Phaser.Physics.ARCADE);
-		
-		this.scene.physics.world.setBoundsCollision(true, true, true, true);
 	}
 
 	userFileExists(username) {
@@ -360,8 +374,30 @@ class ChannelParty extends EffectClient {
 		image.body.velocity.setTo(this.randomVelocity(), this.randomVelocity());
 		image.body.collideWorldBounds = true;
 		image.body.bounce.set(1);
-		
 		image.alpha = 0;
+		
+		
+		if (this.useParticles) {
+			// Add a particle emitter and attach it to the image (also save
+			// a reference to it inside the image object for convenience)
+			image.emitter = this.particles.createEmitter({
+				frame: 'white',
+				tint: [
+					0xff0000,	// Red
+					0xff7f00,	// Orange
+					0xffff00,	// Yellow
+					0x00ff00,	// Green
+					0x0000ff,	// Blue
+					0xff7f00,	// Indigo
+					0x8b00ff,	// Violet
+				],
+				speed: 100,
+				gravity: { x: 0, y: 200 },
+				scale: { start: 0.1, end: 0.4 },
+				follow: image,
+			});
+		}
+		
 		this.scene.tweens.add({
 			targets: image,
 			alpha: 1,
@@ -466,7 +502,7 @@ class ChannelParty extends EffectClient {
 
 const SOUNDS = {
 	'hypemusic': {
-		location: 'HypeMusic.mp3',
+		location: 'assets/HypeMusic.mp3',
 		loop: true,
 	},
 };
@@ -474,9 +510,9 @@ const SOUNDS = {
 const HYPE_DATA = {
 	music: 'hypemusic',
 	levels: [
-		new ImageHypeLevel('Sonic.jpg'),
-		new ImageHypeLevel('Mario.jpg'),
-		new ImageHypeLevel('Portal.jpg'),
+		new ImageHypeLevel('assets/Sonic.jpg'),
+		new ImageHypeLevel('assets/Mario.jpg'),
+		new ImageHypeLevel('assets/Portal.jpg'),
 	],
 };
 
