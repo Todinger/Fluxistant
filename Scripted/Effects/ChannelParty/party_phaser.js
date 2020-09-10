@@ -2,7 +2,7 @@ const FETCH_USERS_URL = 'https://tmi.twitch.tv/group/user/fluxistence/chatters';
 const GLOW_SIZE = 15;
 const GLOW_COLOR = '#ffffcc';
 
-var showAllImages = true;
+var showAllImages = false;
 
 // Assumes Math.floor(max) >= Math.ceil(min)
 function randomInt(min, max) {
