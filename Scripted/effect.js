@@ -14,6 +14,14 @@ class Effect {
 		this._connectedClients = {};
 	}
 	
+	_onClientAttached(handler) {
+		this._clientAttachedHandlers.push(handler);
+	}
+	
+	_onClientDisconnected(handler) {
+		this._clientDisconnectedHandlers.push(handler);
+	}
+	
 	load() {
 		// Do nothing by default (for overriding where needed)
 	}
@@ -35,22 +43,29 @@ class Effect {
 		this._clientAttachedHandlers.forEach(handler => handler(socket));
 	}
 	
-	_onClientAttached(handler) {
-		this._clientAttachedHandlers.push(handler);
-	}
-	
-	_onClientDisconnected(handler) {
-		this._clientDisconnectedHandlers.push(handler);
-	}
-	
-	_broadcastEvent(eventName, args) {
+	broadcastEvent(eventName, args) {
 		Object.values(this._connectedClients).forEach(socket => {
 			socket.emit(eventName, args);
 		});
 	}
 	
-	_onTwitchEvent(eventName, callback) {
+	onTwitchEvent(eventName, callback) {
 		TwitchManager.on(eventName, callback);
+	}
+	
+	// Simple = up to one argument
+	forwardSimpleCommand(cmdname, filters) {
+		this.registerCommand(cmdname, filters, (user, arg) => {
+			this.broadcastEvent(cmdname, arg);
+		});
+	}
+	
+	// Simple = up to one argument
+	forwardSimpleTwitchEvent(eventName) {
+		this.onTwitchEvent(eventName, arg => {
+			// Add the name of the event to 
+			this.broadcastEvent(eventName, arg);
+		});
 	}
 	
 	static get Filters() {

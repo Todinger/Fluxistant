@@ -105,11 +105,11 @@ class TwitchManager {
 	
 	
 	
-	_isKnownCommand(msg) {
-		return msg.startsWith(COMMAND_PREFIX);
-	}
-	
-	_invokeCommand(user, msg, userstate) {
+	_parseCommand(msg) {
+		if (!msg.startsWith(COMMAND_PREFIX)) {
+			return null;
+		}
+		
 		// Ditch the command prefix
 		msg = msg.substring(COMMAND_PREFIX.length);
 		
@@ -118,10 +118,22 @@ class TwitchManager {
 		let parts = msg.split(' ');
 		let cmdname = parts[0];
 		let args = parts.slice(1);
-		let fullargs = [user].concat(args);
+		
+		return {
+			cmdname,
+			args,
+		};
+	}
+	
+	_isKnownCommand(command) {
+		return command !== null && command.cmdname in this._commandHandlers;
+	}
+	
+	_invokeCommand(user, msg, command) {
+		let fullargs = [user].concat(command.args);
 		
 		// Invoke the specific command handlers
-		this._commandHandlers[cmdname].forEach(handler => {
+		this._commandHandlers[command.cmdname].forEach(handler => {
 			if (handler.filters.reduce(
 				(soFar, currentFilter) => soFar && currentFilter(user), true)) {
 					handler.callback.apply(null, fullargs);
@@ -129,7 +141,7 @@ class TwitchManager {
 		});
 		
 		// Invoke the general command handlers
-		this._invokeEvent('command', user, cmdname, args);
+		this._invokeEvent('command', user, command.cmdname, command.args);
 	}
 	
 	_processMessage(userstate, message, self) {
@@ -147,8 +159,10 @@ class TwitchManager {
 					console.warn("Unknown message type received, treating as regular message.");
 				case "whisper":
 				case "chat":
-					if (this._isKnownCommand(message)) {
-						this._invokeCommand(user, message);
+					let command = this._parseCommand(message);
+					
+					if (this._isKnownCommand(command)) {
+						this._invokeCommand(user, message, command);
 					}
 					
 					this._invokeEvent('message', user, message);

@@ -1,15 +1,16 @@
 
 class User {
 	constructor(userstate) {
-    	this.name = userstate.username;
-    	this.displayName = userstate['display-name'];
-    	this.isBroadcaster = userstate.badges.broadcaster == '1';
-    	this.isMod = userstate['mod'];
-    	this.isSub = userstate['subscriber'];
-    	this.hasTurbo = userstate['turbo'];
-    	this.badges = userstate['badges'];
-    	this.color = userstate['color'];
-    	this.userstate = userstate;
+    	this.name			= userstate.username;
+    	this.displayName	= userstate['display-name'];
+    	this.isBroadcaster	= userstate.badges &&
+    						  userstate.badges.broadcaster == '1';
+    	this.isMod			= userstate.mod;
+    	this.isSub			= userstate.subscriber;
+    	this.hasTurbo		= userstate.turbo;
+    	this.badges			= userstate.badges;
+    	this.color			= userstate.color;
+    	this.userstate		= userstate;
 	}
 	
 }

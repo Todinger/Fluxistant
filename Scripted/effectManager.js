@@ -75,8 +75,11 @@ class EffectManager {
 	}
 	
 	attachClient(effectName, socket) {
-		assert(this.nameExists(effectName), `Unknown effect: ${effectName}`);
-		this.effects[effectName].attachClient(socket);
+		if (this.nameExists(effectName)) {
+			this.effects[effectName].attachClient(socket);
+		} else {
+			console.warn(`Unknown effect: ${effectName}`);
+		}
 	}
 }
 

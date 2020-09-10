@@ -21,14 +21,166 @@ function getSubKeys(obj1, obj2) {
 }
 
 
-class ChannelParty {
+class HypeLevel {
+	static get CONTAINER_NAME() { return 'hypeContainer'; }
+	static get FADE_DURATION()	{ return 500; }
+	
+	constructor(source) {
+		this.source = source;
+		this.background = null;
+	}
+	
+	activate() {
+		this.background.fadeIn(HypeLevel.FADE_DURATION);
+	}
+	
+	deactivate() {
+		this.background.fadeOut(HypeLevel.FADE_DURATION);
+	}
+}
+
+class VideoHypeLevel extends HypeLevel {
+	static get CONTAINER_NAME() { return 'videoHypeContainer'; }
+	
+	constructor(source, soundManager) {
+		super(source, soundManager);
+		this.background = 
+			$(`<video src="${source}"></video>`)
+			.hide()
+			.appendTo(`#${VideoHypeLevel.CONTAINER_NAME}`);
+	}
+}
+
+class ImageHypeLevel extends HypeLevel {
+	static get CONTAINER_NAME() { return 'imageHypeContainer'; }
+	
+	constructor(source, soundManager) {
+		super(source, soundManager);
+		this.background = 
+			$(`<img src="${source}" class="fullscreen"></img>`)
+			.hide()
+			.appendTo(`#${ImageHypeLevel.CONTAINER_NAME}`);
+	}
+}
+
+class HypeManager {
+	static get FADE_DURATION()	{ return 500; }
+	
+	// 'levels' should be an array, with indices indicating hype
+	// levels (i.e. at index 0 is hype level 1, at index 3 it's level 4)
+	// 
+	// mainView should contain the name of the HTML element which should
+	// be shown/hidden on hype start/end respectively
+	constructor(hypeData, soundManager, mainView) {
+		this.levels = hypeData.levels;
+		this.soundName = hypeData.music;
+		this.soundManager = soundManager;
+		this.currentLevel = 0;
+		this.mainView = mainView;
+	}
+	
+	_hypeStart() {
+		if (this.soundName) {
+			this.soundManager.play(this.soundName);
+		}
+		
+		if (this.mainView) {
+			$(`#${this.mainView}`).fadeIn(HypeManager.FADE_DURATION);
+		}
+	}
+	
+	_hypeEnd() {
+		if (this.soundName) {
+			// this.soundManager.stop(
+			// 	this.soundName);
+			this.soundManager.fadeOutAndStop(
+				HypeManager.FADE_DURATION,
+				this.soundName);
+		}
+		
+		if (this.mainView) {
+			$(`#${this.mainView}`).fadeOut(HypeManager.FADE_DURATION);
+		}
+	}
+	
+	_getLevel(level) {
+		// Levels are 1-based while the array is 0-based
+		// That is, level 1 represents this.levels[0] (level 0 means off)
+		return this.levels[level - 1];
+	}
+	
+	activateLevel(level) {
+		console.log(`Activating level ${level}`);
+		if (level < 0 || level > this.levels.length) {
+			console.warn(`Invalid hype level: ${level}`);
+			return;
+		}
+		
+		if (this.currentLevel == level) {
+			console.warn('Asked to activate already active level, ignoring request');
+			return;
+		}
+		
+		if (this.currentLevel > 0) {
+			this._getLevel(this.currentLevel).deactivate();
+		}
+		
+		if (level > 0) {
+			this._getLevel(level).activate();
+		}
+		
+		if (this.currentLevel == 0) {
+			// Currently at 0, now rising
+			this._hypeStart();
+		} else if (level == 0) {
+			// Currently above 0, now dropping to 0
+			// No need to activate any level then
+			this._hypeEnd();
+		}
+		
+		this.currentLevel = level;
+	}
+	
+	increment() {
+		if (this.currentLevel >= this.levels.length) {
+			console.warn('Already at max hype level');
+			return;
+		}
+		
+		this.activateLevel(this.currentLevel + 1);
+	}
+	
+	decrement() {
+		if (this.currentLevel == 0) {
+			console.warn('Already at min hype level (i.e. 0)');
+			return;
+		}
+		
+		this.activateLevel(this.currentLevel - 1);
+	}
+	
+	start() {
+		this.activateLevel(1);
+	}
+	
+	stop() {
+		this.activateLevel(0);
+	}
+}
+
+
+
+class ChannelParty extends EffectClient {
 	static get IMAGE_SIZE()		{ return 300; }
 	static get VELOCITY_MIN()	{ return 200; }
 	static get VELOCITY_MAX()	{ return 800; }
 	static get FADE_DURATION()	{ return 500; }
+	static get MAIN_VIEW_ID()	{ return 'gameContainer'; }
 	
 	
-	constructor() {
+	constructor(soundData, hypeData) {
+		super('Channel Party');
+		
 		this.existingUserFiles = {};
 		this.currentUserImages = {};
 		this.currentUsersInChat = {};
@@ -40,6 +192,14 @@ class ChannelParty {
 		this.socket = null;
 		this.game = null;
 		this.scene = null;
+		
+		this.sounds.loadSounds(soundData);
+		
+		this.hypeManager = new HypeManager(
+			hypeData,
+			this.sounds,
+			ChannelParty.MAIN_VIEW_ID);
+		$(`#${ChannelParty.MAIN_VIEW_ID}`).hide();
 	}
 	
 	startPhaser() {
@@ -89,7 +249,7 @@ class ChannelParty {
 		if (this.allReady) {
 			this.processInitialUsers();
 			
-			this.socket.on('userJoined', username => {
+			this.server.on('userJoined', username => {
 				console.log(`User joined: ${username}; present = ${username in this.currentUserImages}`);
 				let hasImage = username in this.existingUserFiles;
 				this.currentUsersInChat[username] = hasImage;
@@ -100,7 +260,7 @@ class ChannelParty {
 				this.currentUserImages[username] = this.addImage(username);
 			});
 			
-			this.socket.on('userLeft', username => {
+			this.server.on('userLeft', username => {
 				console.log(`User left: ${username}; present = ${username in this.currentUserImages}`);
 				if (!(username in this.currentUsersInChat)) {
 					return;
@@ -275,9 +435,9 @@ class ChannelParty {
 	
 	// Start all the network stuff
 	startNetwork() {
-		this.socket = io();
+		// this.socket = io();
 		
-		this.socket.on('userImageList', userList => {
+		this.server.on('userImageList', userList => {
 			Object.keys(userList).forEach(user => {
 				this.existingUserFiles[user] = {
 					url: userList[user],
@@ -287,18 +447,35 @@ class ChannelParty {
 			
 			this.loadUserImages();
 		});
-
-		this.socket.emit('attachTo', 'Channel Party');
-
-		this.socket.on('hide', () => {
+		
+		this.server.attach();
+		// this.server.emit('attachTo', 'Channel Party');
+		
+		this.server.on('hide', () => {
 			$('#gameContainer').fadeOut(ChannelParty.FADE_DURATION);
 		});
-
-		this.socket.on('show', () => {
+		
+		this.server.on('show', () => {
 			$('#gameContainer').fadeIn(ChannelParty.FADE_DURATION);
 		});
-
-		this.socket.emit('getUserImageList');
+		
+		this.server.on('hype', level => {
+			if (level === undefined || level === null) {
+				this.hypeManager.increment();
+			} else {
+				this.hypeManager.activateLevel(level);
+			}
+		});
+		
+		this.server.on('epyh', () => {
+			this.hypeManager.decrement();
+		});
+		
+		this.server.on('endHype', () => {
+			this.hypeManager.stop();
+		});
+		
+		this.server.emit('getUserImageList');
 	}
 	
 	start() {
@@ -308,5 +485,21 @@ class ChannelParty {
 	}
 }
 
-var cp = new ChannelParty();
+const SOUNDS = {
+	'hypemusic': 'HypeMusic.mp3',
+};
+
+const HYPE_DATA = {
+	music: 'hypemusic',
+	levels: [
+		new ImageHypeLevel('Sonic.jpg'),
+		new ImageHypeLevel('Mario.jpg'),
+		new ImageHypeLevel('Portal.jpg'),
+	],
+};
+
+var cp = new ChannelParty(SOUNDS, HYPE_DATA);
 cp.start();
+
+// TODO: Remove
+console.log(cp);

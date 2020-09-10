@@ -10,18 +10,27 @@ class ChannelParty extends Effect {
 	}
 	
 	load() {
-		this._onTwitchEvent('userJoined', username => {
-			this._broadcastEvent('userJoined', username);
-		});
-		this._onTwitchEvent('userLeft', username => {
-			this._broadcastEvent('userLeft', username);
-		});
+		this.forwardSimpleTwitchEvent('userJoined');
+		this.forwardSimpleTwitchEvent('userLeft');
 		this.registerCommand('a', [Effect.Filters.isUser('fluxistence')], user => {
-			this._broadcastEvent('show', 'Channel Party');
+			this.broadcastEvent('show', 'Channel Party');
 		});
 		this.registerCommand('b', [Effect.Filters.isUser('fluxistence')], user => {
-			this._broadcastEvent('hide', 'Channel Party');
+			this.broadcastEvent('hide', 'Channel Party');
 		});
+		this.forwardSimpleCommand('hype', [Effect.Filters.isUser('yecatsmailbox')]);
+		this.forwardSimpleCommand('epyh', [Effect.Filters.isUser('yecatsmailbox')]);
+		
+		this.registerCommand('h', [Effect.Filters.isUser('fluxistence')],
+			(user, level) => {
+				this.broadcastEvent('hype', level);
+			}
+		);
+		this.registerCommand('e', [Effect.Filters.isUser('fluxistence')],
+			(user, level) => {
+				this.broadcastEvent('epyh');
+			}
+		);
 	}
 }
 
