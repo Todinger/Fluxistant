@@ -2,6 +2,8 @@ const FETCH_USERS_URL = 'https://tmi.twitch.tv/group/user/fluxistence/chatters';
 const GLOW_SIZE = 15;
 const GLOW_COLOR = '#ffffcc';
 
+var showAllImages = true;
+
 // Assumes Math.floor(max) >= Math.ceil(min)
 function randomInt(min, max) {
 	return min + Math.floor(Math.random() * (max - min + 1));
@@ -185,7 +187,6 @@ class ChannelParty extends EffectClient {
 		this.currentUserImages = {};
 		this.currentUsersInChat = {};
 		this.running = false;
-		this.showAll = false;
 		this.imagesLoadad = false;
 		this.userlistLoadad = false;
 		this.allReady = false;
@@ -193,7 +194,7 @@ class ChannelParty extends EffectClient {
 		this.game = null;
 		this.scene = null;
 		
-		this.sounds.loadSounds(soundData);
+		this.sounds.loadSounds(soundData, true);
 		
 		this.hypeManager = new HypeManager(
 			hypeData,
@@ -247,7 +248,11 @@ class ChannelParty extends EffectClient {
 		
 		this.allReady = this.imagesLoadad && this.userlistLoadad;
 		if (this.allReady) {
-			this.processInitialUsers();
+			if (showAllImages) {
+				this.addAllExistingUserImages();
+			} else {
+				this.processInitialUsers();
+			}
 			
 			this.server.on('userJoined', username => {
 				console.log(`User joined: ${username}; present = ${username in this.currentUserImages}`);
@@ -376,44 +381,18 @@ class ChannelParty extends EffectClient {
 		});
 	}
 	
-	updateUserImages(newUsers) {
-		let newUsernames = {};
-		let newUserImages = {};
-		
-		newUsers.forEach(username => {
-			if (this.userFileExists(username)) {
-				newUsernames[username] = this.existingUserFiles[username].url;
+	// Should only be called manuall or automatically on load when
+	// the test flag 'showAllImages' is set
+	addAllExistingUserImages() {
+		Object.keys(this.existingUserFiles).forEach(username => {
+			let alreadyLoaded = username in this.currentUserImages;
+			if (!alreadyLoaded) {
+				this.currentUsersInChat[username] = true;
+				this.currentUserImages[username] = this.addImage(username);
 			}
 		});
-		
-		if (showAll) {
-			Object.keys(this.existingUserFiles).forEach(user => {
-				newUsernames[user] = this.existingUserFiles[user].url;
-			});
-		}
-		
-		let usersToRemove = getSubKeys(this.currentUserImages, newUsernames);
-		let usersToAdd = getSubKeys(newUsernames, this.currentUserImages);
-		
-		usersToRemove.forEach(username => {
-			let image = this.currentUserImages[username];
-			scene.tweens.add({
-				targets: image,
-				alpha: 0,
-				duration: ChannelParty.FADE_DURATION,
-				onComplete: () => {
-					image.destroy();
-				},
-			});
-			
-			delete this.currentUserImages[username];
-		});
-		
-		usersToAdd.forEach(username => {
-			this.currentUserImages[username] = this.addImage(username);
-		});
 	}
-
+	
 	fetchCurrentUserlist() {
 		let _this = this;
 		$.ajax({
@@ -486,7 +465,10 @@ class ChannelParty extends EffectClient {
 }
 
 const SOUNDS = {
-	'hypemusic': 'HypeMusic.mp3',
+	'hypemusic': {
+		location: 'HypeMusic.mp3',
+		loop: true,
+	},
 };
 
 const HYPE_DATA = {
@@ -501,5 +483,6 @@ const HYPE_DATA = {
 var cp = new ChannelParty(SOUNDS, HYPE_DATA);
 cp.start();
 
-// TODO: Remove
-console.log(cp);
+function showAll() {
+	cp.addAllExistingUserImages();
+}

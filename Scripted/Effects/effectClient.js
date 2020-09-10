@@ -20,7 +20,7 @@ class SoundManager {
 	}
 	
 	_dataLoaded(name) {
-		if (name in this._notYetLoaded) {
+		if (this._notYetLoaded[name]) {
 			delete this._notYetLoaded[name];
 			if (Object.keys(this._notYetLoaded).length == 0) {
 				this._loadingFinished();
@@ -50,7 +50,7 @@ class SoundManager {
 		sound.volume = vol => { sound.get(0).volume = vol; return sound; }
 	}
 	
-	loadSound(name, location, onLoaded) {
+	loadSound(name, location, loop, onLoaded) {
 		console.assert(!(name in this._sounds),
 			`Duplicate loading of the sound ${name}`);
 		
@@ -61,6 +61,7 @@ class SoundManager {
 				onLoaded(name);
 			}
 		})
+		.prop('loop', loop)
 		.appendTo(`#${this._soundHolderID}`);
 		
 		// Add extra features to our sounds
@@ -73,15 +74,18 @@ class SoundManager {
 	}
 	
 	loadSounds(sounds) {
+		// First run over the collection is for making sure it's valid
 		Object.keys(sounds).forEach(name => {
 			console.assert(!(name in this._sounds),
 				`Duplicate loading of the sound ${name}`);
-			
-			this._notYetLoaded[name] = sounds[name];
 		});
 		
 		Object.keys(sounds).forEach(name => {
-			this.loadSound(name, sounds[name]);
+			// This will actually always be true, since it gets deleted
+			// one the sound finishes loading
+			this._notYetLoaded[name] = true;
+			
+			this.loadSound(name, sounds[name].location, sounds[name].loop);
 		});
 	}
 	
