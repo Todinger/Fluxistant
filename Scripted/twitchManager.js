@@ -75,10 +75,10 @@ class TwitchManager {
 			this._processMessage(userstate, message, self);
 		});
 		this.client.on('join', (channel, username, self) => {
-			this._invokeEvent('userJoined', username);
+			if (!self) this._invokeEvent('userJoined', username);
 		});
 		this.client.on('part', (channel, username, self) => {
-			this._invokeEvent('userLeft', username);
+			if (!self) this._invokeEvent('userLeft', username);
 		});
 	}
 	
