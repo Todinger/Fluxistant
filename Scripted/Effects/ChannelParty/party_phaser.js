@@ -27,25 +27,32 @@ class HypeLevel {
 	static get CONTAINER_NAME() { return 'hypeContainer'; }
 	static get FADE_DURATION()	{ return 500; }
 	
-	constructor(source) {
+	constructor(source, sound) {
 		this.source = source;
+		this.sound = sound;
 		this.background = null;
 	}
 	
-	activate() {
+	activate(soundManager) {
 		this.background.fadeIn(HypeLevel.FADE_DURATION);
+		if (this.sound) {
+			soundManager.fadeIn(HypeLevel.FADE_DURATION, this.sound)
+		}
 	}
 	
-	deactivate() {
+	deactivate(soundManager) {
 		this.background.fadeOut(HypeLevel.FADE_DURATION);
+		if (this.sound) {
+			soundManager.fadeOut(HypeLevel.FADE_DURATION, this.sound)
+		}
 	}
 }
 
 class VideoHypeLevel extends HypeLevel {
 	static get CONTAINER_NAME() { return 'videoHypeContainer'; }
 	
-	constructor(source, soundManager) {
-		super(source, soundManager);
+	constructor(source, sound) {
+		super(source, sound);
 		this.background = 
 			$(`<video src="${source}"></video>`)
 			.hide()
@@ -56,8 +63,8 @@ class VideoHypeLevel extends HypeLevel {
 class ImageHypeLevel extends HypeLevel {
 	static get CONTAINER_NAME() { return 'imageHypeContainer'; }
 	
-	constructor(source, soundManager) {
-		super(source, soundManager);
+	constructor(source, sound) {
+		super(source, sound);
 		this.background = 
 			$(`<img src="${source}" class="fullscreen"></img>`)
 			.hide()
@@ -93,8 +100,6 @@ class HypeManager {
 	
 	_hypeEnd() {
 		if (this.soundName) {
-			// this.soundManager.stop(
-			// 	this.soundName);
 			this.soundManager.fadeOutAndStop(
 				HypeManager.FADE_DURATION,
 				this.soundName);
@@ -124,11 +129,11 @@ class HypeManager {
 		}
 		
 		if (this.currentLevel > 0) {
-			this._getLevel(this.currentLevel).deactivate();
+			this._getLevel(this.currentLevel).deactivate(this.soundManager);
 		}
 		
 		if (level > 0) {
-			this._getLevel(level).activate();
+			this._getLevel(level).activate(this.soundManager);
 		}
 		
 		if (this.currentLevel == 0) {
@@ -189,6 +194,7 @@ class ChannelParty extends EffectClient {
 		this.running = false;
 		this.imagesLoadad = false;
 		this.userlistLoadad = false;
+		this.sceneReady = false;
 		this.allReady = false;
 		this.socket = null;
 		this.game = null;
@@ -253,6 +259,8 @@ class ChannelParty extends EffectClient {
 		
 		scene.physics.world.setBoundsCollision(true, true, true, true);
 		this.particles = scene.add.particles('flares');
+		
+		this.markSceneReady();
 	}
 	
 	randomVelocity() {
@@ -308,7 +316,11 @@ class ChannelParty extends EffectClient {
 			return;
 		}
 		
-		this.allReady = this.imagesLoadad && this.userlistLoadad;
+		this.allReady =
+			this.sceneReady &&
+			this.imagesLoadad &&
+			this.userlistLoadad;
+		
 		if (this.allReady) {
 			if (showAllImages) {
 				this.addAllExistingUserImages();
@@ -319,6 +331,11 @@ class ChannelParty extends EffectClient {
 			this.server.on('userJoined', username => this.addUser(username));
 			this.server.on('userLeft', username => this.removeUser(username));
 		}
+	}
+	
+	markSceneReady() {
+		this.sceneReady = true;
+		this.updateAllReady();
 	}
 	
 	markUserlistLoaded() {
@@ -503,17 +520,20 @@ class ChannelParty extends EffectClient {
 }
 
 const SOUNDS = {
-	'hypemusic': {
-		location: 'assets/HypeMusic.mp3',
+	'sonic': {
+		location: 'assets/sonic.mp3',
+		loop: true,
+	},
+	'mario': {
+		location: 'assets/mario.mp3',
 		loop: true,
 	},
 };
 
 const HYPE_DATA = {
-	music: 'hypemusic',
 	levels: [
-		new ImageHypeLevel('assets/Sonic.jpg'),
-		new ImageHypeLevel('assets/Mario.jpg'),
+		new ImageHypeLevel('assets/Sonic.jpg', 'sonic'),
+		new ImageHypeLevel('assets/Mario.jpg', 'mario'),
 		new ImageHypeLevel('assets/Portal.jpg'),
 	],
 };

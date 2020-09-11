@@ -90,7 +90,7 @@ class SoundManager {
 	}
 	
 	all(func) {
-		this._sounds.forEach(sound => func(sound));
+		Object.values(this._sounds).forEach(sound => func(sound));
 	}
 	
 	_singleOrAll(target, func) {
