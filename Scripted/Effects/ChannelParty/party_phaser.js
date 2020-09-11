@@ -434,9 +434,6 @@ class ChannelParty extends EffectClient {
 			y: this.randomVelocity(),
 		};
 		
-		console.log(`Base Velocity X = ${velocity.x}`);
-		console.log(`Base Velocity Y = ${velocity.y}`);
-		
 		image.body.velocity.setTo(velocity.x, velocity.y);
 		image.baseVelocity = velocity; // Saved for changing by hype level later
 		image.body.collideWorldBounds = true;
@@ -573,7 +570,11 @@ const SOUNDS = {
 		loop: true,
 	},
 	'mario': {
-		location: 'assets/mario.mp3',
+		location: 'assets/MarioStarSequence.mp3',
+		loop: true,
+	},
+	'mk': {
+		location: 'assets/MK.mp3',
 		loop: true,
 	},
 };
@@ -581,7 +582,8 @@ const SOUNDS = {
 const HYPE_DATA = {
 	levels: [
 		new ImageHypeLevel('assets/Sonic.jpg', 'sonic'),
-		new ImageHypeLevel('assets/Mario.jpg', 'mario'),
+		new ImageHypeLevel('assets/Mario1.jpg', 'mario'),
+		new ImageHypeLevel('assets/MK_arcade.jpg', 'mk'),
 		new ImageHypeLevel('assets/Portal.jpg'),
 	],
 };

@@ -83,7 +83,8 @@ class TwitchManager {
 	}
 	
 	say(msg) {
-		this.client.say(this.channel, msg);
+		// TODO: Uncomment after big unveiling and test
+		// this.client.say(this.channel, msg);
 	}
 	
 	on(eventName, callback) {
@@ -111,7 +112,10 @@ class TwitchManager {
 		}
 		
 		// Ditch the command prefix
-		msg = msg.substring(COMMAND_PREFIX.length);
+		msg = msg.substring(COMMAND_PREFIX.length).trim();
+		
+		// Remove multiple consecutive spaces
+		msg = msg.replace(/\s{2,}/g, ' ');
 		
 		// A command is composed of its name followed by arguments, all
 		// delimited by spaces

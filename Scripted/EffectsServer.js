@@ -84,6 +84,10 @@ io.on('connection', socket => {
 		EffectManager.attachClient(scriptName, socket);
 	});
 	
+	socket.on('sayTo', data => {
+		TwitchManager.say(`@${data.username} ${data.message}`);
+	});
+	
 	// TODO: REMOVE!!! DEBUG ONLY!
 	socket.on('ask', request => {
 		socket.emit(request.event, request.data);
