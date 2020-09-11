@@ -566,25 +566,34 @@ class ChannelParty extends EffectClient {
 
 const SOUNDS = {
 	'sonic': {
-		location: 'assets/sonic.mp3',
+		location: 'assets/Sonic/Sonic.mp3',
 		loop: true,
 	},
 	'mario': {
-		location: 'assets/MarioStarSequence.mp3',
+		location: 'assets/Mario/MarioStarSequence.mp3',
 		loop: true,
 	},
 	'mk': {
-		location: 'assets/MK.mp3',
+		location: 'assets/MK/MK.mp3',
+		loop: true,
+	},
+	'pokemon': {
+		location: 'assets/Pokemon/Pokemon.mp3',
+		loop: true,
+	},
+	'zelda': {
+		location: 'assets/Zelda/Zelda.mp3',
 		loop: true,
 	},
 };
 
 const HYPE_DATA = {
 	levels: [
-		new ImageHypeLevel('assets/Sonic.jpg', 'sonic'),
-		new ImageHypeLevel('assets/Mario1.jpg', 'mario'),
-		new ImageHypeLevel('assets/MK_arcade.jpg', 'mk'),
-		new ImageHypeLevel('assets/Portal.jpg'),
+		new ImageHypeLevel('assets/Sonic/Sonic.jpg', 'sonic'),
+		new ImageHypeLevel('assets/Zelda/Zelda-Large.jpg', 'zelda'),
+		new ImageHypeLevel('assets/Pokemon/Scratch_III.png', 'pokemon'),
+		new ImageHypeLevel('assets/Mario/Mario1.jpg', 'mario'),
+		new ImageHypeLevel('assets/MK/MK_arcade.jpg', 'mk'),
 	],
 };
 
