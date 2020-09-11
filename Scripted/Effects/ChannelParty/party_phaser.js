@@ -86,6 +86,8 @@ class HypeManager {
 		this.soundManager = soundManager;
 		this.currentLevel = 0;
 		this.mainView = mainView;
+		
+		this._onLevelActivatedCallbacks = [];
 	}
 	
 	_hypeStart() {
@@ -123,20 +125,25 @@ class HypeManager {
 			return;
 		}
 		
-		if (this.currentLevel == level) {
+		let prevLevel = this.currentLevel;
+		
+		if (prevLevel == level) {
 			console.warn('Asked to activate already active level, ignoring request');
 			return;
 		}
 		
-		if (this.currentLevel > 0) {
-			this._getLevel(this.currentLevel).deactivate(this.soundManager);
+		this.currentLevel = level;
+		
+		if (prevLevel > 0) {
+			this._getLevel(prevLevel).deactivate(this.soundManager);
 		}
 		
 		if (level > 0) {
 			this._getLevel(level).activate(this.soundManager);
+			this._levelActivated(level);
 		}
 		
-		if (this.currentLevel == 0) {
+		if (prevLevel == 0) {
 			// Currently at 0, now rising
 			this._hypeStart();
 		} else if (level == 0) {
@@ -144,8 +151,6 @@ class HypeManager {
 			// No need to activate any level then
 			this._hypeEnd();
 		}
-		
-		this.currentLevel = level;
 	}
 	
 	increment() {
@@ -173,16 +178,25 @@ class HypeManager {
 	stop() {
 		this.activateLevel(0);
 	}
+	
+	onLevelActivated(callback) {
+		this._onLevelActivatedCallbacks.push(callback);
+	}
+	
+	_levelActivated(level) {
+		this._onLevelActivatedCallbacks.forEach(callback => callback(level));
+	}
 }
 
 
 
 class ChannelParty extends EffectClient {
-	static get IMAGE_SIZE()		{ return 300; }
-	static get VELOCITY_MIN()	{ return 200; }
-	static get VELOCITY_MAX()	{ return 800; }
-	static get FADE_DURATION()	{ return 500; }
-	static get MAIN_VIEW_ID()	{ return 'gameContainer'; }
+	static get IMAGE_SIZE()					{ return 300; }
+	static get VELOCITY_MIN()				{ return 200; }
+	static get VELOCITY_MAX()				{ return 800; }
+	static get FADE_DURATION()				{ return 500; }
+	static get MAIN_VIEW_ID()				{ return 'gameContainer'; }
+	static get HYPE_VELOCITY_INCREMENT()	{ return 500; }
 	
 	
 	constructor(soundData, hypeData) {
@@ -208,6 +222,8 @@ class ChannelParty extends EffectClient {
 			hypeData,
 			this.sounds,
 			ChannelParty.MAIN_VIEW_ID);
+		this.hypeManager.onLevelActivated(level => this.hypeLevelActivated(level));
+		
 		$(`#${ChannelParty.MAIN_VIEW_ID}`).hide();
 	}
 	
@@ -375,6 +391,31 @@ class ChannelParty extends EffectClient {
 	userFileExists(username) {
 		return username in this.existingUserFiles;
 	}
+	
+	hypeLevelVeolicty(level, image, axis) {
+		let sign = Math.sign(image.body.velocity[axis]);
+		let absoluteBaseSpeed = Math.abs(image.baseVelocity[axis]);
+		let speed = absoluteBaseSpeed + 
+			ChannelParty.HYPE_VELOCITY_INCREMENT * (level - 1);
+		let finalVelocity = sign * speed;
+		
+		return finalVelocity;
+	}
+	
+	hypeLevelActivated(level) {
+		// The images should move at base speed when hype is off,
+		// so 0 should be treated the same as 1 for the purposes
+		// of valocity calculations
+		if (level == 0) {
+			level = 1;
+		}
+		
+		Object.values(this.currentUserImages).forEach(image => {
+			image.body.velocity.setTo(
+				this.hypeLevelVeolicty(level, image, 'x'),
+				this.hypeLevelVeolicty(level, image, 'y'));
+		});
+	}
 
 	addImage(username) {
 		let xpos = randomInt(ChannelParty.IMAGE_SIZE / 2, 1920 - ChannelParty.IMAGE_SIZE / 2);
@@ -390,7 +431,16 @@ class ChannelParty extends EffectClient {
 			console.log(`Image missing for ${username}`);
 		}
 		
-		image.body.velocity.setTo(this.randomVelocity(), this.randomVelocity());
+		let velocity = {
+			x: this.randomVelocity(),
+			y: this.randomVelocity(),
+		};
+		
+		console.log(`Base Velocity X = ${velocity.x}`);
+		console.log(`Base Velocity Y = ${velocity.y}`);
+		
+		image.body.velocity.setTo(velocity.x, velocity.y);
+		image.baseVelocity = velocity; // Saved for changing by hype level later
 		image.body.collideWorldBounds = true;
 		image.body.bounce.set(1);
 		image.alpha = 0;
