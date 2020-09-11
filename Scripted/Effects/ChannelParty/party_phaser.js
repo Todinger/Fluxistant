@@ -101,11 +101,9 @@ class HypeManager {
 	}
 	
 	_hypeEnd() {
-		if (this.soundName) {
-			this.soundManager.fadeOutAndStop(
-				HypeManager.FADE_DURATION,
-				this.soundName);
-		}
+		// Fade out and stop ALL music
+		this.soundManager.fadeOutAndStop(
+			HypeManager.FADE_DURATION);
 		
 		if (this.mainView) {
 			$(`#${this.mainView}`).fadeOut(HypeManager.FADE_DURATION);
