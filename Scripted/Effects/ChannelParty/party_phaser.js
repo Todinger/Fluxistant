@@ -285,7 +285,9 @@ class ChannelParty extends EffectClient {
 		
 		if (image.emitter) {
 			image.emitter.on = false;
-			setTimeout(() => this.particles.emitters.remove(image.emitter), 2000);
+			this.scene.time.delayedCall(
+				image.emitter.lifespan.propertyValue,
+				() => this.particles.emitters.remove(image.emitter));
 		}
 		
 		this.scene.tweens.add({
