@@ -251,11 +251,14 @@ class SoundManager {
 class ServerCommManager {
 	constructor(scriptName) {
 		this.scriptName = scriptName;
+		this._attached = false;
 		this.socket = io();
+		this.on('connect', () => this._connected());
 	}
 	
 	attach() {
 		this.socket.emit('attachTo', this.scriptName);
+		this._attached = true;
 	}
 	
 	on(eventName, callback) {
@@ -264,6 +267,14 @@ class ServerCommManager {
 	
 	emit(eventName, data) {
 		this.socket.emit(eventName, data);
+	}
+	
+	_connected() {
+		if (this._attached) {
+			// We were attached before but the connection was interrupted,
+			// so we attach again
+			this.attach();
+		}
 	}
 }
 
