@@ -89,6 +89,7 @@ class HypeManager {
 		
 		this._onLevelActivatedCallbacks = [];
 		this._onLevelDeactivatedCallbacks = [];
+		this._onFullyStoppedCallbacks = [];
 	}
 	
 	_hypeStart() {
@@ -107,7 +108,9 @@ class HypeManager {
 			HypeManager.FADE_DURATION);
 		
 		if (this.mainView) {
-			$(`#${this.mainView}`).fadeOut(HypeManager.FADE_DURATION);
+			$(`#${this.mainView}`).fadeOut(
+				HypeManager.FADE_DURATION,
+				() => this._fullyStopped());
 		}
 	}
 	
@@ -175,8 +178,18 @@ class HypeManager {
 		this.activateLevel(1);
 	}
 	
-	stop() {
-		this.activateLevel(0);
+	stop(onFullyStoppedCallback) {
+		if (this.currentLevel == 0) {
+			if (onFullyStoppedCallback) {
+				onFullyStoppedCallback();
+			}
+		} else {
+			if (onFullyStoppedCallback) {
+				this._onFullyStoppedCallbacks.push(onFullyStoppedCallback);
+			}
+			
+			this.activateLevel(0);
+		}
 	}
 	
 	onLevelActivated(callback) {
@@ -193,6 +206,11 @@ class HypeManager {
 	
 	_levelDeactivated(level) {
 		this._onLevelDeactivatedCallbacks.forEach(callback => callback(level));
+	}
+	
+	_fullyStopped(level) {
+		this._onFullyStoppedCallbacks.forEach(callback => callback(level));
+		this._onFullyStoppedCallbacks = [];
 	}
 }
 
@@ -731,8 +749,10 @@ class ChannelParty extends EffectClient {
 	}
 	
 	stopAll() {
-		this.hypeManager.stop();
-		this.resetFinalVideo();
+		this.hypeManager.stop(() => {
+			this.resetFinalVideo();
+			this.sounds.unmute();
+		});
 	}
 	
 	// Start all the network stuff
