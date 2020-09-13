@@ -433,9 +433,9 @@ class ChannelParty extends EffectClient {
 	addLevelParticles(image, level) {
 		let lp = this.levelParticles[level];
 		if (lp) {
-			let scale = lp.data.scale ?? 1;
+			let scale = (lp.data.scale === undefined) ? 1 : lp.data.scale;
 			let emitterConfig = {
-				speed: lp.data.speed ?? 100,
+				speed: (lp.data.speed === undefined) ? 100 : lp.data.speed,
 				gravity: { x: 0, y: 200 },
 				scale: { start: 0.1 * scale, end: 0.2 * scale },
 				follow: image,
