@@ -358,13 +358,11 @@ class ChannelParty extends EffectClient {
 		for (let i = 0; i < this.hypeData.levels.length; i++) {
 			if (this.hypeData.levels[i].particles) {
 				if (this.hypeData.levels[i].particles.animated) {
-					console.log(`Loading spritesheet: ${this.hypeData.levels[i].particles.source}`);
 					scene.load.spritesheet(
 						`particles_${i}`,
 						this.hypeData.levels[i].particles.source,
 						this.hypeData.levels[i].particles.frameConfig);
 				} else {
-					console.log(`Loading image: ${this.hypeData.levels[i].particles.source}`);
 					scene.load.image(
 						`particles_${i}`,
 						this.hypeData.levels[i].particles.source);
@@ -395,7 +393,6 @@ class ChannelParty extends EffectClient {
 				levelParticle.data = this.hypeData.levels[i].particles;
 				
 				if (levelParticle.data.animated) {
-					console.log(`Creating anim for particles_${i}`);
 					levelParticle.anim = scene.anims.create({
 						key: `${i}_${this.hypeData.levels[i].name}_anim`,
 						frames: scene.anims.generateFrameNumbers(`particles_${i}`),

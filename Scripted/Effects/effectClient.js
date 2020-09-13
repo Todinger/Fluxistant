@@ -144,7 +144,6 @@ class SoundManager {
 		// let sound = new Audio(location);
 		
 		this._sounds[name] = sound;
-		console.log(`Sound loaded: ${name}`);
 	}
 	
 	loadSounds(sounds) {
