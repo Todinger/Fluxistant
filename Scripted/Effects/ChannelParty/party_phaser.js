@@ -259,7 +259,6 @@ class SingleAnimatedParticle extends Phaser.GameObjects.Particles.Particle {
 			if (this.i >= this.emitter.anim.frames.length)
 			{
 				this.finished = true;
-				// this.frame = null;
 			} else {
 				this.frame = this.emitter.anim.frames[this.i].frame;
 				this.t -= this.emitter.anim.msPerFrame;
@@ -327,6 +326,10 @@ class ChannelParty extends EffectClient {
 			parent: 'gameContainer',
 			width: container.innerWidth(),
 			height: container.innerHeight(),
+			scale: {
+				mode: Phaser.Scale.FIT,
+				autoCenter: Phaser.Scale.CENTER_BOTH
+			},
 			scene: {
 				preload: function() {
 					_this.preload(this);
@@ -339,9 +342,14 @@ class ChannelParty extends EffectClient {
 		
 		this.game = new Phaser.Game(config);
 		
+		// Use this to make the world bounds move based on the size of the
+		// containing element/window while keeping all the sprites the same,
+		// full size
+		// 
 		// $(window).resize(() => {
 		// 	console.log(`Resizing to ${container.innerWidth()}x${container.innerHeight()}`);
-		// 	this.game.scale.resize(container.innerWidth(), container.innerHeight());
+		// 	// this.scene.scale.resize(container.innerWidth(), container.innerHeight());
+		// 	this.scene.physics.world.setBounds(0, 0, container.innerWidth(), container.innerHeight());
 		// });
 	}
 	
@@ -373,14 +381,6 @@ class ChannelParty extends EffectClient {
 	
 	create(scene)
 	{
-		// TODO: Make the game scale with the window
-		
-		// game.scale.scaleMode = Phaser.Scale.ScaleManager.RESIZE;
-		// game.scale.parentIsWindow = true;
-		
-		// game.physics.startSystem(Phaser.Physics.ARCADE);
-		// game.physics.enable(image, Phaser.Physics.ARCADE);
-		
 		scene.physics.world.setBoundsCollision(true, true, true, true);
 		this.particles = scene.add.particles('flares');
 		
@@ -472,15 +472,6 @@ class ChannelParty extends EffectClient {
 					loop: true,
 				});
 			}
-			
-			// image.emitter = particles.createEmitter({
-			// 	speed: 100,
-			// 	gravity: { x: 0, y: 200 },
-			// 	scale: { start: 0.1, end: 0.2 },
-			// 	follow: image,
-			// 	// rotate: { start: 0, end: 360 },
-			// });
-			// // image.emitter.explode(20);
 		}
 	}
 	
@@ -608,14 +599,14 @@ class ChannelParty extends EffectClient {
 	}
 	
 	hypeLevelDeactivated(level) {
-		// Remvoe and add emitters as necessary
+		// Remove emitters as necessary
 		Object.keys(this.currentUserImages).forEach(username => {
 			this.removeEmitter(username);
 		});
 	}
 	
 	hypeLevelActivated(level) {
-		// Remvoe and add emitters as necessary
+		// Add emitters as necessary
 		Object.values(this.currentUserImages).forEach(image => {
 			this.addLevelParticles(image, level);
 		});
@@ -628,10 +619,12 @@ class ChannelParty extends EffectClient {
 	}
 
 	addImage(username) {
-		let xpos = randomInt(ChannelParty.IMAGE_SIZE / 2, 1920 - ChannelParty.IMAGE_SIZE / 2);
-		let ypos = randomInt(ChannelParty.IMAGE_SIZE / 2, 1080 - ChannelParty.IMAGE_SIZE / 2);
-		// let xpos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.width - IMAGE_SIZE / 2);
-		// let ypos = randomInt(IMAGE_SIZE / 2, game.scale.displaySize.height - IMAGE_SIZE / 2);
+		let xpos = randomInt(
+			ChannelParty.IMAGE_SIZE / 2,
+			this.game.scale.displaySize.width - ChannelParty.IMAGE_SIZE / 2);
+		let ypos = randomInt(
+			ChannelParty.IMAGE_SIZE / 2,
+			this.game.scale.displaySize.height - ChannelParty.IMAGE_SIZE / 2);
 		
 		let image = this.scene.physics.add.image(xpos, ypos, username);
 		image.displayWidth = ChannelParty.IMAGE_SIZE;
@@ -744,8 +737,6 @@ class ChannelParty extends EffectClient {
 	
 	// Start all the network stuff
 	startNetwork() {
-		// this.socket = io();
-		
 		this.server.on('userImageList', userList => {
 			Object.keys(userList).forEach(user => {
 				this.existingUserFiles[user] = {
@@ -758,7 +749,6 @@ class ChannelParty extends EffectClient {
 		});
 		
 		this.server.attach();
-		// this.server.emit('attachTo', 'Channel Party');
 		
 		this.server.on('hide', () => {
 			$('#gameContainer').fadeOut(ChannelParty.FADE_DURATION);
@@ -827,13 +817,13 @@ const HYPE_DATA = {
 		{
 			name: 'Sonic',
 			particles: {
-				source: 'assets/Sonic/RingSprite.png',
-				animated: true,
-				frameConfig: { frameWidth: 350, frameHeight: 306 },
-				frameRate: 24,
-				scale: 0.5,
-				looping: true,
-				// source: 'assets/Sonic/Ring.png',
+				// source: 'assets/Sonic/RingSprite.png',
+				// animated: true,
+				// frameConfig: { frameWidth: 350, frameHeight: 306 },
+				// frameRate: 24,
+				// scale: 0.5,
+				// looping: true,
+				source: 'assets/Sonic/Ring.png',
 				type: 'flow',
 				rotate: false,
 			},
@@ -877,7 +867,6 @@ const HYPE_DATA = {
 				looping: true,
 				speed: 0,
 				frequency: 150,
-				// source: 'assets/MK/Drop.png',
 				type: 'flow',
 				rotate: false,
 			},
