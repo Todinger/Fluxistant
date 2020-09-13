@@ -36,6 +36,11 @@ class ChannelParty extends Effect {
 				this.broadcastEvent('endHype');
 			}
 		);
+		this.registerCommand('q', [Effect.Filters.isUser('fluxistence')],
+			(user, level) => {
+				this.broadcastEvent('finish');
+			}
+		);
 		
 		this.registerCommand('z', [Effect.Filters.isUser('fluxistence')],
 			(username, volume) => {

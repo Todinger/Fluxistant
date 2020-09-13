@@ -7,6 +7,7 @@
     	Solution taken from here:
     	https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
     <link rel="shortcut icon" href="#" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<style>
 		body {
 			margin: 0;
@@ -36,6 +37,15 @@
 			width: 100%;
 			height: 100%;
 		}
+		
+		.front {
+			z-index: 100;
+			/*opacity: 0;*/
+		}
+		
+		.blackbg {
+			background-color: #000
+		}
 	</style>
 </head>
 
@@ -43,13 +53,15 @@
 
 <div id="background" class="fullscreen"></div>
 <div id="gameContainer" class="fullscreen"></div>
-<div id="bla" class="fullscreen"></div>
 <div id="hypeContainer" class="bg">
 	<div id="videoHypeContainer" class="fullscreen"></div>
 	<div id="imageHypeContainer" class="fullscreen"></div>
 </div>
+<div id="finalVideoHolder" class="fullscreen front">
+	<video id="finalVideo" class="blackbg" src="assets/FinishVideo/FinishVideo.mp4">
+</div>
+<script>$('#finalVideo').hide();</script>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="../effectClient.js"></script>

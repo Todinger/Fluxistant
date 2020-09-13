@@ -81,7 +81,7 @@ class HypeManager {
 	// mainView should contain the name of the HTML element which should
 	// be shown/hidden on hype start/end respectively
 	constructor(hypeData, soundManager, mainView) {
-		this.levels = hypeData.levels;
+		this.levels = hypeData.levels.map(levelData => levelData.level);
 		this.soundName = hypeData.music;
 		this.soundManager = soundManager;
 		this.currentLevel = 0;
@@ -216,6 +216,7 @@ class ChannelParty extends EffectClient {
 		
 		this.sounds.loadSounds(soundData, true);
 		
+		this.hypeData = hypeData;
 		this.hypeManager = new HypeManager(
 			hypeData,
 			this.sounds,
@@ -259,6 +260,13 @@ class ChannelParty extends EffectClient {
 			'flares',
 			'assets/flares.png',
 			'assets/flares.json');
+		
+		for (let i = 0; i < this.hypeData.levels.length; i++) {
+			if (this.hypeData.levels[i].particles) {
+				scene.load.image(`particles_${i}`,
+					this.hypeData.levels[i].particles);
+			}
+		}
 	}
 	
 	create(scene)
@@ -273,6 +281,16 @@ class ChannelParty extends EffectClient {
 		
 		scene.physics.world.setBoundsCollision(true, true, true, true);
 		this.particles = scene.add.particles('flares');
+		
+		// Level 0 has no particles, hence its value is null
+		this.levelParticles = [null];
+		for (let i = 0; i < this.hypeData.levels.length; i++) {
+			if (this.hypeData.levels[i].particles) {
+				this.levelParticles.push(scene.add.particles(`particles_${i}`));
+			} else {
+				this.levelParticles.push(null);
+			}
+		}
 		
 		this.markSceneReady();
 	}
@@ -292,6 +310,30 @@ class ChannelParty extends EffectClient {
 		this.currentUserImages[username] = this.addImage(username);
 	}
 	
+	addLevelParticles(username, level) {
+		let particles = this.levelParticles[level];
+		if (particles) {
+			let image = this.currentUserImages[username];
+			image.emitter = particles.createEmitter({
+				speed: 100,
+				gravity: { x: 0, y: 200 },
+				scale: { start: 0.1, end: 0.2 },
+				follow: image,
+				rotate: { start: 0, end: 360 },
+			});
+		}
+	}
+	
+	removeEmitter(username) {
+		let image = this.currentUserImages[username];
+		if (image.emitter) {
+			image.emitter.on = false;
+			this.scene.time.delayedCall(
+				image.emitter.lifespan.propertyValue,
+				() => this.particles.emitters.remove(image.emitter));
+		}
+	}
+	
 	removeUser(username) {
 		if (!(username in this.currentUsersInChat)) {
 			return;
@@ -303,15 +345,9 @@ class ChannelParty extends EffectClient {
 			return;
 		}
 		
+		this.removeEmitter(username);
+		
 		let image = this.currentUserImages[username];
-		
-		if (image.emitter) {
-			image.emitter.on = false;
-			this.scene.time.delayedCall(
-				image.emitter.lifespan.propertyValue,
-				() => this.particles.emitters.remove(image.emitter));
-		}
-		
 		this.scene.tweens.add({
 			targets: image,
 			alpha: 0,
@@ -401,17 +437,24 @@ class ChannelParty extends EffectClient {
 	}
 	
 	hypeLevelActivated(level) {
+		// Remvoe and add emitters as necessary
+		Object.keys(this.currentUserImages).forEach(username => {
+			this.removeEmitter(username);
+			this.addLevelParticles(username, level);
+		});
+		
 		// The images should move at base speed when hype is off,
 		// so 0 should be treated the same as 1 for the purposes
 		// of valocity calculations
-		if (level == 0) {
-			level = 1;
+		let speedLevel = level;
+		if (speedLevel == 0) {
+			speedLevel = 1;
 		}
 		
 		Object.values(this.currentUserImages).forEach(image => {
 			image.body.velocity.setTo(
-				this.hypeLevelVeolicty(level, image, 'x'),
-				this.hypeLevelVeolicty(level, image, 'y'));
+				this.hypeLevelVeolicty(speedLevel, image, 'x'),
+				this.hypeLevelVeolicty(speedLevel, image, 'y'));
 		});
 	}
 
@@ -442,24 +485,26 @@ class ChannelParty extends EffectClient {
 		
 		
 		if (this.useParticles) {
-			// Add a particle emitter and attach it to the image (also save
-			// a reference to it inside the image object for convenience)
-			image.emitter = this.particles.createEmitter({
-				frame: 'white',
-				tint: [
-					0xff0000,	// Red
-					0xff7f00,	// Orange
-					0xffff00,	// Yellow
-					0x00ff00,	// Green
-					0x0000ff,	// Blue
-					0xff7f00,	// Indigo
-					0x8b00ff,	// Violet
-				],
-				speed: 100,
-				gravity: { x: 0, y: 200 },
-				scale: { start: 0.1, end: 0.4 },
-				follow: image,
-			});
+			// // Add a particle emitter and attach it to the image (also save
+			// // a reference to it inside the image object for convenience)
+			// image.emitter = this.particles.createEmitter({
+			// 	frame: 'white',
+			// 	tint: [
+			// 		0xff0000,	// Red
+			// 		0xff7f00,	// Orange
+			// 		0xffff00,	// Yellow
+			// 		0x00ff00,	// Green
+			// 		0x0000ff,	// Blue
+			// 		0xff7f00,	// Indigo
+			// 		0x8b00ff,	// Violet
+			// 	],
+			// 	speed: 100,
+			// 	gravity: { x: 0, y: 200 },
+			// 	scale: { start: 0.1, end: 0.4 },
+			// 	follow: image,
+			// });
+			
+			this.addLevelParticles(username, this.hypeManager.currentLevel);
 		}
 		
 		this.scene.tweens.add({
@@ -512,6 +557,23 @@ class ChannelParty extends EffectClient {
 		});
 	}
 	
+	showFinalVideo() {
+		let vid = $('#finalVideo');
+		vid.show().get(0).play();
+		this.sounds.mute();
+		this.hypeManager.stop();
+		let fadeStartTime = Math.max(0,
+			vid.get(0).duration * 1000 - ChannelParty.FADE_DURATION);
+		this.scene.time.delayedCall(
+			fadeStartTime,
+			() => vid.fadeOut(ChannelParty.FADE_DURATION));
+	}
+	
+	processFinalVideo() {
+		
+		$('#finalVideo').on('ended', () => this.sounds.unmute());
+	}
+	
 	// Start all the network stuff
 	startNetwork() {
 		// this.socket = io();
@@ -554,6 +616,10 @@ class ChannelParty extends EffectClient {
 			this.hypeManager.stop();
 		});
 		
+		this.server.on('finish', () => {
+			this.showFinalVideo();
+		});
+		
 		this.server.emit('getUserImageList');
 	}
 	
@@ -578,7 +644,7 @@ const SOUNDS = {
 		loop: true,
 	},
 	'pokemon': {
-		location: 'assets/Pokemon/Pokemon.mp3',
+		location: 'assets/Pokemon/Theme.mp3',
 		loop: true,
 	},
 	'zelda': {
@@ -589,17 +655,71 @@ const SOUNDS = {
 
 const HYPE_DATA = {
 	levels: [
-		new ImageHypeLevel('assets/Sonic/Sonic.jpg', 'sonic'),
-		new ImageHypeLevel('assets/Zelda/Zelda-Large.jpg', 'zelda'),
-		new ImageHypeLevel('assets/Pokemon/Scratch_III.png', 'pokemon'),
-		new ImageHypeLevel('assets/Mario/Mario1.jpg', 'mario'),
-		new ImageHypeLevel('assets/MK/MK_arcade.jpg', 'mk'),
+		{
+			particles: 'assets/Sonic/Ring-Small.png',
+			level: new ImageHypeLevel('assets/Sonic/Sonic.jpg', 'sonic'),
+		},
+		{
+			particles: 'assets/Zelda/RealSword.png',
+			level: new ImageHypeLevel('assets/Zelda/Zelda-Large.jpg', 'zelda'),
+		},
+		{
+			particles: 'assets/Pokemon/Ball.png',
+			level: new ImageHypeLevel('assets/Pokemon/Scratch_III.png', 'pokemon'),
+		},
+		{
+			particles: 'assets/Mario/Star.png',
+			level: new ImageHypeLevel('assets/Mario/Mario1.jpg', 'mario'),
+		},
+		{
+			particles: 'assets/MK/blood-drop.png',
+			level: new ImageHypeLevel('assets/MK/MK_arcade.jpg', 'mk'),
+		},
 	],
 };
 
-var cp = new ChannelParty(SOUNDS, HYPE_DATA);
+const FINAL_VIDEO = 'assets/FinishVideo/FinishVideo.mp4';
+
+var cp = new ChannelParty(SOUNDS, HYPE_DATA, FINAL_VIDEO);
 cp.start();
 
 function showAll() {
 	cp.addAllExistingUserImages();
+}
+
+
+
+
+
+
+function css(a) {
+    var sheets = document.styleSheets, o = {};
+    for (var i in sheets) {
+        var rules = sheets[i].rules || sheets[i].cssRules;
+        for (var r in rules) {
+            if (a.is(rules[r].selectorText)) {
+                o = $.extend(o, css2json(rules[r].style), css2json(a.attr('style')));
+            }
+        }
+    }
+    return o;
+}
+
+function css2json(css) {
+    var s = {};
+    if (!css) return s;
+    if (css instanceof CSSStyleDeclaration) {
+        for (var i in css) {
+            if ((css[i]).toLowerCase) {
+                s[(css[i]).toLowerCase()] = (css[css[i]]);
+            }
+        }
+    } else if (typeof css == "string") {
+        css = css.split("; ");
+        for (var i in css) {
+            var l = css[i].split(": ");
+            s[l[0].toLowerCase()] = (l[1]);
+        }
+    }
+    return s;
 }

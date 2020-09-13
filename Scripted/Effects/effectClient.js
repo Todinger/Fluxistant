@@ -28,6 +28,7 @@ class SoundManager {
 		this._allLoadedListeners = [];
 		this._notYetLoaded = {};
 		this._masterVolume = 1;
+		this._muted = false;
 	}
 	
 	onDataLoaded(func) {
@@ -166,9 +167,29 @@ class SoundManager {
 		Object.values(this._sounds).forEach(sound => func(sound));
 	}
 	
+	_applyVolumes() {
+		this.all(sound => sound.volumeFactor =
+			this._masterVolume * (this._muted ? 0 : 1));
+	}
+	
 	setMasterVolume(vol) {
 		this._masterVolume = vol.clamp(0, 1);
-		this.all(sound => sound.volumeFactor = this._masterVolume);
+		this._applyVolumes();
+	}
+	
+	mute() {
+		this._muted = true;
+		this._applyVolumes();
+	}
+	
+	unmute() {
+		this._muted = false;
+		this._applyVolumes();
+	}
+	
+	toggleMute() {
+		this._muted = !this._muted;
+		this._applyVolumes();
 	}
 	
 	offsetMasterVolume(diff) {
@@ -275,6 +296,9 @@ class EffectClient {
 				this.sounds.setMasterVolume(volNum / 100);
 			}
 		});
+		
+		this.server.on('fxmute', () => this.sounds.mute());
+		this.server.on('fxunmute', () => this.sounds.unmute());
 	}
 	
 	sayTo(username, message) {
