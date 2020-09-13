@@ -397,7 +397,7 @@ class ChannelParty extends EffectClient {
 				if (levelParticle.data.animated) {
 					console.log(`Creating anim for particles_${i}`);
 					levelParticle.anim = scene.anims.create({
-						key: `${this.hypeData.levels[i].name}_anim`,
+						key: `${i}_${this.hypeData.levels[i].name}_anim`,
 						frames: scene.anims.generateFrameNumbers(`particles_${i}`),
 						frameRate: levelParticle.data.frameRate,
 						repeat: levelParticle.data.looping ? -1 : 1,
