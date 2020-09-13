@@ -88,6 +88,7 @@ class HypeManager {
 		this.mainView = mainView;
 		
 		this._onLevelActivatedCallbacks = [];
+		this._onLevelDeactivatedCallbacks = [];
 	}
 	
 	_hypeStart() {
@@ -134,6 +135,7 @@ class HypeManager {
 		
 		if (prevLevel > 0) {
 			this._getLevel(prevLevel).deactivate(this.soundManager);
+			this._levelDeactivated(level);
 		}
 		
 		if (level > 0) {
@@ -184,6 +186,14 @@ class HypeManager {
 	_levelActivated(level) {
 		this._onLevelActivatedCallbacks.forEach(callback => callback(level));
 	}
+	
+	onLevelDeactivated(callback) {
+		this._onLevelDeactivatedCallbacks.push(callback);
+	}
+	
+	_levelDeactivated(level) {
+		this._onLevelDeactivatedCallbacks.forEach(callback => callback(level));
+	}
 }
 
 
@@ -222,6 +232,7 @@ class ChannelParty extends EffectClient {
 			this.sounds,
 			ChannelParty.MAIN_VIEW_ID);
 		this.hypeManager.onLevelActivated(level => this.hypeLevelActivated(level));
+		this.hypeManager.onLevelDeactivated(level => this.hypeLevelDeactivated(level));
 		
 		$(`#${ChannelParty.MAIN_VIEW_ID}`).hide();
 	}
@@ -436,10 +447,16 @@ class ChannelParty extends EffectClient {
 		return finalVelocity;
 	}
 	
-	hypeLevelActivated(level) {
+	hypeLevelDeactivated(level) {
 		// Remvoe and add emitters as necessary
 		Object.keys(this.currentUserImages).forEach(username => {
 			this.removeEmitter(username);
+		});
+	}
+	
+	hypeLevelActivated(level) {
+		// Remvoe and add emitters as necessary
+		Object.keys(this.currentUserImages).forEach(username => {
 			this.addLevelParticles(username, level);
 		});
 		
@@ -569,9 +586,23 @@ class ChannelParty extends EffectClient {
 			() => vid.fadeOut(ChannelParty.FADE_DURATION));
 	}
 	
+	resetFinalVideo() {
+		$('#finalVideo').fadeOut(ChannelParty.FADE_DURATION);
+		let videoElement = $('#finalVideo').get(0);
+		videoElement.pause();
+		videoElement.currentTime = 0;
+	}
+	
 	processFinalVideo() {
-		
-		$('#finalVideo').on('ended', () => this.sounds.unmute());
+		$('#finalVideo').on('ended', () => {
+			this.sounds.unmute();
+			this.resetFinalVideo();
+		});
+	}
+	
+	stopAll() {
+		this.hypeManager.stop();
+		this.resetFinalVideo();
 	}
 	
 	// Start all the network stuff
@@ -613,7 +644,7 @@ class ChannelParty extends EffectClient {
 		});
 		
 		this.server.on('endHype', () => {
-			this.hypeManager.stop();
+			this.stopAll();
 		});
 		
 		this.server.on('finish', () => {
@@ -624,6 +655,7 @@ class ChannelParty extends EffectClient {
 	}
 	
 	start() {
+		this.processFinalVideo();
 		this.startPhaser();
 		this.fetchCurrentUserlist();
 		this.startNetwork();
@@ -640,11 +672,11 @@ const SOUNDS = {
 		loop: true,
 	},
 	'mk': {
-		location: 'assets/MK/MK.mp3',
+		location: 'assets/MK/MK-Equalized.mp3',
 		loop: true,
 	},
 	'pokemon': {
-		location: 'assets/Pokemon/Theme.mp3',
+		location: 'assets/Pokemon/Theme-Equalized.mp3',
 		loop: true,
 	},
 	'zelda': {
@@ -664,12 +696,12 @@ const HYPE_DATA = {
 			level: new ImageHypeLevel('assets/Zelda/Zelda-Large.jpg', 'zelda'),
 		},
 		{
-			particles: 'assets/Pokemon/Ball.png',
-			level: new ImageHypeLevel('assets/Pokemon/Scratch_III.png', 'pokemon'),
-		},
-		{
 			particles: 'assets/Mario/Star.png',
 			level: new ImageHypeLevel('assets/Mario/Mario1.jpg', 'mario'),
+		},
+		{
+			particles: 'assets/Pokemon/Ball.png',
+			level: new ImageHypeLevel('assets/Pokemon/Scratch_III.png', 'pokemon'),
 		},
 		{
 			particles: 'assets/MK/blood-drop.png',
@@ -685,41 +717,4 @@ cp.start();
 
 function showAll() {
 	cp.addAllExistingUserImages();
-}
-
-
-
-
-
-
-function css(a) {
-    var sheets = document.styleSheets, o = {};
-    for (var i in sheets) {
-        var rules = sheets[i].rules || sheets[i].cssRules;
-        for (var r in rules) {
-            if (a.is(rules[r].selectorText)) {
-                o = $.extend(o, css2json(rules[r].style), css2json(a.attr('style')));
-            }
-        }
-    }
-    return o;
-}
-
-function css2json(css) {
-    var s = {};
-    if (!css) return s;
-    if (css instanceof CSSStyleDeclaration) {
-        for (var i in css) {
-            if ((css[i]).toLowerCase) {
-                s[(css[i]).toLowerCase()] = (css[css[i]]);
-            }
-        }
-    } else if (typeof css == "string") {
-        css = css.split("; ");
-        for (var i in css) {
-            var l = css[i].split(": ");
-            s[l[0].toLowerCase()] = (l[1]);
-        }
-    }
-    return s;
 }
