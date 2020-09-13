@@ -316,6 +316,8 @@ class ChannelParty extends EffectClient {
 	startPhaser() {
 		let _this = this;
 		
+		let container = $('#gameContainer');
+		
 		var config = {
 			type: Phaser.AUTO,
 			transparent: true,
@@ -323,8 +325,8 @@ class ChannelParty extends EffectClient {
 				default: 'arcade'
 			},
 			parent: 'gameContainer',
-			width: 1920,
-			height: 1080,
+			width: container.innerWidth(),
+			height: container.innerHeight(),
 			scene: {
 				preload: function() {
 					_this.preload(this);
@@ -336,6 +338,11 @@ class ChannelParty extends EffectClient {
 		};
 		
 		this.game = new Phaser.Game(config);
+		
+		// $(window).resize(() => {
+		// 	console.log(`Resizing to ${container.innerWidth()}x${container.innerHeight()}`);
+		// 	this.game.scale.resize(container.innerWidth(), container.innerHeight());
+		// });
 	}
 	
 	preload(scene) {
@@ -351,11 +358,13 @@ class ChannelParty extends EffectClient {
 		for (let i = 0; i < this.hypeData.levels.length; i++) {
 			if (this.hypeData.levels[i].particles) {
 				if (this.hypeData.levels[i].particles.animated) {
+					console.log(`Loading spritesheet: ${this.hypeData.levels[i].particles.source}`);
 					scene.load.spritesheet(
 						`particles_${i}`,
 						this.hypeData.levels[i].particles.source,
 						this.hypeData.levels[i].particles.frameConfig);
 				} else {
+					console.log(`Loading image: ${this.hypeData.levels[i].particles.source}`);
 					scene.load.image(
 						`particles_${i}`,
 						this.hypeData.levels[i].particles.source);
@@ -384,9 +393,11 @@ class ChannelParty extends EffectClient {
 				let levelParticle = {};
 				levelParticle.manager = scene.add.particles(`particles_${i}`);
 				levelParticle.data = this.hypeData.levels[i].particles;
+				
 				if (levelParticle.data.animated) {
+					console.log(`Creating anim for particles_${i}`);
 					levelParticle.anim = scene.anims.create({
-						key: 'idle',
+						key: `${this.hypeData.levels[i].name}_anim`,
 						frames: scene.anims.generateFrameNumbers(`particles_${i}`),
 						frameRate: levelParticle.data.frameRate,
 						repeat: levelParticle.data.looping ? -1 : 1,
@@ -446,6 +457,7 @@ class ChannelParty extends EffectClient {
 					emitterConfig.particleClass = LoopingAnimatedParticle;
 				} else {
 					emitterConfig.particleClass = SingleAnimatedParticle;
+					emitterConfig.lifespan = lp.anim.duration;
 				}
 			}
 			
@@ -453,7 +465,6 @@ class ChannelParty extends EffectClient {
 			
 			if (lp.data.animated) {
 				image.emitter.anim = lp.anim;
-				image.emitter.ILoveStacey = true;
 			}
 			
 			if (lp.data.type == 'explode') {
@@ -817,19 +828,22 @@ const SOUNDS = {
 const HYPE_DATA = {
 	levels: [
 		{
+			name: 'Sonic',
 			particles: {
-				// source: 'assets/Sonic/RingSprite.png',
-				// animated: true,
-				// frameConfig: { frameWidth: 350, frameHeight: 306 },
-				// frameRate: 24,
-				// scale: 0.5,
-				source: 'assets/Sonic/Ring.png',
+				source: 'assets/Sonic/RingSprite.png',
+				animated: true,
+				frameConfig: { frameWidth: 350, frameHeight: 306 },
+				frameRate: 24,
+				scale: 0.5,
+				looping: true,
+				// source: 'assets/Sonic/Ring.png',
 				type: 'flow',
 				rotate: false,
 			},
 			level: new ImageHypeLevel('assets/Sonic/Sonic.jpg', 'sonic'),
 		},
 		{
+			name: 'Zelda',
 			particles: {
 				source: 'assets/Zelda/RealSword.png',
 				type: 'flow',
@@ -838,6 +852,7 @@ const HYPE_DATA = {
 			level: new ImageHypeLevel('assets/Zelda/Zelda-Large.jpg', 'zelda'),
 		},
 		{
+			name: 'Mario',
 			particles: {
 				source: 'assets/Mario/Star.png',
 				type: 'flow',
@@ -846,6 +861,7 @@ const HYPE_DATA = {
 			level: new ImageHypeLevel('assets/Mario/Mario1.jpg', 'mario'),
 		},
 		{
+			name: 'Pokemon',
 			particles: {
 				source: 'assets/Pokemon/Ball.png',
 				type: 'flow',
@@ -854,12 +870,14 @@ const HYPE_DATA = {
 			level: new ImageHypeLevel('assets/Pokemon/Scratch_III.png', 'pokemon'),
 		},
 		{
+			name: 'MK',
 			particles: {
 				source: 'assets/MK/Blood/TypeBSheet.png',
 				animated: true,
 				frameConfig: { frameWidth: 252, frameHeight: 119 },
 				frameRate: 16,
 				scale: 16,
+				looping: true,
 				speed: 0,
 				frequency: 150,
 				// source: 'assets/MK/Drop.png',
