@@ -197,6 +197,81 @@ class HypeManager {
 }
 
 
+class LoopingAnimatedParticle extends Phaser.GameObjects.Particles.Particle {
+	constructor(emitter)
+	{
+		super(emitter);
+		
+		this.t = 0;
+		this.i = 0;
+		this.emitter = emitter;
+	}
+	
+	update(delta, step, processors)
+	{
+		var result = super.update(delta, step, processors);
+		
+		this.t += delta;
+		
+		if (this.t >= this.emitter.anim.msPerFrame)
+		{
+			this.i++;
+			
+			if (this.i >= this.emitter.anim.frames.length)
+			{
+				this.i = 0;
+			}
+			
+			this.frame = this.emitter.anim.frames[this.i].frame;
+			
+			this.t -= this.emitter.anim.msPerFrame;
+		}
+		
+		return result;
+	}
+}
+
+class SingleAnimatedParticle extends Phaser.GameObjects.Particles.Particle {
+	constructor(emitter)
+	{
+		super(emitter);
+		
+		this.t = 0;
+		this.i = 0;
+		this.emitter = emitter;
+		this.finished = false;
+	}
+	
+	update(delta, step, processors)
+	{
+		var result = super.update(delta, step, processors);
+		
+		if (this.finished) {
+			return result;
+		}
+		
+		this.t += delta;
+		
+		if (this.t >= this.emitter.anim.msPerFrame)
+		{
+			this.i++;
+			
+			if (this.i >= this.emitter.anim.frames.length)
+			{
+				this.finished = true;
+				// this.frame = null;
+			} else {
+				this.frame = this.emitter.anim.frames[this.i].frame;
+				this.t -= this.emitter.anim.msPerFrame;
+			}
+		}
+		
+		return result;
+	}
+}
+
+
+
 
 class ChannelParty extends EffectClient {
 	static get IMAGE_SIZE()					{ return 300; }
@@ -205,6 +280,7 @@ class ChannelParty extends EffectClient {
 	static get FADE_DURATION()				{ return 500; }
 	static get MAIN_VIEW_ID()				{ return 'gameContainer'; }
 	static get HYPE_VELOCITY_INCREMENT()	{ return 500; }
+	static get PARTICLE_EXPLODE_INTERVAL()	{ return 100; }
 	
 	
 	constructor(soundData, hypeData) {
@@ -274,8 +350,16 @@ class ChannelParty extends EffectClient {
 		
 		for (let i = 0; i < this.hypeData.levels.length; i++) {
 			if (this.hypeData.levels[i].particles) {
-				scene.load.image(`particles_${i}`,
-					this.hypeData.levels[i].particles);
+				if (this.hypeData.levels[i].particles.animated) {
+					scene.load.spritesheet(
+						`particles_${i}`,
+						this.hypeData.levels[i].particles.source,
+						this.hypeData.levels[i].particles.frameConfig);
+				} else {
+					scene.load.image(
+						`particles_${i}`,
+						this.hypeData.levels[i].particles.source);
+				}
 			}
 		}
 	}
@@ -297,7 +381,19 @@ class ChannelParty extends EffectClient {
 		this.levelParticles = [null];
 		for (let i = 0; i < this.hypeData.levels.length; i++) {
 			if (this.hypeData.levels[i].particles) {
-				this.levelParticles.push(scene.add.particles(`particles_${i}`));
+				let levelParticle = {};
+				levelParticle.manager = scene.add.particles(`particles_${i}`);
+				levelParticle.data = this.hypeData.levels[i].particles;
+				if (levelParticle.data.animated) {
+					levelParticle.anim = scene.anims.create({
+						key: 'idle',
+						frames: scene.anims.generateFrameNumbers(`particles_${i}`),
+						frameRate: levelParticle.data.frameRate,
+						repeat: levelParticle.data.looping ? -1 : 1,
+					});
+				}
+				
+				this.levelParticles.push(levelParticle);
 			} else {
 				this.levelParticles.push(null);
 			}
@@ -321,23 +417,72 @@ class ChannelParty extends EffectClient {
 		this.currentUserImages[username] = this.addImage(username);
 	}
 	
-	addLevelParticles(username, level) {
-		let particles = this.levelParticles[level];
-		if (particles) {
-			let image = this.currentUserImages[username];
-			image.emitter = particles.createEmitter({
-				speed: 100,
+	doParticleExplosion(emitter) {
+		emitter.explode(30);
+		
+	}
+	
+	addLevelParticles(image, level) {
+		let lp = this.levelParticles[level];
+		if (lp) {
+			let scale = lp.data.scale ?? 1;
+			let emitterConfig = {
+				speed: lp.data.speed ?? 100,
 				gravity: { x: 0, y: 200 },
-				scale: { start: 0.1, end: 0.2 },
+				scale: { start: 0.1 * scale, end: 0.2 * scale },
 				follow: image,
-				rotate: { start: 0, end: 360 },
-			});
+			};
+			
+			if (lp.data.rotate) {
+				emitterConfig.rotate = { start: 0, end: 360 };
+			}
+			
+			if (lp.data.frequency) {
+				emitterConfig.frequency = lp.data.frequency;
+			}
+			
+			if (lp.data.animated) {
+				if (lp.data.looping) {
+					emitterConfig.particleClass = LoopingAnimatedParticle;
+				} else {
+					emitterConfig.particleClass = SingleAnimatedParticle;
+				}
+			}
+			
+			image.emitter = lp.manager.createEmitter(emitterConfig);
+			
+			if (lp.data.animated) {
+				image.emitter.anim = lp.anim;
+				image.emitter.ILoveStacey = true;
+			}
+			
+			if (lp.data.type == 'explode') {
+				image.emitter.explode();
+				image.emitter.explosionTimer = this.scene.time.addEvent({
+					delay: ChannelParty.PARTICLE_EXPLODE_INTERVAL,
+					callback: () => image.emitter.explode(30),
+					loop: true,
+				});
+			}
+			
+			// image.emitter = particles.createEmitter({
+			// 	speed: 100,
+			// 	gravity: { x: 0, y: 200 },
+			// 	scale: { start: 0.1, end: 0.2 },
+			// 	follow: image,
+			// 	// rotate: { start: 0, end: 360 },
+			// });
+			// // image.emitter.explode(20);
 		}
 	}
 	
 	removeEmitter(username) {
 		let image = this.currentUserImages[username];
 		if (image.emitter) {
+			if (image.emitter.explosionTimer) {
+				image.emitter.explosionTimer.remove(false);
+			}
+			
 			image.emitter.on = false;
 			this.scene.time.delayedCall(
 				image.emitter.lifespan.propertyValue,
@@ -438,6 +583,13 @@ class ChannelParty extends EffectClient {
 	}
 	
 	hypeLevelVeolicty(level, image, axis) {
+		// The images should move at base speed when hype is off,
+		// so 0 should be treated the same as 1 for the purposes
+		// of valocity calculations
+		if (level == 0) {
+			level = 1;
+		}
+		
 		let sign = Math.sign(image.body.velocity[axis]);
 		let absoluteBaseSpeed = Math.abs(image.baseVelocity[axis]);
 		let speed = absoluteBaseSpeed + 
@@ -456,22 +608,14 @@ class ChannelParty extends EffectClient {
 	
 	hypeLevelActivated(level) {
 		// Remvoe and add emitters as necessary
-		Object.keys(this.currentUserImages).forEach(username => {
-			this.addLevelParticles(username, level);
+		Object.values(this.currentUserImages).forEach(image => {
+			this.addLevelParticles(image, level);
 		});
-		
-		// The images should move at base speed when hype is off,
-		// so 0 should be treated the same as 1 for the purposes
-		// of valocity calculations
-		let speedLevel = level;
-		if (speedLevel == 0) {
-			speedLevel = 1;
-		}
 		
 		Object.values(this.currentUserImages).forEach(image => {
 			image.body.velocity.setTo(
-				this.hypeLevelVeolicty(speedLevel, image, 'x'),
-				this.hypeLevelVeolicty(speedLevel, image, 'y'));
+				this.hypeLevelVeolicty(level, image, 'x'),
+				this.hypeLevelVeolicty(level, image, 'y'));
 		});
 	}
 
@@ -495,33 +639,18 @@ class ChannelParty extends EffectClient {
 		};
 		
 		image.body.velocity.setTo(velocity.x, velocity.y);
-		image.baseVelocity = velocity; // Saved for changing by hype level later
+		image.baseVelocity = velocity; // Saved for changing by hype level
 		image.body.collideWorldBounds = true;
 		image.body.bounce.set(1);
 		image.alpha = 0;
 		
+		image.body.velocity.setTo(
+			this.hypeLevelVeolicty(this.hypeManager.currentLevel, image, 'x'),
+			this.hypeLevelVeolicty(this.hypeManager.currentLevel, image, 'y'));
+		
 		
 		if (this.useParticles) {
-			// // Add a particle emitter and attach it to the image (also save
-			// // a reference to it inside the image object for convenience)
-			// image.emitter = this.particles.createEmitter({
-			// 	frame: 'white',
-			// 	tint: [
-			// 		0xff0000,	// Red
-			// 		0xff7f00,	// Orange
-			// 		0xffff00,	// Yellow
-			// 		0x00ff00,	// Green
-			// 		0x0000ff,	// Blue
-			// 		0xff7f00,	// Indigo
-			// 		0x8b00ff,	// Violet
-			// 	],
-			// 	speed: 100,
-			// 	gravity: { x: 0, y: 200 },
-			// 	scale: { start: 0.1, end: 0.4 },
-			// 	follow: image,
-			// });
-			
-			this.addLevelParticles(username, this.hypeManager.currentLevel);
+			this.addLevelParticles(image, this.hypeManager.currentLevel);
 		}
 		
 		this.scene.tweens.add({
@@ -688,23 +817,55 @@ const SOUNDS = {
 const HYPE_DATA = {
 	levels: [
 		{
-			particles: 'assets/Sonic/Ring-Small.png',
+			particles: {
+				// source: 'assets/Sonic/RingSprite.png',
+				// animated: true,
+				// frameConfig: { frameWidth: 350, frameHeight: 306 },
+				// frameRate: 24,
+				// scale: 0.5,
+				source: 'assets/Sonic/Ring.png',
+				type: 'flow',
+				rotate: false,
+			},
 			level: new ImageHypeLevel('assets/Sonic/Sonic.jpg', 'sonic'),
 		},
 		{
-			particles: 'assets/Zelda/RealSword.png',
+			particles: {
+				source: 'assets/Zelda/RealSword.png',
+				type: 'flow',
+				rotate: true,
+			},
 			level: new ImageHypeLevel('assets/Zelda/Zelda-Large.jpg', 'zelda'),
 		},
 		{
-			particles: 'assets/Mario/Star.png',
+			particles: {
+				source: 'assets/Mario/Star.png',
+				type: 'flow',
+				rotate: true,
+			},
 			level: new ImageHypeLevel('assets/Mario/Mario1.jpg', 'mario'),
 		},
 		{
-			particles: 'assets/Pokemon/Ball.png',
+			particles: {
+				source: 'assets/Pokemon/Ball.png',
+				type: 'flow',
+				rotate: true,
+			},
 			level: new ImageHypeLevel('assets/Pokemon/Scratch_III.png', 'pokemon'),
 		},
 		{
-			particles: 'assets/MK/blood-drop.png',
+			particles: {
+				source: 'assets/MK/Blood/TypeBSheet.png',
+				animated: true,
+				frameConfig: { frameWidth: 252, frameHeight: 119 },
+				frameRate: 16,
+				scale: 16,
+				speed: 0,
+				frequency: 150,
+				// source: 'assets/MK/Drop.png',
+				type: 'flow',
+				rotate: false,
+			},
 			level: new ImageHypeLevel('assets/MK/MK_arcade.jpg', 'mk'),
 		},
 	],

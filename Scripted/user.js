@@ -21,6 +21,7 @@ class Filters {
 	static isAtLeastMod() { return (user) => user.isMod || user.isBroadcaster; }
 	static isSub() { return (user) => user.isSub; }
 	static isUser(username) { return (user) => user.name == username; }
+	static isOneOf(usernames) { return (user) => usernames.includes(user.name); }
 }
 
 module.exports = {
