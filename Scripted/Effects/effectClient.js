@@ -251,14 +251,17 @@ class SoundManager {
 class ServerCommManager {
 	constructor(scriptName) {
 		this.scriptName = scriptName;
-		this._attached = false;
+		this._attachRequested = false;
+		this._reattachNeeded = false;
 		this.socket = io();
 		this.on('connect', () => this._connected());
+		this.on('disconnect', () => this._disconnected());
 	}
 	
 	attach() {
+		console.log(`[${this.scriptName}] Attaching`);
 		this.socket.emit('attachTo', this.scriptName);
-		this._attached = true;
+		this._attachRequested = true;
 	}
 	
 	on(eventName, callback) {
@@ -270,10 +273,17 @@ class ServerCommManager {
 	}
 	
 	_connected() {
-		if (this._attached) {
+		if (this._reattachNeeded) {
 			// We were attached before but the connection was interrupted,
 			// so we attach again
 			this.attach();
+			this._reattachNeeded = false;
+		}
+	}
+	
+	_disconnected() {
+		if (this._attachRequested) {
+			this._reattachNeeded = true;
 		}
 	}
 }
@@ -290,9 +300,9 @@ class EffectClient {
 		this.server = new ServerCommManager(scriptName);
 		
 		this.server.on('fxvol', data => {
-			// if (data.volume === undefined) {
-			// 	return;
-			// }
+			if (data.volume === undefined) {
+				return;
+			}
 			
 			let volNum = Number(data.volume);
 			if (volNum === NaN) {
@@ -315,5 +325,8 @@ class EffectClient {
 		this.server.emit('sayTo', { username, message });
 	}
 	
+	log(message) {
+		console.log(`[${this.scriptName}] ${message}`);
+	}
 }
 
