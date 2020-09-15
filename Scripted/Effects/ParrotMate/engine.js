@@ -133,8 +133,10 @@ class SequencePlayer {
 	}
 	
 	play() {
-		this._playing = true;
-		this._playNext();
+		if (!this._playing) {
+			this._playing = true;
+			this._playNext();
+		}
 	}
 	
 	_playNext() {
@@ -162,6 +164,11 @@ class RandomSequencePlayer extends SequencePlayer {
 		
 		Object.values(this.sequences).forEach(sequence => 
 			sequence.onFinished(() => this._showBaseImage()));
+	}
+	
+	setDelay(minDelay, maxDelay) {
+		this.minDelay = minDelay;
+		this.maxDelay = maxDelay;
 	}
 	
 	_playNextImplementation() {
