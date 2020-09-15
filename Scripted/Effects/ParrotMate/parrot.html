@@ -78,6 +78,10 @@
 			white-space: pre-wrap;
 			line-height: 1em;
 		}
+		
+		.hide-on-startup {
+			visibility: hidden;
+		}
 	</style>
 </head>
 <body>
@@ -85,14 +89,21 @@
 	
 	<div id="imageholder" class="imgbox">
 		<img id="parrot" class="center-fit" src="">
-			<div id="bubble" class="bubble-holder">
-				<div id="bubbleText" class="bubble bubble-bottom-left bubble-text"></div>
-			</div>
+		<div id="bubble" class="bubble-holder hide-on-startup">
+			<div id="bubbleText" class="bubble bubble-bottom-left bubble-text"></div>
+		</div>
 	</div>
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	
-	<script type="text/javascript">$('#bubble').hide();</script>
+	<!-- This is to prevent the speech bubble from showing up when the page
+		 loads. Just using hide() here prevents it from showing up on Chrome,
+		 but not on OBS, so more drastic measures were necessary.
+	 -->
+	<script type="text/javascript">
+		$('#bubble').hide();
+		$('#bubble').css('visibility', 'visible');
+	</script>
 	
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="../effectClient.js"></script>

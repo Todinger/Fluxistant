@@ -3,7 +3,7 @@ const SECONDS = 1000;
 const MINUTES = 60 * SECONDS;
 
 class ParrotMate extends EffectClient {
-	static get DEFAULT_BASE_DELAY()		{ return 5 * SECONDS; }
+	static get DEFAULT_BASE_DELAY()		{ return 5 * MINUTES; }
 	static get DEFAULT_DELAY_VARIANCE()	{ return 0; }
 	static get STARTING_DELAY()			{ return ParrotMate.DEFAULT_BASE_DELAY; }
 	
