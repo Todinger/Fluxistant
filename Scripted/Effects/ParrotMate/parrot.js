@@ -5,6 +5,7 @@ const MINUTES = 60 * SECONDS;
 class ParrotMate extends EffectClient {
 	static get DEFAULT_BASE_DELAY()		{ return 5 * SECONDS; }
 	static get DEFAULT_DELAY_VARIANCE()	{ return 0; }
+	static get STARTING_DELAY()			{ return ParrotMate.DEFAULT_BASE_DELAY; }
 	
 	constructor() {
 		super('Parrot Mate');
@@ -47,10 +48,11 @@ class ParrotMate extends EffectClient {
 		this.server.on('stop', () => this.player.stop());
 		
 		showImage('regular');
+		clearText();
 		
 		this.server.attach();
 		
-		this.player.play();
+		setTimeout(() => this.player.play(), ParrotMate.STARTING_DELAY);
 	}
 }
 

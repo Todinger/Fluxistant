@@ -1,25 +1,38 @@
-class Action {
-	constructor(name) {
-		this.name = name;
-	}
-}
-
 function showImage(name) {
 	$('#parrot').attr("src", IMAGE_LOCATIONS[name]);
 }
 
-class ImageAction extends Action {
-	perform() {
-		showImage(this.name);
-	}
-	
+function showText(text) {
+	$('#bubbleText').text(text);
+	$('#bubble').show();
+}
+
+function clearText() {
+	$('#bubble').hide();
+	$('#bubbleText').empty();
+}
+
+class Action {
 	get duration() {
 		return 0;
 	}
 }
-function Image(time, name) { return new ImageAction(time, name); }
 
-class SoundAction extends Action {
+class ResourceAction extends Action {
+	constructor(name) {
+		super();
+		this.name = name;
+	}
+}
+
+class ImageAction extends ResourceAction {
+	perform() {
+		showImage(this.name);
+	}
+}
+function Image(name) { return new ImageAction(name); }
+
+class SoundAction extends ResourceAction {
 	perform() {
 		Sounds[this.name].play();
 	}
@@ -28,7 +41,26 @@ class SoundAction extends Action {
 		return Sounds[this.name].duration * 1000;
 	}
 }
-function Sound(time, name) { return new SoundAction(time, name); }
+function Sound(name) { return new SoundAction(name); }
+
+class TextAction extends Action {
+	constructor(text) {
+		super();
+		this.text = text;
+	}
+	
+	perform() {
+		showText(this.text);
+	}
+}
+function Text(text) { return new TextAction(text); }
+
+class ClearTextAction extends Action {
+	perform() {
+		clearText();
+	}
+}
+function ClearText() { return new ClearTextAction() };
 
 class TimedEvent {
 	constructor(time, actions) {
@@ -128,8 +160,9 @@ class SequencePlayer {
 		this._playing = false;
 	}
 	
-	_showBaseImage() {
+	_sequenceFinished() {
 		showImage(this.baseImageName);
+		clearText();
 	}
 	
 	play() {
@@ -163,7 +196,7 @@ class RandomSequencePlayer extends SequencePlayer {
 		this.maxDelay = maxDelay;
 		
 		Object.values(this.sequences).forEach(sequence => 
-			sequence.onFinished(() => this._showBaseImage()));
+			sequence.onFinished(() => this._sequenceFinished()));
 	}
 	
 	setDelay(minDelay, maxDelay) {
@@ -188,7 +221,7 @@ class LoopingSequencePlayer extends SequencePlayer {
 		this.interval = interval;
 		this.running = false;
 		
-		this.sequence.onFinished(() => this._showBaseImage());
+		this.sequence.onFinished(() => this._sequenceFinished());
 	}
 	
 	_playNextImplementation() {

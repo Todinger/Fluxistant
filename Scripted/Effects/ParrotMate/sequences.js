@@ -2,6 +2,7 @@
 const SEQUENCES = {
 	hey: Sequence([
 		Event(0, [ Sound('hey') ]),
+		Event(0, [ Text('Hey! Look! Listen!\nHey! Look! Listen!') ]),
 		Event(200, [ Image('wing') ]),
 		Event(500, [ Image('regular') ]),
 		Event(750, [ Image('look') ]),
@@ -39,6 +40,7 @@ const SEQUENCES = {
 	behind: Sequence([
 		Event(0, [ Sound('behind') ]),
 		Event(173, [ Image('wing') ]),
+		Event(694, [ Text('Look behind you!') ]),
 		Event(694, [ Image('look') ]),
 		Event(1744, [ Image('regular') ]),
 	]),
@@ -47,6 +49,7 @@ const SEQUENCES = {
 		Event(0, [ Sound('attention') ]),
 		Event(163, [ Image('wing') ]),
 		Event(686, [ Image('regular') ]),
+		Event(928, [ Text('Give me attention!') ]),
 		Event(928, [ Image('wing') ]),
 		Event(1183, [ Image('regular') ]),
 		Event(1417, [ Image('wing') ]),
@@ -58,6 +61,7 @@ const SEQUENCES = {
 		Event(0, [ Sound('cracker') ]),
 		Event(187, [ Image('mouth') ]),
 		Event(754, [ Image('look') ]),
+		Event(1066, [ Text('Polly want a cracker!') ]),
 		Event(1066, [ Image('mouth') ]),
 		Event(1336, [ Image('regular') ]),
 		Event(1606, [ Image('mouth') ]),
@@ -66,12 +70,14 @@ const SEQUENCES = {
 	
 	dl6: Sequence([
 		Event(0, [ Sound('dl6') ]),
+		Event(0, [ Text('Remember DL-6...') ]),
 		Event(137, [ Image('mouth') ]),
 		Event(376, [ Image('regular') ]),
 		Event(615, [ Image('mouth') ]),
 		Event(775, [ Image('regular') ]),
 		Event(935, [ Image('mouth') ]),
 		Event(1095, [ Image('regular') ]),
+		Event(1955, [ Text('*STARE*') ]),
 		Event(1955, [ Image('look') ]),
 		Event(7000, [ Image('regular') ]),
 	]),
@@ -90,6 +96,7 @@ const SEQUENCES = {
 		Event(0, [ Sound('died') ]),
 		Event(75, [ Image('wing') ]),
 		Event(675, [ Image('regular') ]),
+		Event(943, [ Text('I am died.') ]),
 		Event(943, [ Image('mouth') ]),
 		Event(1155, [ Image('regular') ]),
 		Event(1389, [ Image('mouth') ]),
@@ -99,8 +106,8 @@ const SEQUENCES = {
 	lars: Sequence([
 		Event(0, [ Sound('lars') ]),
 		Event(20, [ Image('mouth') ]),
-		Event(20, [ Image('mouth') ]),
 		Event(592, [ Image('regular') ]),
+		Event(842, [ Text('Where is Lars?') ]),
 		Event(842, [ Image('mouth') ]),
 		Event(1064, [ Image('look') ]),
 		Event(1331, [ Image('mouth') ]),
@@ -112,6 +119,7 @@ const SEQUENCES = {
 		Event(0, [ Sound('law') ]),
 		Event(148, [ Image('mouth') ]),
 		Event(649, [ Image('regular') ]),
+		Event(873, [ Text('What is law?') ]),
 		Event(873, [ Image('wing') ]),
 		Event(1136, [ Image('look') ]),
 		Event(1380, [ Image('wing') ]),
