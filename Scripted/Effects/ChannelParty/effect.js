@@ -43,8 +43,8 @@ class ChannelParty extends Effect {
 		);
 		
 		this.registerCommand('z', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(username, volume) => {
-				this.broadcastEvent('fxvol', { username, volume });
+			(user, volume) => {
+				this.broadcastEvent('fxvol', { username: user.name, volume });
 			}
 		);
 	}
