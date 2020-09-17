@@ -31,6 +31,12 @@ function getUserImageList(socket) {
 	});
 }
 
+var KEYCODES = require('./enums').KEYCODES;
+var KeyboardManager = require('./keyboardManager');
+// KeyboardManager.logAllUp = true;
+KeyboardManager.start();
+
+
 // Load all the effects we have
 var Effect = require('./effect');
 var EffectManager = require('./effectManager');

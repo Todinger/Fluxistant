@@ -25,7 +25,7 @@ class TwitchManager {
 			tip: [],				// 
 			host: [],				// 
 			raid: [],				// 
-			channelReward: [],		// 
+			channelReward: [],		// (user, reward, msg)
 			userJoined: [],			// (username)
 			userLeft: [],			// (username)
 			userFirstMessage: [],	// 
@@ -152,17 +152,25 @@ class TwitchManager {
 		// TODO: Uncomment error catching
 		// try {
 			if(self) return;
+			console.log('Message!');
+			console.log(message);
+			console.log(userstate);
 			
 			let user = new User(userstate);
 			
-			switch(userstate["message-type"]) {
-				case "action":
+			if (userstate['custom-reward-id']) {
+				// This is a reward redemption with a custom message
+				// 
+			}
+			
+			switch(userstate['message-type']) {
+				case 'action':
 					this._invokeEvent('action', user, message);
 					break;
 				default:
 					console.warn("Unknown message type received, treating as regular message.");
-				case "whisper":
-				case "chat":
+				case 'whisper':
+				case 'chat':
 					let command = this._parseCommand(message);
 					
 					if (this._isKnownCommand(command)) {

@@ -1,5 +1,7 @@
 var User = require('./user');
 var TwitchManager = require('./twitchManager');
+var Enums = require('./enums');
+var KeyboardManager = require('./keyboardManager');
 
 class Effect {
 	constructor(description) {
@@ -68,8 +70,23 @@ class Effect {
 		});
 	}
 	
+	registerShortcutKey(name, shortcut, callback) {
+		KeyboardManager.registerShortcut(
+			`${this.name}_${name}`,
+			shortcut,
+			callback);
+	}
+	
+	unregisterShortcutKey(name, shortcut, callback) {
+		KeyboardManager.unregisterShortcut(`${this.name}_${name}`);
+	}
+	
 	static get Filters() {
 		return User.Filters;
+	}
+	
+	static get Keycodes() {
+		return Enums.KEYCODES;
 	}
 }
 
