@@ -73,6 +73,16 @@ class Countdown extends Effect {
 			],
 			() => this.broadcastEvent('offsetTime', -Countdown.KEY_OFFSET_AMOUNT)
 		);
+		
+		this.registerShortcutKey(
+			'resetTime',
+			[
+				Effect.Keycodes.VC_CONTROL_L,
+				Effect.Keycodes.VC_META_L,
+				Effect.Keycodes.VC_KP_0
+			],
+			() => this.broadcastEvent('setTime', this.initialTime)
+		);
 	}
 }
 
