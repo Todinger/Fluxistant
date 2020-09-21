@@ -45,6 +45,17 @@ class Effect {
 		this._clientAttachedHandlers.forEach(handler => handler(socket));
 	}
 	
+	// Should check if a given command (= { cmdname, args }) is a command
+	// for this effect, and if so, invoke it and return true - otherwise
+	// it should return false (like it does here by default)!
+	// Derive in concrete deriving classes that have complex commands (if a
+	// command is simple you can use registerCommand or forwardSimpleCommand
+	// for it; this is for more complex things, such as commands with dynamic
+	// names, e.g. self-commands)
+	invokeCommand(user, command) {
+		return false;
+	}
+	
 	broadcastEvent(eventName, args) {
 		Object.values(this._connectedClients).forEach(socket => {
 			socket.emit(eventName, args);

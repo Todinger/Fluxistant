@@ -1,6 +1,7 @@
 var assert = require('assert').strict;
 var tmi = require('tmi.js');
 var User = require('./user').User;
+var EffectManager = require('./effectManager');
 
 const COMMAND_PREFIX = '!';
 
@@ -133,28 +134,48 @@ class TwitchManager {
 		return command !== null && command.cmdname in this._commandHandlers;
 	}
 	
-	_invokeCommand(user, msg, command) {
-		let fullargs = [user].concat(command.args);
+	_invokeCommand(user, command) {
+		if (command === null) {
+			return false;
+		}
 		
-		// Invoke the specific command handlers
-		this._commandHandlers[command.cmdname].forEach(handler => {
-			if (handler.filters.reduce(
-				(soFar, currentFilter) => soFar && currentFilter(user), true)) {
-					handler.callback.apply(null, fullargs);
-			}
+		let isCommand = false;
+		
+		// Check if any handlers have been registered for this command
+		// and invoke them if so
+		if (command.cmdname in this._commandHandlers) {
+			isCommand = true;
+			
+			let fullargs = [user].concat(command.args);
+			
+			// Invoke the specific command handlers
+			this._commandHandlers[command.cmdname].forEach(handler => {
+				if (handler.filters.reduce(
+					(soFar, currentFilter) => soFar && currentFilter(user), true)) {
+						handler.callback.apply(null, fullargs);
+				}
+			});
+			
+			// Invoke the general command handlers
+			this._invokeEvent('command', user, command.cmdname, command.args);
+		}
+		
+		// Let every effect examine the command and invoke it if it's one of
+		// its commands - if any of them did, then this is a command
+		Object.values(EffectManager.effects).forEach(effect => {
+			isCommand = isCommand || effect.invokeCommand(user, command);
 		});
 		
-		// Invoke the general command handlers
-		this._invokeEvent('command', user, command.cmdname, command.args);
+		return isCommand;
 	}
 	
 	_processMessage(userstate, message, self) {
 		// TODO: Uncomment error catching
-		// try {
+		try {
 			if(self) return;
-			console.log('Message!');
-			console.log(message);
-			console.log(userstate);
+			// console.log('Message!');
+			// console.log(message);
+			// console.log(userstate);
 			
 			let user = new User(userstate);
 			
@@ -171,10 +192,12 @@ class TwitchManager {
 					console.warn("Unknown message type received, treating as regular message.");
 				case 'whisper':
 				case 'chat':
+					// Check if this is a command and invoke it if so - only
+					// proceed to treat this as a regular message if it's not
+					// a command
 					let command = this._parseCommand(message);
-					
-					if (this._isKnownCommand(command)) {
-						this._invokeCommand(user, message, command);
+					if (this._invokeCommand(user, message, command)) {
+						return;
 					}
 					
 					this._invokeEvent('message', user, message);
@@ -185,10 +208,10 @@ class TwitchManager {
 			// if(message.toLowerCase() === '!hello') {
 			// 	client.say(channel, `@${tags.username}, heya!`);
 			// }
-		// }
-		// catch (err) {
-		// 	console.error(err);
-		// }
+		}
+		catch (err) {
+			console.error(err);
+		}
 	}
 	
 	_invokeEvent(eventName, ...args) {
