@@ -95,6 +95,7 @@ class TwitchManager {
 	}
 	
 	onCommand(cmdname, filters, callback) {
+		console.log(`onCommand(${cmdname}) invoked!`)
 		if (!(cmdname in this._commandHandlers)) {
 			this._commandHandlers[cmdname] = [];
 		}
@@ -130,10 +131,6 @@ class TwitchManager {
 		};
 	}
 	
-	_isKnownCommand(command) {
-		return command !== null && command.cmdname in this._commandHandlers;
-	}
-	
 	_invokeCommand(user, command) {
 		if (command === null) {
 			return false;
@@ -155,9 +152,6 @@ class TwitchManager {
 						handler.callback.apply(null, fullargs);
 				}
 			});
-			
-			// Invoke the general command handlers
-			this._invokeEvent('command', user, command.cmdname, command.args);
 		}
 		
 		// Let every effect examine the command and invoke it if it's one of
@@ -165,6 +159,11 @@ class TwitchManager {
 		Object.values(EffectManager.effects).forEach(effect => {
 			isCommand = isCommand || effect.invokeCommand(user, command);
 		});
+		
+		if (isCommand) {
+			// Invoke the general command handlers
+			this._invokeEvent('command', user, command.cmdname, command.args);
+		}
 		
 		return isCommand;
 	}
@@ -196,7 +195,7 @@ class TwitchManager {
 					// proceed to treat this as a regular message if it's not
 					// a command
 					let command = this._parseCommand(message);
-					if (this._invokeCommand(user, message, command)) {
+					if (this._invokeCommand(user, command)) {
 						return;
 					}
 					
