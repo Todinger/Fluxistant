@@ -11,13 +11,6 @@
 		"sound": "/assets/user-images/yecatsmailbox.mp3"
 	},
 	
-	"objection": {
-		"image": {
-			"url": "/assets/image-display/Objection.png"
-		},
-		"sound": "/assets/sfx/objection.mp3"
-	},
-	
 	"besttwitchdrummer": {
 		"image": {
 			"url": "/assets/user-images/maxadrums.png"
@@ -57,5 +50,85 @@
 			}
 		},
 		"sound": "/assets/sfx/dundundun.mp3"
+	},
+	
+	"holdit": {
+		"image": {
+			"url": "/assets/image-display/Hold It.png"
+		},
+		"sound": "/assets/sfx/holdit.mp3"
+	},
+	
+	"nitsua": {
+		"image": {
+			"url": "/assets/image-display/nitsua.png"
+		}
+	},
+	
+	"nomnomnom": {
+		"image": {
+			"duration": 6500,
+			"url": "/assets/image-display/Cookiemonster.png"
+		},
+		"sound": "/assets/sfx/cookie.mp3"
+	},
+	
+	"objection": {
+		"image": {
+			"url": "/assets/image-display/Objection.png"
+		},
+		"sound": "/assets/sfx/objection.mp3"
+	},
+	
+	":parrot:": {
+		"image": {
+			"url": "/assets/image-display/Parrot.png",
+			"effects": {
+				"dundundun": {}
+			}
+		},
+		"sound": "/assets/sfx/parrot/squawk.mp3"
+	},
+	
+	"parrot": {
+		"image": {
+			"url": "/assets/image-display/Parrot.png",
+			"effects": {
+				"dundundun": {}
+			}
+		},
+		"sound": "/assets/sfx/parrot/squawk.mp3"
+	},
+	
+	"sheldon": {
+		"sound": "/assets/sfx/sheldon.mp3"
+	},
+	
+	"shop": {
+		"sound": "/assets/sfx/bapanada.mp3"
+	},
+	
+	"takethat": {
+		"image": {
+			"url": "/assets/image-display/Take That.png"
+		},
+		"sound": "/assets/sfx/takethat.mp3"
+	},
+	
+	"undercover": {
+		"image": {
+			"url": "/assets/image-display/GumshoeSunglasses.png"
+		}
+	},
+	
+	"whatislaw": {
+		"image": {
+			"url": "/assets/image-display/Saturday Wright Live.gif"
+		},
+		"sound": "/assets/sfx/whatislove.mp3"
+	},
+	
+	"yay": {
+		"sound": "/assets/sfx/hooray.mp3"
 	}
 }

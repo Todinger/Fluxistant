@@ -198,10 +198,15 @@ class ImageDisplay extends EffectClient {
 		}
 	}
 	
-	playSound(url) {
+	playSound(url, notifyOnFinish) {
 		let sound = new Audio(url);
-		$(sound).on('ended', () => this.soundDone());
-		sound.play().catch(() => this.soundDone());
+		
+		if (notifyOnFinish) {
+			$(sound).on('ended', () => this.soundDone());
+			sound.play().catch(() => this.soundDone());
+		} else {
+			sound.play().catch(() => {});
+		}
 	}
 	
 	imageDone(imageParameters) {
@@ -235,15 +240,19 @@ class ImageDisplay extends EffectClient {
 		
 		if (parameters.sound) {
 			this.currentSoundDone = false;
-			this.playSound(parameters.sound);
+			this.playSound(parameters.sound, true);
 		}
 	}
 	
 	start() {
 		this.server.on('showImage', parameters => {
-			this.performBlockingEvent(
-				'showImage',
-				() => this.processRequest(parameters));
+			if (parameters.image) {
+				this.performBlockingEvent(
+					'showImage',
+					() => this.processRequest(parameters));
+			} else if (parameters.sound) {
+				this.playSound(parameters.sound, false);
+			}
 		});
 		
 		this.server.attachToTag('imgdisp');
