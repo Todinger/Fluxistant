@@ -373,29 +373,109 @@ class EffectClient {
 		}
 	}
 	
-	performBlockingEvent(eventName, callback) {
-		if (!(eventName in this.blockingEventQueues)) {
-			this.blockingEventQueues[eventName] = [];
+	_isBlockingEventReady(blockingEventDescriptor) {
+		return Object.values(blockingEventDescriptor.eventFlags).reduce(
+			(sum, next) => sum && next.ready, true);
+	}
+	
+	_isBlockingEventDone(blockingEventDescriptor) {
+		return Object.values(blockingEventDescriptor.eventFlags).reduce(
+			(sum, next) => sum && next.done, true);
+	}
+	
+	performBlockingEvent(eventNames, callback) {
+		if (typeof eventNames === 'string') {
+			eventNames = [eventNames];
 		}
 		
-		this.blockingEventQueues[eventName].push(callback);
+		let eventDescriptor = {
+			callback: callback,
+			eventFlags: {},
+			running: false,
+		}
 		
-		if (this.blockingEventQueues[eventName].length === 1) {
+		let performNow = true;
+		
+		eventNames.forEach(eventName => {
+			eventDescriptor.eventFlags[eventName] = {
+				ready: false,
+				done: false,
+			};
+			
+			if (!(eventName in this.blockingEventQueues)) {
+				this.blockingEventQueues[eventName] = [];
+			}
+			
+			this.blockingEventQueues[eventName].push(eventDescriptor);
+			if (this.blockingEventQueues[eventName].length == 1) {
+				eventDescriptor.eventFlags[eventName].ready = true;
+			} else {
+				performNow = false;
+			}
+		});
+		
+		if (performNow) {
 			callback();
 		}
 	}
 	
-	freeBlockingEvent(eventName) {
-		console.assert(eventName in this.blockingEventQueues,
-			`Unknokwn blocking event: ${eventName}`);
+	freeBlockingEvent(eventNames) {
+		if (typeof eventNames === 'string') {
+			eventNames = [eventNames];
+		}
 		
-		// The one at the beginning of the queue is the one currently working,
-		// so if it's done then we can clear it out
-		this.blockingEventQueues[eventName].shift();
+		// Input validation
+		eventNames.forEach(eventName => {
+			console.assert(eventName in this.blockingEventQueues,
+				`Unknokwn blocking event: ${eventName}`);
+		});
 		
-		// If there's still any left, start the nextg one
-		if (this.blockingEventQueues[eventName].length > 0) {
-			this.blockingEventQueues[eventName][0]();
+		let queue = this.blockingEventQueues[eventNames[0]];
+		if (queue.length == 0) {
+			console.warn(`Freeing of empty queue for '${eventNames[0]}`);
+			return;
+		}
+		
+		let eventDescriptor = queue[0];
+		
+		eventNames.forEach(eventName => {
+			console.assert(eventName in eventDescriptor.eventFlags,
+				`Release of unrelated event '${eventName}`);
+			
+			if (eventDescriptor.eventFlags[eventName].done) {
+				console.warn(`Release of already-released event '${eventName}`);
+			}
+			
+			eventDescriptor.eventFlags[eventName].done = true;
+		});
+		
+		// The one at the beginning of the queue is the one currently
+		// working, so if it's done then we can clear it out - and it's done
+		// once all of the events it's occupying is done
+		if (this._isBlockingEventDone(eventDescriptor)) {
+			// First we clear it out and then we check if there's anything new
+			// that's ready to start
+			Object.keys(eventDescriptor.eventFlags).forEach(eventName => {
+				this.blockingEventQueues[eventName].shift();
+				if (this.blockingEventQueues[eventName].length > 0) {
+					this.blockingEventQueues[eventName][0]
+						.eventFlags[eventName].ready = true;
+				}
+			});
+			
+			// Check all the queues that have just had something cleared for
+			// them and start all those whose requirements are all met
+			// Note: Only start things that haven't started yet!
+			Object.keys(eventDescriptor.eventFlags).forEach(eventName => {
+				if (this.blockingEventQueues[eventName].length > 0) {
+					let nextEventDesc = this.blockingEventQueues[eventName][0];
+					if (this._isBlockingEventReady(nextEventDesc) &&
+						!nextEventDesc.running) {
+							nextEventDesc.running = true;
+							nextEventDesc.callback();
+					}
+				}
+			});
 		}
 	}
 }

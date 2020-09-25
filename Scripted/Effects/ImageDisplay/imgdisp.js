@@ -214,13 +214,11 @@ class ImageDisplay extends EffectClient {
 			this.clearImageEffects(imageParameters.effects);
 		}
 		
-		this.currentImageDone = true;
-		this.checkAllDone();
+		this.freeBlockingEvent('Image');
 	}
 	
 	soundDone() {
-		this.currentSoundDone = true;
-		this.checkAllDone();
+		this.freeBlockingEvent('Sound');
 	}
 	
 	checkAllDone() {
@@ -246,13 +244,24 @@ class ImageDisplay extends EffectClient {
 	
 	start() {
 		this.server.on('showImage', parameters => {
+			let blockingEvents = [];
+			
 			if (parameters.image) {
-				this.performBlockingEvent(
-					'showImage',
-					() => this.processRequest(parameters));
-			} else if (parameters.sound) {
-				this.playSound(parameters.sound, false);
+				blockingEvents.push('Image');
 			}
+			
+			if (parameters.sound) {
+				blockingEvents.push('Sound');
+			}
+			
+			if (blockingEvents.length == 0) {
+				// Empty request, do nothing
+				return;
+			}
+			
+			this.performBlockingEvent(
+				blockingEvents,
+				() => this.processRequest(parameters));
 		});
 		
 		this.server.attachToTag('imgdisp');
