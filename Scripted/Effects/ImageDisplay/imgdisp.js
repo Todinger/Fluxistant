@@ -17,15 +17,6 @@ function extendJQueryFunction(functionName) {
 	});
 }
 
-// $.fn.extend({
-// 	qcss: function(css) {
-// 		return $(this).queue(function(next) {
-// 			$(this).css(css);
-// 			next();
-// 		});
-// 	}
-// });
-
 extendJQueryFunction('css');
 extendJQueryFunction('width');
 extendJQueryFunction('height');
@@ -85,6 +76,10 @@ class ImageEffects {
 				DURATION_SMALL: 584,
 				DURATION_MEDIUM: 438,
 				DURATION_LARGE: DEFAULT_SHOW_DURATION,
+				
+				SIZE_SMALL: 300,
+				SIZE_MEDIUM: 400,
+				SIZE_LARGE: 500,
 			},
 			shake: function(jTarget, amount, duration, onFinished) {
 				if (jTarget.shakeTimeLeft === undefined ||
@@ -123,13 +118,19 @@ class ImageEffects {
 					ImageEffects.dundundun.DEFAULTS.DURATION_MEDIUM;
 				let durationLarge = effectData.durationLarge ||
 					ImageEffects.dundundun.DEFAULTS.DURATION_LARGE;
+				let sizeSmall = effectData.sizeSmall ||
+					ImageEffects.dundundun.DEFAULTS.SIZE_SMALL;
+				let sizeMedium = effectData.sizeMedium ||
+					ImageEffects.dundundun.DEFAULTS.SIZE_MEDIUM;
+				let sizeLarge = effectData.sizeLarge ||
+					ImageEffects.dundundun.DEFAULTS.SIZE_LARGE;
 				
 				jTarget
-				.qwidth(300).qheight(300)
+				.qwidth(sizeSmall).qheight(sizeSmall)
 				.delay(durationSmall)
-				.qwidth(400).qheight(400)
+				.qwidth(sizeMedium).qheight(sizeMedium)
 				.delay(durationMedium)
-				.qwidth(500).qheight(500)
+				.qwidth(sizeLarge).qheight(sizeLarge)
 				.delay(0,
 					function() {
 						jTarget.shakeTimeLeft = durationLarge;
