@@ -42,7 +42,8 @@ class TwitchManager {
 			ban: [],				// 
 		}
 		
-		this._commandHandlers = {};
+		this._commandHandlers = {};		// Maps cmdname to collection of ID: callback
+		this._commandHandlerIDs = {};	// Maps ID to cmdname name
 		
 		this.client = null;
 	}
@@ -94,18 +95,42 @@ class TwitchManager {
 		return this;
 	}
 	
-	onCommand(cmdname, filters, callback) {
-		console.log(`onCommand(${cmdname}) invoked!`)
+	// onCommand(cmdname, filters, callback) {
+	// 	console.log(`onCommand(${cmdname}) invoked!`)
+	// 	if (!(cmdname in this._commandHandlers)) {
+	// 		this._commandHandlers[cmdname] = [];
+	// 	}
+		
+	// 	this._commandHandlers[cmdname].push({
+	// 		filters: filters || [],
+	// 		callback: callback,
+	// 	});
+	// }
+	
+	registerCommand(id, cmdname, filters, callback) {
+		assert(!(id in this._commandHandlerIDs),
+			`Duplicate command registration for ID "${id}"`);
+		
+		console.log(`Registering command '${COMMAND_PREFIX}${cmdname}' for '${id}'`);
+		
 		if (!(cmdname in this._commandHandlers)) {
-			this._commandHandlers[cmdname] = [];
+			this._commandHandlers[cmdname] = {};
 		}
 		
-		this._commandHandlers[cmdname].push({
-			filters: filters,
+		this._commandHandlerIDs[id] = cmdname;
+		
+		this._commandHandlers[cmdname][id] = {
+			filters: filters || [],
 			callback: callback,
-		});
+		};
 	}
 	
+	unregisterCommand(id) {
+		assert(id in this._commandHandlerIDs, `Unknown handler ID: ${id}`);
+		
+		delete this._commandHandlers[this._commandHandlerIDs[id]];
+		delete this._commandHandlerIDs[id];
+	}
 	
 	
 	_parseCommand(msg) {
@@ -146,7 +171,7 @@ class TwitchManager {
 			let fullargs = [user].concat(command.args);
 			
 			// Invoke the specific command handlers
-			this._commandHandlers[command.cmdname].forEach(handler => {
+			Object.values(this._commandHandlers[command.cmdname]).forEach(handler => {
 				if (handler.filters.reduce(
 					(soFar, currentFilter) => soFar && currentFilter(user), true)) {
 						handler.callback.apply(null, fullargs);

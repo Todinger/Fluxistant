@@ -22,6 +22,18 @@ class Filters {
 	static isSub() { return (user) => user.isSub; }
 	static isUser(username) { return (user) => user.name == username; }
 	static isOneOf(usernames) { return (user) => usernames.includes(user.name); }
+	
+	static fromData(name, args) {
+		return Filters[name].apply(null, args);
+	}
+	
+	static fromDataSingle(name, argument) {
+		if (name in Filters) {
+			return Filters[name](argument);
+		} else {
+			return undefined;
+		}
+	}
 }
 
 module.exports = {

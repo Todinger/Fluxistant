@@ -16,6 +16,7 @@ class EffectManager {
 	constructor() {
 		this.effects = {};
 		this.clientEffects = {};
+		this.tags = {};
 	}
 	
 	nameExists(name) {
@@ -45,6 +46,16 @@ class EffectManager {
 				source: urljoin(webdir, effect.source),
 				zindex: effect.zindex,
 			}
+		}
+		
+		if (effect.tags) {
+			effect.tags.forEach(tag => {
+				if (!(tag in this.tags)) {
+					this.tags[tag] = [];
+				}
+				
+				this.tags[tag].push(effect);
+			});
 		}
 		
 		effect.load();
@@ -79,6 +90,14 @@ class EffectManager {
 			this.effects[effectName].attachClient(socket);
 		} else {
 			console.warn(`Unknown effect: ${effectName}`);
+		}
+	}
+	
+	attachClientToTag(tag, socket) {
+		if (tag in this.tags) {
+			this.tags[tag].forEach(effect => effect.attachClient(socket));
+		} else {
+			console.warn(`Unknown tag: ${tag}`);
 		}
 	}
 }

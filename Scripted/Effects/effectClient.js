@@ -249,19 +249,27 @@ class SoundManager {
 }
 
 class ServerCommManager {
-	constructor(scriptName) {
-		this.scriptName = scriptName;
+	constructor(effectName) {
+		this.effectName = effectName;
 		this._attachRequested = false;
+		this._tagAttachRequested = false;
 		this._reattachNeeded = false;
 		this.socket = io();
 		this.on('connect', () => this._connected());
 		this.on('disconnect', () => this._disconnected());
+		this.tag = null;
 	}
 	
 	attach() {
-		console.log(`[${this.scriptName}] Attaching`);
-		this.socket.emit('attachTo', this.scriptName);
+		console.log(`[${this.effectName}] Attaching`);
+		this.socket.emit('attachTo', this.effectName);
 		this._attachRequested = true;
+	}
+	
+	attachToTag(tag) {
+		this.tag = tag;
+		this.socket.emit('attachToTag', tag);
+		this._tagAttachRequested = true;
 	}
 	
 	on(eventName, callback) {
@@ -277,12 +285,18 @@ class ServerCommManager {
 			// We were attached before but the connection was interrupted,
 			// so we attach again
 			this.attach();
-			this._reattachNeeded = false;
 		}
+		
+		if (this._tagAttachRequested) {
+			// Same but with a tag attachment
+			this.attachToTag(this.tag);
+		}
+		
+		this._reattachNeeded = false;
 	}
 	
 	_disconnected() {
-		if (this._attachRequested) {
+		if (this._attachRequested || this._tagAttachRequested) {
 			this._reattachNeeded = true;
 		}
 	}
@@ -291,13 +305,16 @@ class ServerCommManager {
 class EffectClient {
 	static get SOUND_HOLDER_ID() { return 'EffectClient_AudioHolder'; }
 	
-	constructor(scriptName) {
-		this.scriptName = scriptName;
+	constructor(effectName) {
+		this.effectName = effectName;
+		this.parent = null;
+		this.children = {};
+		this.blockingEventQueues = {};
 		
 		$(document.body).prepend(`<div id="${EffectClient.SOUND_HOLDER_ID}"></div>`);
 		this.sounds = new SoundManager(EffectClient.SOUND_HOLDER_ID);
 		
-		this.server = new ServerCommManager(scriptName);
+		this.server = new ServerCommManager(effectName);
 		
 		this.server.on('fxvol', data => {
 			if (data.volume === undefined) {
@@ -319,6 +336,11 @@ class EffectClient {
 		
 		this.server.on('fxmute', () => this.sounds.mute());
 		this.server.on('fxunmute', () => this.sounds.unmute());
+		
+		window.effectClient = this;
+		if (window.top !== window && parent.effectClient) {
+			parent.effectClient.addChild(this);
+		}
 	}
 	
 	sayTo(username, message) {
@@ -326,7 +348,54 @@ class EffectClient {
 	}
 	
 	log(message) {
-		console.log(`[${this.scriptName}] ${message}`);
+		console.log(`[${this.effectName}] ${message}`);
+	}
+	
+	setParent(parentEffectClient) {
+		this.parent = parentEffectClient;
+	}
+	
+	addChild(childEffectClient) {
+		let name = childEffectClient.effectName;
+		console.log(`Added child: ${name}`);
+		console.assert(!(name in this.children),
+			`A child effect client by the name of "${name}" already exists.`);
+		
+		this.children[name] = childEffectClient;
+		childEffectClient.setParent(this);
+	}
+	
+	getRoot() {
+		if (this.parent === null) {
+			return this;
+		} else {
+			return this.parent.getRoot();
+		}
+	}
+	
+	performBlockingEvent(eventName, callback) {
+		if (!(eventName in this.blockingEventQueues)) {
+			this.blockingEventQueues[eventName] = [];
+		}
+		
+		this.blockingEventQueues[eventName].push(callback);
+		
+		if (this.blockingEventQueues[eventName].length === 1) {
+			callback();
+		}
+	}
+	
+	freeBlockingEvent(eventName) {
+		console.assert(eventName in this.blockingEventQueues,
+			`Unknokwn blocking event: ${eventName}`);
+		
+		// The one at the beginning of the queue is the one currently working,
+		// so if it's done then we can clear it out
+		this.blockingEventQueues[eventName].shift();
+		
+		// If there's still any left, start the nextg one
+		if (this.blockingEventQueues[eventName].length > 0) {
+			this.blockingEventQueues[eventName][0]();
+		}
 	}
 }
-

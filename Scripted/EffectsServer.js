@@ -16,6 +16,19 @@ const USERIMAGE_URL = '/assets/user-images/';
 app.use(USERIMAGE_URL,
 	express.static(path.join(__dirname, USERIMAGE_DIR)));
 
+// Image Display
+const IMAGEDISPLAY_DIR = '../../Images/Display Images';
+const IMAGEDISPLAY_URL = '/assets/image-display/';
+app.use(IMAGEDISPLAY_URL,
+	express.static(path.join(__dirname, IMAGEDISPLAY_DIR)));
+
+// Sound Effects
+const SOUNDEFFECTS_DIR = '../../sfx';
+const SOUNDEFFECTS_URL = '/assets/sfx/';
+app.use(SOUNDEFFECTS_URL,
+	express.static(path.join(__dirname, SOUNDEFFECTS_DIR)));
+
+
 function getUserImageList(socket) {
 	console.log('User image list requested.');
 	glob(path.join(USERIMAGE_DIR, '*.png'), {}, (err, files) => {
@@ -43,6 +56,8 @@ var EffectManager = require('./effectManager');
 EffectManager.loadAll('/fx/', 'Effects', app, express);
 app.use('/fx/effectClient.js',
 	express.static(path.join(__dirname, 'Effects', 'effectClient.js')));
+app.use('/fx/clientUtils.js',
+	express.static(path.join(__dirname, 'Effects', 'clientUtils.js')));
 
 var TwitchManager = require('./twitchManager');
 TwitchManager.init('fluxistence', 'fluxistant', 'oauth:luxvl6vwq0r0o9t03p7m1s3kf482lc');
@@ -85,9 +100,14 @@ io.on('connection', socket => {
 	socket.on('getScripts', () => 
 		socket.emit('scriptList', EffectManager.clientEffects));
 	
-	socket.on('attachTo', scriptName => {
-		console.log(`Attaching client to ${scriptName}`);
-		EffectManager.attachClient(scriptName, socket);
+	socket.on('attachTo', effectName => {
+		console.log(`Attaching client to ${effectName}`);
+		EffectManager.attachClient(effectName, socket);
+	});
+	
+	socket.on('attachToTag', tag => {
+		console.log(`Attaching client by tag to ${tag}`);
+		EffectManager.attachClientToTag(tag, socket);
 	});
 	
 	socket.on('sayTo', data => {

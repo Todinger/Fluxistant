@@ -1,0 +1,61 @@
+{
+	"y": {
+		"image": {
+			"url": "/assets/user-images/yecatsmailbox.png",
+			"effects": {
+				"glow": {
+					"color": "#0000ff"
+				}
+			}
+		},
+		"sound": "/assets/user-images/yecatsmailbox.mp3"
+	},
+	
+	"objection": {
+		"image": {
+			"url": "/assets/image-display/Objection.png"
+		},
+		"sound": "/assets/sfx/objection.mp3"
+	},
+	
+	"besttwitchdrummer": {
+		"image": {
+			"url": "/assets/user-images/maxadrums.png"
+		}
+	},
+	
+	"besttwitchstreamer": {
+		"image": {
+			"url": "/assets/image-display/besttwitchstreamer.png"
+		}
+	},
+	
+	"besttwitchstreamers": {
+		"image": {
+			"url": "/assets/image-display/MaxAndMaaz.png"
+		}
+	},
+	
+	"cool": {
+		"image": {
+			"url": "/assets/image-display/GumshoeSunglasses.png"
+		}
+	},
+	
+	"dundundun": {
+		"filters": [
+			{
+				"name": "isOneOf",
+				"argument": ["omreeny", "fluxlingkitten", "fluxistence"]
+			}
+		],
+		"image": {
+			"duration": 4000,
+			"url": "/assets/image-display/DunDunDunHamster.png",
+			"effects": {
+				"dundundun": {}
+			}
+		},
+		"sound": "/assets/sfx/dundundun.mp3"
+	}
+}

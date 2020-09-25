@@ -9,6 +9,7 @@ class Effect {
 		this.webname = description.webname;
 		this.source = description.source;
 		this.zindex = description.zindex;
+		this.tags = description.tags;
 		this.effectManager = null;
 		
 		this._clientAttachedHandlers = [];
@@ -32,8 +33,20 @@ class Effect {
 		// Do nothing by default (for overriding where needed)
 	}
 	
+	getCommandId(cmdname) {
+		return `<${this.name}> ${cmdname}`;
+	}
+	
 	registerCommand(cmdname, filters, callback) {
-		TwitchManager.onCommand(cmdname, filters, callback);
+		TwitchManager.registerCommand(
+			this.getCommandId(cmdname),
+			cmdname,
+			filters,
+			callback);
+	}
+	
+	unregisterCommand(cmdname) {
+		TwitchManager.unregisterCommand(this.getCommandId(cmdname));
 	}
 	
 	attachClient(socket) {
