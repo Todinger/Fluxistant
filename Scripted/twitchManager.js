@@ -111,6 +111,9 @@ class TwitchManager {
 		assert(!(id in this._commandHandlerIDs),
 			`Duplicate command registration for ID "${id}"`);
 		
+		// This is to make all commands case-insensitive
+		cmdname = cmdname.toLowerCase();
+		
 		console.log(`Registering command '${COMMAND_PREFIX}${cmdname}' for '${id}'`);
 		
 		if (!(cmdname in this._commandHandlers)) {
@@ -147,7 +150,7 @@ class TwitchManager {
 		// A command is composed of its name followed by arguments, all
 		// delimited by spaces
 		let parts = msg.split(' ');
-		let cmdname = parts[0];
+		let cmdname = parts[0].toLowerCase();
 		let args = parts.slice(1);
 		
 		return {
