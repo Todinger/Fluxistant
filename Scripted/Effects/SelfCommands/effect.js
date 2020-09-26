@@ -1,8 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const Utils = require('../../utils');
 const Effect = require('../../effect');
 
 class SelfCommands extends Effect {
