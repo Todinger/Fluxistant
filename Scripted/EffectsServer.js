@@ -10,38 +10,31 @@ var io = require('socket.io')(server);
 const PORT = 3333;
 
 
-// Self-Images
-const USERIMAGE_DIR = '../../Images/User-Specific';
-const USERIMAGE_URL = '/assets/user-images/';
-app.use(USERIMAGE_URL,
-	express.static(path.join(__dirname, USERIMAGE_DIR)));
+const Assets = require('./assets');
+Assets.registerAll(app);
 
-// Image Display
-const IMAGEDISPLAY_DIR = '../../Images/Display Images';
-const IMAGEDISPLAY_URL = '/assets/image-display/';
-app.use(IMAGEDISPLAY_URL,
-	express.static(path.join(__dirname, IMAGEDISPLAY_DIR)));
+// // Self-Images
+// const USERIMAGE_DIR = '../../Images/User-Specific';
+// const USERIMAGE_URL = '/assets/user-images/';
+// app.use(USERIMAGE_URL,
+// 	express.static(path.join(__dirname, USERIMAGE_DIR)));
 
-// Sound Effects
-const SOUNDEFFECTS_DIR = '../../sfx';
-const SOUNDEFFECTS_URL = '/assets/sfx/';
-app.use(SOUNDEFFECTS_URL,
-	express.static(path.join(__dirname, SOUNDEFFECTS_DIR)));
+// // Image Display
+// const IMAGEDISPLAY_DIR = '../../Images/Display Images';
+// const IMAGEDISPLAY_URL = '/assets/image-display/';
+// app.use(IMAGEDISPLAY_URL,
+// 	express.static(path.join(__dirname, IMAGEDISPLAY_DIR)));
+
+// // Sound Effects
+// const SOUNDEFFECTS_DIR = '../../sfx';
+// const SOUNDEFFECTS_URL = '/assets/sfx/';
+// app.use(SOUNDEFFECTS_URL,
+// 	express.static(path.join(__dirname, SOUNDEFFECTS_DIR)));
 
 
 function getUserImageList(socket) {
 	console.log('User image list requested.');
-	glob(path.join(USERIMAGE_DIR, '*.png'), {}, (err, files) => {
-		let imageList = {};
-		files.forEach(file => {
-			let username = path.parse(file).name;
-			let imageext = path.parse(file).ext;
-			let imageurl = USERIMAGE_URL + username + imageext;
-			imageList[username] = imageurl;
-		});
-		
-		socket.emit('userImageList', imageList);
-	});
+	Assets.getUserImages(imageList => socket.emit('userImageList', imageList));
 }
 
 var KEYCODES = require('./enums').KEYCODES;

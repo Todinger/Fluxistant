@@ -1,16 +1,4 @@
 {
-	"y": {
-		"image": {
-			"url": "/assets/user-images/yecatsmailbox.png",
-			"effects": {
-				"glow": {
-					"color": "#0000ff"
-				}
-			}
-		},
-		"sound": "/assets/user-images/yecatsmailbox.mp3"
-	},
-	
 	"besttwitchdrummer": {
 		"image": {
 			"url": "/assets/user-images/maxadrums.png"

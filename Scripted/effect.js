@@ -2,6 +2,7 @@ var User = require('./user');
 var TwitchManager = require('./twitchManager');
 var Enums = require('./enums');
 var KeyboardManager = require('./keyboardManager');
+var Assets = require('./assets');
 
 class Effect {
 	constructor(description) {
@@ -111,6 +112,10 @@ class Effect {
 	
 	static get Keycodes() {
 		return Enums.KEYCODES;
+	}
+	
+	static get Assets() {
+		return Assets;
 	}
 }
 
