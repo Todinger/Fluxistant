@@ -41,18 +41,6 @@ class ChannelParty extends Effect {
 				this.broadcastEvent('fxvol', { username: user.name, volume });
 			}
 		);
-		
-		this.registerCommand('h', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user, level) => {
-				this.broadcastEvent('hype', level);
-			}
-		);
-		
-		this.registerCommand('s', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user, level) => {
-				this.broadcastEvent('endHype');
-			}
-		);
 	}
 }
 
