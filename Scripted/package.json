@@ -12,6 +12,7 @@
   "author": "Fluxistence",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.20.0",
     "express": "^4.17.1",
     "glob": "^7.1.6",
     "iohook": "^0.6.6",

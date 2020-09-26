@@ -9,6 +9,7 @@ var io = require('socket.io')(server);
 
 const PORT = 3333;
 
+const Config = require('./botConfig.json');
 
 const Assets = require('./assets');
 Assets.registerAll(app);
@@ -53,7 +54,7 @@ app.use('/fx/clientUtils.js',
 	express.static(path.join(__dirname, 'Effects', 'clientUtils.js')));
 
 var TwitchManager = require('./twitchManager');
-TwitchManager.init('fluxistence', 'fluxistant', 'oauth:luxvl6vwq0r0o9t03p7m1s3kf482lc');
+TwitchManager.init(Config.channel, Config.username, Config.oAuth);
 
 /* Testing Code
 
@@ -84,7 +85,19 @@ TwitchManager.onCommand('e', [User.isAtLeastMod()], (user, x) => {
 });
 */
 
-
+var SEManager = require('./seManager');
+setTimeout(() => {
+	SEManager.getUserPoints('fluxistence', points => console.log(`Flux's points: ${points}`), error => console.error(error));
+	// SEManager.addUserPoints('fluxistence', 500, newAmount => console.log(`After adding 500: ${newAmount}`), error => console.error(error));
+	// SEManager.subtractUserPoints('fluxistence', 1, newAmount => console.log(`After subtracting 1: ${newAmount}`), error => console.error(error));
+	// SEManager.consumeUserPoints(
+	// 	'fluxistence',
+	// 	500,
+	// 	newAmount => console.log(`New amount after consuming 500: ${newAmount}`),
+	// 	(amount, points) => console.log(`User only has ${points} points, not enough to consume ${amount}.`),
+	// 	error => console.error(error)
+	// );
+}, 5000);
 
 
 io.on('connection', socket => {
