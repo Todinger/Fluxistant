@@ -40,6 +40,23 @@ class Utils {
 		return { add, keep, remove };
 	}
 	
+	static randomRange(min, max) {
+		return min + Math.random() * (max - min);
+	}
+	
+	static randomInt(min, max) {
+		return min + Math.floor(Math.random() * (max - min));
+	}
+	
+	static randomKey(obj) {
+		let keys = Object.keys(obj);
+		return keys[randomInt(0, keys.length)];
+	}
+	
+	static randomValue(obj) {
+		return obj[randomKey(obj)];
+	}
+	
 	// Taken from:
 	// https://github.com/ReactiveSets/toubkal/blob/master/lib/util/value_equals.js
 	static equals( a, b, enforce_properties_order, cyclic ) {
