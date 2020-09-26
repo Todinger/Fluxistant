@@ -51,9 +51,12 @@ class Assets {
 		return USERIMAGE_URL + parsed.name + parsed.ext;
 	}
 	
-	static _cacheImageURL(filename) {
+	static _cacheImageDetails(filename) {
 		let parsed = path.parse(filename);
-		return RANDOMIMAGECACHE_URL + parsed.name + parsed.ext;
+		return {
+			name: parsed.name,
+			url: RANDOMIMAGECACHE_URL + parsed.name + parsed.ext,
+		};
 	}
 	
 	static getUserImages(onDone) {
@@ -114,8 +117,8 @@ class Assets {
 			}
 			
 			let index = Utils.randomInt(0, files.length);
-			
-			onDone(Assets._cacheImageURL(files[index]));
+			let fileDetails = Assets._cacheImageDetails(files[index]);
+			onDone(fileDetails.name, fileDetails.url);
 		});
 	}
 }

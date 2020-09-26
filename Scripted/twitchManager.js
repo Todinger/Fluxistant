@@ -1,7 +1,8 @@
-var assert = require('assert').strict;
-var tmi = require('tmi.js');
-var User = require('./user').User;
-var EffectManager = require('./effectManager');
+const assert = require('assert').strict;
+const tmi = require('tmi.js');
+const User = require('./user').User;
+const EffectManager = require('./effectManager');
+const SEManager = require('./seManager');
 
 const COMMAND_PREFIX = '!';
 
@@ -85,8 +86,11 @@ class TwitchManager {
 	}
 	
 	say(msg) {
-		// TODO: Uncomment after big unveiling and test
-		// this.client.say(this.channel, msg);
+		this.client.say(this.channel, msg);
+	}
+	
+	tell(user, msg) {
+		this.say(`@${user.name} ${msg}`);
 	}
 	
 	on(eventName, callback) {
@@ -107,7 +111,7 @@ class TwitchManager {
 	// 	});
 	// }
 	
-	registerCommand(id, cmdname, filters, callback) {
+	registerCommand(id, cmdname, filters, callback, cost) {
 		assert(!(id in this._commandHandlerIDs),
 			`Duplicate command registration for ID "${id}"`);
 		
@@ -125,6 +129,7 @@ class TwitchManager {
 		this._commandHandlers[cmdname][id] = {
 			filters: filters || [],
 			callback: callback,
+			cost: cost,
 		};
 	}
 	
@@ -154,8 +159,9 @@ class TwitchManager {
 		let args = parts.slice(1);
 		
 		return {
-			cmdname,
-			args,
+			cmdname: cmdname,
+			args: args,
+			fullname: `${COMMAND_PREFIX}${cmdname}`,
 		};
 	}
 	
@@ -177,7 +183,32 @@ class TwitchManager {
 			Object.values(this._commandHandlers[command.cmdname]).forEach(handler => {
 				if (handler.filters.reduce(
 					(soFar, currentFilter) => soFar && currentFilter(user), true)) {
-						handler.callback.apply(null, fullargs);
+						let responseDetails = undefined;
+						if (handler.cost && handler.cost > 0) {
+							let response =
+								`${user.name} has invoked ${command.fullname} for ${handler.cost} ${SEManager.POINTS_NAME}`;
+							SEManager.consumeUserPoints(
+								user.name,
+								handler.cost,
+								(oldAmount, newAmount) => {
+									// To-log: `${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`
+									responseDetails = handler.callback.apply(null, fullargs);
+									
+									if (responseDetails) {
+										this.say(`${response}: ${responseDetails}`);
+									} else {
+										this.say(`${response}!`);
+									}
+								},
+								(amount, points) => {
+									this.tell(user, `You do not have enough ${SEManager.POINTS_NAME} to use the ${command.fullname} command. (${points} / ${amount})`);
+								},
+								error => {
+									console.error(`Failed to consume user points: ${error}`);
+								});
+						} else {
+							handler.callback.apply(null, fullargs);
+						}
 				}
 			});
 		}

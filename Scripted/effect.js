@@ -38,12 +38,13 @@ class Effect {
 		return `<${this.name}> ${cmdname}`;
 	}
 	
-	registerCommand(cmdname, filters, callback) {
+	registerCommand(cmdname, filters, callback, cost) {
 		TwitchManager.registerCommand(
 			this.getCommandId(cmdname),
 			cmdname,
 			filters,
-			callback);
+			callback,
+			cost);
 	}
 	
 	unregisterCommand(cmdname) {
@@ -104,6 +105,14 @@ class Effect {
 	
 	unregisterShortcutKey(name, shortcut, callback) {
 		KeyboardManager.unregisterShortcut(`${this.name}_${name}`);
+	}
+	
+	say(msg) {
+		TwitchManager.say(msg);
+	}
+	
+	tell(user, msg) {
+		TwitchManager.tell(user, msg);
 	}
 	
 	static get Filters() {

@@ -73,9 +73,7 @@ class Request {
 
 class SEManager {
 	constructor() {
-		this.requestQueues = {
-			points: [],
-		};
+		this.POINTS_NAME = Config.pointsName;
 	}
 	
 	getUserPoints(username, onDone, onError) {
@@ -107,6 +105,9 @@ class SEManager {
 		this.addUserPoints(username, -amount, onDone, onError);
 	}
 	
+	// onDone should take two arguments: (oldAmount, newAmount), which
+	// represent the amount of points the user had before and after the
+	// operation respectively
 	// onInsufficientPoints should take two arguments: (amount, points), where
 	// 'amount' is the amount of points we tried to consume and 'points' is the
 	// amount of points the user actually had
@@ -117,7 +118,11 @@ class SEManager {
 				if (points < amount) {
 					onInsufficientPoints(amount, points);
 				} else {
-					this.subtractUserPoints(username, amount, onDone, onError);
+					this.subtractUserPoints(
+						username,
+						amount,
+						newPoints => onDone(points, newPoints),
+						onError);
 				}
 			},
 			onError);

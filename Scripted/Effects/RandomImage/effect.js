@@ -2,6 +2,8 @@
 
 const Effect = require('../../effect');
 
+const COMMAND_COST = 300;
+
 class RandomImage extends Effect {
 	constructor() {
 		super({
@@ -11,15 +13,21 @@ class RandomImage extends Effect {
 	}
 	
 	showRandomImage() {
-		Effect.Assets.getRandomImageFromCache(imageurl => {
+		Effect.Assets.getRandomImageFromCache((name, url) => {
+			this.say(`Showing: ${name}`);
 			this.broadcastEvent('showImage', {
-				image: { url: imageurl },
+				image: { url: url },
 			});
 		});
 	}
 	
 	load() {
-		this.registerCommand('pixelate', [], () => this.showRandomImage());
+		this.registerCommand(
+			'pix',
+			// 'pixelate',
+			[],
+			user => this.showRandomImage(user),
+			COMMAND_COST);
 	}
 }
 

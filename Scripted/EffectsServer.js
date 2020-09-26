@@ -85,6 +85,7 @@ TwitchManager.onCommand('e', [User.isAtLeastMod()], (user, x) => {
 });
 */
 
+/*
 var SEManager = require('./seManager');
 setTimeout(() => {
 	SEManager.getUserPoints('fluxistence', points => console.log(`Flux's points: ${points}`), error => console.error(error));
@@ -98,6 +99,16 @@ setTimeout(() => {
 	// 	error => console.error(error)
 	// );
 }, 5000);
+KeyboardManager.registerShortcut(
+	`DEBUG_ShowPixels`,
+	[
+		Effect.Keycodes.VC_CONTROL_L,
+		Effect.Keycodes.VC_META_L,
+		Effect.Keycodes.VC_X
+	],
+	() => SEManager.getUserPoints('fluxistence', points => console.log(`Flux's points: ${points}`), error => console.error(error))
+);
+*/
 
 
 io.on('connection', socket => {
