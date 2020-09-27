@@ -21,6 +21,9 @@ class SelfCommands extends Effect {
 				hasFiles = true;
 				requestData.image = {
 					url: userFiles.image,
+					effects: {
+						glow: {}
+					}
 				};
 			}
 			

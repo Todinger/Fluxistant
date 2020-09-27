@@ -67,7 +67,6 @@ class Assets {
 	}
 	
 	static _imageDetails(baseURL, filename) {
-		console.log(`_imageDetails("${baseURL}" , "${filename}")`);
 		let parsed = path.parse(filename);
 		return {
 			name: parsed.name,
