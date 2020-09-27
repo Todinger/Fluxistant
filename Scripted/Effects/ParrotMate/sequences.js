@@ -149,8 +149,4 @@ const SEQUENCES = {
 	], NO_AUTOPLAY),
 };
 
-// soundManager.onDataLoaded(function () {
-// 	Object.values(SEQUENCES).forEach(sequence => sequence.calculateDuration());
-// });
-
 parrotMate.loadAll(SEQUENCES);

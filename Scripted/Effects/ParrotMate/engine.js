@@ -39,7 +39,6 @@ class SoundAction extends ResourceAction {
 	}
 	
 	perform() {
-		// Sounds[this.name].play();
 		this.soundManager.play(this.name);
 	}
 	
@@ -170,7 +169,6 @@ class QueuedSequence extends TimedSequence {
 	}
 }
 
-// function Sequence(events) { return new TimedSequence(events); }
 function Sequence(events, noAutoplay) {
 	let seq = new QueuedSequence(events, parrotMate);
 	seq.autoPlay = !noAutoplay;
