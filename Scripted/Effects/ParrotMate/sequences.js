@@ -1,4 +1,6 @@
 
+const NO_AUTOPLAY = true;
+
 const SEQUENCES = {
 	hey: Sequence([
 		Event(0, [ Sound('hey') ]),
@@ -126,8 +128,29 @@ const SEQUENCES = {
 		Event(1686, [ Image('look') ]),
 		Event(2119, [ Image('regular') ]),
 	]),
+	
+	what: Sequence([
+		Event(0, [ Sound('what') ]),
+		Event(0, [ Image('mouth') ]),
+		Event(0, [ Text('What...') ]),
+		Event(450, [ Image('look') ]),
+		Event(450, [ ClearText() ]),
+		Event(952, [ Image('regular') ]),
+		Event(1454, [ Image('look') ]),
+		Event(1956, [ Image('regular') ]),
+		Event(2458, [ Image('look') ]),
+		Event(2709, [ Image('regular') ]),
+		Event(2960, [ Image('mouth') ]),
+		Event(2960, [ Text('What was that?') ]),
+		Event(3190, [ Image('regular') ]),
+		Event(3470, [ Image('mouth') ]),
+		Event(4470, [ ClearText() ]),
+		Event(6600, [ Image('regular') ]),
+	], NO_AUTOPLAY),
 };
 
-soundManager.onDataLoaded(function () {
-	Object.values(SEQUENCES).forEach(sequence => sequence.calculateDuration());
-});
+// soundManager.onDataLoaded(function () {
+// 	Object.values(SEQUENCES).forEach(sequence => sequence.calculateDuration());
+// });
+
+parrotMate.loadAll(SEQUENCES);

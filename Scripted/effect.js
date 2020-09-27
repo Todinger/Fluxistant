@@ -58,6 +58,7 @@ class Effect {
 			delete this._connectedClients[socket.id];
 		});
 		this._clientAttachedHandlers.forEach(handler => handler(socket));
+		console.log(`Client attached to ${this.name}.`);
 	}
 	
 	// Should check if a given command (= { cmdname, args }) is a command

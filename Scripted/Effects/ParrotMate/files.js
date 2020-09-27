@@ -6,20 +6,36 @@ const IMAGE_LOCATIONS = {
 	wing:		'./Images/Parrot-Wing.png',
 };
 
-const SOUND_LOCATIONS = {
-	hey:		'./Sounds/Hey! Look! Listen!.mp3',
-	laughter:	'./Sounds/Laughter.mp3',
-	behind:		'./Sounds/Look Behind You.mp3',
-	attention:	'./Sounds/Pay Me Attention.mp3',
-	cracker:	'./Sounds/Polly Want a Cracker.mp3',
-	dl6:		'./Sounds/Remember DL-6.mp3',
-	bigcry:		'./Sounds/SQUAAAAAAAWK!.mp3',
-	cry:		'./Sounds/Squawk.mp3',
-	died:		'./Sounds/Died.mp3',
-	lars:		'./Sounds/Lars.mp3',
-	law:		'./Sounds/Law.mp3',
+const SOUNDS = {
+	hey:		{ location: './Sounds/Hey! Look! Listen!.mp3' },
+	laughter:	{ location: './Sounds/Laughter.mp3' },
+	behind:		{ location: './Sounds/Look Behind You.mp3' },
+	attention:	{ location: './Sounds/Pay Me Attention.mp3' },
+	cracker:	{ location: './Sounds/Polly Want a Cracker.mp3' },
+	dl6:		{ location: './Sounds/Remember DL-6.mp3' },
+	bigcry:		{ location: './Sounds/SQUAAAAAAAWK!.mp3' },
+	cry:		{ location: './Sounds/Squawk.mp3' },
+	died:		{ location: './Sounds/Died.mp3' },
+	lars:		{ location: './Sounds/Lars.mp3' },
+	law:		{ location: './Sounds/Law.mp3' },
+	what:		{ location: './Sounds/What.mp3' },
 };
 
+// const SOUND_LOCATIONS = {
+// 	hey:		'./Sounds/Hey! Look! Listen!.mp3',
+// 	laughter:	'./Sounds/Laughter.mp3',
+// 	behind:		'./Sounds/Look Behind You.mp3',
+// 	attention:	'./Sounds/Pay Me Attention.mp3',
+// 	cracker:	'./Sounds/Polly Want a Cracker.mp3',
+// 	dl6:		'./Sounds/Remember DL-6.mp3',
+// 	bigcry:		'./Sounds/SQUAAAAAAAWK!.mp3',
+// 	cry:		'./Sounds/Squawk.mp3',
+// 	died:		'./Sounds/Died.mp3',
+// 	lars:		'./Sounds/Lars.mp3',
+// 	law:		'./Sounds/Law.mp3',
+// };
+
+/*
 const IMAGE_NAMES = Object.keys(IMAGE_LOCATIONS);
 const SOUND_NAMES = Object.keys(SOUND_LOCATIONS);
 
@@ -67,3 +83,4 @@ class SoundManagerClass {
 
 var soundManager = new SoundManagerClass();
 soundManager.loadSounds();
+*/

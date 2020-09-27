@@ -85,6 +85,10 @@ class SoundManager {
 		return this._sounds[name];
 	}
 	
+	getSoundDuration(name) {
+		return this.getSound(name).get(0).duration;
+	}
+	
 	_addFeaturesToSound(sound) {
 		sound.pause = () => { sound.get(0).pause(); return sound; };
 		sound.play = () => { sound.get(0).play(); return sound; };
@@ -175,11 +179,14 @@ class SoundManager {
 				`Duplicate loading of the sound ${name}`);
 		});
 		
+		// Mark all we need to load before we actually start loading
 		Object.keys(sounds).forEach(name => {
 			// This will actually always be true, since it gets deleted
 			// one the sound finishes loading
 			this._notYetLoaded[name] = true;
-			
+		});
+		
+		Object.keys(sounds).forEach(name => {
 			this.loadSound(name, sounds[name].location, sounds[name].loop);
 		});
 	}
@@ -371,8 +378,16 @@ class EffectClient {
 		this.server.emit('sayTo', { username, message });
 	}
 	
+	_printForm(message) {
+		return `[${this.effectName}] ${message}`;
+	}
+	
 	log(message) {
-		console.log(`[${this.effectName}] ${message}`);
+		console.log(this._printForm(message));
+	}
+	
+	warn(message) {
+		console.warn(this._printForm(message));
 	}
 	
 	setParent(parentEffectClient) {
@@ -501,5 +516,9 @@ class EffectClient {
 				}
 			});
 		}
+	}
+	
+	assert(test, message) {
+		console.assert(test, this._printForm(message));
 	}
 }

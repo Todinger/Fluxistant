@@ -33,15 +33,21 @@ class ImageAction extends ResourceAction {
 function Image(name) { return new ImageAction(name); }
 
 class SoundAction extends ResourceAction {
+	constructor(name, soundManager) {
+		super(name);
+		this.soundManager = soundManager;
+	}
+	
 	perform() {
-		Sounds[this.name].play();
+		// Sounds[this.name].play();
+		this.soundManager.play(this.name);
 	}
 	
 	get duration() {
-		return Sounds[this.name].duration * 1000;
+		return this.soundManager.getSoundDuration(this.name) * 1000;
 	}
 }
-function Sound(name) { return new SoundAction(name); }
+function Sound(name) { return new SoundAction(name, parrotMate.sounds); }
 
 class TextAction extends Action {
 	constructor(text) {
@@ -132,8 +138,44 @@ class TimedSequence {
 	_finished() {
 		this.sequenceFinishedListeners.forEach(listener => listener());
 	}
+	
+	clone() {
+		let copy = new TimedSequence(this.events);
+		copy.calculateDuration();
+		return copy;
+	}
 }
-function Sequence(events) { return new TimedSequence(events); }
+
+class QueuedSequence extends TimedSequence {
+	constructor(events, effectClient) {
+		super(events);
+		this.effectClient = effectClient;
+	}
+	
+	play() {
+		this.effectClient.performBlockingEvent(
+			'Parrot Mate Sequence',
+			() => super.play());
+	}
+	
+	_finished() {
+		super._finished();
+		this.effectClient.freeBlockingEvent('Parrot Mate Sequence');
+	}
+	
+	clone() {
+		let copy = new QueuedSequence(this.events, this.effectClient);
+		copy.calculateDuration();
+		return copy;
+	}
+}
+
+// function Sequence(events) { return new TimedSequence(events); }
+function Sequence(events, noAutoplay) {
+	let seq = new QueuedSequence(events, parrotMate);
+	seq.autoPlay = !noAutoplay;
+	return seq;
+}
 
 
 

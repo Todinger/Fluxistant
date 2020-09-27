@@ -12,11 +12,8 @@ class ParrotMate extends EffectClient {
 		
 		this.baseDelay = ParrotMate.DEFAULT_BASE_DELAY;
 		this.delayVariance = ParrotMate.DEFAULT_DELAY_VARIANCE;
-		this.player = new RandomSequencePlayer(
-			'regular', 
-			SEQUENCES,
-			ParrotMate.DEFAULT_BASE_DELAY - ParrotMate.DEFAULT_DELAY_VARIANCE,
-			ParrotMate.DEFAULT_BASE_DELAY + ParrotMate.DEFAULT_DELAY_VARIANCE);
+		this.sequences = {};
+		this.player = null;
 	}
 	
 	updateDelays() {
@@ -35,7 +32,42 @@ class ParrotMate extends EffectClient {
 		this.updateDelays();
 	}
 	
+	loadAll(sequences) {
+		if (this.player) {
+			this.warn('Tried to load when already loaded');
+			return;
+		}
+		
+		Object.keys(sequences)
+		
+		this.sequences = sequences;
+		this.sounds.onDataLoaded(
+			() => Object.values(sequences).forEach(sequence => 
+				sequence.calculateDuration()));
+		
+		this.sounds.loadSounds(SOUNDS);
+		
+		this.player = new RandomSequencePlayer(
+			'regular', 
+			Object.filter(sequences, seq => seq.autoPlay), // See ../clientUtils.js
+			this.baseDelay - this.delayVariance,
+			this.baseDelay + this.delayVariance);
+	}
+	
+	playSequence(name) {
+		if (!(name in this.sequences)) {
+			this.warn(`No sequence found by the name "${name}"`);
+			return;
+		}
+		
+		// This needs to be cloned first, otherwise it can clash with
+		// sequences that are already running
+		this.sequences[name].clone().play();
+	}
+	
 	start() {
+		this.assert(this.player, 'Cannot start without a player loaded');
+		
 		this.server.on('setDelay', baseDelay => {
 			this.setBaseDelay(baseDelay);
 		});
@@ -47,6 +79,9 @@ class ParrotMate extends EffectClient {
 		this.server.on('play', () => this.player.play());
 		this.server.on('stop', () => this.player.stop());
 		
+		this.server.on('playSequence', sequenceName =>
+			this.playSequence(sequenceName));
+		
 		showImage('regular');
 		clearText();
 		
@@ -57,8 +92,9 @@ class ParrotMate extends EffectClient {
 }
 
 
-var pm = new ParrotMate();
-pm.start();
+var parrotMate = new ParrotMate();
+var pm = parrotMate;
+// pm.start();
 
 
 // var rsp = new RandomSequencePlayer('regular', SEQUENCES, 3000, 6000);

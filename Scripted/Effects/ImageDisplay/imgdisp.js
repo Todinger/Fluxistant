@@ -216,16 +216,11 @@ class ImageDisplay extends EffectClient {
 		}
 		
 		this.freeBlockingEvent('Image');
+		this.server.emit('imgdispDone', imageParameters.url);
 	}
 	
 	soundDone() {
 		this.freeBlockingEvent('Sound');
-	}
-	
-	checkAllDone() {
-		if (this.currentImageDone && this.currentSoundDone) {
-			this.freeBlockingEvent('showImage');
-		}
 	}
 	
 	processRequest(parameters) {
