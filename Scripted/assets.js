@@ -2,6 +2,7 @@ var express = require('express');
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
+const urljoin = require('url-join');
 
 const Utils = require('./utils');
 
@@ -13,6 +14,10 @@ const SOUNDEFFECTS_DIR = '../../sfx';
 const SOUNDEFFECTS_URL = '/assets/sfx/';
 const RANDOMIMAGECACHE_DIR = '../../Images/Random Image Cache';
 const RANDOMIMAGECACHE_URL = '/assets/random-image-cache/';
+const FSHOWER_DIR = '../../Images/F';
+const FSHOWER_URL = '/assets/fshower/';
+const FSHOWER_SUBDIR_CACHE = 'Defaults/';
+const FSHOWER_SUBDIR_USERS = 'User-Specific/';
 
 class Assets {
 	static registerAll(app) {
@@ -20,42 +25,53 @@ class Assets {
 		Assets.registerDisplayImages(app);
 		Assets.registerSoundEffects(app);
 		Assets.registerRandomImageCache(app);
+		Assets.registerFShowerImages(app);
+	}
+	
+	static registerDir(app, dir, url) {
+		app.use(url, express.static(path.join(__dirname, dir)));
 	}
 	
 	// Self-Images
 	static registerUserImages(app) {
-		app.use(USERIMAGE_URL,
-			express.static(path.join(__dirname, USERIMAGE_DIR)));
+		Assets.registerDir(app, USERIMAGE_DIR, USERIMAGE_URL);
 	}
 	
 	// Image Display
 	static registerDisplayImages(app) {
-		app.use(IMAGEDISPLAY_URL,
-			express.static(path.join(__dirname, IMAGEDISPLAY_DIR)));
+		Assets.registerDir(app, IMAGEDISPLAY_DIR, IMAGEDISPLAY_URL);
 	}
 	
 	// Random Image Cache
 	static registerRandomImageCache(app) {
-		app.use(RANDOMIMAGECACHE_URL,
-			express.static(path.join(__dirname, RANDOMIMAGECACHE_DIR)));
+		Assets.registerDir(app, RANDOMIMAGECACHE_DIR, RANDOMIMAGECACHE_URL);
+	}
+	
+	// F Shower Images
+	static registerFShowerImages(app) {
+		Assets.registerDir(app, FSHOWER_DIR, FSHOWER_URL);
 	}
 	
 	// Sound Effects
 	static registerSoundEffects(app) {
-		app.use(SOUNDEFFECTS_URL,
-			express.static(path.join(__dirname, SOUNDEFFECTS_DIR)));
+		Assets.registerDir(app, SOUNDEFFECTS_DIR, SOUNDEFFECTS_URL);
+	}
+	
+	static _imageURL(baseURL, filename) {
+		let parsed = path.parse(filename);
+		return urljoin(baseURL, parsed.name + parsed.ext);
 	}
 	
 	static _userImageURL(filename) {
-		let parsed = path.parse(filename);
-		return USERIMAGE_URL + parsed.name + parsed.ext;
+		return Assets._imageURL(USERIMAGE_URL, filename);
 	}
 	
-	static _cacheImageDetails(filename) {
+	static _imageDetails(baseURL, filename) {
+		console.log(`_imageDetails("${baseURL}" , "${filename}")`);
 		let parsed = path.parse(filename);
 		return {
 			name: parsed.name,
-			url: RANDOMIMAGECACHE_URL + parsed.name + parsed.ext,
+			url: baseURL + parsed.name + parsed.ext,
 		};
 	}
 	
@@ -68,7 +84,8 @@ class Assets {
 			
 			let imageList = {};
 			files.forEach(file => {
-				imageList[username] = Assets._userImageURL(file);
+				let details = Assets._imageDetails(USERIMAGE_URL, file);
+				imageList[details.name] = details.url;
 			});
 			
 			onDone(imageList);
@@ -78,13 +95,11 @@ class Assets {
 	static getUserFiles(username) {
 		let userFiles = {};
 		let imagePath = path.join(USERIMAGE_DIR, username + '.png');
-		console.log(`Checking: ${imagePath}`);
 		if (fs.existsSync(imagePath)) {
 			userFiles.image = Assets._userImageURL(imagePath);
 		}
 		
 		let soundPath = path.join(USERIMAGE_DIR, username + '.mp3');
-		console.log(`Checking: ${soundPath}`);
 		if (fs.existsSync(soundPath)) {
 			userFiles.sound = Assets._userImageURL(soundPath);
 		}
@@ -105,21 +120,55 @@ class Assets {
 		return imageList;
 	}
 	
-	static getRandomImageFromCache(onDone) {
-		glob(path.join(RANDOMIMAGECACHE_DIR, '*.*'), {}, (err, files) => {
-			// if (err) {
-			// 	console.error(`Filed to read image cache: ${err}`);
-			// 	return;
-			// }
+	static getRandomImage(dir, baseURL, onDone, onNotFound, pattern) {
+		if (!pattern) {
+			pattern = '*.*';
+		}
+		
+		glob(path.join(dir, pattern), {}, (err, files) => {
+			
+			if (err) {
+				console.error(`Filed to read image dir: ${err}`);
+				return;
+			}
 			
 			if (!files || files.length == 0) {
+				if (onNotFound) {
+					onNotFound();
+				}
+				
 				return;
 			}
 			
 			let index = Utils.randomInt(0, files.length);
-			let fileDetails = Assets._cacheImageDetails(files[index]);
+			let fileDetails = Assets._imageDetails(baseURL, files[index]);
 			onDone(fileDetails.name, fileDetails.url);
 		});
+	}
+	
+	static getRandomImageFromCache(onDone, onNotFound) {
+		Assets.getRandomImage(
+			RANDOMIMAGECACHE_DIR,
+			RANDOMIMAGECACHE_URL,
+			onDone,
+			onNotFound);
+	}
+	
+	static getRandomFShowerImage(onDone, onNotFound) {
+		Assets.getRandomImage(
+			path.join(FSHOWER_DIR, FSHOWER_SUBDIR_CACHE),
+			urljoin(FSHOWER_URL, FSHOWER_SUBDIR_CACHE),
+			onDone,
+			onNotFound);
+	}
+	
+	static getUserFShowerFile(username, onDone, onNotFound) {
+		Assets.getRandomImage(
+			path.join(FSHOWER_DIR, FSHOWER_SUBDIR_USERS),
+			urljoin(FSHOWER_URL, FSHOWER_SUBDIR_USERS),
+			onDone,
+			onNotFound,
+			`${username}*.*`);
 	}
 }
 
