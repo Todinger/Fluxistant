@@ -23,7 +23,7 @@ class RandomImage extends Effect {
 	
 	load() {
 		this.registerCommand(
-			'pix',
+			'pixelate',
 			[],
 			user => this.showRandomImage(user),
 			COMMAND_COST);

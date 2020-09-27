@@ -10,7 +10,8 @@ class ScriptedEffects extends Effect {
 		
 		this.scriptsToShow = [
 			'Channel Party',
-			// 'Image Display',
+			'Image Display',
+			'F Shower',
 			// 'Parrot Mate',
 		];
 		
