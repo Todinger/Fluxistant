@@ -3,7 +3,7 @@
 		"filters": [
 			{
 				"name": "isUser",
-				"argument": "fluxistence"
+				"argument": "yecatsmailbox"
 			}
 		],
 		"sequence": "box"
