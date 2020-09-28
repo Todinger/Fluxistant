@@ -85,8 +85,10 @@ TwitchManager.onCommand('e', [User.isAtLeastMod()], (user, x) => {
 });
 */
 
-/*
 var SEManager = require('./seManager');
+SEManager.init();
+
+/*
 setTimeout(() => {
 	SEManager.getUserPoints('fluxistence', points => console.log(`Flux's points: ${points}`), error => console.error(error));
 	// SEManager.addUserPoints('fluxistence', 500, newAmount => console.log(`After adding 500: ${newAmount}`), error => console.error(error));

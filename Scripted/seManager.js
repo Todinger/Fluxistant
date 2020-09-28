@@ -1,9 +1,12 @@
 const assert = require('assert').strict;
+const io = require('socket.io-client');
 const axios = require('axios');
 const Config = require('./botConfig.json');
+const EventNotifier = require('./eventNotifier');
 
 const URL_BASE = 'https://api.streamelements.com/kappa/v2';
 const URL_POINTS = URL_BASE + '/points';
+const SOCKET_URL = 'https://realtime.streamelements.com';
 
 // Add the authorization token to every Axios request.
 axios.defaults.headers.common['Authorization'] = `Bearer ${Config.token}`;
@@ -71,10 +74,69 @@ class Request {
 }
 */
 
-class SEManager {
+class SEManager extends EventNotifier {
 	constructor() {
+		super();
+		
+		// The data given in each of these eventns is the .data value supplied
+		// in the event message from StreamElements
+		// See StreamElements.websocket.schema.json for a description of
+		// the details object received in each request (its .data property
+		// is the one mentioned above)
+		this._addEvents([
+			'cheer',		// User cheered (with bits)
+			'follow',		// New follower in the stream
+			'host',			// Hosted by someone
+			'raid',			// Raided by someone
+			'redemption',	// Store redemption (costs SE loyalty points)
+			'subscriber',	// New subscription (possibly a recurring one, I think)
+			'tip',			// StreamElements tip
+		]);
+		
 		this.POINTS_NAME = Config.pointsName;
+		this.socket = null;
 	}
+	
+	init() {
+		this.socket = io(SOCKET_URL, {
+			transports: ['websocket'],
+		});
+		
+		this.socket.on('connect', () => this._onConnected());
+		this.socket.on('disconnect', () => this._onDisconnected());
+		this.socket.on('authenticated', (data) => this._onAuthenticated(data));
+		this.socket.on('event', (data) => this._onEvent(data));
+		this.socket.on('event:message', (data) => this._onEvent(data));
+	}
+	
+	_onConnected() {
+		console.log('Connected to StreamElements');
+		this.socket.emit('authenticate', {
+			method: 'jwt',
+			token: Config.token,
+		});
+	}
+	
+	_onDisconnected() {
+		console.log('Disconnected from StreamElements');
+	}
+	
+	_onAuthenticated(data) {
+		const {
+			channelId
+		} = data;
+		
+		console.log(
+			`Successfully connected via StreamElements to channel ${channelId}`);
+	}
+	
+	_onEvent(details) {
+		if (details) {
+			this.notify(details.type, details.data);
+		}
+	}
+	
+	
 	
 	getUserPoints(username, onDone, onError) {
 		let requestURL = `${URL_POINTS}/${Config.channelID}/${username}`;

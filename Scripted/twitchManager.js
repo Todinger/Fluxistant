@@ -1,14 +1,17 @@
 const assert = require('assert').strict;
 const tmi = require('tmi.js');
+const EventNotifier = require('./eventNotifier');
 const User = require('./user').User;
 const EffectManager = require('./effectManager');
 const SEManager = require('./seManager');
 
 const COMMAND_PREFIX = '!';
 
-class TwitchManager {
+class TwitchManager extends EventNotifier {
 	constructor() {
-		this._eventHandlers = {
+		super();
+		
+		this._addEvents([
 			// On the right are the arguments that handlers of
 			// each event should accept
 			// Their types and meaning are denoted by their names:
@@ -18,30 +21,31 @@ class TwitchManager {
 			// - cmdname:	The name of a command (string, doesn't include the
 			// 				command character)
 			// - args:		Additional arguments, used in commands
+			// - SEData:	The .data property of SE events (see SEManager)
 			
-			message: [],			// (user, message)
-			command: [],			// (user, cmdname, args)
-			action: [],				// (user, message)
-			follow: [],				// 
-			cheer: [],				// 
-			tip: [],				// 
-			host: [],				// 
-			raid: [],				// 
-			channelReward: [],		// (user, reward, msg)
-			userJoined: [],			// (username)
-			userLeft: [],			// (username)
-			userFirstMessage: [],	// 
-			userReturnMessage: [],	// 
-			streamStart: [],		// 
-			streamEnd: [],			// 
-			userInactive: [],		// 
-			userActiveAgain: [],	// 
-			sub: [],				// 
-			resub: [],				// 
-			giftSub: [],			// 
-			kick: [],				// 
-			ban: [],				// 
-		}
+			'message',				// (user, message)
+			'command',				// (user, cmdname, args)
+			'action',				// (user, message)
+			'follow',				// (SEData)
+			'cheer',				// 
+			'tip',					// (SEData)
+			'host',					// 
+			'raid',					// 
+			'channelReward',		// (user, reward, msg)
+			'userJoined',			// (username)
+			'userLeft',				// (username)
+			'userFirstMessage',		// 
+			'userReturnMessage',	// 
+			'streamStart',			// 
+			'streamEnd',			// 
+			'userInactive',			// 
+			'userActiveAgain',		// 
+			'sub',					// 
+			'resub',				// 
+			'giftSub',				// 
+			'kick',					// 
+			'ban',					// 
+		]);
 		
 		this._commandHandlers = {};		// Maps cmdname to collection of ID: callback
 		this._commandHandlerIDs = {};	// Maps ID to cmdname name
@@ -71,18 +75,23 @@ class TwitchManager {
 		this._registerAllEvents();
 	}
 	
+	_forwardSEEvent(eventName) {
+		SEManager.on(eventName, data => this._notify(eventName, data));
+	}
+	
 	_registerAllEvents() {
-		let _this = this;
-		
 		this.client.on('message', (channel, userstate, message, self) => {
 			this._processMessage(userstate, message, self);
 		});
 		this.client.on('join', (channel, username, self) => {
-			if (!self) this._invokeEvent('userJoined', username);
+			if (!self) this._notify('userJoined', username);
 		});
 		this.client.on('part', (channel, username, self) => {
-			if (!self) this._invokeEvent('userLeft', username);
+			if (!self) this._notify('userLeft', username);
 		});
+		
+		this._forwardSEEvent('tip');
+		this._forwardSEEvent('follow');
 	}
 	
 	say(msg) {
@@ -92,24 +101,6 @@ class TwitchManager {
 	tell(user, msg) {
 		this.say(`@${user.name} ${msg}`);
 	}
-	
-	on(eventName, callback) {
-		assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
-		this._eventHandlers[eventName].push(callback);
-		return this;
-	}
-	
-	// onCommand(cmdname, filters, callback) {
-	// 	console.log(`onCommand(${cmdname}) invoked!`)
-	// 	if (!(cmdname in this._commandHandlers)) {
-	// 		this._commandHandlers[cmdname] = [];
-	// 	}
-		
-	// 	this._commandHandlers[cmdname].push({
-	// 		filters: filters || [],
-	// 		callback: callback,
-	// 	});
-	// }
 	
 	registerCommand(id, cmdname, filters, callback, cost) {
 		assert(!(id in this._commandHandlerIDs),
@@ -221,7 +212,7 @@ class TwitchManager {
 		
 		if (isCommand) {
 			// Invoke the general command handlers
-			this._invokeEvent('command', user, command.cmdname, command.args);
+			this._notify('command', user, command.cmdname, command.args);
 		}
 		
 		return isCommand;
@@ -244,7 +235,7 @@ class TwitchManager {
 			
 			switch(userstate['message-type']) {
 				case 'action':
-					this._invokeEvent('action', user, message);
+					this._notify('action', user, message);
 					break;
 				default:
 					console.warn("Unknown message type received, treating as regular message.");
@@ -258,7 +249,7 @@ class TwitchManager {
 						return;
 					}
 					
-					this._invokeEvent('message', user, message);
+					this._notify('message', user, message);
 					
 					break;
 			}
@@ -270,12 +261,6 @@ class TwitchManager {
 		catch (err) {
 			console.error(err);
 		}
-	}
-	
-	_invokeEvent(eventName, ...args) {
-		assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
-		console.log(`Invoking event: ${eventName}`);
-		this._eventHandlers[eventName].forEach(callback => callback.apply(null, args));
 	}
 }
 
