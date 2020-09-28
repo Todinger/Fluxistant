@@ -167,6 +167,12 @@ class Utils {
 	
 	// Taken from:
 	// https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object
+	// 
+	// IMPORTANT NOTE!!!
+	// Only use this for simple objects that contain primitive data and/or
+	// arrays and objects of such simple objects!
+	// This function cannot compy complex objects (e.g. custom classes and
+	// functions).
 	static clone(obj) {
 		var copy;
 
