@@ -167,7 +167,7 @@ class Assets {
 			urljoin(FSHOWER_URL, FSHOWER_SUBDIR_USERS),
 			onDone,
 			onNotFound,
-			`${username}*.*`);
+			`${username.toLowerCase()}*.*`);
 	}
 }
 

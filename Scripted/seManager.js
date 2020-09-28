@@ -132,7 +132,7 @@ class SEManager extends EventNotifier {
 	
 	_onEvent(details) {
 		if (details) {
-			this.notify(details.type, details.data);
+			this._notify(details.type, details.data);
 		}
 	}
 	

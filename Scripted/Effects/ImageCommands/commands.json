@@ -68,17 +68,8 @@
 		"sound": "/assets/sfx/objection.mp3"
 	},
 	
-	":parrot:": {
-		"image": {
-			"url": "/assets/image-display/Parrot.png",
-			"effects": {
-				"dundundun": {}
-			}
-		},
-		"sound": "/assets/sfx/parrot/squawk.mp3"
-	},
-	
 	"parrot": {
+		"aliases": [ ":parrot:", "polly" ],
 		"image": {
 			"url": "/assets/image-display/Parrot.png",
 			"effects": {

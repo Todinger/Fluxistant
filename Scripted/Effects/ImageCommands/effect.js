@@ -9,7 +9,8 @@ const COMMANDS_FILENAME = path.join(__dirname, 'commands.json');
 
 // Command structure:
 // cmdname: {
-// 	filters: [	// Completely optional
+// 	aliases: [ "list", "of", "aliases" ],	// Completely optional
+// 	filters: [								// Completely optional
 // 		{
 // 			name: "filterName",		// E.g. "isUser"
 // 			argument: "Some value",	// E.g. "Fluxistence", omit if unnecessary
@@ -29,6 +30,15 @@ class Command {
 		this.cmdname = cmdname;
 		this.imageParameters = data.image;
 		this.soundurl = data.sound;
+		
+		this.aliases = data.aliases;
+		if (this.aliases) {
+			if (!(this.cmdname in this.aliases)) {
+				this.aliases.push(this.cmdname);
+			}
+		} else {
+			this.aliases = [this.cmdname];
+		}
 		
 		if (data.filters) {
 			this.filters = data.filters.map(
@@ -77,19 +87,24 @@ class ImageCommands extends Effect {
 		let changes = Utils.oldNewSplit(this.commandsData, newCommandsData);
 		
 		Object.keys(changes.remove).forEach(cmdname => {
-			this.unregisterCommand(cmdname);
+			this.commands[cmdname].aliases.forEach(alias => {
+				this.unregisterCommand(alias);
+			});
+			
 			delete this.commands[cmdname];
 		});
 		
 		Object.keys(changes.add).forEach(cmdname => {
 			let cmd = new Command(cmdname, changes.add[cmdname]);
 			this.commands[cmdname] = cmd;
-			this.registerCommand(
-				cmdname,
-				cmd.filters,
-				() => {
-					this._sendCommand(cmd);
-				});
+			cmd.aliases.forEach(alias => {
+				this.registerCommand(
+					alias,
+					cmd.filters,
+					() => {
+						this._sendCommand(cmd);
+					});
+			});
 		});
 		
 		this.commandsData = newCommandsData;
