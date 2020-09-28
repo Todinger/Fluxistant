@@ -147,6 +147,16 @@ const SEQUENCES = {
 		Event(4470, [ ClearText() ]),
 		Event(6600, [ Image('regular') ]),
 	], NO_AUTOPLAY),
+	
+	box: Sequence([
+		Event(0, [ Sound('box') ]),
+		Event(0, [ Image('mouth') ]),
+		Event(643, [ Image('regular') ]),
+		Event(872, [ Image('wing'), Text("What's in the box?") ]),
+		Event(1138, [ Image('regular') ]),
+		Event(1393, [ Image('wing') ]),
+		Event(1968, [ Image('regular') ]),
+	], NO_AUTOPLAY),
 };
 
 parrotMate.loadAll(SEQUENCES);

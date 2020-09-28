@@ -19,4 +19,7 @@ const SOUNDS = {
 	lars:		{ location: './Sounds/Lars.mp3' },
 	law:		{ location: './Sounds/Law.mp3' },
 	what:		{ location: './Sounds/What.mp3' },
+	box:		{ location: './Sounds/Box.mp3' },
 };
+
+const BASE_IMAGE_NAME = 'regular';

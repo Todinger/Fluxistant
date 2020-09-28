@@ -2,6 +2,10 @@ function showImage(name) {
 	$('#parrot').attr("src", IMAGE_LOCATIONS[name]);
 }
 
+function clearImage() {
+	showImage(BASE_IMAGE_NAME);
+}
+
 function showText(text) {
 	$('#bubbleText').text(text);
 	$('#bubble').show();
@@ -10,6 +14,11 @@ function showText(text) {
 function clearText() {
 	$('#bubble').hide();
 	$('#bubbleText').empty();
+}
+
+function clearAll() {
+	clearText();
+	
 }
 
 class Action {
@@ -70,6 +79,11 @@ function ClearText() { return new ClearTextAction() };
 class TimedEvent {
 	constructor(time, actions) {
 		this.time = time;
+		
+		if (!Array.isArray(actions)) {
+			actions = [actions];
+		}
+		
 		this.actions = actions;
 	}
 	
@@ -135,6 +149,7 @@ class TimedSequence {
 	}
 	
 	_finished() {
+		clearAll();
 		this.sequenceFinishedListeners.forEach(listener => listener());
 	}
 	
@@ -201,8 +216,7 @@ class SequencePlayer {
 	}
 	
 	_sequenceFinished() {
-		showImage(this.baseImageName);
-		clearText();
+		// Deprecated
 	}
 	
 	play() {

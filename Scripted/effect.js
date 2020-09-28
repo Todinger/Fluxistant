@@ -1,8 +1,9 @@
-var User = require('./user');
-var TwitchManager = require('./twitchManager');
-var Enums = require('./enums');
-var KeyboardManager = require('./keyboardManager');
-var Assets = require('./assets');
+const User = require('./user');
+const TwitchManager = require('./twitchManager');
+const Enums = require('./enums');
+const KeyboardManager = require('./keyboardManager');
+const Assets = require('./assets');
+const CommandManager = require('./commandManager');
 
 class Effect {
 	constructor(description) {
@@ -12,6 +13,13 @@ class Effect {
 		this.zindex = description.zindex;
 		this.tags = description.tags;
 		this.effectManager = null;
+		this.commandManager = new CommandManager(this);
+		
+		// Do not set these two; they are set by EffectManager
+		// after the effect has finished construction and validation
+		// (before the load() function is invoked)
+		this.effectManager = null;
+		this.workdir = null;
 		
 		this._clientAttachedHandlers = [];
 		this._clientDisconnectedHandlers = [];

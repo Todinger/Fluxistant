@@ -5,9 +5,7 @@ const path = require('path');
 const Utils = require('../../utils');
 const Effect = require('../../effect');
 
-const COMMANDS_FILENAME = path.join(__dirname, 'commands.json');
-
-// Command structure:
+// Command file structure:
 // cmdname: {
 // 	aliases: [ "list", "of", "aliases" ],	// Completely optional
 // 	filters: [								// Completely optional
@@ -25,34 +23,7 @@ const COMMANDS_FILENAME = path.join(__dirname, 'commands.json');
 // 	sound: "/url/of/sound.mp3",		// Optional, can be image only
 // 	// Both image and sound are optional, but at least one must be present
 // }
-class Command {
-	constructor(cmdname, data) {
-		this.cmdname = cmdname;
-		this.imageParameters = data.image;
-		this.soundurl = data.sound;
-		
-		this.aliases = data.aliases;
-		if (this.aliases) {
-			if (!(this.cmdname in this.aliases)) {
-				this.aliases.push(this.cmdname);
-			}
-		} else {
-			this.aliases = [this.cmdname];
-		}
-		
-		if (data.filters) {
-			this.filters = data.filters.map(
-				filterData => Effect.Filters.fromDataSingle(
-					filterData.name,
-					filterData.argument));
-		}
-	}
-	
-	// Should be in the form of { name: "Filter Name", argument: someValue }
-	filterByData(data) {
-		return Effect.Filters.fromDataSingle(data.name, data.argument);
-	}
-}
+const COMMANDS_FILENAME = 'commands.json';
 
 class ImageCommands extends Effect {
 	constructor() {
@@ -60,54 +31,58 @@ class ImageCommands extends Effect {
 			name: 'Image Commands',
 			tags: ['imgdisp'],
 		});
-		
-		this.commands = {};
-		this.commandsData = {};
 	}
 	
 	_sendCommand(cmd) {
 		this.broadcastEvent('showImage', {
-			image: cmd.imageParameters,
-			sound: cmd.soundurl,
+			image: cmd.image,
+			sound: cmd.sound,
 		});
 	}
 	
-	loadCommands() {
-		let rawData = fs.readFileSync(COMMANDS_FILENAME);
-		let newCommandsData = null;
+	// loadCommands() {
+	// 	let rawData = fs.readFileSync(COMMANDS_FILENAME);
+	// 	let newCommandsData = null;
 		
-		try {
-			newCommandsData = JSON.parse(rawData);
-		} catch (err) {
-			console.error('Failed to read commands file:');
-			console.error(err);
-			return;
-		}
+	// 	try {
+	// 		newCommandsData = JSON.parse(rawData);
+	// 	} catch (err) {
+	// 		console.error('Failed to read commands file:');
+	// 		console.error(err);
+	// 		return;
+	// 	}
 		
-		let changes = Utils.oldNewSplit(this.commandsData, newCommandsData);
+	// 	let changes = Utils.oldNewSplit(this.commandsData, newCommandsData);
 		
-		Object.keys(changes.remove).forEach(cmdname => {
-			this.commands[cmdname].aliases.forEach(alias => {
-				this.unregisterCommand(alias);
-			});
+	// 	Object.keys(changes.remove).forEach(cmdname => {
+	// 		this.commands[cmdname].aliases.forEach(alias => {
+	// 			this.unregisterCommand(alias);
+	// 		});
 			
-			delete this.commands[cmdname];
-		});
+	// 		delete this.commands[cmdname];
+	// 	});
 		
-		Object.keys(changes.add).forEach(cmdname => {
-			let cmd = new Command(cmdname, changes.add[cmdname]);
-			this.commands[cmdname] = cmd;
-			cmd.aliases.forEach(alias => {
-				this.registerCommand(
-					alias,
-					cmd.filters,
-					() => {
-						this._sendCommand(cmd);
-					});
-			});
-		});
+	// 	Object.keys(changes.add).forEach(cmdname => {
+	// 		let cmd = new Command(cmdname, changes.add[cmdname]);
+	// 		this.commands[cmdname] = cmd;
+	// 		cmd.aliases.forEach(alias => {
+	// 			this.registerCommand(
+	// 				alias,
+	// 				cmd.filters,
+	// 				() => {
+	// 					this._sendCommand(cmd);
+	// 				});
+	// 		});
+	// 	});
 		
-		this.commandsData = newCommandsData;
+	// 	this.commandsData = newCommandsData;
+	// }
+	
+	loadCommands() {
+		this.commandManager.loadFile(
+			COMMANDS_FILENAME,
+			(cmd) => this._sendCommand(cmd)
+		);
 	}
 	
 	load() {

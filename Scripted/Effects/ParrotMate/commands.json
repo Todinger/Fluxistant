@@ -1,0 +1,11 @@
+{
+	"box": {
+		"filters": [
+			{
+				"name": "isUser",
+				"argument": "fluxistence"
+			}
+		],
+		"sequence": "box"
+	}
+}

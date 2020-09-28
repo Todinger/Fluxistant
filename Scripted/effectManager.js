@@ -58,8 +58,9 @@ class EffectManager {
 			});
 		}
 		
-		effect.load();
 		effect.effectManager = this;
+		effect.workdir = fxdir;
+		effect.load();
 		this.effects[effect.name] = effect;
 		
 		console.log(`Loaded effect: ${effect.name}`);

@@ -1,5 +1,6 @@
 var Effect = require('../../effect.js');
 
+const USER_COMMANDS_FILE = "commands.json";
 const PARROT_IMAGE_URL = "/assets/image-display/Parrot.png";
 const WWT_COOLDOWN_DURATION = 4000;
 
@@ -15,7 +16,20 @@ class ParrotMate extends Effect {
 		this.whatWasThatCooldownActive = false;
 	}
 	
+	forwardSequenceCommand(cmd) {
+		this.broadcastEvent('playSequence', cmd.sequence);
+	}
+	
+	loadUserCommands() {
+		this.commandManager.loadFile(
+			USER_COMMANDS_FILE,
+			cmd => this.forwardSequenceCommand(cmd)
+		);
+	}
+	
 	load() {
+		this.loadUserCommands();
+		
 		this.registerCommand('parrottime', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
 			(user, delay) => {
 				if (isNaN(delay)) {
@@ -64,9 +78,6 @@ class ParrotMate extends Effect {
 				}
 			});
 		});
-		this.registerCommand('parrot', [],
-			() => {
-			});
 	}
 }
 
