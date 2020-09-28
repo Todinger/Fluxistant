@@ -40,44 +40,6 @@ class ImageCommands extends Effect {
 		});
 	}
 	
-	// loadCommands() {
-	// 	let rawData = fs.readFileSync(COMMANDS_FILENAME);
-	// 	let newCommandsData = null;
-		
-	// 	try {
-	// 		newCommandsData = JSON.parse(rawData);
-	// 	} catch (err) {
-	// 		console.error('Failed to read commands file:');
-	// 		console.error(err);
-	// 		return;
-	// 	}
-		
-	// 	let changes = Utils.oldNewSplit(this.commandsData, newCommandsData);
-		
-	// 	Object.keys(changes.remove).forEach(cmdname => {
-	// 		this.commands[cmdname].aliases.forEach(alias => {
-	// 			this.unregisterCommand(alias);
-	// 		});
-			
-	// 		delete this.commands[cmdname];
-	// 	});
-		
-	// 	Object.keys(changes.add).forEach(cmdname => {
-	// 		let cmd = new Command(cmdname, changes.add[cmdname]);
-	// 		this.commands[cmdname] = cmd;
-	// 		cmd.aliases.forEach(alias => {
-	// 			this.registerCommand(
-	// 				alias,
-	// 				cmd.filters,
-	// 				() => {
-	// 					this._sendCommand(cmd);
-	// 				});
-	// 		});
-	// 	});
-		
-	// 	this.commandsData = newCommandsData;
-	// }
-	
 	loadCommands() {
 		this.commandManager.loadFile(
 			COMMANDS_FILENAME,
@@ -85,19 +47,12 @@ class ImageCommands extends Effect {
 		);
 	}
 	
+	reloadData() {
+		this.loadCommands();
+	}
+	
 	load() {
 		this.loadCommands();
-		
-		// Ctrl + WinKey + F5 = Reread commands
-		this.registerShortcutKey(
-			'rereadCommands',
-			[
-				Effect.Keycodes.VC_CONTROL_L,
-				Effect.Keycodes.VC_META_L,
-				Effect.Keycodes.VC_F5
-			],
-			() => this.loadCommands()
-		);
 	}
 }
 

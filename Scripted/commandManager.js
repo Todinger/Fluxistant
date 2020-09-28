@@ -30,7 +30,7 @@ class Command {
 	constructor(cmdname, data) {
 		this.cmdname = cmdname;
 		
-		this.aliases = data.aliases;
+		this.aliases = Utils.clone(data.aliases);
 		if (this.aliases) {
 			if (!(this.cmdname in this.aliases)) {
 				this.aliases.push(this.cmdname);
@@ -52,7 +52,7 @@ class Command {
 	readExtraData(data) {
 		Object.keys(data).forEach(property => {
 			if (!(property in this)) {
-				this[property] = data[property];
+				this[property] = Utils.clone(data[property]);
 			}
 		});
 	}
@@ -92,7 +92,7 @@ class CommandManager {
 		
 		Object.keys(changes.remove).forEach(cmdname => {
 			this.commands[cmdname].aliases.forEach(alias => {
-				this.unregisterCommand(alias);
+				this.effect.unregisterCommand(alias);
 			});
 			
 			delete this.commands[cmdname];

@@ -34,11 +34,20 @@ class Effect {
 		this._clientDisconnectedHandlers.push(handler);
 	}
 	
+	// Invoked after creation and assignment of basic values by EffectManager
 	load() {
 		// Do nothing by default (for overriding where needed)
 	}
 	
+	// Invoked for all effects after all load() functions have been called
 	postload() {
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	// Invoked manually, meant to have all commands reload any data they may
+	// have - namely, if there are any command files loaded into commandManager,
+	// they should be reloaded
+	reloadData() {
 		// Do nothing by default (for overriding where needed)
 	}
 	
@@ -66,7 +75,7 @@ class Effect {
 			delete this._connectedClients[socket.id];
 		});
 		this._clientAttachedHandlers.forEach(handler => handler(socket));
-		console.log(`Client attached to ${this.name}.`);
+		this.log(`Client attached.`);
 	}
 	
 	// Should check if a given command (= { cmdname, args }) is a command
@@ -122,6 +131,22 @@ class Effect {
 	
 	tell(user, msg) {
 		TwitchManager.tell(user, msg);
+	}
+	
+	_printForm(message) {
+		return `[${this.name}] ${message}`;
+	}
+	
+	log(message) {
+		console.log(this._printForm(message));
+	}
+	
+	warn(message) {
+		console.warn(this._printForm(message));
+	}
+	
+	error(message) {
+		console.error(this._printForm(message));
 	}
 	
 	static get Filters() {

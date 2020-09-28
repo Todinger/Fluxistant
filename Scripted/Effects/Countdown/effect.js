@@ -24,7 +24,7 @@ class Countdown extends Effect {
 		this.registerCommand('settime', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
 			(user, time) => {
 				if (isNaN(time)) {
-					console.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
+					this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
 					return;
 				}
 				
@@ -35,7 +35,7 @@ class Countdown extends Effect {
 		this.registerCommand('addtime', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
 			(user, time) => {
 				if (isNaN(time)) {
-					console.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
+					this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
 					return;
 				}
 				
@@ -46,7 +46,7 @@ class Countdown extends Effect {
 		this.registerCommand('subtracttime', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
 			(user, time) => {
 				if (isNaN(time)) {
-					console.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
+					this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
 					return;
 				}
 				

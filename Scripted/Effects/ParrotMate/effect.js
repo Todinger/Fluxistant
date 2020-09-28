@@ -27,6 +27,11 @@ class ParrotMate extends Effect {
 		);
 	}
 	
+	reloadData() {
+		this.loadUserCommands();
+	}
+	
+	
 	load() {
 		this.loadUserCommands();
 		
@@ -34,7 +39,7 @@ class ParrotMate extends Effect {
 			(user, delay) => {
 				if (isNaN(delay)) {
 					this.tell(user, `Please enter a number for the delay value.`);
-					console.error(`Bad command by ${user.name}: '${delay}' is not a number`);
+					this.error(`Bad command by ${user.name}: '${delay}' is not a number`);
 				} else {
 					this.broadcastEvent('setDelay', Number(delay));
 				}
@@ -46,7 +51,7 @@ class ParrotMate extends Effect {
 				if (isNaN(variance)) {
 					// TODO: Give the use an error, once we're ready to reveal
 					// Fluxistant to the world
-					console.error(`Bad command by ${user.name}: '${variance}' is not a number`);
+					this.error(`Bad command by ${user.name}: '${variance}' is not a number`);
 				} else {
 					this.broadcastEvent('setVariance', Number(variance));
 				}

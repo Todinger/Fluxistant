@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert').strict;
 const urljoin = require('url-join');
+const KEYCODES = require('./enums').KEYCODES;
+const KeyboardManager = require('./keyboardManager');
 
 // Taken from:
 // https://stackoverflow.com/questions/18112204/get-all-directories-within-directory-nodejs/24594123
@@ -17,6 +19,17 @@ class EffectManager {
 		this.effects = {};
 		this.clientEffects = {};
 		this.tags = {};
+		
+		// Ctrl + WinKey + F5 = Have all effects reload their data
+		KeyboardManager.registerShortcut(
+			'EffectManager:ReloadData',
+			[
+				KEYCODES.VC_CONTROL_L,
+				KEYCODES.VC_META_L,
+				KEYCODES.VC_F5
+			],
+			() => this.reloadAllEffectData()
+		);
 	}
 	
 	nameExists(name) {
@@ -100,6 +113,12 @@ class EffectManager {
 		} else {
 			console.warn(`Unknown tag: ${tag}`);
 		}
+	}
+	
+	reloadAllEffectData() {
+		Object.values(this.effects).forEach(effect => {
+			effect.reloadData();
+		});
 	}
 }
 

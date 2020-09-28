@@ -22,7 +22,7 @@ class FShower extends Effect {
 			() => {
 				Effect.Assets.getRandomFShowerImage(
 					(filename, fileurl) => this.sendFile(fileurl),
-					() => console.error('No FShower images found in cache'));
+					() => this.error('No FShower images found in cache'));
 			});
 	}
 	
