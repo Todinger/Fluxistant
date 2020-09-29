@@ -1,5 +1,6 @@
 {
 	"box": {
+		"aliases": [ "7" ],
 		"filters": [
 			{
 				"name": "isUser",
