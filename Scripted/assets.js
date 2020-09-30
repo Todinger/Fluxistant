@@ -95,7 +95,10 @@ class Assets {
 		let userFiles = {};
 		let imagePath = path.join(USERIMAGE_DIR, username + '.png');
 		if (fs.existsSync(imagePath)) {
-			userFiles.image = Assets._userImageURL(imagePath);
+			userFiles.image = {
+				path: imagePath,
+				url: Assets._userImageURL(imagePath),
+			};
 		}
 		
 		let soundPath = path.join(USERIMAGE_DIR, username + '.mp3');

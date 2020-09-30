@@ -1,5 +1,3 @@
-// const DEFAULT_WIDTH = 300;
-// const DEFAULT_HEIGHT = 300;
 const FADE_DURATION = 250;
 const DEFAULT_SHOW_DURATION = 5000;
 
