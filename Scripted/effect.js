@@ -4,6 +4,7 @@ const Enums = require('./enums');
 const KeyboardManager = require('./keyboardManager');
 const Assets = require('./assets');
 const CommandManager = require('./commandManager');
+const SEManager = require('./seManager');
 
 class Effect {
 	constructor(description) {
@@ -55,13 +56,14 @@ class Effect {
 		return `<${this.name}> ${cmdname}`;
 	}
 	
-	registerCommand(cmdname, filters, callback, cost) {
+	registerCommand(cmdname, filters, callback, cost, descriptionFunc) {
 		TwitchManager.registerCommand(
 			this.getCommandId(cmdname),
 			cmdname,
 			filters,
 			callback,
-			cost);
+			cost,
+			descriptionFunc);
 	}
 	
 	unregisterCommand(cmdname) {
@@ -159,6 +161,10 @@ class Effect {
 	
 	static get Assets() {
 		return Assets;
+	}
+	
+	static get USERPOINTS_NAME() {
+		return SEManager.POINTS_NAME;
 	}
 }
 

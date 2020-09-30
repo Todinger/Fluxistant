@@ -102,7 +102,7 @@ class TwitchManager extends EventNotifier {
 		this.say(`@${user.name} ${msg}`);
 	}
 	
-	registerCommand(id, cmdname, filters, callback, cost) {
+	registerCommand(id, cmdname, filters, callback, cost, descriptionFunc) {
 		assert(!(id in this._commandHandlerIDs),
 			`Duplicate command registration for ID "${id}"`);
 		
@@ -121,6 +121,7 @@ class TwitchManager extends EventNotifier {
 			filters: filters || [],
 			callback: callback,
 			cost: cost,
+			descriptionFunc: descriptionFunc,
 		};
 	}
 	
@@ -174,22 +175,17 @@ class TwitchManager extends EventNotifier {
 			Object.values(this._commandHandlers[command.cmdname]).forEach(handler => {
 				if (handler.filters.reduce(
 					(soFar, currentFilter) => soFar && currentFilter(user), true)) {
-						let responseDetails = undefined;
 						if (handler.cost && handler.cost > 0) {
-							let response =
-								`${user.name} has invoked ${command.fullname} for ${handler.cost} ${SEManager.POINTS_NAME}`;
+							let response = handler.descriptionFunc
+								? handler.descriptionFunc(user, command.cmdname)
+								: `${user.name} has invoked ${command.fullname} for ${handler.cost} ${SEManager.POINTS_NAME}!`;
 							SEManager.consumeUserPoints(
 								user.name,
 								handler.cost,
 								(oldAmount, newAmount) => {
 									// To-log: `${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`
-									responseDetails = handler.callback.apply(null, fullargs);
-									
-									if (responseDetails) {
-										this.say(`${response}: ${responseDetails}`);
-									} else {
-										this.say(`${response}!`);
-									}
+									this.say(response);
+									handler.callback.apply(null, fullargs);
 								},
 								(amount, points) => {
 									this.tell(user, `You do not have enough ${SEManager.POINTS_NAME} to use the ${command.fullname} command. (${points} / ${amount})`);

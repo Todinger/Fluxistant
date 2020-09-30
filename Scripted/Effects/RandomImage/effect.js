@@ -1,7 +1,9 @@
 'use strict';
 
+const _ = require('lodash');
 const Effect = require('../../effect');
 
+const COMMAND_NAME = 'pixelate';
 const COMMAND_COST = 300;
 
 class RandomImage extends Effect {
@@ -21,12 +23,17 @@ class RandomImage extends Effect {
 		});
 	}
 	
+	describeCommand() {
+		return `${_.capitalize(COMMAND_NAME)} redeemed for ${COMMAND_COST} ${Effect.USERPOINTS_NAME}! One random drawing by Yecats coming up!`;
+	}
+	
 	load() {
 		this.registerCommand(
-			'pixelate',
+			COMMAND_NAME,
 			[],
 			user => this.showRandomImage(user),
-			COMMAND_COST);
+			COMMAND_COST,
+			user => this.describeCommand(user));
 	}
 }
 
