@@ -4,6 +4,7 @@ const EventNotifier = require('./eventNotifier');
 const User = require('./user').User;
 const EffectManager = require('./effectManager');
 const SEManager = require('./seManager');
+const Log = require('./logger');
 
 const COMMAND_PREFIX = '!';
 
@@ -183,7 +184,7 @@ class TwitchManager extends EventNotifier {
 								user.name,
 								handler.cost,
 								(oldAmount, newAmount) => {
-									// To-log: `${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`
+									Log.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
 									this.say(response);
 									handler.callback.apply(null, fullargs);
 								},
