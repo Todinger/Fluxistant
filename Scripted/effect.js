@@ -5,6 +5,7 @@ const KeyboardManager = require('./keyboardManager');
 const Assets = require('./assets');
 const CommandManager = require('./commandManager');
 const SEManager = require('./seManager');
+const Log = require('./logger');
 
 class Effect {
 	constructor(description) {
@@ -15,6 +16,7 @@ class Effect {
 		this.tags = description.tags;
 		this.effectManager = null;
 		this.commandManager = new CommandManager(this);
+		this.dblog = Log;
 		
 		// Do not set these two; they are set by EffectManager
 		// after the effect has finished construction and validation
