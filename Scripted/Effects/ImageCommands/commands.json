@@ -69,7 +69,7 @@
 	},
 	
 	"parrot": {
-		"aliases": [ ":parrot:", "polly" ],
+		"aliases": [ "🦜", "polly" ],
 		"image": {
 			"url": "/assets/image-display/Parrot.png",
 			"effects": {
