@@ -28,12 +28,12 @@ class RandomImage extends Effect {
 	}
 	
 	load() {
-		this.registerCommand(
-			COMMAND_NAME,
-			[],
-			user => this.showRandomImage(user),
-			COMMAND_COST,
-			user => this.describeCommand(user));
+		this.registerCommand({
+			cmdname: COMMAND_NAME,
+			callback: user => this.showRandomImage(user),
+			cost: COMMAND_COST,
+			descriptionFunc: user => this.describeCommand(user)
+		});
 	}
 }
 

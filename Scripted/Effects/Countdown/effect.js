@@ -21,38 +21,44 @@ class Countdown extends Effect {
 	load() {
 		this._onClientAttached(() => this.broadcastEvent('setTime', this.initialTime));
 		
-		this.registerCommand('settime', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user, time) => {
+		this.registerCommand({
+			cmdname: 'settime',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user, time) => {
 				if (isNaN(time)) {
 					this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
 					return;
 				}
 				
 				this.broadcastEvent('setTime', Number(time) * MINUTES);
-			}
-		);
+			},
+		});
 		
-		this.registerCommand('addtime', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user, time) => {
+		this.registerCommand({
+			cmdname: 'addtime',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user, time) => {
 				if (isNaN(time)) {
 					this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
 					return;
 				}
 				
 				this.broadcastEvent('offsetTime', Number(time) * MINUTES);
-			}
-		);
+			},
+		});
 		
-		this.registerCommand('subtracttime', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user, time) => {
+		this.registerCommand({
+			cmdname: 'subtracttime',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user, time) => {
 				if (isNaN(time)) {
 					this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
 					return;
 				}
 				
 				this.broadcastEvent('offsetTime', -Number(time) * MINUTES);
-			}
-		);
+			},
+		});
 		
 		this.registerShortcutKey(
 			'addTime',

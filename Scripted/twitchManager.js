@@ -103,27 +103,33 @@ class TwitchManager extends EventNotifier {
 		this.say(`@${user.name} ${msg}`);
 	}
 	
-	registerCommand(id, cmdname, filters, callback, cost, descriptionFunc) {
+	// registerCommand(id, cmdname, filters, callback, cost, descriptionFunc) {
+	registerCommand(id, cmd) {
 		assert(!(id in this._commandHandlerIDs),
 			`Duplicate command registration for ID "${id}"`);
 		
 		// This is to make all commands case-insensitive
-		cmdname = cmdname.toLowerCase();
+		cmd.cmdname = cmd.cmdname.toLowerCase();
 		
-		console.log(`Registering command '${COMMAND_PREFIX}${cmdname}' for '${id}'`);
+		// Default value if omitted
+		cmd.filters = cmd.filters || [];
 		
-		if (!(cmdname in this._commandHandlers)) {
-			this._commandHandlers[cmdname] = {};
+		console.log(`Registering command '${COMMAND_PREFIX}${cmd.cmdname}' for '${id}'`);
+		
+		if (!(cmd.cmdname in this._commandHandlers)) {
+			this._commandHandlers[cmd.cmdname] = {};
 		}
 		
-		this._commandHandlerIDs[id] = cmdname;
+		this._commandHandlerIDs[id] = cmd.cmdname;
 		
-		this._commandHandlers[cmdname][id] = {
-			filters: filters || [],
-			callback: callback,
-			cost: cost,
-			descriptionFunc: descriptionFunc,
-		};
+		this._commandHandlers[cmd.cmdname][id] = cmd;
+		// this._commandHandlers[cmd.cmdname][id] = {
+		// 	filters: cmd.filters || [],
+		// 	callback: cmd.callback,
+		// 	cost: cmd.cost,
+		// 	descriptionFunc: cmd.descriptionFunc,
+		// 	cooldown: cmd.cooldown,
+		// };
 	}
 	
 	unregisterCommand(id) {

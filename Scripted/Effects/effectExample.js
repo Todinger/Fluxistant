@@ -12,11 +12,13 @@ class MyEffect extends Effect {
 	load() {
 		this._onClientAttached(() => this.broadcastEvent('setTime', this.initialTime));
 		
-		this.registerCommand('somecmd', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user, value) => {
+		this.registerCommand({
+			cmdname: 'somecmd',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user, value) => {
 				this.broadcastEvent('somecmd', `Hello ${value}!`);
 			}
-		);
+		});
 		
 		// On Ctrl + WinKey + Numpad Add
 		this.registerShortcutKey(

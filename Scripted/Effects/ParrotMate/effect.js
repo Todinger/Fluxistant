@@ -31,12 +31,13 @@ class ParrotMate extends Effect {
 		this.loadUserCommands();
 	}
 	
-	
 	load() {
 		this.loadUserCommands();
 		
-		this.registerCommand('parrottime', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user, delay) => {
+		this.registerCommand({
+			cmdname: 'parrottime',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user, delay) => {
 				if (isNaN(delay)) {
 					this.tell(user, `Please enter a number for the delay value.`);
 					this.error(`Bad command by ${user.name}: '${delay}' is not a number`);
@@ -44,10 +45,12 @@ class ParrotMate extends Effect {
 					this.broadcastEvent('setDelay', Number(delay));
 				}
 			}
-		);
+		});
 		
-		this.registerCommand('parrotoffset', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user, variance) => {
+		this.registerCommand({
+			cmdname: 'parrotoffset',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user, variance) => {
 				if (isNaN(variance)) {
 					// TODO: Give the use an error, once we're ready to reveal
 					// Fluxistant to the world
@@ -56,19 +59,23 @@ class ParrotMate extends Effect {
 					this.broadcastEvent('setVariance', Number(variance));
 				}
 			}
-		);
+		});
 		
-		this.registerCommand('parrotstart', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user) => {
+		this.registerCommand({
+			cmdname: 'parrotstart',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user) => {
 				this.broadcastEvent('play');
 			}
-		);
+		});
 		
-		this.registerCommand('parrotstop', [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-			(user) => {
+		this.registerCommand({
+			cmdname: 'parrotstop',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user) => {
 				this.broadcastEvent('stop');
 			}
-		);
+		});
 		
 		this._onClientAttached(socket => {
 			socket.on('imgdispDone', url => {

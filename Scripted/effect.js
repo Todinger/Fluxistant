@@ -60,14 +60,16 @@ class Effect {
 		return `<${this.name}> ${cmdname}`;
 	}
 	
-	registerCommand(cmdname, filters, callback, cost, descriptionFunc) {
+	// registerCommand(cmdname, filters, callback, cost, descriptionFunc) {
+	registerCommand(cmd) {
 		TwitchManager.registerCommand(
-			this.getCommandId(cmdname),
-			cmdname,
-			filters,
-			callback,
-			cost,
-			descriptionFunc);
+			this.getCommandId(cmd.cmdname),
+			cmd);
+			// cmdname,
+			// filters,
+			// callback,
+			// cost,
+			// descriptionFunc);
 	}
 	
 	unregisterCommand(cmdname) {
@@ -107,8 +109,12 @@ class Effect {
 	
 	// Simple = up to one argument
 	forwardSimpleCommand(cmdname, filters) {
-		this.registerCommand(cmdname, filters, (user, arg) => {
-			this.broadcastEvent(cmdname, arg);
+		this.registerCommand({
+			cmdname: cmdname,
+			filters: filters,
+			callback: (user, arg) => {
+				this.broadcastEvent(cmdname, arg);
+			},
 		});
 	}
 	

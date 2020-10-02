@@ -47,10 +47,11 @@ class CandyGame extends Effect {
 	}
 	
 	load() {
-		this.registerCommand(
-			'candy',
-			[Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-			user => this.startGame(user));
+		this.registerCommand({
+			cmdname: 'candy',
+			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
+			callback: user => this.startGame(user),
+		});
 	}
 }
 

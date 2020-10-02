@@ -101,11 +101,11 @@ class CommandManager {
 			let cmd = new Command(cmdname, changes.add[cmdname]);
 			this.commands[cmdname] = cmd;
 			cmd.aliases.forEach(alias => {
-				this.effect.registerCommand(
-					alias,
-					cmd.filters,
-					() => handler(cmd)
-				);
+				this.effect.registerCommand({
+					cmdname: alias,
+					filters: cmd.filters,
+					callback: () => handler(cmd),
+				});
 			});
 		});
 		
