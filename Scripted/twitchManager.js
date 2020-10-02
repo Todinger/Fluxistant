@@ -288,26 +288,22 @@ class TwitchManager extends EventNotifier {
 			if (cdd.users) {
 				Object.keys(cdd.users).forEach(username => {
 					if (cdd.users[username] < now) {
-						console.log(`>> Deleting user cooldown for ${username}`);
 						delete cdd.users[username];
 					}
 				});
 				
 				if (_.isEmpty(cdd.users)) {
-					console.log(`>> Deleting empty cooldown data: users`);
 					delete cdd.users;
 				}
 			}
 			
 			if (cdd.global) {
 				if (cdd.global < now) {
-					console.log(`>> Deleting empty cooldown data: global`);
 					delete cdd.global;
 				}
 			}
 			
 			if (_.isEmpty(cdd)) {
-				console.log(`>> Deleting empty cooldown data`);
 				delete this._cooldownData[id];
 			}
 		});
