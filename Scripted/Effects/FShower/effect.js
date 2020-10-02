@@ -6,13 +6,12 @@ class FShower extends Effect {
 	constructor() {
 		super({
 			name: 'F Shower',
-			webname: 'fshower',
-			source: 'fshower.html',
+			tags: ['imgdrop'], 
 		});
 	}
 	
 	sendFile(fileurl) {
-		this.broadcastEvent('fShower', fileurl);
+		this.broadcastEvent('dropImage', { url: fileurl });
 	}
 	
 	findAndSendFile(user) {

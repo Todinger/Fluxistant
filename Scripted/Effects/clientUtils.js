@@ -23,3 +23,11 @@ Object.filter = (obj, predicate) =>
 	Object.keys(obj)
 		.filter( key => predicate(obj[key]) )
 		.reduce( (res, key) => (res[key] = obj[key], res), {} );
+
+function applyDefaults(obj, defs) {
+	Object.keys(defs).forEach(key => {
+		if (defs.hasOwnProperty(key) && !(key in obj)) {
+			obj[key] = defs[key];
+		}
+	});
+}
