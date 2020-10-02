@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const User = require('./user');
 const TwitchManager = require('./twitchManager');
 const Enums = require('./enums');
@@ -151,6 +153,14 @@ class Effect {
 	
 	error(message) {
 		console.error(this._printForm(message));
+	}
+	
+	readFile(localFilePath) {
+		return fs.readFileSync(path.join(this.workdir, localFilePath));
+	}
+	
+	readJSON(localJsonFilePath) {
+		return JSON.parse(this.readFile(localJsonFilePath));
 	}
 	
 	static get Filters() {

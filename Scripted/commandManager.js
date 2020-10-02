@@ -77,11 +77,10 @@ class CommandManager {
 	// NOTE: The location of the file is relative to the effect's working
 	// directory - i.e. the location of its 'effect.js' file
 	loadFile(filename, handler) {
-		let rawData = fs.readFileSync(path.join(this.effect.workdir, filename));
 		let newCommandsData = null;
 		
 		try {
-			newCommandsData = JSON.parse(rawData);
+			newCommandsData = this.effect.readJSON(filename);
 		} catch (err) {
 			this.effect.error('Failed to read commands file:');
 			this.effect.error(err);
@@ -111,6 +110,7 @@ class CommandManager {
 		});
 		
 		this.commandsData = newCommandsData;
+		this.effect.log('Loaded commands.');
 	}
 }
 
