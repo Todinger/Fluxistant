@@ -4,7 +4,8 @@ const EventNotifier = require('./eventNotifier');
 const User = require('./user').User;
 const EffectManager = require('./effectManager');
 const SEManager = require('./seManager');
-const Log = require('./logger');
+const DBLog = require('./Logger');
+const Utils = require('./utils');
 
 const COMMAND_PREFIX = '!';
 
@@ -50,6 +51,7 @@ class TwitchManager extends EventNotifier {
 		
 		this._commandHandlers = {};		// Maps cmdname to collection of ID: callback
 		this._commandHandlerIDs = {};	// Maps ID to cmdname name
+		this._cooldownData = {};
 		
 		this.client = null;
 	}
@@ -103,7 +105,23 @@ class TwitchManager extends EventNotifier {
 		this.say(`@${user.name} ${msg}`);
 	}
 	
-	// registerCommand(id, cmdname, filters, callback, cost, descriptionFunc) {
+	// cmd structure:
+	// 		cmdname		Name used to invoke the command (e.g. 'bla' for '!bla')
+	// 		callback	Function to call upon command invocation
+	// 		filters		User filters to run before executing (only if all the
+	// 					filters return true will the command be executed)
+	// 		cost		Price (StreamElements loyalty points) to invoke the
+	// 					command - it will only be executed if the user has
+	// 					enough points for it, and those points will be deducted
+	// 					if so (naturally this only applies if this value is set,
+	// 					and only if it's a positive number)
+	// 		descFunc	A function to invoke that should return a string for the
+	// 					bot to send to the channel upon command invocation (only
+	// 					applies to commands with an actual cost)
+	// 		cooldowns {	Various cooldown values, in milliseconds
+	// 			user	The same user can only use the command once in this time
+	// 			global	The command can only be invoked once in this time
+	// 		}
 	registerCommand(id, cmd) {
 		assert(!(id in this._commandHandlerIDs),
 			`Duplicate command registration for ID "${id}"`);
@@ -164,6 +182,32 @@ class TwitchManager extends EventNotifier {
 		};
 	}
 	
+	_handleCommand(user, command, handler) {
+		let fullargs = [user].concat(command.args);
+		
+		if (handler.cost && handler.cost > 0) {
+			let response = handler.descFunc
+				? handler.descFunc(user, command.cmdname)
+				: `${user.name} has invoked ${command.fullname} for ${handler.cost} ${SEManager.POINTS_NAME}!`;
+			SEManager.consumeUserPoints(
+				user.name,
+				handler.cost,
+				(oldAmount, newAmount) => {
+					DBLog.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
+					this.say(response);
+					handler.callback.apply(null, fullargs);
+				},
+				(amount, points) => {
+					this.tell(user, `You do not have enough ${SEManager.POINTS_NAME} to use the ${command.fullname} command. (${points} / ${amount})`);
+				},
+				error => {
+					console.error(`Failed to consume user points: ${error}`);
+				});
+		} else {
+			handler.callback.apply(null, fullargs);
+		}
+	}
+	
 	_invokeCommand(user, command) {
 		if (command === null) {
 			return false;
@@ -176,35 +220,15 @@ class TwitchManager extends EventNotifier {
 		if (command.cmdname in this._commandHandlers) {
 			isCommand = true;
 			
-			let fullargs = [user].concat(command.args);
-			
 			// Invoke the specific command handlers
-			Object.values(this._commandHandlers[command.cmdname]).forEach(handler => {
-				if (handler.filters.reduce(
-					(soFar, currentFilter) => soFar && currentFilter(user), true)) {
-						if (handler.cost && handler.cost > 0) {
-							let response = handler.descriptionFunc
-								? handler.descriptionFunc(user, command.cmdname)
-								: `${user.name} has invoked ${command.fullname} for ${handler.cost} ${SEManager.POINTS_NAME}!`;
-							SEManager.consumeUserPoints(
-								user.name,
-								handler.cost,
-								(oldAmount, newAmount) => {
-									Log.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
-									this.say(response);
-									handler.callback.apply(null, fullargs);
-								},
-								(amount, points) => {
-									this.tell(user, `You do not have enough ${SEManager.POINTS_NAME} to use the ${command.fullname} command. (${points} / ${amount})`);
-								},
-								error => {
-									console.error(`Failed to consume user points: ${error}`);
-								});
-						} else {
-							handler.callback.apply(null, fullargs);
-						}
-				}
-			});
+			Object.values(this._commandHandlers[command.cmdname]).forEach(
+				handler => {
+					if (handler.filters.reduce(
+						(soFar, currentFilter) => soFar && currentFilter(user),
+						true)) {
+							this._handleCommand(user, command, handler)
+					}
+				});
 		}
 		
 		// Let every effect examine the command and invoke it if it's one of

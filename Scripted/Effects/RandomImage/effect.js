@@ -23,8 +23,8 @@ class RandomImage extends Effect {
 		});
 	}
 	
-	describeCommand() {
-		return `${_.capitalize(COMMAND_NAME)} redeemed for ${COMMAND_COST} ${Effect.USERPOINTS_NAME}! One random drawing by Yecats coming up!`;
+	describeCommand(user) {
+		return `${_.capitalize(COMMAND_NAME)} redeemed by ${user.displayName} for ${COMMAND_COST} ${Effect.USERPOINTS_NAME}! One random drawing by Yecats coming up!`;
 	}
 	
 	load() {
@@ -32,7 +32,7 @@ class RandomImage extends Effect {
 			cmdname: COMMAND_NAME,
 			callback: user => this.showRandomImage(user),
 			cost: COMMAND_COST,
-			descriptionFunc: user => this.describeCommand(user)
+			descFunc: user => this.describeCommand(user)
 		});
 	}
 }
