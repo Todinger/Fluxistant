@@ -1,5 +1,6 @@
 const assert = require('assert').strict;
 const tmi = require('tmi.js');
+const _ = require('lodash');
 const EventNotifier = require('./eventNotifier');
 const User = require('./user').User;
 const EffectManager = require('./effectManager');
@@ -8,6 +9,7 @@ const DBLog = require('./Logger');
 const Utils = require('./utils');
 
 const COMMAND_PREFIX = '!';
+const COOLDOWN_CLEANUP_INTERVAL = 5 * 60 * 1000;	// 5 minutes
 
 class TwitchManager extends EventNotifier {
 	constructor() {
@@ -76,6 +78,8 @@ class TwitchManager extends EventNotifier {
 		this.client.connect().catch(console.error);
 		
 		this._registerAllEvents();
+		
+		setInterval(() => this._cleanupCooldowns(), COOLDOWN_CLEANUP_INTERVAL);
 	}
 	
 	_forwardSEEvent(eventName) {
@@ -106,6 +110,16 @@ class TwitchManager extends EventNotifier {
 	}
 	
 	// cmd structure:
+	// 		id			Unique identifier for this command registration
+	// 					Note: The same cmdname can be registered for multiple
+	// 					commands (so each effect can make e.g. '!start' do its
+	// 					own thing if desired), but this should be unique across
+	// 					ALL registrations - therefore it is recommended to use
+	// 					the effect's inherited registerCommand() function rather
+	// 					than this one, as it adds the name of the effect to the
+	// 					ID, preventing collision between different effects
+	// 					Another note: Putting this in the cmd object itself is
+	// 					optional (it will be added if it's not present)
 	// 		cmdname		Name used to invoke the command (e.g. 'bla' for '!bla')
 	// 		callback	Function to call upon command invocation
 	// 		filters		User filters to run before executing (only if all the
@@ -125,6 +139,11 @@ class TwitchManager extends EventNotifier {
 	registerCommand(id, cmd) {
 		assert(!(id in this._commandHandlerIDs),
 			`Duplicate command registration for ID "${id}"`);
+		
+		// Add the ID to the command object if it hasn't been added already
+		if (!(id in cmd)) {
+			cmd.id = id;
+		}
 		
 		// This is to make all commands case-insensitive
 		cmd.cmdname = cmd.cmdname.toLowerCase();
@@ -155,6 +174,7 @@ class TwitchManager extends EventNotifier {
 		
 		delete this._commandHandlers[this._commandHandlerIDs[id]];
 		delete this._commandHandlerIDs[id];
+		delete this._cooldownData[id];
 	}
 	
 	
@@ -196,6 +216,7 @@ class TwitchManager extends EventNotifier {
 					DBLog.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
 					this.say(response);
 					handler.callback.apply(null, fullargs);
+					this._applyCooldowns(user, handler);
 				},
 				(amount, points) => {
 					this.tell(user, `You do not have enough ${SEManager.POINTS_NAME} to use the ${command.fullname} command. (${points} / ${amount})`);
@@ -205,7 +226,91 @@ class TwitchManager extends EventNotifier {
 				});
 		} else {
 			handler.callback.apply(null, fullargs);
+			this._applyCooldowns(user, handler);
 		}
+	}
+	
+	// Returns true iff the user is currently allowed to use theh command
+	_checkCooldowns(user, handler) {
+		if (handler.cooldowns) {
+			let cdd = this._cooldownData[handler.id];
+			
+			// If cdd is undefined then there's no cooldown data yet,
+			// so it hasn't been used and thus it's not on cooldown
+			if (cdd) {
+				if (cdd.global && (Utils.now() < cdd.global)) {
+					// This command is still on a global cooldown right now
+					return false;
+				}
+				
+				if (cdd.users &&
+					cdd.users[user.name] &&
+					Utils.now() < cdd.users[user.name]) {
+						// This user is still on cooldown for this command
+						return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	// Applies cooldowns for the command (should only be used after the command
+	// has successfully been invoked)
+	_applyCooldowns(user, handler) {
+		if (handler.cooldowns) {
+			let cooldownData = this._cooldownData[handler.id] || {};
+			
+			if (handler.cooldowns.user) {
+				if (!cooldownData.users) {
+					cooldownData.users = {};
+				}
+				
+				cooldownData.users[user.name] =
+					Utils.now() + handler.cooldowns.user;
+			}
+			
+			if (handler.cooldowns.global) {
+				cooldownData.global = Utils.now() + handler.cooldowns.global;
+			}
+			
+			this._cooldownData[handler.id] = cooldownData;
+		}
+	}
+	
+	// Removes expired cooldowns periodically
+	_cleanupCooldowns() {
+		let now = Utils.now();
+		
+		Object.keys(this._cooldownData).forEach(id => {
+			let cdd = this._cooldownData[id];
+			
+			if (cdd.users) {
+				Object.keys(cdd.users).forEach(username => {
+					if (cdd.users[username] < now) {
+						console.log(`>> Deleting user cooldown for ${username}`);
+						delete cdd.users[username];
+					}
+				});
+				
+				if (_.isEmpty(cdd.users)) {
+					console.log(`>> Deleting empty cooldown data: users`);
+					delete cdd.users;
+				}
+			}
+			
+			if (cdd.global) {
+				if (cdd.global < now) {
+					console.log(`>> Deleting empty cooldown data: global`);
+					delete cdd.global;
+				}
+			}
+			
+			if (_.isEmpty(cdd)) {
+				console.log(`>> Deleting empty cooldown data`);
+				delete this._cooldownData[id];
+			}
+		});
 	}
 	
 	_invokeCommand(user, command) {
@@ -226,7 +331,9 @@ class TwitchManager extends EventNotifier {
 					if (handler.filters.reduce(
 						(soFar, currentFilter) => soFar && currentFilter(user),
 						true)) {
-							this._handleCommand(user, command, handler)
+							if (this._checkCooldowns(user, handler)) {
+								this._handleCommand(user, command, handler);
+							}
 					}
 				});
 		}
