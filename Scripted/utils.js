@@ -1,4 +1,8 @@
 class Utils {
+	static now() {
+		return new Date().getTime();
+	}
+	
 	// Gets a list of all the keys that are in obj1 and not in obj2
 	static getSubKeys(obj1, obj2) {
 		var k1 = Object.keys(obj1);
