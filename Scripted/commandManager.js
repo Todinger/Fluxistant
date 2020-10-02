@@ -83,8 +83,8 @@ class CommandManager {
 		try {
 			newCommandsData = JSON.parse(rawData);
 		} catch (err) {
-			console.error('Failed to read commands file:');
-			console.error(err);
+			this.effect.error('Failed to read commands file:');
+			this.effect.error(err);
 			return;
 		}
 		
