@@ -28,7 +28,7 @@ class FShower extends Effect {
 	load() {
 		this.registerCommand({
 			cmdname: 'f',
-			callback: user => this.findAndSendFile(user)
+			callback: user => this.findAndSendFile(user),
 		});
 	}
 }
