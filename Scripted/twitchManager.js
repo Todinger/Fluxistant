@@ -102,7 +102,7 @@ class TwitchManager extends EventNotifier {
 	}
 	
 	tell(user, msg) {
-		this.say(`@${user.name} ${msg}`);
+		this.say(`@${user.displayName} ${msg}`);
 	}
 	
 	// cmd structure:
