@@ -1,0 +1,43 @@
+{
+	"CandyCorn": {
+		"image": {
+			"url": "Images/CandyCorn.png"
+		},
+		"weight": 1
+	},
+	
+	"GummiWorms": {
+		"image": {
+			"url": "Images/GummiWorms.png"
+		},
+		"weight": 1
+	},
+	
+	"JellyBean": {
+		"image": {
+			"url": "Images/JellyBean.png"
+		},
+		"weight": 1
+	},
+	
+	"Lollibat": {
+		"image": {
+			"url": "Images/Lollibat.png"
+		},
+		"weight": 1
+	},
+	
+	"VampireMouth": {
+		"image": {
+			"url": "Images/VampireMouth.png"
+		},
+		"weight": 1
+	},
+	
+	"WrappedCandy": {
+		"image": {
+			"url": "Images/WrappedCandy.png"
+		},
+		"weight": 1
+	}
+}
