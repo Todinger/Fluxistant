@@ -10,6 +10,7 @@ class TextDisplay extends Effect {
 			name: 'Text Display',
 			webname: 'textdisp',
 			source: 'textdisp.html',
+			zindex: 5,
 		});
 		
 		this.styles = null;
