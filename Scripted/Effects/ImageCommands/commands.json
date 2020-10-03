@@ -47,6 +47,16 @@
 		"sound": "/assets/sfx/holdit.mp3"
 	},
 	
+	"mac": {
+		"image": {
+			"url": "/assets/image-display/Mac.gif",
+			"width": 480,
+			"height": 360,
+			"duration": 6500
+		},
+		"sound": "/assets/sfx/xfiles.mp3"
+	},
+	
 	"nitsua": {
 		"image": {
 			"url": "/assets/image-display/nitsua.png"

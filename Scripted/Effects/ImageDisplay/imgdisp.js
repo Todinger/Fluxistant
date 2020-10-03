@@ -149,8 +149,6 @@ class ImageEffects {
 class ImageDisplay extends EffectClient {
 	constructor() {
 		super('Image Display');
-		this.currentImageDone = false;
-		this.currentSoundDone = false;
 	}
 	
 	setOrClear(jTarget, attr, value) {
@@ -197,15 +195,10 @@ class ImageDisplay extends EffectClient {
 		}
 	}
 	
-	playSound(url, notifyOnFinish) {
+	playSound(url) {
 		let sound = new Audio(url);
-		
-		if (notifyOnFinish) {
-			$(sound).on('ended', () => this.soundDone());
-			sound.play().catch(() => this.soundDone());
-		} else {
-			sound.play().catch(() => {});
-		}
+		$(sound).on('ended', () => this.soundDone());
+		sound.play().catch(() => this.soundDone());
 	}
 	
 	imageDone(imageParameters) {
@@ -222,17 +215,12 @@ class ImageDisplay extends EffectClient {
 	}
 	
 	processRequest(parameters) {
-		this.currentImageDone = true;
-		this.currentSoundDone = true;
-		
 		if (parameters.image) {
-			this.currentImageDone = false;
 			this.showImage(parameters.image);
 		}
 		
 		if (parameters.sound) {
-			this.currentSoundDone = false;
-			this.playSound(parameters.sound, true);
+			this.playSound(parameters.sound);
 		}
 	}
 	

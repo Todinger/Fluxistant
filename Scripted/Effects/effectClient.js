@@ -483,8 +483,12 @@ class EffectClient extends EventNotifier {
 		return this.children[childName];
 	}
 	
+	isRoot() {
+		return this.parent === null;
+	}
+	
 	getRoot() {
-		if (this.parent === null) {
+		if (this.isRoot()) {
 			return this;
 		} else {
 			return this.parent.getRoot();
@@ -507,6 +511,11 @@ class EffectClient extends EventNotifier {
 	}
 	
 	performBlockingEvent(eventNames, callback) {
+		if (!this.isRoot()) {
+			this.getRoot().performBlockingEvent(eventNames, callback);
+			return;
+		}
+		
 		if (typeof eventNames === 'string') {
 			eventNames = [eventNames];
 		}
@@ -543,6 +552,11 @@ class EffectClient extends EventNotifier {
 	}
 	
 	freeBlockingEvent(eventNames) {
+		if (!this.isRoot()) {
+			this.getRoot().freeBlockingEvent(eventNames);
+			return;
+		}
+		
 		if (typeof eventNames === 'string') {
 			eventNames = [eventNames];
 		}

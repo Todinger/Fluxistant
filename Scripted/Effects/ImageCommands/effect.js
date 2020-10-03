@@ -16,6 +16,7 @@ const Effect = require('../../effect');
 // 		url: "/url/of/image.png",
 // 		width: widthInPixels,		// Optional, defaults to 300
 // 		height: heightInPixels,		// Optional, defaults to 300
+// 		duration: timeInMS,			// Optional, defaults to 300
 // 	},
 // 	sound: "/url/of/sound.mp3",		// Optional, can be image only
 // 	// Both image and sound are optional, but at least one must be present

@@ -38,6 +38,7 @@ class TextDisplay extends Effect {
 				displayEffect: {
 					name: 'fade',
 				},
+				sound: "/assets/sfx/xfiles.mp3",
 			}),
 		});
 	}

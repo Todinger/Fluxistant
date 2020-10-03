@@ -96,12 +96,30 @@ class TextDisplay extends EffectClient {
 				textData.displayEffect,
 				() => {
 					this.notifyChild(textData.style, 'hideText');
-					this.freeBlockingEvent('showText');
+					this.freeBlockingEvent('Text');
 				});
 			
 		},
 		textData.duration - displayEffect.duration(
 			textData.displayEffect));
+	}
+	
+	soundDone() {
+		this.freeBlockingEvent('Sound');
+	}
+	
+	playSound(url) {
+		let sound = new Audio(url);
+		$(sound).on('ended', () => this.soundDone());
+		sound.play().catch(() => this.soundDone());
+	}
+	
+	processRequest(textData) {
+		this.showText(textData);
+		
+		if (textData.sound) {
+			this.playSound(textData.sound);
+		}
 	}
 	
 	start() {
@@ -147,9 +165,15 @@ class TextDisplay extends EffectClient {
 				2 * displayEffect.duration(textData.displayEffect),
 				`Text display effect exceeds its display time.`);
 			
+			let blockingEvents = ['Text'];
+			
+			if (textData.sound) {
+				blockingEvents.push('Sound');
+			}
+			
 			this.performBlockingEvent(
-				'showText',
-				() => this.showText(textData));
+				blockingEvents,
+				() => this.processRequest(textData));
 		});
 		
 		this.server.onAttached(() => this.server.emit('getStyleList'));
