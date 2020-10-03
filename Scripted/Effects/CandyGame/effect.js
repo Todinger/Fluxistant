@@ -10,6 +10,21 @@ const START_COMMAND = 'candy';
 const CANDY_DEFAULTS = {
 	weight: 25,
 	reward: 50,
+	image: {
+		width: 100,
+		height: 100,
+	},
+	userBonus: {
+		amount: 500,
+	},
+};
+
+const IMAGE_DEFAULTS = {
+	
+};
+
+const USERBONUS_DEFAULTS = {
+	amount: 500,
 };
 
 class CandyGame extends Effect {
@@ -65,10 +80,16 @@ class CandyGame extends Effect {
 		let candyName = Utils.weightedRandomKey(this.candyData, cd => cd.weight);
 		let candy = this.candyData[candyName];
 		
-		this.modifyUserPoints(user, candy.reward);
+		let reward = candy.reward;
+		if (candy.userBonus) {
+			if (candy.userBonus.username.toLowerCase() === user.name.toLowerCase()) {
+				reward += candy.userBonus.amount;
+			}
+		}
+		
+		this.modifyUserPoints(user, reward);
 		
 		this.dropImage(candy.image);
-		console.log(candy);
 		if (candy.winning) {
 			this.announceWinner(user);
 			this.ongoing = false;
@@ -120,6 +141,11 @@ class CandyGame extends Effect {
 			
 			cost: 10,
 			silent: true,
+			
+			// cooldowns: {
+			// 	user: 3000,
+			// },
+			
 			callback: user => this.candyRequest(user),
 		});
 	}
