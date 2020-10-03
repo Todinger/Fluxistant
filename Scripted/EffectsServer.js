@@ -2,17 +2,18 @@ const path = require('path');
 const glob = require('glob');
 
 // Basic server setup
-var express = require('express');
-var app = express();
-var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+const express = require('express');
+const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 
 const PORT = 3333;
 
 const Config = require('./botConfig.json');
 
 const Assets = require('./assets');
-Assets.registerAll(app);
+Assets.init(app);
+Assets.registerAll();
 
 // // Self-Images
 // const USERIMAGE_DIR = '../../Images/User-Specific';
@@ -38,22 +39,21 @@ function getUserImageList(socket) {
 	Assets.getUserImages(imageList => socket.emit('userImageList', imageList));
 }
 
-var KEYCODES = require('./enums').KEYCODES;
-var KeyboardManager = require('./keyboardManager');
+const KEYCODES = require('./enums').KEYCODES;
+const KeyboardManager = require('./keyboardManager');
 // KeyboardManager.logAllUp = true;
 KeyboardManager.start();
 
 
 // Load all the effects we have
-var Effect = require('./effect');
-var EffectManager = require('./effectManager');
+const EffectManager = require('./effectManager');
 EffectManager.loadAll('/fx/', 'Effects', app, express);
 app.use('/fx/effectClient.js',
 	express.static(path.join(__dirname, 'Effects', 'effectClient.js')));
 app.use('/fx/clientUtils.js',
 	express.static(path.join(__dirname, 'Effects', 'clientUtils.js')));
 
-var TwitchManager = require('./twitchManager');
+const TwitchManager = require('./twitchManager');
 TwitchManager.init(Config.channel, Config.username, Config.oAuth);
 
 /* Testing Code
@@ -85,7 +85,7 @@ TwitchManager.onCommand('e', [User.isAtLeastMod()], (user, x) => {
 });
 */
 
-var SEManager = require('./seManager');
+const SEManager = require('./seManager');
 SEManager.init();
 
 /*

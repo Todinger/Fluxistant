@@ -12,6 +12,7 @@ class ScriptedEffects extends Effect {
 			'Channel Party',
 			'Image Display',
 			'Image Dropper',
+			'Text Display',
 			// 'Parrot Mate',
 		];
 		

@@ -1,53 +1,50 @@
 {
 	"CandyCorn": {
 		"image": {
-			"url": "Images/CandyCorn.png"
+			"url": "CandyCorn.png"
 		},
+		"reward": -100,
 		"weight": 1
 	},
 	
 	"GummiWorms": {
 		"image": {
-			"url": "Images/GummiWorms.png"
-		},
-		"weight": 1
+			"url": "GummiWorms.png"
+		}
 	},
 	
 	"JellyBean": {
 		"image": {
-			"url": "Images/JellyBean.png"
-		},
-		"weight": 1
+			"url": "JellyBean.png"
+		}
 	},
 	
 	"Lollibat": {
 		"image": {
-			"url": "Images/Lollibat.png"
-		},
-		"weight": 1
+			"url": "Lollibat.png"
+		}
 	},
 	
 	"VampireMouth": {
 		"image": {
-			"url": "Images/VampireMouth.png"
-		},
-		"weight": 1
+			"url": "VampireMouth.png"
+		}
 	},
 	
 	"WrappedCandy": {
 		"image": {
-			"url": "Images/WrappedCandy.png"
-		},
-		"weight": 1
+			"url": "WrappedCandy.png"
+		}
 	},
 	
 	"Coin": {
 		"image": {
-			"url": "Images/WrappedCandy.png",
+			"url": "Coin.png",
 			"width": 100,
 			"height": 100
 		},
-		"weight": 1,
+		"reward": 1000,
+		"weight": 5,
 		"winning": true
 	}
 }

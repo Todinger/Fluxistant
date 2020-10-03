@@ -37,19 +37,11 @@ class ImageCommands extends Effect {
 		});
 	}
 	
-	loadCommands() {
+	loadData() {
 		this.commandManager.loadFile(
 			COMMANDS_FILENAME,
 			(cmd) => this._sendCommand(cmd)
 		);
-	}
-	
-	reloadData() {
-		this.loadCommands();
-	}
-	
-	load() {
-		this.loadCommands();
 	}
 }
 

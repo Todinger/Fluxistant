@@ -4,13 +4,7 @@ const assert = require('assert').strict;
 const urljoin = require('url-join');
 const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
-
-// Taken from:
-// https://stackoverflow.com/questions/18112204/get-all-directories-within-directory-nodejs/24594123
-const getDirectories = source =>
-  fs.readdirSync(source, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name);
+const Utils = require('./utils');
 
 const EFFECT_MAIN_FILENAME = "effect.js";
 
@@ -20,7 +14,7 @@ class EffectManager {
 		this.clientEffects = {};
 		this.tags = {};
 		
-		// Ctrl + WinKey + F5 = Have all effects reload their data
+		// Ctrl + WinKey + F5 = Have all effects (re)load their data
 		KeyboardManager.registerShortcut(
 			'EffectManager:ReloadData',
 			[
@@ -28,7 +22,7 @@ class EffectManager {
 				KEYCODES.VC_META_L,
 				KEYCODES.VC_F5
 			],
-			() => this.reloadAllEffectData()
+			() => this.loadAllEffectData()
 		);
 	}
 	
@@ -73,7 +67,11 @@ class EffectManager {
 		
 		effect.effectManager = this;
 		effect.workdir = fxdir;
+		
+		effect.preload();
+		effect.loadData();
 		effect.load();
+		
 		this.effects[effect.name] = effect;
 		
 		console.log(`Loaded effect: ${effect.name}`);
@@ -81,7 +79,7 @@ class EffectManager {
 	
 	loadAll(webPrefix, effectsdir, app, express) {
 		// Load all the effects in the given directory
-		let subdirs = getDirectories(effectsdir);
+		let subdirs = Utils.getDirectories(effectsdir);
 		subdirs.forEach(subdir => {
 			let fxdir = path.join(effectsdir, subdir);
 			let fxfile = path.join(fxdir, EFFECT_MAIN_FILENAME);
@@ -101,7 +99,7 @@ class EffectManager {
 	
 	attachClient(effectName, socket) {
 		if (this.nameExists(effectName)) {
-			this.effects[effectName].attachClient(socket);
+			this.effects[effectName].attachClient(socket, 'direct');
 		} else {
 			console.warn(`Unknown effect: ${effectName}`);
 		}
@@ -109,15 +107,15 @@ class EffectManager {
 	
 	attachClientToTag(tag, socket) {
 		if (tag in this.tags) {
-			this.tags[tag].forEach(effect => effect.attachClient(socket));
+			this.tags[tag].forEach(effect => effect.attachClient(socket, 'tag'));
 		} else {
 			console.warn(`Unknown tag: ${tag}`);
 		}
 	}
 	
-	reloadAllEffectData() {
+	loadAllEffectData() {
 		Object.values(this.effects).forEach(effect => {
-			effect.reloadData();
+			effect.loadData();
 		});
 	}
 }

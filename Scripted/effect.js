@@ -40,6 +40,18 @@ class Effect {
 	}
 	
 	// Invoked after creation and assignment of basic values by EffectManager
+	preload() {
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	// Invoked after preload and whenever the effect is requested to reload its
+	// data (only applicable to some effects, usually those that read files and
+	// such)
+	loadData() {
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	// Invoked after loadData
 	load() {
 		// Do nothing by default (for overriding where needed)
 	}
@@ -76,13 +88,14 @@ class Effect {
 		TwitchManager.unregisterCommand(this.getCommandId(cmdname));
 	}
 	
-	attachClient(socket) {
+	attachClient(socket, source) {
 		this._connectedClients[socket.id] = socket;
 		socket.on('disconnect', () => {
 			this._clientDisconnectedHandlers.forEach(handler => handler(socket));
 			delete this._connectedClients[socket.id];
 		});
 		this._clientAttachedHandlers.forEach(handler => handler(socket));
+		socket.emit('attached', source);
 		this.log(`Client attached.`);
 	}
 	
@@ -167,6 +180,13 @@ class Effect {
 	
 	readJSON(localJsonFilePath) {
 		return JSON.parse(this.readFile(localJsonFilePath));
+	}
+	
+	registerAssetDir(localPath, name) {
+		let url = `/assets/effects/${this.name}/${name}`;
+		// Assets.registerDir(path.join(this.workdir, localPath), '/assets/bla');
+		Assets.registerDir(path.join(this.workdir, localPath), url);
+		return url;
 	}
 	
 	static get Filters() {

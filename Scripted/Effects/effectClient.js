@@ -277,6 +277,40 @@ class SoundManager {
 	}
 }
 
+class EventNotifier {
+	constructor() {
+		this._eventHandlers = {};
+	}
+	
+	_addEvent(eventName) {
+		assert(!(eventName in this._eventHandlers),
+			`Multiple registrations of event '${eventName}'`);
+		
+		this._eventHandlers[eventName] = [];
+	}
+	
+	_addEvents(eventNames) {
+		eventNames.forEach(eventName => this._addEvent(eventName));
+	}
+	
+	on(eventName, callback) {
+		if (!(eventName in this._eventHandlers)) {
+			this._eventHandlers[eventName] = [];
+		}
+		
+		this._eventHandlers[eventName].push(callback);
+		return this;
+	}
+	
+	_notify(eventName, ...args) {
+		console.assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
+		
+		console.log(`Invoking event: ${eventName}`);
+		this._eventHandlers[eventName].forEach(
+			callback => callback.apply(null, args));
+	}
+}
+
 class ServerCommManager {
 	constructor(effectName) {
 		this.effectName = effectName;
@@ -286,19 +320,39 @@ class ServerCommManager {
 		this.socket = io();
 		this.on('connect', () => this._connected());
 		this.on('disconnect', () => this._disconnected());
+		this.on('attached', (source) => this._attached(source));
 		this.tag = null;
+		
+		this._attachmentHandlers = {
+			attach: [],
+			tagAttach: [],
+			detach: [],
+		};
 	}
 	
 	attach() {
-		console.log(`[${this.effectName}] Attaching`);
+		console.log(`[${this.effectName}] Attaching to server`);
 		this.socket.emit('attachTo', this.effectName);
 		this._attachRequested = true;
 	}
 	
 	attachToTag(tag) {
+		console.log(`[${this.effectName}] Attaching to the '${tag}' tag`);
 		this.tag = tag;
 		this.socket.emit('attachToTag', tag);
 		this._tagAttachRequested = true;
+	}
+	
+	onAttached(callback) {
+		this._attachmentHandlers.attach.push(callback);
+	}
+	
+	onTagAttached(callback) {
+		this._attachmentHandlers.attach.push(callback);
+	}
+	
+	onDetached(callback) {
+		this._attachmentHandlers.detach.push(callback);
 	}
 	
 	on(eventName, callback) {
@@ -307,6 +361,10 @@ class ServerCommManager {
 	
 	emit(eventName, data) {
 		this.socket.emit(eventName, data);
+	}
+	
+	_notifyAttachmentEvent(event) {
+		this._attachmentHandlers[event].forEach(callback => callback());
 	}
 	
 	_connected() {
@@ -327,14 +385,28 @@ class ServerCommManager {
 	_disconnected() {
 		if (this._attachRequested || this._tagAttachRequested) {
 			this._reattachNeeded = true;
+			this._notifyAttachmentEvent('detach');
+		}
+	}
+	
+	_attached(source) {
+		if (source === 'tag') {
+			this._notifyAttachmentEvent('tagAttach');
+		} else if (source === 'direct') {
+			this._notifyAttachmentEvent('attach');
+		} else {
+			throw `Unknown server attachment source: ${source}`;
 		}
 	}
 }
 
-class EffectClient {
+
+class EffectClient extends EventNotifier {
 	static get SOUND_HOLDER_ID() { return 'EffectClient_AudioHolder'; }
 	
 	constructor(effectName) {
+		super();
+		
 		console.assert(effectName, `Effect name not set!`);
 		
 		this.effectName = effectName;
@@ -404,12 +476,24 @@ class EffectClient {
 		childEffectClient.setParent(this);
 	}
 	
+	getChild(childName) {
+		console.assert(childName in this.children,
+			`Unknown child: ${childName}`);
+		
+		return this.children[childName];
+	}
+	
 	getRoot() {
 		if (this.parent === null) {
 			return this;
 		} else {
 			return this.parent.getRoot();
 		}
+	}
+	
+	notifyChild(childName, event, ...eventArgs) {
+		let child = this.getChild(childName);
+		child._notify.apply(child, [event].concat(eventArgs));
 	}
 	
 	_isBlockingEventReady(blockingEventDescriptor) {

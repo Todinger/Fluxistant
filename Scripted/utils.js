@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 class Utils {
 	static now() {
 		return new Date().getTime();
@@ -60,6 +62,42 @@ class Utils {
 	static randomValue(obj) {
 		return obj[randomKey(obj)];
 	}
+	
+	static weightedRandomKey(obj, elementWeightFunc) {
+		if (!elementWeightFunc) {
+			elementWeightFunc = x => x;
+		}
+		
+		let totalWeight = Object.values(obj).reduce(
+			(soFar, current) => soFar + elementWeightFunc(current),
+			0);
+		
+		let choice = Math.random() * totalWeight;
+		let sum = 0;
+		for (let key in obj) {
+			sum += elementWeightFunc(obj[key]);
+			if (choice < sum) {
+				return key;
+			}
+		};
+	}
+	
+	static applyDefaults(obj, defs) {
+		Object.keys(defs).forEach(key => {
+			if (defs.hasOwnProperty(key) && !(key in obj)) {
+				obj[key] = defs[key];
+			}
+		});
+	}
+	
+	// Taken from:
+	// https://stackoverflow.com/questions/18112204/get-all-directories-within-directory-nodejs/24594123
+	static getDirectories (source) {
+	  return fs.readdirSync(source, { withFileTypes: true })
+	    .filter(dirent => dirent.isDirectory())
+	    .map(dirent => dirent.name);
+	}
+	
 	
 	// Taken from:
 	// https://github.com/ReactiveSets/toubkal/blob/master/lib/util/value_equals.js

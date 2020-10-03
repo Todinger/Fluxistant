@@ -20,20 +20,14 @@ class ParrotMate extends Effect {
 		this.broadcastEvent('playSequence', cmd.sequence);
 	}
 	
-	loadUserCommands() {
+	loadData() {
 		this.commandManager.loadFile(
 			USER_COMMANDS_FILE,
 			cmd => this.forwardSequenceCommand(cmd)
 		);
 	}
 	
-	reloadData() {
-		this.loadUserCommands();
-	}
-	
 	load() {
-		this.loadUserCommands();
-		
 		this.registerCommand({
 			cmdname: 'parrottime',
 			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
