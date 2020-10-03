@@ -45,26 +45,22 @@ class CandyGame extends Effect {
 	
 	startGame(user) {
 		if (this.ongoing) {
-			this.tell(user, 'Bad cg!');
-			// this.tell(user, 'A candy game is already taking place!');
+			this.tell(user, 'A candy game is already taking place!');
 			return;
 		}
 		
 		this.ongoing = true;
-		this.say(`${user.displayName} cg'ed!`);
-		// this.say(`${user.displayName} has started a candy game!`);
+		this.say(`${user.displayName} has started a candy game!`);
 	}
 	
 	endGame(user) {
 		if (!this.ongoing) {
-			this.tell(user, "Bad ce!");
-			// this.tell(user, "You can't stop a game that isn't running!");
+			this.tell(user, "You can't stop a game that isn't running!");
 			return;
 		}
 		
 		this.ongoing = false;
-		this.say(`${user.displayName} ce'ed!`);
-		// this.say(`Sorry folks, ${user.displayName} has ended the candy game!`);
+		this.say(`Sorry folks, ${user.displayName} has ended the candy game!`);
 	}
 	
 	announceWinner(user) {
@@ -93,7 +89,7 @@ class CandyGame extends Effect {
 		if (candy.winning) {
 			this.announceWinner(user);
 			this.ongoing = false;
-			this.say('A');
+			// this.say('A');
 		}
 	}
 	
@@ -119,22 +115,19 @@ class CandyGame extends Effect {
 	
 	load() {
 		this.registerCommand({
-			cmdname: 'cg',
-			// cmdname: 'trickortreat',
+			cmdname: 'trickortreat',
 			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
 			callback: user => this.startGame(user),
 		});
 		
 		this.registerCommand({
-			cmdname: 'ce',
-			// cmdname: 'nomorecandy',
+			cmdname: 'nomorecandy',
 			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
 			callback: user => this.endGame(user),
 		});
 		
 		this.registerCommand({
-			cmdname: 'c',
-			// cmdname: 'gimme',
+			cmdname: 'gimme',
 			
 			// This makes the command inactive while the game isn't on
 			filters: [() => this.ongoing],
@@ -142,9 +135,9 @@ class CandyGame extends Effect {
 			cost: 10,
 			silent: true,
 			
-			// cooldowns: {
-			// 	user: 3000,
-			// },
+			cooldowns: {
+				user: 3000,
+			},
 			
 			callback: user => this.candyRequest(user),
 		});
