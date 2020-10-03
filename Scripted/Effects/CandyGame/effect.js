@@ -64,6 +64,9 @@ class CandyGame extends Effect {
 	candyRequest(user) {
 		let candyName = Utils.weightedRandomKey(this.candyData, cd => cd.weight);
 		let candy = this.candyData[candyName];
+		
+		this.modifyUserPoints(user, candy.reward);
+		
 		this.dropImage(candy.image);
 		console.log(candy);
 		if (candy.winning) {
@@ -115,6 +118,8 @@ class CandyGame extends Effect {
 			// This makes the command inactive while the game isn't on
 			filters: [() => this.ongoing],
 			
+			cost: 10,
+			silent: true,
 			callback: user => this.candyRequest(user),
 		});
 	}

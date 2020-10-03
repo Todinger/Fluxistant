@@ -189,6 +189,14 @@ class Effect {
 		return url;
 	}
 	
+	modifyUserPoints(user, amount) {
+		SEManager.addUserPoints(
+			user.name,
+			amount,
+			null,
+			(err) => this.error(`Failed to add points to ${user.name}: ${err}`));
+	}
+	
 	static get Filters() {
 		return User.Filters;
 	}

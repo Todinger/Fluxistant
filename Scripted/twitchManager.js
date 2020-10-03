@@ -132,6 +132,7 @@ class TwitchManager extends EventNotifier {
 	// 		descFunc	A function to invoke that should return a string for the
 	// 					bot to send to the channel upon command invocation (only
 	// 					applies to commands with an actual cost)
+	// 		silent		Avoid writing a response or logging into the DB
 	// 		cooldowns {	Various cooldown values, in milliseconds
 	// 			user	The same user can only use the command once in this time
 	// 			global	The command can only be invoked once in this time
@@ -213,8 +214,11 @@ class TwitchManager extends EventNotifier {
 				user.name,
 				handler.cost,
 				(oldAmount, newAmount) => {
-					DBLog.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
-					this.say(response);
+					if (!handler.silent) {
+						DBLog.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
+						this.say(response);
+					}
+					
 					handler.callback.apply(null, fullargs);
 					this._applyCooldowns(user, handler);
 				},
