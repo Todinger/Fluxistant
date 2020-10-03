@@ -82,10 +82,22 @@ class Utils {
 		};
 	}
 	
+	static isObject(val) {
+		return typeof val === 'object' && val !== null;
+	}
+	
 	static applyDefaults(obj, defs) {
 		Object.keys(defs).forEach(key => {
-			if (defs.hasOwnProperty(key) && !(key in obj)) {
-				obj[key] = defs[key];
+			if (defs.hasOwnProperty(key)) {
+				if (key in obj) {
+					if (Utils.isObject(defs[key])) {
+						Utils.applyDefaults(obj[key], defs[key]);
+					}
+				} else {
+					if (!Utils.isObject(defs[key])) {
+						obj[key] = defs[key];
+					}
+				}
 			}
 		});
 	}
