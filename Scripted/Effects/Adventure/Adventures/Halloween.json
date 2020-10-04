@@ -1,0 +1,46 @@
+{
+	"title": "spooky",
+	"startDesc": "$user has started a spooky!",
+	"adventures": {
+		
+		"castle": [
+			"$all set out on an adventure to a haunted castle.",
+			"The floors creak and windows shake as they pass through the halls.",
+			"Mysterious figures erupt from the shadows, dragging bodies off to their final resting place.",
+			"$winner somehow escapes to tell the tale and is awarded $reward pixels!"
+		],
+		
+		"seance": [
+			"$all are performing a seance in a graveyard.",
+			"Frightened, they still seek to reach the great spirit of Horace.",
+			"Metallic clings can be heard, digital speech echoes from beneath the dirt.",
+			"A jealous robot appears, shooting lasers right at $all!",
+			"$winner dodges and takes shelter behind a giant tombstone, securing $reward pixels!"
+		],
+		
+		"pirates": [
+			"$all set sails on the high seas to pillage King Neptune's treasure!",
+			"Tides be turnin' and rum be spillin', as they steer towards doom.",
+			"Tally ho! A cannon is fired at their ship by the scourge of the seven seas!",
+			"'To Davey Jones' Locker with ye!' is heard through thunderous rumblings.",
+			"A magical sea serpent appears and $winner jumps on its back, riding to freedom and $reward pixels!"
+		],
+		
+		"dst": [
+			"$all go out camping in Don't Starve Together.",
+			"A swarm of frogs make them lose all of their belongings!",
+			"Resources are scarce and night is quickly approaching.",
+			"$winner manages to light a campfire and roast some berries! $reward pixels."
+		],
+		
+		"phoenix": [
+			"$all are on trial for the suspicious death of Fluxistence!",
+			"Defense attorney Phoenix Fright conjures black magic to destroy crucial evidence!",
+			"Prosecutor Miles Edgeworth believes he knows the true killer and is ready to cause courtroom shock!",
+			"There is a loud thump outside the courtroom. KAPOW! The doors fling upon. Tsk-tsk-tsk.",
+			"Manfred von Karma is BACK TO SEEK HIS REVENGE!",
+			"He barrels through the courtroom, his mouth frothing, his voice muttering \"Braaaaaaains...\"",
+			"Everyone becomes undead except the Judge and $winner, for no brains were detected. Court is adjourned and $reward pixels are awarded out of pity."
+		]
+	}
+}
