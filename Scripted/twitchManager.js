@@ -141,6 +141,10 @@ class TwitchManager extends EventNotifier {
 		assert(!(id in this._commandHandlerIDs),
 			`Duplicate command registration for ID "${id}"`);
 		
+		// Avoid affecting other things when we make changes to the
+		// command object
+		cmd = _.cloneDeep(cmd);
+		
 		// Add the ID to the command object if it hasn't been added already
 		if (!(id in cmd)) {
 			cmd.id = id;
