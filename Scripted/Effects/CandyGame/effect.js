@@ -87,8 +87,8 @@ class CandyGame extends Effect {
 		
 		this.dropImage(candy.image);
 		if (candy.winning) {
-			this.announceWinner(user);
 			this.ongoing = false;
+			this.announceWinner(user);
 			// this.say('A');
 		}
 	}
