@@ -3,6 +3,12 @@
 const Effect = require('../../effect');
 
 // Command file structure:
+//	{
+//		cmdname1: {...},
+//		cmdname2: {...},
+//	}
+// 
+// Command details:
 // cmdname: {
 // 	aliases: [ "list", "of", "aliases" ],	// Completely optional
 // 	filters: [								// Completely optional
