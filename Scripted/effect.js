@@ -74,14 +74,20 @@ class Effect {
 	
 	// registerCommand(cmdname, filters, callback, cost, descriptionFunc) {
 	registerCommand(cmd) {
-		TwitchManager.registerCommand(
-			this.getCommandId(cmd.cmdname),
-			cmd);
-			// cmdname,
-			// filters,
-			// callback,
-			// cost,
-			// descriptionFunc);
+		if (!cmd.aliases) {
+			cmd.aliases = [];
+		}
+		
+		if (!cmd.aliases.includes(cmd.cmdname)) {
+			cmd.aliases.unshift(cmd.cmdname);
+		}
+		
+		cmd.aliases.forEach(alias => {
+			cmd.cmdname = alias;
+			TwitchManager.registerCommand(
+				this.getCommandId(alias),
+				cmd);
+		});
 	}
 	
 	unregisterCommand(cmdname) {
