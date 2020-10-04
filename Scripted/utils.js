@@ -1,4 +1,5 @@
 const fs = require('fs');
+const assert = require('assert').strict;
 
 class Utils {
 	static now() {
@@ -56,11 +57,15 @@ class Utils {
 	
 	static randomKey(obj) {
 		let keys = Object.keys(obj);
-		return keys[randomInt(0, keys.length)];
+		return keys[Utils.randomInt(0, keys.length)];
 	}
 	
 	static randomValue(obj) {
-		return obj[randomKey(obj)];
+		return obj[Utils.randomKey(obj)];
+	}
+	
+	static randomElement(arr) {
+		return arr[Utils.randomInt(0, arr.length)];
 	}
 	
 	static weightedRandomKey(obj, elementWeightFunc) {
@@ -108,6 +113,32 @@ class Utils {
 	  return fs.readdirSync(source, { withFileTypes: true })
 	    .filter(dirent => dirent.isDirectory())
 	    .map(dirent => dirent.name);
+	}
+	
+	static getFiles (source) {
+	  return fs.readdirSync(source, { withFileTypes: true })
+	    .filter(dirent => dirent.isFile())
+	    .map(dirent => dirent.name);
+	}
+	
+	static makeEnglishList(items) {
+		assert(Array.isArray(items) && items.length > 0,
+			'An array of at least one item is required to make an English list.');
+		
+		if (items.length == 1) {
+			return items[0];
+		}
+		
+		// Here we have at least two items, so it's going to end with "X and Y"
+		let result = `${items[items.length - 2]} and ${items[items.length - 1]}`;
+		
+		// Now we add "item, " for each item, so we get something that
+		// looks like "A, B, C, X and Y"
+		for (let i = 0; i < items.length - 2; i++) {
+			result = `${items[i]}, ${result}`;
+		}
+		
+		return result;
 	}
 	
 	
@@ -229,7 +260,7 @@ class Utils {
 	// functions).
 	static clone(obj) {
 		var copy;
-
+		
 		// Handle the 3 simple types, and null or undefined
 		if (null == obj || "object" != typeof obj) return obj;
 
@@ -239,7 +270,7 @@ class Utils {
 			copy.setTime(obj.getTime());
 			return copy;
 		}
-
+		
 		// Handle Array
 		if (obj instanceof Array) {
 			copy = [];
@@ -248,7 +279,7 @@ class Utils {
 			}
 			return copy;
 		}
-
+		
 		// Handle Object
 		if (obj instanceof Object) {
 			copy = {};
@@ -257,7 +288,7 @@ class Utils {
 			}
 			return copy;
 		}
-
+		
 		throw new Error("Unable to copy obj! Its type isn't supported.");
 	}
 }
