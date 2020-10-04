@@ -47,7 +47,7 @@
 		"sound": "/assets/sfx/holdit.mp3"
 	},
 	
-	"mac": {
+	"saywhat": {
 		"image": {
 			"url": "/assets/image-display/Mac.gif",
 			"width": 480,
