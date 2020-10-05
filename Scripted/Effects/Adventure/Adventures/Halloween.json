@@ -1,6 +1,6 @@
 {
-	"title": "spooky",
-	"startDesc": "$user has started a spooky!",
+	"title": "spooky adventure",
+	"startDesc": "$user has started a $title!",
 	"adventures": {
 		
 		"castle": [

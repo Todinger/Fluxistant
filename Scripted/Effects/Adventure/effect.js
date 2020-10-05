@@ -45,25 +45,26 @@ const REWARD_PLACEHOLDER = '$reward';
 
 // The command people use to join the adventure
 const JOIN_COMMAND_PLACEHOLDER = '$cmd';
-const JOIN_COMMAND = 'j';
+const JOIN_COMMAND = 'join';
+// const JOIN_COMMAND = 'j';
 
 // Amount of points awarded to the winner
 const VICTORY_REWARD = 500;
 
 // How long we wait for users to join the adventure
-const RECRUITMENT_DURATION = 5 * SECONDS;
-// const RECRUITMENT_DURATION = 2 * MINUTES;
+// const RECRUITMENT_DURATION = 5 * SECONDS;
+const RECRUITMENT_DURATION = 1 * MINUTES;
 
 // How often we remind people to join
-const REMINDER_INTERVAL = 1 * SECONDS;
-// const REMINDER_INTERVAL = 30 * SECONDS;
+// const REMINDER_INTERVAL = 1 * SECONDS;
+const REMINDER_INTERVAL = 30 * SECONDS;
 
 // The minimum amount of participants we are willing to start the adventure with
-const MINIMUM_PARTICIPANTS = 1;
+const MINIMUM_PARTICIPANTS = 2;
 
 // How long we wait between showing parts of the adventure
-const PARTS_PAUSE_LENGTH = 1 * SECONDS;
-// const PARTS_PAUSE_LENGTH = 5 * SECONDS;
+// const PARTS_PAUSE_LENGTH = 1 * SECONDS;
+const PARTS_PAUSE_LENGTH = 5 * SECONDS;
 
 class Adventure extends Effect {
 	constructor() {
@@ -198,12 +199,12 @@ class Adventure extends Effect {
 	
 	// TODO: Remove for production
 	// These makes us print to console instead of saying in chat
-	say(msg) {
-		this.log(msg);
-	}
-	tell(user, msg) {
-		this.say(`@${user.displayName} ${msg}`);
-	}
+	// say(msg) {
+	// 	this.log(msg);
+	// }
+	// tell(user, msg) {
+	// 	this.say(`@${user.displayName} ${msg}`);
+	// }
 	
 	startRecruiting(user) {
 		if (this.activeAdventure) {
@@ -315,9 +316,9 @@ class Adventure extends Effect {
 	
 	load() {
 		this.registerCommand({
-			cmdname: 'a',
-			// cmdname: 'adventure',
-			// aliases: ['adv'],
+			// cmdname: 'a',
+			cmdname: 'adventure',
+			aliases: ['adv'],
 			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
 			callback: user => this.startRecruiting(user),
 		});
@@ -329,8 +330,8 @@ class Adventure extends Effect {
 		});
 		
 		this.registerCommand({
-			cmdname: 'e',
-			// cmdname: 'endadventure',
+			// cmdname: 'e',
+			cmdname: 'endadventure',
 			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
 			callback: user => this.endAdventure(),
 		});
