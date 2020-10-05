@@ -94,7 +94,7 @@ class Utils {
 	static applyDefaults(obj, defs) {
 		Object.keys(defs).forEach(key => {
 			if (defs.hasOwnProperty(key)) {
-				if (key in obj) {
+				if (key in obj && obj[key] !== undefined) {
 					if (Utils.isObject(defs[key])) {
 						Utils.applyDefaults(obj[key], defs[key]);
 					}
