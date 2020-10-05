@@ -29,6 +29,15 @@ class Effect {
 		this._clientAttachedHandlers = [];
 		this._clientDisconnectedHandlers = [];
 		this._connectedClients = {};
+		
+		// Loads the effect in debug mode, replacing chat messages with
+		// console log printouts
+		if (description.debug) {
+			this.say = this.log;
+			this.tell = (user, msg) => {
+				this.say(`@${user.displayName} ${msg}`);
+			}
+		}
 	}
 	
 	_onClientAttached(handler) {
