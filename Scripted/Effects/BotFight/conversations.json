@@ -1,0 +1,40 @@
+{
+	"conversations": {
+		"hello": {
+			"startingBot": "Me",
+			"lineDuration": 5000,
+			"entries": [
+				{
+					"lineDuration": 5000,
+					"lines": [
+						{
+							"lineDuration": 5000,
+							"line": "Hello World!"
+						},
+						{
+							"lineDuration": 5000,
+							"line": "It's me!"
+						}
+					]
+				},
+				{
+					"speaker": "SE",
+					"lines": [
+						{
+							"lineDuration": 5000,
+							"line": "Howdy there!"
+						},
+						{
+							"lineDuration": 5000,
+							"line": "It's SE!"
+						}
+					]
+				}
+			]
+		},
+		"hello2": [
+			"Hello World! It's me!",
+			"Howdy there! It's SE!"
+		]
+	}
+}
