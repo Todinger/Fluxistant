@@ -107,11 +107,14 @@ class CandyGame extends Effect {
 		
 		this.modifyUserPoints(user, reward);
 		
-		this.dropImage(candy.image);
+		let imageData = Utils.clone(candy.image);
 		if (candy.winning) {
+			imageData.effect = 'glow';
 			this.ongoing = false;
 			this.announceWinner(user);
 		}
+		
+		this.dropImage(imageData);
 	}
 	
 	preload() {

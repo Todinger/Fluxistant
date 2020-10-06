@@ -6,39 +6,26 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-
 const PORT = 3333;
 
 const Config = require('./botConfig.json');
 
+
+// Asset- and file-related registration
 const Assets = require('./assets');
 Assets.init(app);
 Assets.registerAll();
-
-// // Self-Images
-// const USERIMAGE_DIR = '../../Images/User-Specific';
-// const USERIMAGE_URL = '/assets/user-images/';
-// app.use(USERIMAGE_URL,
-// 	express.static(path.join(__dirname, USERIMAGE_DIR)));
-
-// // Image Display
-// const IMAGEDISPLAY_DIR = '../../Images/Display Images';
-// const IMAGEDISPLAY_URL = '/assets/image-display/';
-// app.use(IMAGEDISPLAY_URL,
-// 	express.static(path.join(__dirname, IMAGEDISPLAY_DIR)));
-
-// // Sound Effects
-// const SOUNDEFFECTS_DIR = '../../sfx';
-// const SOUNDEFFECTS_URL = '/assets/sfx/';
-// app.use(SOUNDEFFECTS_URL,
-// 	express.static(path.join(__dirname, SOUNDEFFECTS_DIR)));
-
 
 function getUserImageList(socket) {
 	console.log('User image list requested.');
 	Assets.getUserImages(imageList => socket.emit('userImageList', imageList));
 }
 
+// The files here are needed by the HTML pages of the various effects
+Assets.registerDir(path.join(__dirname, 'ClientsCommon'), '/common');
+
+
+// Initialize keyboard interaction
 const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
 // KeyboardManager.logAllUp = true;
@@ -48,71 +35,18 @@ KeyboardManager.start();
 // Load all the effects we have
 const EffectManager = require('./effectManager');
 EffectManager.loadAll('/fx/', 'Effects', app, express);
-app.use('/fx/effectClient.js',
-	express.static(path.join(__dirname, 'Effects', 'effectClient.js')));
-app.use('/fx/clientUtils.js',
-	express.static(path.join(__dirname, 'Effects', 'clientUtils.js')));
 
+// Load Twitch interaction
 const TwitchManager = require('./twitchManager');
 TwitchManager.init(Config.channel, Config.username, Config.oAuth);
 
-/* Testing Code
 
-TwitchManager.on('message', (user, message) => {
-	console.log(`${user.displayName}: ${message}`);
-});
-TwitchManager.on('action', (user, message) => {
-	console.log(`${user.displayName} ${message}`);
-});
-TwitchManager.onCommand('a', (user, x, y, z) => {
-	console.log(`Ha! ${user.displayName} does ${x} to the ${y} with the ${z}!`);
-})
-
-TwitchManager.onCommand('a', [], (user, x, y, z) => {
-	console.log(`Ha! ${user.displayName} does ${x} to the ${y} with the ${z}!`);
-});
-TwitchManager.onCommand('b', [User.isMod()], (user, x) => {
-	console.log(`b: ${user.displayName} does ${x}!`);
-});
-TwitchManager.onCommand('c', [User.isUser('fluxistence')], (user, x) => {
-	console.log(`c: ${user.displayName} does ${x}!`);
-});
-TwitchManager.onCommand('d', [User.isUser('yecatsmailbox')], (user, x) => {
-	console.log(`d: ${user.displayName} does ${x}!`);
-});
-TwitchManager.onCommand('e', [User.isAtLeastMod()], (user, x) => {
-	console.log(`e: ${user.displayName} does ${x}!`);
-});
-*/
-
+// Set up StreamElements integration
 const SEManager = require('./seManager');
 SEManager.init();
 
-/*
-setTimeout(() => {
-	SEManager.getUserPoints('fluxistence', points => console.log(`Flux's points: ${points}`), error => console.error(error));
-	// SEManager.addUserPoints('fluxistence', 500, newAmount => console.log(`After adding 500: ${newAmount}`), error => console.error(error));
-	// SEManager.subtractUserPoints('fluxistence', 1, newAmount => console.log(`After subtracting 1: ${newAmount}`), error => console.error(error));
-	// SEManager.consumeUserPoints(
-	// 	'fluxistence',
-	// 	500,
-	// 	newAmount => console.log(`New amount after consuming 500: ${newAmount}`),
-	// 	(amount, points) => console.log(`User only has ${points} points, not enough to consume ${amount}.`),
-	// 	error => console.error(error)
-	// );
-}, 5000);
-KeyboardManager.registerShortcut(
-	`DEBUG_ShowPixels`,
-	[
-		Effect.Keycodes.VC_CONTROL_L,
-		Effect.Keycodes.VC_META_L,
-		Effect.Keycodes.VC_X
-	],
-	() => SEManager.getUserPoints('fluxistence', points => console.log(`Flux's points: ${points}`), error => console.error(error))
-);
-*/
 
-
+// Register to handle general server events
 io.on('connection', socket => {
 	console.log('Client connected.');
 	socket.on('getUserImageList', () => getUserImageList(socket));
@@ -134,5 +68,6 @@ io.on('connection', socket => {
 	});
 });
 
+// Start the server
 server.listen(PORT);
 console.log(`Listening on port ${PORT}...`);

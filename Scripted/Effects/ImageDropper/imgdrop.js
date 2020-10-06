@@ -16,7 +16,8 @@ class FShower extends EffectClient {
 		// We use double this duration along with double the distance
 		// to avoid the slowing at the end of the default easing
 		let duration = randomInt(image.minDuration, image.maxDuration);
-		$(`<img class="faller" src="${image.url}">`)
+		let jImage = $(`<img class="faller" src="${image.url}">`);
+		jImage
 		.width(image.width).height(image.height)
 		.css({ 
 			position: "absolute",
@@ -33,6 +34,17 @@ class FShower extends EffectClient {
 				$(this).remove();
 			})
 		.appendTo("#imageholder");
+		
+		if (image.effect) {
+			if (typeof image.effect == 'string') {
+				image.effect = {
+					name: image.effect,
+					effectData: {},
+				}
+			}
+			
+			jImage.applyEffect(image.effect.name, image.effect.effectData);
+		}
 	}
 	
 	dropImages(image) {
