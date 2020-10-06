@@ -27,6 +27,12 @@ const USERBONUS_DEFAULTS = {
 	amount: 500,
 };
 
+const INFLATIONS = {
+	NONE:						(start, step) => start,
+	makeLinear:    (weight) =>	(start, step) => start + step * weight,
+	makeExponential: (base) =>	(start, step) => start * (base ** step),
+}
+
 class CandyGame extends Effect {
 	constructor() {
 		super({
@@ -37,6 +43,9 @@ class CandyGame extends Effect {
 		this.candyData = {};
 		this.ongoing = false;
 		this.imageDirURL = null;
+		
+		this.winningWeightInflation = INFLATIONS.makeLinear(5);
+		this.candyCount = 0;
 	}
 	
 	dropImage(image) {
@@ -72,9 +81,22 @@ class CandyGame extends Effect {
 		});
 	}
 	
+	getCandyWeight(candy) {
+		if (candy.winning) {
+			return this.winningWeightInflation(
+				candy.weight,
+				this.candyCount);
+		} else {
+			return candy.weight;
+		}
+	}
+	
 	candyRequest(user) {
-		let candyName = Utils.weightedRandomKey(this.candyData, cd => cd.weight);
+		let candyName = Utils.weightedRandomKey(
+			this.candyData,
+			candy => this.getCandyWeight(candy));
 		let candy = this.candyData[candyName];
+		this.candyCount++;
 		
 		let reward = candy.reward;
 		if (candy.userBonus) {
@@ -89,7 +111,6 @@ class CandyGame extends Effect {
 		if (candy.winning) {
 			this.ongoing = false;
 			this.announceWinner(user);
-			// this.say('A');
 		}
 	}
 	
