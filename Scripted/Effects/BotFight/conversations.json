@@ -8,11 +8,11 @@
 					"lineDuration": 5000,
 					"lines": [
 						{
-							"lineDuration": 5000,
+							"lineDuration": 1000,
 							"line": "Hello World!"
 						},
 						{
-							"lineDuration": 5000,
+							"lineDuration": 1000,
 							"line": "It's me!"
 						}
 					]
@@ -21,20 +21,31 @@
 					"speaker": "SE",
 					"lines": [
 						{
-							"lineDuration": 5000,
+							"lineDuration": 1000,
 							"line": "Howdy there!"
 						},
 						{
-							"lineDuration": 5000,
+							"lineDuration": 1000,
 							"line": "It's SE!"
 						}
 					]
 				}
 			]
 		},
-		"hello2": [
-			"Hello World! It's me!",
-			"Howdy there! It's SE!"
-		]
+		"lamejoke": {
+			"startingBot": "SE",
+			"lineDuration": 2000,
+			"entries": [
+				"@Fluxistant Knock, knock.",
+				"Who's there?",
+				"A little old lady.",
+				"A little old lady who?",
+				{ "line": "Wow, I didn't know you could yodel!", "lineDuration": 3000 },
+				[
+					{ "line": "<_<", "lineDuration": 3500 },
+					"OK, I'm gonna go over there now."
+				]
+			]
+		}
 	}
 }

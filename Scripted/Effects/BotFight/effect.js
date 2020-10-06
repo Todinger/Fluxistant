@@ -113,23 +113,86 @@ const CONVERSATIONS_FILE = 'conversations.json';
 const SECONDS = 1000;
 const MINUTES = 60 * SECONDS;
 
-const BOTS = {
-	Me: 'Me',
-	SE: 'SE',
+const CONVERSATIONS_INTERVAL = {
+	BASE: 15 * SECONDS,
+	VARIANCE: 5 * SECONDS,
+	// BASE: 45 * MINUTES,
+	// VARIANCE: 10 * MINUTES,
+}
+
+const BOTNAME_SELF = 'Me';
+const BOTNAME_STREAMELEMENTS = 'SE';
+
+const DEFAULTS = {
+	startingBot: BOTNAME_SELF,
+	lineDuration: 5 * SECONDS,
+};
+
+class Bot {
+	constructor(effect) {
+		this.effect = effect;
+	}
 	
-	Other: function(botName) {
-		if (botName.toLowerCase() === BOTS.Me.toLowerCase()) {
-			return BOTS.SE;
-		} else {
-			return BOTS.Me;
-		}
+	say(message) { throw 'Abstract function called.'; }
+	name() { throw 'Abstract function called.'; }
+	get other() { throw 'Abstract function called.'; }
+
+	// Extra delay to put after a bot says something:
+	// If one bot is slower than the other (contacting SE and having their
+	// bot say something might take noticeably longer), add some time for
+	// the slower bot to mitigate it
+	get delay() { throw 'Abstract function called.'; }
+	
+	toString() {
+		return `<${this.name}>`;
 	}
 }
 
-const DEFAULTS = {
-	startingBot: BOTS.Me,
-	lineDuration: 5 * SECONDS,
-};
+class BotManager {
+	constructor() {
+		this.bots = {};
+	}
+	
+	register(bot) {
+		this.bots[bot.name] = bot;
+	}
+	
+	get(name) {
+		return this.bots[name];
+	}
+}
+var botManager = new BotManager();
+
+class MeBot extends Bot {
+	constructor(effect) {
+		super(effect);
+	}
+	
+	get name() { return BOTNAME_SELF; }
+	get other() { return botManager.get(BOTNAME_STREAMELEMENTS); }
+	get delay() { return 0; }
+	
+	say(message) {
+		this.effect.say(`Fluxistant: ${message}`);
+		// this.effect.say(message);
+	}
+}
+
+class SEBot extends Bot {
+	constructor(effect) {
+		super(effect);
+	}
+	
+	get name() { return BOTNAME_STREAMELEMENTS; }
+	get other() { return botManager.get(BOTNAME_SELF); }
+	get delay() { return 0; }
+	
+	say(message) {
+		this.effect.say(`StreamElements: ${message}`);
+		// this.sendSEMessage(message);
+	}
+}
+
 
 class BotFight extends Effect {
 	constructor() {
@@ -139,6 +202,9 @@ class BotFight extends Effect {
 		});
 		
 		this.conversations = {};
+		this.activeConversation = null;
+		
+		this.active = true;
 	}
 	
 	loadData() {
@@ -196,7 +262,7 @@ class BotFight extends Effect {
 			
 			let resultEntry = this.loadEntry(entry, entryDefaults);
 			
-			speaker = BOTS.Other(resultEntry.speaker);
+			speaker = botManager.get(resultEntry.speaker).other.name;
 			result.push(resultEntry);
 		});
 		
@@ -284,8 +350,94 @@ class BotFight extends Effect {
 		return le;
 	}
 	
+	scheduleNextConversation() {
+		setTimeout(
+			() => this.startRandomConversation(),
+			Utils.randomInRadius(
+				CONVERSATIONS_INTERVAL.BASE,
+				CONVERSATIONS_INTERVAL.VARIANCE));
+	}
+	
+	startRandomConversation() {
+		if (this.active) {
+			let conversationName = Utils.randomKey(this.conversations);
+			this.startConversation(conversationName);
+		}
+	}
+	
+	startConversation(conversationName) {
+		if (this.activeConversation) {
+			this.error('There is already a conversation taking place.');
+			return;
+		}
+		
+		this.activeConversation = {
+			name: conversationName,
+			entries: this.conversations[conversationName].entries,
+			currentEntryIndex: 0,
+			currentLineIndex: 0,
+		}
+		
+		this.nextLine();
+	}
+	
+	nextLine() {
+		assert(this.activeConversation, 'No conversation is active!');
+		
+		let ac = this.activeConversation;
+		
+		if (ac.currentEntryIndex == ac.entries.length) {
+			this.endConversation();
+			return;
+		}
+		
+		let entry = ac.entries[ac.currentEntryIndex];
+		let speakerBot = botManager.get(entry.speaker);
+		let lineEntry = entry.lines[ac.currentLineIndex++];
+		speakerBot.say(lineEntry.line);
+		let nextFunc = null;
+		if (ac.currentLineIndex == entry.lines.length) {
+			ac.currentEntryIndex++;
+			if (ac.currentEntryIndex == ac.entries.length) {
+				nextFunc = () => this.endConversation();
+			} else {
+				ac.currentLineIndex = 0;
+				nextFunc = () => this.nextLine();
+			}
+		} else {
+			nextFunc = () => this.nextLine();
+		}
+		
+		setTimeout(nextFunc, lineEntry.lineDuration + speakerBot.delay);
+	}
+	
+	endConversation() {
+		this.activeConversation = null;
+		this.scheduleNextConversation();
+	}
+	
 	load() {
+		if (this.active) {
+			this.scheduleNextConversation();
+		}
+		
+		this.registerCommand({
+			cmdname: 'botfight',
+			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
+			callback: () => {
+				if (!this.active) {
+					this.active = true;
+					this.startRandomConversation();
+				}
+			},
+		});
 	}
 }
 
-module.exports = new BotFight();
+var bf = new BotFight();
+var meBot = new MeBot(bf);
+var seBot = new SEBot(bf);
+botManager.register(meBot);
+botManager.register(seBot);
+
+module.exports = bf;

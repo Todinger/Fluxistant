@@ -6,6 +6,7 @@ const EventNotifier = require('./eventNotifier');
 
 const URL_BASE = 'https://api.streamelements.com/kappa/v2';
 const URL_POINTS = URL_BASE + '/points';
+const URL_BOT = URL_BASE + '/bot'
 const SOCKET_URL = 'https://realtime.streamelements.com';
 
 // Add the authorization token to every Axios request.
@@ -188,6 +189,21 @@ class SEManager extends EventNotifier {
 				}
 			},
 			onError);
+	}
+	
+	say(msg, onDone, onError) {
+		let requestURL =
+			`${URL_BOT}/${Config.channelID}/say`;
+		
+		let promise = axios.post(requestURL, { message: msg });
+		
+		if (onDone) {
+			promise = promise.then(onDone);
+		}
+		
+		if (onError) {
+			promise = promise.catch(onError);
+		}
 	}
 }
 

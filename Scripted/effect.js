@@ -11,6 +11,13 @@ const Log = require('./logger');
 
 class Effect {
 	constructor(description) {
+		if (description.enabled === false) {
+			this.enabled = false;
+			return;
+		} else {
+			this.enabled = true;
+		}
+		
 		this.name = description.name;
 		this.webname = description.webname;
 		this.source = description.source;
@@ -210,6 +217,10 @@ class Effect {
 			amount,
 			null,
 			(err) => this.error(`Failed to add points to ${user.name}: ${err}`));
+	}
+	
+	sendSEMessage(msg) {
+		SEManager.say(msg);
 	}
 	
 	static get Filters() {

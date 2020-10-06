@@ -37,6 +37,10 @@ class EffectManager {
 	
 	_loadEffect(fxdir, fxfile, webPrefix, app, express) {
 		let effect = require('./' + fxfile);
+		if (!effect.enabled) {
+			return;
+		}
+		
 		assert(!this.nameExists(effect.name),
 			`Ambiguous effect name: '${effect.name}'`);
 		

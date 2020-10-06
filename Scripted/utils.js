@@ -68,6 +68,10 @@ class Utils {
 		return arr[Utils.randomInt(0, arr.length)];
 	}
 	
+	static randomInRadius(base, variance) {
+		return Utils.randomRange(base - variance, base + variance);
+	}
+	
 	static weightedRandomKey(obj, elementWeightFunc) {
 		if (!elementWeightFunc) {
 			elementWeightFunc = x => x;
