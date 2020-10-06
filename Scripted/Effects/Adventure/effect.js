@@ -57,7 +57,7 @@ const RECRUITMENT_DURATION = 1 * MINUTES;
 
 // How often we remind people to join
 // const REMINDER_INTERVAL = 1 * SECONDS;
-const REMINDER_INTERVAL = 30 * SECONDS;
+const REMINDER_INTERVAL = 15 * SECONDS;
 
 // The minimum amount of participants we are willing to start the adventure with
 const MINIMUM_PARTICIPANTS = 2;
