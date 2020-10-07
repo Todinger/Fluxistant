@@ -42,7 +42,7 @@
 	
 	"holdit": {
 		"image": {
-			"url": "/assets/image-display/Hold It.png"
+			"url": "/assets/image-display/Hold It - Itor.png"
 		},
 		"sound": "/assets/sfx/holdit.mp3"
 	},
@@ -73,7 +73,7 @@
 	
 	"objection": {
 		"image": {
-			"url": "/assets/image-display/Objection.png"
+			"url": "/assets/image-display/Objection - Flux.png"
 		},
 		"sound": "/assets/sfx/objection.mp3"
 	},
@@ -99,7 +99,7 @@
 	
 	"takethat": {
 		"image": {
-			"url": "/assets/image-display/Take That.png"
+			"url": "/assets/image-display/Take That - Flux.png"
 		},
 		"sound": "/assets/sfx/takethat.mp3"
 	},

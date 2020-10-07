@@ -19,10 +19,6 @@ const CANDY_DEFAULTS = {
 	},
 };
 
-const IMAGE_DEFAULTS = {
-	
-};
-
 const USERBONUS_DEFAULTS = {
 	amount: 500,
 };
@@ -55,11 +51,13 @@ class CandyGame extends Effect {
 	startGame(user) {
 		if (this.ongoing) {
 			this.tell(user, 'A candy game is already taking place!');
-			return;
+			return false;
 		}
 		
 		this.ongoing = true;
 		this.say(`${user.displayName} has started a candy game!`);
+		this.say('Use !gimme (costs 10 pixels) to drop candy and win pixels! The game ends when the gold-wrapped chocolate coins are found, granting the winner 1000 pixels!');
+		return true;
 	}
 	
 	endGame(user) {
@@ -165,6 +163,17 @@ class CandyGame extends Effect {
 			
 			callback: user => this.candyRequest(user),
 		});
+		
+		this.onChannelReward(
+			'Start a Candy Game',
+			user => {
+				if (!this.startGame(user)) {
+					this.tell(
+						user,
+						"Sorry, like the description says, we can't refund the points for this...");
+				}
+			}
+		);
 	}
 }
 

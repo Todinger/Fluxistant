@@ -31,6 +31,11 @@ const KeyboardManager = require('./keyboardManager');
 // KeyboardManager.logAllUp = true;
 KeyboardManager.start();
 
+// Load channel rewards
+// NOTE: This needs to be done BEFORE anything registers to listen for reward
+// redemptions, or an error will be thrown
+const RewardsManager = require('./rewardsManager');
+RewardsManager.init();
 
 // Load all the effects we have
 const EffectManager = require('./effectManager');

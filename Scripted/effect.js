@@ -7,6 +7,7 @@ const KeyboardManager = require('./keyboardManager');
 const Assets = require('./assets');
 const CommandManager = require('./commandManager');
 const SEManager = require('./seManager');
+const RewardsManager = require('./rewardsManager');
 const Log = require('./logger');
 
 class Effect {
@@ -206,7 +207,6 @@ class Effect {
 	
 	registerAssetDir(localPath, name) {
 		let url = `/assets/effects/${this.name}/${name}`;
-		// Assets.registerDir(path.join(this.workdir, localPath), '/assets/bla');
 		Assets.registerDir(path.join(this.workdir, localPath), url);
 		return url;
 	}
@@ -221,6 +221,14 @@ class Effect {
 	
 	sendSEMessage(msg) {
 		SEManager.say(msg);
+	}
+	
+	// The handler will be invoked when the given channel point reward is
+	// redeemed (the name should be registered in the rewards file listed
+	// in rewardsManager.js)
+	// The function should accept the arguments (user, msg)
+	onChannelReward(rewardName, handler) {
+		RewardsManager.on(rewardName, handler);
 	}
 	
 	static get Filters() {

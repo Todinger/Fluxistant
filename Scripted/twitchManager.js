@@ -35,7 +35,7 @@ class TwitchManager extends EventNotifier {
 			'tip',					// (SEData)
 			'host',					// 
 			'raid',					// 
-			'channelReward',		// (user, reward, msg)
+			'channelReward',		// (user, rewardID, msg)
 			'userJoined',			// (username)
 			'userLeft',				// (username)
 			'userFirstMessage',		// 
@@ -379,15 +379,38 @@ class TwitchManager extends EventNotifier {
 					console.warn("Unknown message type received, treating as regular message.");
 				case 'whisper':
 				case 'chat':
+					// We want to let various message type handlers all examine
+					// this but not to register it as a regular message when
+					// they're done if one if them considers it special, so we
+					// use this to keep track of whether it's just a regular
+					// message or not
+					let regularMessage = true;
+					
+					// Check if this is a channel reward redemption
+					// This is only possible when the redemption comes with
+					// a message, otherwise it wouldn't be sent to us at all
+					// through tmi.js and we ned PubSub to see it - something
+					// that is not yet implemented
+					if (userstate['custom-reward-id']) {
+						this._notify(
+							'channelReward',
+							user,
+							userstate['custom-reward-id'],
+							message);
+						regularMessage = false;
+					}
+					
 					// Check if this is a command and invoke it if so - only
 					// proceed to treat this as a regular message if it's not
 					// a command
 					let command = this._parseCommand(message);
 					if (this._invokeCommand(user, command)) {
-						return;
+						regularMessage = false;
 					}
 					
-					this._notify('message', user, message);
+					if (regularMessage) {
+						this._notify('message', user, message);
+					}
 					
 					break;
 			}
