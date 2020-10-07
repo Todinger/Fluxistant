@@ -22,7 +22,7 @@ class TextDisplay extends Effect {
 	}
 	
 	load() {
-		this._onClientAttached(socket => {
+		this.onClientAttached(socket => {
 			socket.on('getStyleList', () => {
 				socket.emit('styleList', this.styles);
 			});

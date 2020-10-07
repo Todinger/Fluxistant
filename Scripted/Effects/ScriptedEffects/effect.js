@@ -27,7 +27,7 @@ class ScriptedEffects extends Effect {
 			}
 		});
 		
-		this._onClientAttached(socket => {
+		this.onClientAttached(socket => {
 			socket.emit('scriptList', this.scriptsData);
 		});
 	}

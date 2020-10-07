@@ -19,7 +19,7 @@ class Countdown extends Effect {
 	}
 	
 	load() {
-		this._onClientAttached(() => this.broadcastEvent('setTime', this.initialTime));
+		this.onClientAttached(() => this.broadcastEvent('setTime', this.initialTime));
 		
 		this.registerCommand({
 			cmdname: 'settime',

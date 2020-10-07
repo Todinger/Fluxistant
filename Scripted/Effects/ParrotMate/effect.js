@@ -71,7 +71,7 @@ class ParrotMate extends Effect {
 			}
 		});
 		
-		this._onClientAttached(socket => {
+		this.onClientAttached(socket => {
 			socket.on('imgdispDone', url => {
 				if (PARROT_IMAGE_URL == url && !this.whatWasThatCooldownActive) {
 					this.whatWasThatCooldownActive = true;
