@@ -1,12 +1,14 @@
 const fs = require('fs');
 const assert = require('assert').strict;
 
+// A general-purpose "static" class with various paraphernalia functions useful
+// for all sorts of things.
 class Utils {
 	static now() {
 		return new Date().getTime();
 	}
 	
-	// Gets a list of all the keys that are in obj1 and not in obj2
+	// Gets a list of all the keys that are in obj1 and not in obj2.
 	static getSubKeys(obj1, obj2) {
 		var k1 = Object.keys(obj1);
 		return k1.filter(function(x) {
@@ -15,10 +17,13 @@ class Utils {
 	}
 	
 	// Splits two collections into three lists of "things to add," "things
-	// to remove" and "things to keep"
+	// to remove" and "things to keep".
 	// Values that have the same keys in the old and the new are checked for
 	// equality - if they are equal they are put in "things to keep", otherwise
-	// they are marked for removal and re-addition
+	// they are marked for removal and re-addition.
+	// 
+	// NOTE: The contents of the objects need to be possible to check for
+	// equality by the Utils.equals() function!
 	static oldNewSplit(oldCollection, newCollection) {
 		let add = {};
 		let keep = {};
@@ -27,6 +32,9 @@ class Utils {
 		Object.keys(newCollection).forEach(key =>
 		{
 			if (key in oldCollection) {
+				// If a key is present in both collections, keep it if the
+				// values are the same, otherwise mark the old one for removal
+				// and the new one for addition
 				if (Utils.equals(oldCollection[key], newCollection[key])) {
 					keep[key] = newCollection[key];
 				} else {
@@ -34,10 +42,13 @@ class Utils {
 					add[key] = newCollection[key];
 				}
 			} else {
+				// If a key is only present in the new one, it needs to be added
 				add[key] = newCollection[key];
 			}
 		});
 		
+		// Anything in the old collection that isn't in the new collection
+		// should be removed
 		Object.keys(oldCollection).forEach(key => {
 			if (!(key in newCollection)) {
 				remove[key] = oldCollection[key];
@@ -47,31 +58,59 @@ class Utils {
 		return { add, keep, remove };
 	}
 	
+	// Returns a random real number in the range: min <= num < max
 	static randomRange(min, max) {
 		return min + Math.random() * (max - min);
 	}
 	
+	// Returns a random real INTEGER in the range: min <= num < max
 	static randomInt(min, max) {
 		return min + Math.floor(Math.random() * (max - min));
 	}
 	
+	// Returns a random key in the given object.
 	static randomKey(obj) {
 		let keys = Object.keys(obj);
 		return keys[Utils.randomInt(0, keys.length)];
 	}
 	
+	// Returns a random value in the given object.
 	static randomValue(obj) {
 		return obj[Utils.randomKey(obj)];
 	}
 	
+	// Returns a random element in the given array
 	static randomElement(arr) {
 		return arr[Utils.randomInt(0, arr.length)];
 	}
 	
+	// Returns a random real number in the range:
+	// 	base - vairance <= num < base + variance
 	static randomInRadius(base, variance) {
 		return Utils.randomRange(base - variance, base + variance);
 	}
 	
+	// Returns a random key from an object, with each value having a differet
+	// chance of being selected based on weight.
+	// A weight can be any positive number. If one value has the weight of X and
+	// another has the weight of 2X, the odds of the latter being chosen are
+	// twice as high as those of the former being chosen.
+	// The probability of a specific value being chosen is equal to the weight
+	// of that value divided by the sum of all the weights.
+	// 
+	// Parameters:
+	// 	obj					The object to choose from.
+	// 	[elementWeightFunc]	A function that takes a value (not a key!) from the
+	// 						object and returns its weight. It must return the
+	// 						same number for the same value from the moment this
+	// 						function starts and until it finishes (but
+	// 						subsequent calls to this function on the same object
+	// 						can have different weight values with no concern, if
+	// 						that's something you need for some reason; see the
+	// 						Candy Game effect for an example of this).
+	// 						This parameter is optional. If it is omitted, the
+	// 						function assumes that the values in the object *are*
+	// 						the weights.
 	static weightedRandomKey(obj, elementWeightFunc) {
 		if (!elementWeightFunc) {
 			elementWeightFunc = x => x;
@@ -91,13 +130,69 @@ class Utils {
 		};
 	}
 	
+	// Returns true iff the given value is of the object type.
 	static isObject(val) {
 		return typeof val === 'object' && val !== null;
 	}
 	
+	// Copies properties from the given defaults object (defs) to the given
+	// object if they are not already present in the given object.
+	// Works recursively, so that you can include defaults for sub-objects, but
+	// in order to support that, this disallows objects to be values themselves.
+	// 
+	// Examples:
+	// 
+	// 	def = {
+	// 		a: 3,
+	// 		b: 1,
+	// 	}
+	// 	obj = {
+	// 		a: 5,
+	// 	}
+	// 	==> result = {
+	// 		a: 5,
+	// 		b: 1,
+	// 	}
+	// 	
+	// 	def = {
+	// 		x: 4,
+	// 		stuff: {
+	// 			y: 5,
+	// 			z: 9,
+	// 		},
+	// 	}
+	// 	obj = {
+	// 		stuff: {
+	// 			z: 3,
+	// 		},
+	// 	}
+	// 	==> result = {
+	// 		x: 4,
+	// 		stuff: {
+	// 			y: 5,
+	// 			z: 3,
+	// 		},
+	// 	}
+	// 
+	// 	def = {
+	// 		x: 4,
+	// 		stuff: {
+	// 			y: 5,
+	// 			z: 9,
+	// 		},
+	// 	}
+	// 	obj = {
+	// 		x: 3,
+	// 	}
+	// 	==> result = {
+	// 		x: 3,
+	// 	}
+	// 
 	static applyDefaults(obj, defs) {
 		Object.keys(defs).forEach(key => {
 			if (defs.hasOwnProperty(key)) {
+				// If the value here is another object, proceed recursively
+				// to apply the sub-object defaults
 				if (key in obj && obj[key] !== undefined) {
 					if (Utils.isObject(defs[key])) {
 						Utils.applyDefaults(obj[key], defs[key]);
@@ -111,6 +206,8 @@ class Utils {
 		});
 	}
 	
+	// Gets a list of sub-directory names in the given directory.
+	// 
 	// Taken from:
 	// https://stackoverflow.com/questions/18112204/get-all-directories-within-directory-nodejs/24594123
 	static getDirectories (source) {
@@ -119,16 +216,24 @@ class Utils {
 	    .map(dirent => dirent.name);
 	}
 	
+	// Gets a list of file names in the given directory.
 	static getFiles (source) {
 	  return fs.readdirSync(source, { withFileTypes: true })
 	    .filter(dirent => dirent.isFile())
 	    .map(dirent => dirent.name);
 	}
 	
+	// Turns an array into a correct form of a list in English.
+	// Examples:
+	// 	makeEnglishList('a', 'b', 'c') === 'a, b and c'
+	// 	makeEnglishList('b', 'c') === 'b and c'
+	// 	makeEnglishList('c') === 'c'
+	// 	makeEnglishList('a', 'b', 'c', 5, 6) === 'a, b, c, 5 and 6'
 	static makeEnglishList(items) {
 		assert(Array.isArray(items) && items.length > 0,
 			'An array of at least one item is required to make an English list.');
 		
+		// A list of one item is just that item itself
 		if (items.length == 1) {
 			return items[0];
 		}
@@ -146,6 +251,9 @@ class Utils {
 	}
 	
 	
+	// Checks for equality between two values.
+	// Only supports basic value types.
+	// 
 	// Taken from:
 	// https://github.com/ReactiveSets/toubkal/blob/master/lib/util/value_equals.js
 	static equals( a, b, enforce_properties_order, cyclic ) {
@@ -260,7 +368,7 @@ class Utils {
 	// IMPORTANT NOTE!!!
 	// Only use this for simple objects that contain primitive data and/or
 	// arrays and objects of such simple objects!
-	// This function cannot compy complex objects (e.g. custom classes and
+	// This function cannot copy complex objects (e.g. custom classes and
 	// functions).
 	static clone(obj) {
 		var copy;

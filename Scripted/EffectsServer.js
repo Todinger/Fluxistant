@@ -8,6 +8,7 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const PORT = 3333;
 
+// Bot configuration - that is where you make it work with your bot and channel
 const Config = require('./botConfig.json');
 
 
@@ -16,6 +17,8 @@ const Assets = require('./assets');
 Assets.init(app);
 Assets.registerAll();
 
+// Gets a collection of { username: imageurl } pairs for all the users who have
+// self-images in the user self-image directory
 function getUserImageList(socket) {
 	console.log('User image list requested.');
 	Assets.getUserImages(imageList => socket.emit('userImageList', imageList));
@@ -28,8 +31,8 @@ Assets.registerDir(path.join(__dirname, 'ClientsCommon'), '/common');
 // Initialize keyboard interaction
 const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
-// KeyboardManager.logAllUp = true;
 KeyboardManager.start();
+
 
 // Load channel rewards
 // NOTE: This needs to be done BEFORE anything registers to listen for reward
@@ -37,9 +40,11 @@ KeyboardManager.start();
 const RewardsManager = require('./rewardsManager');
 RewardsManager.init();
 
+
 // Load all the effects we have
 const EffectManager = require('./effectManager');
 EffectManager.loadAll('/fx/', 'Effects', app, express);
+
 
 // Load Twitch interaction
 const TwitchManager = require('./twitchManager');
@@ -54,20 +59,28 @@ SEManager.init();
 // Register to handle general server events
 io.on('connection', socket => {
 	console.log('Client connected.');
+	
+	// Requests for the list of user self-images
 	socket.on('getUserImageList', () => getUserImageList(socket));
+	
+	// Requests for a list of all the Effects we have
 	socket.on('getScripts', () => 
 		socket.emit('scriptList', EffectManager.clientEffects));
 	
+	// Attachment requests:
+	// Direct attachment, by Effect name
 	socket.on('attachTo', effectName => {
 		console.log(`Attaching client to ${effectName}`);
 		EffectManager.attachClient(effectName, socket);
 	});
 	
+	// Attachment by tag
 	socket.on('attachToTag', tag => {
 		console.log(`Attaching client by tag to ${tag}`);
 		EffectManager.attachClientToTag(tag, socket);
 	});
 	
+	// Makes our bot say something to a specific user
 	socket.on('sayTo', data => {
 		TwitchManager.say(`@${data.username} ${data.message}`);
 	});

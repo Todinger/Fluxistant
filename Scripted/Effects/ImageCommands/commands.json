@@ -12,6 +12,7 @@
 	},
 	
 	"besttwitchstreamers": {
+		"aliases": [ "cheers" ],
 		"image": {
 			"url": "/assets/image-display/MaxAndMaaz.png"
 		}

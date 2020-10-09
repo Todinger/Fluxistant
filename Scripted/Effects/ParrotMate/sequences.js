@@ -51,7 +51,7 @@ const SEQUENCES = {
 		Event(0, [ Sound('attention') ]),
 		Event(163, [ Image('wing') ]),
 		Event(686, [ Image('regular') ]),
-		Event(928, [ Text('Give me attention!') ]),
+		Event(928, [ Text('Pay me attention!') ]),
 		Event(928, [ Image('wing') ]),
 		Event(1183, [ Image('regular') ]),
 		Event(1417, [ Image('wing') ]),

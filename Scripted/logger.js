@@ -1,3 +1,6 @@
+// This is used to log events in a database.
+// Everything here is hard-coded at the moment, but there isn't much to begin
+// with, so just change these details to fit your own database.
 const dblogger = require('node-db-logger').createLogger({
 	// config 
 	mongo: {
@@ -10,6 +13,15 @@ const dblogger = require('node-db-logger').createLogger({
 	}
 });
 
+// A wrapper class to facilitate writing to the database.
+// The dblogger defined above has one method, .record(), which takes as its
+// first argument the category of the entry, which is one of: info, error, warn,
+// debug and trace.
+// Here we make an object that has a corresponding function for each such event,
+// along with the regular .record() method.
+// In other words, to make an info log entry for example, you can invoke
+// logger.info('Some message'), but logger.record('info', 'Some message') will
+// do the exact same thing.
 class Logger {
 	constructor() {
 		this._addLogMethod('info');

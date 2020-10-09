@@ -1,3 +1,13 @@
+// This entire file is an example for using Twitch's PubSub service, but it
+// has not yet been used, and may never be as I've discovered that there are
+// libraries that wrap this stuff so I might use them instead if and when I
+// decide to start using PubSub.
+// If you want to add PubSub to your system, check these out:
+//   https://d-fischer.github.io/twitch-pubsub-client/
+//   https://www.npmjs.com/package/twitchps
+
+
+
 var clientId = '<YOUR CLIENT ID HERE>'; 
 var redirectURI = '<YOUR REDIRECT URL HERE>';
 var scope = 'user_read+chat_login';

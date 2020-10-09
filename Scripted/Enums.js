@@ -1,5 +1,7 @@
 const Enums = {};   
 
+// Keyboard keycodes, used to register key shortcuts and events in
+// KeyboardManager
 Enums.KEYCODES = {
 	VC_ESCAPE: 0x0001,
 
