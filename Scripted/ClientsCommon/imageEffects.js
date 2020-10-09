@@ -1,4 +1,13 @@
-// jQuery Extensions
+// ----------------- //
+// jQuery Extensions //
+// ----------------- //
+
+// Adds an extension to jQuery that invokes a given attribute in an action-queue
+// supporting way (so it happens at the right time when you add delays and 
+// such).
+// Adds a 'q' at the beginning of the name and puts that as a new jQuery
+// function.
+// 
 // Based on:
 // https://stackoverflow.com/questions/5396119/using-jquery-delay-with-css
 function extendJQueryFunction(functionName) {
@@ -12,12 +21,27 @@ function extendJQueryFunction(functionName) {
 	});
 }
 
+// Delayed CSS action
 extendJQueryFunction('css');
+// Delayed width action
 extendJQueryFunction('width');
+// Delayed height action
 extendJQueryFunction('height');
 
-
+// An assortment of effects that can be added to images.
+// Each effect has three parts to it:
+// - DEFAULTS: 	Default values which are used if the given effectData object
+// 				doesn't have the values the effect needs.
+// - apply:		Applies the effect to the given image.
+// 				Takes the jQuery object of the image and an optional effectData
+// 				object with parameters to override the ones from DEFAULTS.
+// - clear:		Removes the effect from the given image. Should only be called
+// 				on an image that previously had the effect's apply() function
+// 				called on it.
+// 				Takes the jQuery object of the image.
 class ImageEffects {
+	// Provides an outer glow effect.
+	// Doesn't actually deal with the "size" part so well, I'm afraid. =\
 	static get glow() {
 		return {
 			DEFAULTS: {
@@ -43,6 +67,8 @@ class ImageEffects {
 		}
 	}
 	
+	// Provides an outer shadow effect.
+	// The same as an outer glow of black.
 	static get shadow() {
 		return {
 			DEFAULTS: {
@@ -65,6 +91,12 @@ class ImageEffects {
 		}
 	}
 	
+	// Shows the in three steps, with each one larger than the previous one, and
+	// the last one shaking side to side.
+	// Meant to imitate the "DUN DUN DUN" dog clip thing.
+	// The defaults here fit the sound effect I used, but you can provide
+	// alternative values for the duration and sizes through the effectData
+	// object.
 	static get dundundun() {
 		return {
 			DEFAULTS: {
@@ -145,7 +177,7 @@ class ImageEffects {
 	}
 }
 
-// Add effect applying as extensions
+// Add effect-applying as extensions
 $.fn.extend({
 	applyEffect: function(name, effectData) {
 		console.assert(

@@ -302,8 +302,7 @@ class Effect {
 	}
 	
 	// [For use by inheriting classes]
-	// Logs a warning  message to the console, marked as coming from this
-	// Effect.
+	// Logs a warning message to the console, marked as coming from this Effect.
 	warn(message) {
 		console.warn(this._printForm(message));
 	}
