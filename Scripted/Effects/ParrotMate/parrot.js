@@ -93,3 +93,7 @@ class ParrotMate extends EffectClient {
 
 var parrotMate = new ParrotMate();
 var pm = parrotMate;
+
+function play(sequenceName) {
+	pm.playSequence(sequenceName);
+}

@@ -8,5 +8,8 @@
 			}
 		],
 		"sequence": "box"
+	},
+	"tater": {
+		"sequence": "tater"
 	}
 }

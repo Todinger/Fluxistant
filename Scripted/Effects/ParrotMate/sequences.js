@@ -157,6 +157,18 @@ const SEQUENCES = {
 		Event(1393, [ Image('wing') ]),
 		Event(1968, [ Image('regular') ]),
 	], NO_AUTOPLAY),
+	
+	tater: Sequence([
+		Event(0, [ Sound('tater') ]),
+		Event(187, [ Image('mouth') ]),
+		Event(553, [ Image('look') ]),
+		Event(926, [ Text('Polly want a tater!') ]),
+		Event(926, [ Image('mouth') ]),
+		Event(1177, [ Image('regular') ]),
+		Event(1438, [ Image('mouth') ]),
+		Event(1756, [ Image('regular') ]),
+		Event(2077, [ Image('regular') ]),
+	]),
 };
 
 parrotMate.loadAll(SEQUENCES);
