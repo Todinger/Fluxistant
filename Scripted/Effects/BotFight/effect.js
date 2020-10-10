@@ -223,7 +223,7 @@ class BotFight extends Effect {
 		super({
 			name: 'Bot Fight',
 			debug: true,
-			// enabled: false,
+			enabled: false,
 		});
 		
 		this.conversations = {};
