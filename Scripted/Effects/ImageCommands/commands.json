@@ -41,6 +41,10 @@
 		"sound": "/assets/sfx/dundundun.mp3"
 	},
 	
+	"funnyjoke": {
+		"sound": "/assets/sfx/MmmhFUNNYJOKE.mp3"
+	},
+	
 	"holdit": {
 		"image": {
 			"url": "/assets/image-display/Hold It - Itor.png"

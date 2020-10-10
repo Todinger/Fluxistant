@@ -10,6 +10,7 @@ const MINUTES = 60 * SECONDS;
 
 // Adventures file structure:
 //	{
+//		active: true,	// true by default, set to false to disable the file
 //		title: "AdventureCategoryName",	// E.g. "adventure" / "",
 //		startDesc: "$user has started an adventure! Enter $cmd to join!",
 //		adventures: {
@@ -46,26 +47,47 @@ const REWARD_PLACEHOLDER = '$reward';
 // The command people use to join the adventure
 const JOIN_COMMAND_PLACEHOLDER = '$cmd';
 const JOIN_COMMAND = 'join';
-// const JOIN_COMMAND = 'j';
 
 // Amount of points awarded to the winner
 const VICTORY_REWARD = 500;
 
 // How long we wait for users to join the adventure
-// const RECRUITMENT_DURATION = 5 * SECONDS;
 const RECRUITMENT_DURATION = 1 * MINUTES;
 
 // How often we remind people to join
-// const REMINDER_INTERVAL = 1 * SECONDS;
 const REMINDER_INTERVAL = 15 * SECONDS;
 
 // The minimum amount of participants we are willing to start the adventure with
 const MINIMUM_PARTICIPANTS = 2;
 
 // How long we wait between showing parts of the adventure
-// const PARTS_PAUSE_LENGTH = 1 * SECONDS;
 const PARTS_PAUSE_LENGTH = 5 * SECONDS;
 
+// Adventure Game
+// --------------
+// Lets users have a text adventure together.
+// An adventure starts when a user enters the starting command: !adventure
+// They're entered into a group of "adventurers" who are embarking upon this
+// adventure, and a recruitment phase begins.
+// During this phase, other users can use !join to join the adventure.
+// There is a minimum number of participants, indicated by the
+// MINIMUM_PARTICIPANTS constant. Failure to meet this amount results in the
+// adventure being cancelled when the recruitment phase is over.
+// 
+// The recruitment phase lasts for RECRUITMENT_DURATION.
+// Once it's over, assuming enough people entered, a random adventure is
+// selected from the collection of adventures in the ADVENTURES_DIR subfolder
+// (each file is a category of adventures which can be disabled by setting its
+// "active" property to false in the JSON file).
+// 
+// Once the adventure begins, a winner is selected from the participants.
+// The adventure is sent to the chat by the bot one part at a time, with a pause
+// of PARTS_PAUSE_LENGTH between them.
+// Once the final part is sent the winner is awarded VICTORY_REWARD
+// StreamElements loyalty points.
+// 
+// Another adventure can start afterwards, but there can't be two of them active
+// at the same time.
 class Adventure extends Effect {
 	constructor() {
 		super({
@@ -92,11 +114,18 @@ class Adventure extends Effect {
 		this.nextPartTimerHandle = null;
 	}
 	
+	// Loads a single JSON file with adventure data.
+	// 
+	// Parameters:
+	// 	name	Adventure file/category identifier. Unique amongst files.
+	// 	data	The contents of the JSON file.
 	loadAdventureFile(name, data) {
+		// Inactive files are ignored
 		if (data.active == false) {
 			return;
 		}
 		
+		// Load all of the adventures in the file
 		Object.keys(data.adventures).forEach(advname => {
 			let advData = data.adventures[advname];
 			
@@ -106,12 +135,16 @@ class Adventure extends Effect {
 					parts: advData,
 					active: true,
 				}
+			// If it's not an array then it should be an object
 			} else if (advData.active === false) {
 				// Object form means it's inactive if it has an 'active'
 				// property and it's set to false
 				delete data.adventures[advname];
 			}
 			
+			// If we haven't deleted it on account of it being inactive then
+			// at this point it should have a .parts property which should
+			// contain a non-empty array, so we make sure that's true
 			if (data.adventures[advname]) {
 				assert(
 					data.adventures[advname].parts.length > 0,
@@ -119,9 +152,16 @@ class Adventure extends Effect {
 			}
 		});
 		
+		// Save what we've loaded under the category name
 		this.categories[name] = data;
 	}
 	
+	// [Inherited, called externally]
+	// Loads all the adventures from their files.
+	// Replaces whatever we've loaded before.
+	// If used while an adventure is active, it shouldn't affect it, but
+	// starting another adventure might mess things up.
+	// Just... don't do this while an adventure is ongoing; that'd be best. <_<
 	loadData() {
 		this.categories = {};
 		this.adventureCache = [];
@@ -152,6 +192,13 @@ class Adventure extends Effect {
 		this.log('Adventures loaded, yay!');
 	}
 	
+	// Replaces all the placeholders we know in the given text with their
+	// intended values.
+	// 
+	// Parameters:
+	// 	text	The text to fill.
+	// 	[user]	User object to be used in relevant context (e.g. the user who
+	// 			started the adventure).
 	fillText(text, user) {
 		let result = text;
 		
@@ -167,6 +214,8 @@ class Adventure extends Effect {
 				TITLE_PLACEHOLDER,
 				this.activeAdventure.title);
 			
+			// The participants should be written in proper English, e.g.
+			// 'Cee, Tee and JDee' for ['Cee', 'Tee', 'JDee'].
 			if (this.activeAdventure.participants) {
 				result = result.replace(
 					PARTICIPANTS_PLACEHOLDER,
@@ -175,6 +224,9 @@ class Adventure extends Effect {
 						.map(user => user.displayName)));
 			}
 			
+			// For the purpose of this working, a winner should be chosen as
+			// soon as the adventure begins, even if they're awarded points only
+			// at the end
 			if (this.activeAdventure.winner) {
 				result = result.replace(
 					WINNER_PLACEHOLDER,
@@ -185,27 +237,25 @@ class Adventure extends Effect {
 		return result;
 	}
 	
+	// Shorthand for this.say(this.fillText(text, user)).
 	fillSay(text, user) {
 		this.say(this.fillText(text, user));
 	}
 	
+	// Shorthand for this.say(target, this.fillText(text, user)).
 	fillTell(target, text, user) {
 		this.tell(target, this.fillText(text, user));
 	}
 	
+	// Selects a random adventure from our cache and returns it.
 	getRandomAdventure() {
 		return Utils.randomElement(this.adventureCache);
 	}
 	
-	// TODO: Remove for production
-	// These makes us print to console instead of saying in chat
-	// say(msg) {
-	// 	this.log(msg);
-	// }
-	// tell(user, msg) {
-	// 	this.say(`@${user.displayName} ${msg}`);
-	// }
-	
+	// Begins the recruitment phase.
+	// 
+	// Parameters:
+	// 	user	The user who started the adventure game.
 	startRecruiting(user) {
 		if (this.activeAdventure) {
 			this.fillTell(user, 'There is already an active $title!');
@@ -238,12 +288,19 @@ class Adventure extends Effect {
 			RECRUITMENT_DURATION);
 	}
 	
+	// Sends a timed reminder to the Twitch chat to tell people to join the
+	// adventure and how.
 	remind() {
 		if (this.recruiting) {
 			this.fillSay('Use $cmd to take part in the $title!');
 		}
 	}
 	
+	// Signs the given user up for the adventure.
+	// Does nothing if the user is already taking part in it.
+	// 
+	// Parameters:
+	// 	user	The user signing up.
 	join(user) {
 		if (!(user.name in this.activeAdventure.participants)) {
 			this.activeAdventure.participants[user.name] = user;
@@ -251,6 +308,9 @@ class Adventure extends Effect {
 		}
 	}
 	
+	// Ends the recruitment phase.
+	// This should be called when the phase ends (i.e. when the adventure
+	// starts) or when the adventure is cancelled.
 	stopRecruiting() {
 		this.recruiting = false;
 		if (this.reminderIntervalHandle) {
@@ -259,6 +319,7 @@ class Adventure extends Effect {
 		}
 	}
 	
+	// Begins a new adventure.
 	startAdventure() {
 		// This is in case we've cancelled the adventure before it started
 		if (!this.activeAdventure) {
@@ -277,11 +338,15 @@ class Adventure extends Effect {
 		this.nextPart();
 	}
 	
+	// Selects a winner from the group of adventurers.
+	// Stores the result in the active adventure.
+	// Should only be called while an adventure is underway.
 	chooseWinner() {
 		this.activeAdventure.winner = 
 			Utils.randomValue(this.activeAdventure.participants);
 	}
 	
+	// Sends the next part of the adventure to the chat.
 	nextPart() {
 		this.nextPartTimerHandle = null;
 		
@@ -289,18 +354,25 @@ class Adventure extends Effect {
 		this.fillSay(adv.parts[adv.currentPart++]);
 		
 		if (adv.currentPart < adv.parts.length) {
+			// If we haven't reached the end of the adventure then schedule the
+			// next part
 			this.nextPartTimerHandle = setTimeout(
 				() => this.nextPart(),
 				PARTS_PAUSE_LENGTH);
 		} else {
+			// Otherwise we give the winner their points and end the adventure
 			this.modifyUserPoints(this.activeAdventure.winner, VICTORY_REWARD);
 			this.endAdventure();
 		}
 	}
 	
+	// Ends the adventure, whether it's done or still taking place, no matter
+	// which phase it's in.
 	endAdventure() {
+		// Stop recruitment phase
 		this.stopRecruiting();
 		
+		// Clear timers that are meant to do stuff to continue the adventure
 		if (this.startAdventureTimerHandle) {
 			clearTimeout(this.startAdventureTimerHandle);
 			this.startAdventureTimerHandle = null;
@@ -311,12 +383,14 @@ class Adventure extends Effect {
 			this.nextPartTimerHandle = null;
 		}
 		
+		// Mark that there is no active adventure
 		this.activeAdventure = null;
 	}
 	
+	// [Inherited, called externally]
+	// Effect entry point.
 	load() {
 		this.registerCommand({
-			// cmdname: 'a',
 			cmdname: 'adventure',
 			aliases: ['adv'],
 			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
@@ -330,7 +404,6 @@ class Adventure extends Effect {
 		});
 		
 		this.registerCommand({
-			// cmdname: 'e',
 			cmdname: 'endadventure',
 			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
 			callback: user => this.endAdventure(),

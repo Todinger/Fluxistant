@@ -57,6 +57,7 @@ class CandyGame extends Effect {
 		this.ongoing = true;
 		this.say(`${user.displayName} has started a candy game!`);
 		this.say('Use !gimme (costs 10 pixels) to drop candy and win pixels! The game ends when the gold-wrapped chocolate coins are found, granting the winner 1000 pixels!');
+		this.candyCount = 0;
 		return true;
 	}
 	

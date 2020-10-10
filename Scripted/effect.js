@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const util = require('util');
 const User = require('./user');
 const TwitchManager = require('./twitchManager');
 const Enums = require('./enums');
@@ -8,7 +9,7 @@ const Assets = require('./assets');
 const CommandManager = require('./commandManager');
 const SEManager = require('./seManager');
 const RewardsManager = require('./rewardsManager');
-const Log = require('./logger');
+const Log = require('./logger')
 
 // This is the base class for all server-side Effect-specific logic classes.
 // 
@@ -311,6 +312,15 @@ class Effect {
 	// Log an error message to the console, marked as coming from this Effect.
 	error(message) {
 		console.error(this._printForm(message));
+	}
+	
+	// [For use by inheriting classes]
+	deepPrint(obj, header) {
+		if (header) {
+			this.log(header);
+		}
+		
+		console.log(util.inspect(obj, false, null, true));
 	}
 	
 	// [For use by inheriting classes]
