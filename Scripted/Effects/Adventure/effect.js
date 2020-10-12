@@ -30,22 +30,22 @@ const MINUTES = 60 * SECONDS;
 const ADVENTURES_DIR = 'Adventures';
 
 // Represents everyone who is participating in the adventure
-const PARTICIPANTS_PLACEHOLDER = '$all';
+const PARTICIPANTS_PLACEHOLDER = /\$all/g;
 
 // Represents the winner selected from among the participants
-const WINNER_PLACEHOLDER = '$winner';
+const WINNER_PLACEHOLDER = /\$winner/g;
 
 // Represents the user in the relevant context (e.g. message sender)
-const USER_PLACEHOLDER = '$user';
+const USER_PLACEHOLDER = /\$user/g;
 
 // Represents the title of the type of the active adventure
-const TITLE_PLACEHOLDER = '$title';
+const TITLE_PLACEHOLDER = /\$title/g;
 
 // Represents the amount of points the winner of the adventure is rewarded
-const REWARD_PLACEHOLDER = '$reward';
+const REWARD_PLACEHOLDER = /\$reward/g;
 
 // The command people use to join the adventure
-const JOIN_COMMAND_PLACEHOLDER = '$cmd';
+const JOIN_COMMAND_PLACEHOLDER = /\$cmd/g;
 const JOIN_COMMAND = 'join';
 
 // Amount of points awarded to the winner
@@ -393,7 +393,6 @@ class Adventure extends Effect {
 		this.registerCommand({
 			cmdname: 'adventure',
 			aliases: ['adv'],
-			filters: [Effect.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
 			callback: user => this.startRecruiting(user),
 		});
 		

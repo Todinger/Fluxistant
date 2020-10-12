@@ -24,7 +24,7 @@ class RandomImage extends Effect {
 	}
 	
 	describeCommand(user) {
-		return `${_.capitalize(COMMAND_NAME)} redeemed by ${user.displayName} for ${COMMAND_COST} ${Effect.USERPOINTS_NAME}! One random drawing by Yecats coming up!`;
+		return `${_.capitalize(COMMAND_NAME)} redeemed by ${user.displayName} for ${this.pointsString(COMMAND_COST)}! One random drawing by Yecats coming up!`;
 	}
 	
 	load() {

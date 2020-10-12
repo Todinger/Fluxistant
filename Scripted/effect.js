@@ -95,27 +95,35 @@ class Effect {
 		this._clientDisconnectedHandlers.push(handler);
 	}
 	
-	// [For override by inheriting classes]
+	// [For external use (by EffectManager), for override by inheriting classes]
 	// Invoked after creation and assignment of basic values by EffectManager.
 	preload() {
 		// Do nothing by default (for overriding where needed)
 	}
 	
-	// [For override by inheriting classes]
+	// [For external use (by EffectManager), for override by inheriting classes]
 	// Invoked after preload and whenever the effect is requested to reload its
 	// data (only applicable to some effects, usually those that read files and
 	// such).
+	// If there are any command files loaded into commandManager, they should
+	// be reloaded.
+	// 
+	// NOTE: ONLY SAVE VALID DATA!
+	// If an Effect encounters an error while loading data, it should throw an
+	// error and KEEP THE OLD DATA (if it has any).
+	// This is so that when we reload data during runtime we can aslert the user
+	// about faulty data and still keep running smoothly without crashing.
 	loadData() {
 		// Do nothing by default (for overriding where needed)
 	}
 	
-	// [For override by inheriting classes]
+	// [For external use (by EffectManager), for override by inheriting classes]
 	// Invoked after loadData.
 	load() {
 		// Do nothing by default (for overriding where needed)
 	}
 	
-	// [For override by inheriting classes]
+	// [For external use (by EffectManager), for override by inheriting classes]
 	// Invoked for all effects after all load() functions have been called,
 	postload() {
 		// Do nothing by default (for overriding where needed)
@@ -177,7 +185,7 @@ class Effect {
 		TwitchManager.unregisterCommand(this._getCommandId(cmdname));
 	}
 	
-	// [For use from the outside (by EffectManager)]
+	// [For external use (by EffectManager)]
 	// Attaches the given client (socket) to this Effect.
 	// The source parameter specifies if this connection is direct ('direct'),
 	// which means the client requested to attach to this Effect by name, or by
@@ -198,7 +206,7 @@ class Effect {
 		this.log(`Client attached.`);
 	}
 	
-	// [For use from the outside, and for override by inheriting classes
+	// [For external use (by EffectManager), for override by inheriting classes]
 	// Should check if a given command (= { cmdname, args }) is a command
 	// for this effect, and if so, invoke it and return true - otherwise
 	// it should return false (like it does here by default)!
@@ -374,6 +382,18 @@ class Effect {
 	}
 	
 	// [For use by inheriting classes]
+	// Return a string specifying the given amount of points along with the name
+	// of the user points.
+	// Also adjusts for singular when the quantity is 1 or -1.
+	pointsString(points) {
+		let name = 
+			Math.abs(points) === 1 ?
+			Effect.USERPOINTS_NAME_SINGULAR :
+			Effect.USERPOINTS_NAME;
+		return `${points} ${name}`;
+	}
+	
+	// [For use by inheriting classes]
 	// Utility access to the user Filters collection.
 	static get Filters() {
 		return User.Filters;
@@ -395,6 +415,13 @@ class Effect {
 	// Utility access to the name of our loyalty points.
 	static get USERPOINTS_NAME() {
 		return SEManager.POINTS_NAME;
+	}
+	
+	// [For use by inheriting classes]
+	// Utility access to the name of our loyalty points in singular form (e.g.
+	// "point" for 1 point instead of "points").
+	static get USERPOINTS_NAME_SINGULAR() {
+		return SEManager.POINTS_NAME_SINGULAR;
 	}
 }
 

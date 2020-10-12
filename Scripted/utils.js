@@ -250,6 +250,18 @@ class Utils {
 		return result;
 	}
 	
+	// Returns true iff every key in sub is also a key in obj
+	static isKeySubset(sub, obj) {
+		return Object.keys(sub).reduce(
+			(soFar, key) => soFar && (key in obj), true);
+	}
+	
+	// Returns true iff every key in sub is also a key in obj
+	static isArraySubset(sub, arr) {
+		return sub.reduce(
+			(soFar, element) => soFar && arr.includes(element), true);
+	}
+	
 	
 	// Checks for equality between two values.
 	// Only supports basic value types.

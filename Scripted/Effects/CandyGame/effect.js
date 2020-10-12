@@ -4,6 +4,10 @@ const urljoin = require('url-join');
 const Effect = require('../../effect');
 const Utils = require('../../utils');
 
+// File structure:
+// 	{
+// 		"CandyName"
+// 	}
 const CANDY_FILENAME = 'candy.json';
 const START_COMMAND = 'candy';
 
@@ -29,6 +33,39 @@ const INFLATIONS = {
 	makeExponential: (base) =>	(start, step) => start * (base ** step),
 }
 
+// Candy Game
+// ----------
+// Adds a "Candy Game" to the stream which can be started either freely by
+// specific people or by anyone through a channel reward redemption.
+// During the game, people can use the candy drop command, !gimme, to have the
+// bot choose a random candy from the candy database and drop a shower of them
+// on its client webpage.
+// Using the command costs a small amount of points, and each candy has its own
+// value of points it grants the player for getting it.
+// Most candy have the same fixed, positive value, with three exceptions:
+// 1. A "bust" candy which deducts points instead of giving them.
+// 2. A personal user-specific candy which grants its "owner" extra points.
+// 3. The "winning" candy which grants a large amount of points and ends the
+//    game.
+// When a player gets the winning candy, their name is displayed on the text
+// display client web page with a Halloween-ish effect.
+// 
+// The winning candy has a low chance of being found at first (well, the same
+// chance as everything else, but there are a lot of candy options so it's a
+// small chance), but every time someone drops a candy that chance increases.
+// This is to ensure that the game becomes easy to end after a while.
+// 
+// The chances are decided by a "weight" value given to each type of candy, and
+// the weight of the winning candy is "inflated" based on the number of candies
+// that have been dropped so far via an inflation function.
+// I set it to use a linear function with a step size of 5, but I've added some
+// other options as well, so feel free to use whatever works best for you.
+// 
+// Note: I've been saying "winning candy" in singular form until now, but in
+// actuality there can be more than one winning candy.
+// Set <"winning": true> in a candy's data to make it a winning one.
+// All winning candy weights are inflated in the same way, but you can change
+// their starting weights to be different.
 class CandyGame extends Effect {
 	constructor() {
 		super({
@@ -44,9 +81,12 @@ class CandyGame extends Effect {
 		this.candyCount = 0;
 	}
 	
+	// Sends the given image parameters to the Image Display Effect client for
+	// display
 	dropImage(image) {
 		this.broadcastEvent('dropImage', image);
 	}
+	
 	
 	startGame(user) {
 		if (this.ongoing) {
@@ -82,9 +122,14 @@ class CandyGame extends Effect {
 	
 	getCandyWeight(candy) {
 		if (candy.winning) {
-			return this.winningWeightInflation(
+			let weight = this.winningWeightInflation(
 				candy.weight,
 				this.candyCount);
+			this.log(`Winning candy weight: ${weight}`);
+			return weight;
+			// return this.winningWeightInflation(
+			// 	candy.weight,
+			// 	this.candyCount);
 		} else {
 			return candy.weight;
 		}
@@ -98,17 +143,23 @@ class CandyGame extends Effect {
 		this.candyCount++;
 		
 		let reward = candy.reward;
+		let userBonusRewarded = false;
 		if (candy.userBonus) {
 			if (candy.userBonus.username.toLowerCase() === user.name.toLowerCase()) {
 				reward += candy.userBonus.amount;
+				userBonusRewarded = true;
 			}
 		}
 		
 		this.modifyUserPoints(user, reward);
 		
 		let imageData = Utils.clone(candy.image);
-		if (candy.winning) {
+		
+		if (candy.winning || userBonusRewarded) {
 			imageData.effect = 'glow';
+		}
+		
+		if (candy.winning) {
 			this.ongoing = false;
 			this.announceWinner(user);
 		}

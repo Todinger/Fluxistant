@@ -92,6 +92,7 @@ class SEManager extends EventNotifier {
 		// through StreamElements but I didn't bother doing that as it's a
 		// pretty static thing)
 		this.POINTS_NAME = Config.pointsName;
+		this.POINTS_NAME_SINGULAR = Config.pointsNameSingular;
 		
 		// Used for event notifications
 		this.socket = null;

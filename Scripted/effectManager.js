@@ -32,7 +32,7 @@ class EffectManager {
 				KEYCODES.VC_META_L,
 				KEYCODES.VC_F5
 			],
-			() => this.loadAllEffectData()
+			() => this.reloadAllEffectData()
 		);
 	}
 	
@@ -112,8 +112,11 @@ class EffectManager {
 		effect.workdir = fxdir;
 		
 		// Let the Effect load everything it needs
+		// We don't catch errors here because if an Effect has a critical
+		// problem then we want to know about it immediately and fix it before
+		// starting the server
 		effect.preload();
-		effect.loadData();
+		effect.loadData(); // NOTE: EFFECTS SHOULD ONLY SAVE DATA IF IT IS VALID 
 		effect.load();
 		
 		// Save the effect and announce it to show success
@@ -182,9 +185,22 @@ class EffectManager {
 	// Invokes the .loadData() function of all the loaded Effects.
 	// This is meant to refresh external data that is read by the Effects during
 	// runtime.
-	loadAllEffectData() {
+	reloadAllEffectData() {
 		Object.values(this.effects).forEach(effect => {
-			effect.loadData();
+			// We do catch errors here because all the loaded Effects are
+			// currently already running with valid data from the last time they
+			// had .loadData() called, so if the data files have changed in a
+			// way that causes an error, we can simply show that error and not
+			// load them and the program will be able to continue running fine
+			// with the old data
+			try {
+				// For the above reason, .loadData() should only save loaded
+				// data if the data is valid
+				effect.loadData();
+			} catch (err) {
+				console.log(`Error loading data in ${effect.name}:`);
+				console.log(err);
+			}
 		});
 	}
 }
