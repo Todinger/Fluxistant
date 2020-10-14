@@ -774,7 +774,7 @@ class BranchingAdventure extends Effect {
 		
 		this.registerCommand({
 			cmdname: 'b',
-			// cmdname: 'bouken',
+			// cmdname: 'choose',
 			// aliases: ['adv'],
 			callback: user => this.startAdventure(user),
 		});
