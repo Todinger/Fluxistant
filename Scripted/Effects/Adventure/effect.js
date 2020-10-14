@@ -35,6 +35,9 @@ const PARTICIPANTS_PLACEHOLDER = /\$all/g;
 // Represents the winner selected from among the participants
 const WINNER_PLACEHOLDER = /\$winner/g;
 
+// Represents every participant EXCEPT the chosen winner
+const LOSERS_PLACEHOLDER = /\$losers/g;
+
 // Represents the user in the relevant context (e.g. message sender)
 const USER_PLACEHOLDER = /\$user/g;
 
@@ -214,13 +217,22 @@ class Adventure extends Effect {
 				TITLE_PLACEHOLDER,
 				this.activeAdventure.title);
 			
-			// The participants should be written in proper English, e.g.
-			// 'Cee, Tee and JDee' for ['Cee', 'Tee', 'JDee'].
 			if (this.activeAdventure.participants) {
+				// The participants should be written in proper English, e.g.
+				// 'Cee, Tee and JDee' for ['Cee', 'Tee', 'JDee'].
 				result = result.replace(
 					PARTICIPANTS_PLACEHOLDER,
 					Utils.makeEnglishList(
 						Object.values(this.activeAdventure.participants)
+						.map(user => user.displayName)));
+				
+				// Same as the participants, only without the winner
+				result = result.replace(
+					LOSERS_PLACEHOLDER,
+					Utils.makeEnglishList(
+						Object.values(this.activeAdventure.participants)
+						.filter(user =>
+							user.name !== this.activeAdventure.winner.name)
 						.map(user => user.displayName)));
 			}
 			
