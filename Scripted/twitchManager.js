@@ -123,9 +123,31 @@ class TwitchManager extends EventNotifier {
 		SEManager.on(eventName, data => this._notify(eventName, data));
 	}
 	
+	_simulateUserMessage(username, message) {
+		let userstate = {
+			["username"]: username,
+			["display-name"]: _.capitalize(username),
+			['message-type']: 'chat',
+		}
+		
+		this._processMessage(userstate, message, false);
+	}
+	
 	// Registers to all the events in tmi.js and StreamElements that we want
 	// to know about.
 	_registerAllEvents() {
+		// Message simulation CLI commands
+		cli.on(['m', 'msg', 'message'], message => {
+			// Pretend user, completely bogus, no such person ever existed
+			this._simulateUserMessage('fluxistence', message);
+		});
+		cli.on(['u', 'usermsg', 'usermessage'], cmdline => {
+			// First parameter is the username, and the rest is the message
+			let username = cmdline.split(' ')[0];
+			let message = cmdline.substring(username.length).trim();
+			this._simulateUserMessage(username, message);
+		});
+		
 		// Called on every message sent to the channel chat
 		this.client.on('message', (channel, userstate, message, self) => {
 			this._processMessage(userstate, message, self);
