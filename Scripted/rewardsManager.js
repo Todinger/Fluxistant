@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const EventNotifier = require('./eventNotifier');
+const cli = require('./cliManager');
 const TwitchManager = require('./twitchManager');
 
 // This file needs to contain { rewardId: rewardName } pairs that match a custom
@@ -40,8 +41,8 @@ class RewardsManager extends EventNotifier {
 				__dirname,
 				REWARDS_FILENAME)));
 		} catch (err) {
-			console.error('Failed to read rewards file:');
-			console.error(err);
+			cli.error('Failed to read rewards file:');
+			cli.error(err);
 			return;
 		}
 		

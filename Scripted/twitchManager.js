@@ -2,6 +2,7 @@ const assert = require('assert').strict;
 const tmi = require('tmi.js');
 const _ = require('lodash');
 const EventNotifier = require('./eventNotifier');
+const cli = require('./cliManager');
 const User = require('./user').User;
 const EffectManager = require('./effectManager');
 const SEManager = require('./seManager');
@@ -228,7 +229,7 @@ class TwitchManager extends EventNotifier {
 		// Default value if omitted
 		cmd.filters = cmd.filters || [];
 		
-		console.log(`Registering command '${COMMAND_PREFIX}${cmd.cmdname}' for '${id}'`);
+		cli.log(`Registering command '${COMMAND_PREFIX}${cmd.cmdname}' for '${id}'`);
 		
 		// The same command can activate multiple callbacks, so we store a
 		// dictionary of ID-to-command to keep track of what needs to be invoked
@@ -359,7 +360,7 @@ class TwitchManager extends EventNotifier {
 				},
 				// Failure due to a program error
 				error => {
-					console.error(`Failed to consume user points: ${error}`);
+					cli.error(`Failed to consume user points: ${error}`);
 				});
 		// Handle free commands
 		} else {
@@ -570,7 +571,7 @@ class TwitchManager extends EventNotifier {
 					this._notify('action', user, message);
 					break;
 				default:
-					console.warn("Unknown message type received; treating as regular message.");
+					cli.warn("Unknown message type received; treating as regular message.");
 				case 'whisper':
 				case 'chat':
 					// We want to let various message type handlers all examine
@@ -587,9 +588,9 @@ class TwitchManager extends EventNotifier {
 					// that is not yet implemented
 					if (userstate['custom-reward-id']) {
 						if (this.printRewardIDs) {
-							console.log('Reward redeemed:');
-							console.log(`  ID: ${userstate['custom-reward-id']}`);
-							console.log(`  Message: ${message}`);
+							cli.log('Reward redeemed:');
+							cli.log(`  ID: ${userstate['custom-reward-id']}`);
+							cli.log(`  Message: ${message}`);
 						}
 						
 						this._notify(
@@ -623,7 +624,7 @@ class TwitchManager extends EventNotifier {
 		// General try-catch to catch everything so that nothing causes the
 		// server to crash
 		catch (err) {
-			console.error(err);
+			cli.error(err);
 		}
 	}
 }

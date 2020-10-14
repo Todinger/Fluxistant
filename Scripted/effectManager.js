@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert').strict;
 const urljoin = require('url-join');
+const cli = require('./cliManager');
 const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
 const Utils = require('./utils');
@@ -121,7 +122,7 @@ class EffectManager {
 		
 		// Save the effect and announce it to show success
 		this.effects[effect.name] = effect;
-		console.log(`Loaded effect: ${effect.name}`);
+		cli.log(`Loaded effect: ${effect.name}`);
 	}
 	
 	// Loads all the Effects, we have in the system, with all that entails.
@@ -169,7 +170,7 @@ class EffectManager {
 		if (this.nameExists(effectName)) {
 			this.effects[effectName].attachClient(socket, 'direct');
 		} else {
-			console.warn(`Unknown effect: ${effectName}`);
+			cli.warn(`Unknown effect: ${effectName}`);
 		}
 	}
 	
@@ -178,7 +179,7 @@ class EffectManager {
 		if (tag in this.tags) {
 			this.tags[tag].forEach(effect => effect.attachClient(socket, 'tag'));
 		} else {
-			console.warn(`Unknown tag: ${tag}`);
+			cli.warn(`Unknown tag: ${tag}`);
 		}
 	}
 	
@@ -198,8 +199,8 @@ class EffectManager {
 				// data if the data is valid
 				effect.loadData();
 			} catch (err) {
-				console.log(`Error loading data in ${effect.name}:`);
-				console.log(err);
+				cli.log(`Error loading data in ${effect.name}:`);
+				cli.log(err);
 			}
 		});
 	}

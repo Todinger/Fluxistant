@@ -1,4 +1,5 @@
 const assert = require('assert').strict;
+const Globals = require('./globals');
 
 // General event notification class.
 // Lets you use on(...) and invokes registered callbacks upon _notify(...).
@@ -6,7 +7,7 @@ const assert = require('assert').strict;
 // inherited and used by the deriving class to notify about events without the
 // deriving class needing to deal with registration and invocation.
 class EventNotifier {
-	constructor(allowDynamicEvents, ignoreCase) {
+	constructor(allowDynamicEvents, ignoreCase, silent) {
 		// If enabled, when the .on() function is called, if the given event
 		// does not exist, we add it instead of throwing an error
 		this.allowDynamicEvents = allowDynamicEvents;
@@ -17,6 +18,9 @@ class EventNotifier {
 		// This is where we store the handlers (callbacks) of all the events
 		// we support
 		this._eventHandlers = {};
+		
+		// Silent mode means it doesn't alert about events being fired
+		this.silent = silent;
 	}
 	
 	// Adds support for an event by the given name.
@@ -39,7 +43,7 @@ class EventNotifier {
 	}
 	
 	// Registers a callback to be invoked when an event occurs.
-	on(eventName, callback) {
+	_onSingle(eventName, callback) {
 		if (this._ignoreCase) {
 			eventName = eventName.toLowerCase();
 		}
@@ -56,6 +60,16 @@ class EventNotifier {
 		return this;
 	}
 	
+	// Registers a callback to be invoked when one or more events occur.
+	on(eventNames, callback) {
+		if (Array.isArray(eventNames)) {
+			eventNames.forEach(
+				eventName => this._onSingle(eventName, callback));
+		} else {
+			this._onSingle(eventNames, callback);
+		}
+	}
+	
 	// Invokes all the callbacks that registered for the specified event.
 	// If the event has arguments, simply list them after the event name when
 	// invoking this function.
@@ -65,12 +79,12 @@ class EventNotifier {
 	// accept these arguments, e.g.:
 	// 	somethingThatDerivesFromEventNotifier.on(
 	// 		'helloWorld',
-	// 		(hello, world) => console.log(`${hello} ${world}`));
+	// 		(hello, world) => cli.log(`${hello} ${world}`));
 	// Of course, if you don't care about the arguments you don't need to use
 	// them. This would work fine too:
 	// 	somethingThatDerivesFromEventNotifier.on(
 	// 		'helloWorld',
-	// 		() => console.log(`Someone said hello world!`));
+	// 		() => cli.log(`Someone said hello world!`));
 	_notify(eventName, ...args) {
 		if (this._ignoreCase) {
 			eventName = eventName.toLowerCase();
@@ -78,9 +92,16 @@ class EventNotifier {
 		
 		assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
 		
-		console.log(`Invoking event: ${eventName}`);
+		if (!this.silent) {
+			Globals.cli.log(`Invoking event: ${eventName}`);
+		}
+		
 		this._eventHandlers[eventName].forEach(
 			callback => callback.apply(null, args));
+	}
+	
+	_isEvent(eventName) {
+		return eventName in this._eventHandlers;
 	}
 }
 

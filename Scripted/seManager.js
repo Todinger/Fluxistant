@@ -3,6 +3,7 @@ const io = require('socket.io-client');
 const axios = require('axios');
 const Config = require('./botConfig.json');
 const EventNotifier = require('./eventNotifier');
+const cli = require('./cliManager');
 
 const URL_BASE = 'https://api.streamelements.com/kappa/v2';
 const URL_POINTS = URL_BASE + '/points';
@@ -112,7 +113,7 @@ class SEManager extends EventNotifier {
 	
 	// Called when we've established an initial connection to SE.
 	_onConnected() {
-		console.log('Connected to StreamElements');
+		cli.log('Connected to StreamElements');
 		this.socket.emit('authenticate', {
 			method: 'jwt',
 			token: Config.token,
@@ -121,7 +122,7 @@ class SEManager extends EventNotifier {
 	
 	// Called when we've been disconnected.
 	_onDisconnected() {
-		console.log('Disconnected from StreamElements');
+		cli.log('Disconnected from StreamElements');
 	}
 	
 	// After connecting we attempt authentication.
@@ -132,7 +133,7 @@ class SEManager extends EventNotifier {
 			channelId
 		} = data;
 		
-		console.log(
+		cli.log(
 			`Successfully connected via StreamElements to channel ${channelId}`);
 	}
 	

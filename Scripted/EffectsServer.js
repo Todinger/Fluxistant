@@ -11,6 +11,15 @@ const PORT = 3333;
 // Bot configuration - that is where you make it work with your bot and channel
 const Config = require('./botConfig.json');
 
+// Globals object, used to work around circular dependencies
+const Globals = require('./globals');
+
+// CLI input and output
+const cli = require('./cliManager');
+Globals.cli = cli;
+cli.on(['q', 'quit', 'exit'], () => process.exit(0)); // Exit command
+
+cli.on('a', () => cli.log('\x08\x08\x08\nHello'));
 
 // Asset- and file-related registration
 const Assets = require('./assets');
@@ -20,7 +29,7 @@ Assets.registerAll();
 // Gets a collection of { username: imageurl } pairs for all the users who have
 // self-images in the user self-image directory
 function getUserImageList(socket) {
-	console.log('User image list requested.');
+	cli.log('User image list requested.');
 	Assets.getUserImages(imageList => socket.emit('userImageList', imageList));
 }
 
@@ -58,7 +67,7 @@ SEManager.init();
 
 // Register to handle general server events
 io.on('connection', socket => {
-	console.log('Client connected.');
+	cli.log('Client connected.');
 	
 	// Requests for the list of user self-images
 	socket.on('getUserImageList', () => getUserImageList(socket));
@@ -70,13 +79,13 @@ io.on('connection', socket => {
 	// Attachment requests:
 	// Direct attachment, by Effect name
 	socket.on('attachTo', effectName => {
-		console.log(`Attaching client to ${effectName}`);
+		cli.log(`Attaching client to ${effectName}`);
 		EffectManager.attachClient(effectName, socket);
 	});
 	
 	// Attachment by tag
 	socket.on('attachToTag', tag => {
-		console.log(`Attaching client by tag to ${tag}`);
+		cli.log(`Attaching client by tag to ${tag}`);
 		EffectManager.attachClientToTag(tag, socket);
 	});
 	
@@ -88,4 +97,5 @@ io.on('connection', socket => {
 
 // Start the server
 server.listen(PORT);
-console.log(`Listening on port ${PORT}...`);
+cli.log(`Listening on port ${PORT}...`);
+cli.start();

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
+const cli = require('./cliManager');
 const User = require('./user');
 const TwitchManager = require('./twitchManager');
 const Enums = require('./enums');
@@ -307,19 +308,19 @@ class Effect {
 	// [For use by inheriting classes]
 	// Logs a message to the console, marked as coming from this Effect.
 	log(message) {
-		console.log(this._printForm(message));
+		cli.log(this._printForm(message));
 	}
 	
 	// [For use by inheriting classes]
 	// Logs a warning message to the console, marked as coming from this Effect.
 	warn(message) {
-		console.warn(this._printForm(message));
+		cli.warn(this._printForm(message));
 	}
 	
 	// [For use by inheriting classes]
 	// Log an error message to the console, marked as coming from this Effect.
 	error(message) {
-		console.error(this._printForm(message));
+		cli.error(this._printForm(message));
 	}
 	
 	// [For use by inheriting classes]
@@ -328,7 +329,7 @@ class Effect {
 			this.log(header);
 		}
 		
-		console.log(util.inspect(obj, false, null, true));
+		cli.log(util.inspect(obj, false, null, true));
 	}
 	
 	// [For use by inheriting classes]

@@ -1,6 +1,7 @@
 'use strict';
 const assert = require('assert').strict;
 const ioHook = require('iohook');
+const cli = require('./cliManager');
 
 // Responsible for all keyboard interaction.
 // Currently only supports registration of keyboard shortcuts, but feel free to
@@ -81,8 +82,8 @@ class KeyboardManager {
 	// 			such (see ioHook documentation for the full details).
 	_onKeyDown(event) {
 		if (this.logAllDown) {
-			console.log('KeyDown Event:');
-			console.log(event);
+			cli.log('KeyDown Event:');
+			cli.log(event);
 		}
 	}
 	
@@ -93,8 +94,8 @@ class KeyboardManager {
 	// 			such (see ioHook documentation for the full details).
 	_onKeyUp(event) {
 		if (this.logAllUp) {
-			console.log('KeyUp Event:');
-			console.log(event);
+			cli.log('KeyUp Event:');
+			cli.log(event);
 		}
 	}
 }

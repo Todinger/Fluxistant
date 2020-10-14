@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 const urljoin = require('url-join');
+const cli = require('./cliManager');
 const Utils = require('./utils');
 
 // The "_DIR" paths here can be changed freely and should point to the
@@ -56,7 +57,7 @@ class AssetManager {
 	registerDir(dir, url) {
 		assert(this.app, 'Please initialize AssetManager before using it.');
 		
-		console.log(`Registering "${dir}" as "${url}"`);
+		cli.log(`Registering "${dir}" as "${url}"`);
 		this.app.use(url, express.static(dir));
 	}
 	
@@ -134,7 +135,7 @@ class AssetManager {
 	getUserImages(onDone) {
 		glob(path.join(USERIMAGE_DIR, '*.png'), {}, (err, files) => {
 			if (err) {
-				console.error(`Filed to read user images: ${err}`);
+				cli.error(`Filed to read user images: ${err}`);
 				return;
 			}
 			
@@ -204,7 +205,7 @@ class AssetManager {
 		
 		glob(path.join(dir, pattern), {}, (err, files) => {
 			if (err) {
-				console.error(`Filed to read image dir: ${err}`);
+				cli.error(`Filed to read image dir: ${err}`);
 				return;
 			}
 			
