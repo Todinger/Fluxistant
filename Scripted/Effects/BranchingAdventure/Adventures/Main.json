@@ -1,4 +1,5 @@
 {
+	"active": false,
 	"title": "personal adventure",
 	"adventures": {
 		"omreeny": {
@@ -10,7 +11,7 @@
 					"To define branches, use brackets to give the user their",
 					"options, like so:",
 					"Choose if you want to go [left:leftArea] or [right:rightArea]."
-				],
+				]
 			},
 			"winningChapters": [
 			],
