@@ -221,7 +221,9 @@ const TIMEOUT_MESSAGES = [
 // 	while (matches = CHOICE_REGEX.exec(chapterPartText)) {
 // 		// Process the matches array expecting the above structure
 // 	}
-const CHOICE_REGEX = /\[([^:\|]+?)\s*(?:(?:\:\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)*\s*)?\]/g;
+// const CHOICE_REGEX = /\[([^:\|]+?)\s*(?:(?:\:\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)*\s*)?\]/g;
+const CHOICE_REGEX = /\[([^:\|]+?)\s*(?::([^\]]+))?\]/g;
+const CHAPTER_OPTIONS = /(?:\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?\s*)/g;
 
 // This is for "next" values for a chapter.
 // It's the same as the part in CHOICE_REGEX that describes the options of which
@@ -470,6 +472,42 @@ class BranchingAdventure extends Effect {
 		return choice;
 	}
 	
+	parseChapterOptions(optionsString, chapterName, advData) {
+		let options = {};
+		
+		// Options are delimited by commas, so first we split the string into
+		// the different separate options
+		let optionStrings = optionsString.split(',');
+		
+		// Now we parse each one and aggregate the results
+		optionStrings.forEach(os => {
+			CHAPTER_OPTIONS.lastIndex = 0;
+			let matches = CHAPTER_OPTIONS.exec(os);
+			
+			// If we got no matches then the given chapter options string is
+			// badly formed
+			assert(matches, `Bad choice string in "${chapterName}": ${os}`);
+			
+			// The first match (after the global match) is the name of the
+			// chapter we go to, and the second one is its weight, which is
+			// optional and defaults to '1'
+			let optionChapterName = matches[1];
+			let weight = matches[2] || '1';
+			
+			// If the same optionChapterName appears more than once then while
+			// it doesn't necessarily need to be an error, we still treat it as
+			// such, since it's probably some copy/paste user error, as it
+			// doesn't make sense to have it so
+			assert(
+				!(optionChapterName in options),
+				`Chapter ${chapterName}: Option ${optionChapterName} appears more than once in the same choice string: ${os}`);
+			
+			options[optionChapterName] = Number(weight);
+		});
+		
+		return options;
+	}
+	
 	loadChapter(chapterName, advData) {
 		let chapter = advData.chapters[chapterName];
 		
@@ -506,12 +544,6 @@ class BranchingAdventure extends Effect {
 		chapter.parts.forEach(part => {
 			CHOICE_REGEX.lastIndex = 0;
 			while (matches = CHOICE_REGEX.exec(part)) {
-				// There should be at least 2 elements in the array, otherwise
-				// the choice is not structured properly
-				assert(
-					matches.length >= 2,
-					`Bad choice definition in chapter "${chapterName}": ${matches[0]}`);
-				
 				// The user's choice should be in the element at index 1 (we
 				// ignore surrounding spaces, multiple spaces and letter casing)
 				let choiceString = this.toChoiceString(matches[1]);
@@ -522,12 +554,17 @@ class BranchingAdventure extends Effect {
 					!(choiceString in choices),
 					`The choice string "${choiceString}" appears in chapter "${chapterName}" more than once!`);
 				
-				// If there are choices given, parse them; otherwise treat the
-				// choice string itself as the chapter it leads to
-				if ((matches.length > 2) && matches[2]) {
-					choices[choiceString] = this.parseChoiceStringMatches(
-						matches,
-						2,
+				// The options of where we go if the user makes that choice
+				// should be right after it, in the element at index 2
+				let chapterOptions = matches[2];
+				
+				// If there isn't anything there, then the choice string itself
+				// is also the name of the chapter we're supposed to proceed to
+				// if the user selects this option, and if there is, then we
+				// need to parse what we have to get the options and weights
+				if (chapterOptions) {
+					choices[choiceString] = this.parseChapterOptions(
+						chapterOptions,
 						chapterName,
 						advData);
 				} else {
@@ -580,11 +617,8 @@ class BranchingAdventure extends Effect {
 		}
 		
 		if (chapter.next) {
-			CHAPTER_OPTIONS_REGEX.lastIndex = 0;
-			let matches = CHAPTER_OPTIONS_REGEX.exec(chapter.next);
-			result.next = this.parseChoiceStringMatches(
-				matches,
-				1,
+			result.next = this.parseChapterOptions(
+				chapter.next,
 				chapterName,
 				advData);
 		}
@@ -807,7 +841,7 @@ class BranchingAdventure extends Effect {
 	// choice.
 	remind(userAdventure) {
 		let reminderText = Utils.randomElement(REMINDER_MESSAGES);
-		this.sayAdventureMessage(reminderText, userAdventure);
+		this.fillSay(reminderText, userAdventure);
 	}
 	
 	adventureTimedOut(userAdventure) {
