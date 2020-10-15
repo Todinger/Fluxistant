@@ -20,7 +20,11 @@ class EventNotifier {
 		this._eventHandlers = {};
 		
 		// Silent mode means it doesn't alert about events being fired
-		this.silent = silent;
+		if (silent === true || silent === undefined) {
+			this.silent = true;
+		} else {
+			this.silent = false;
+		}
 	}
 	
 	// Adds support for an event by the given name.
