@@ -211,13 +211,23 @@ const TIMEOUT_MESSAGES = [
 //      specified, the second element will be undefined, which we can then
 //      default to 1.
 // 
+// The list of choices is optional. If not given, the text should be in the form
+// of "[text]", which means that when the user enters "text", the adventure will
+// proceed to the chapter titled "text".
+// 
 // Since we can (and obviously will) have multiple matches in our search, we
 // need to make the regex stateful with the trailing /g, and then to search for
 // all occurrences we use something like:
 // 	while (matches = CHOICE_REGEX.exec(chapterPartText)) {
 // 		// Process the matches array expecting the above structure
 // 	}
-const CHOICE_REGEX = /\[([^:]+):(?:\s*([a-zA-Z_\$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z_\$]+)\s*(?:\|\s*(\d+))?)*\s*\]/g;
+const CHOICE_REGEX = /\[([^:\|]+?)\s*(?:(?:\:\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)*\s*)?\]/g;
+
+// This is for "next" values for a chapter.
+// It's the same as the part in CHOICE_REGEX that describes the options of which
+// chapters can be chosen and their weights (since it has the same meaning here,
+// only without the player's choice).
+const CHAPTER_OPTIONS_REGEX = /(?:\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)*\s*/g;
 
 // Branching Adventure Game
 // ------------------------
@@ -264,6 +274,10 @@ class BranchingAdventure extends Effect {
 		this.nextPartTimerHandle = null;
 	}
 	
+	endAllAdventures() {
+		
+	}
+	
 	// [Inherited, called externally]
 	// Loads all the adventures from their files.
 	// Replaces whatever we've loaded before.
@@ -278,6 +292,7 @@ class BranchingAdventure extends Effect {
 		let advFiles = Utils.getFiles(path.join(this.workdir, ADVENTURES_DIR));
 		advFiles.forEach(filename => {
 			let parsed = path.parse(filename);
+			this.log(`Loading adventure file: ${filename}`);
 			let adventureFile = this.readJSON(path.join(ADVENTURES_DIR, filename));
 			this.loadAdventureFile(parsed.name, adventureFile);
 		});
@@ -419,6 +434,42 @@ class BranchingAdventure extends Effect {
 		return str.trim().replace(/\s\s+/g, ' ').toLowerCase();
 	}
 	
+	// Parses the part of a choice string defined by the CHAPTER_OPTIONS_REGEX.
+	// This appears in both player choices and automatic "next" options, but it
+	// starts on different indices, so we need to get the index where the
+	// matching pairs are.
+	parseChoiceStringMatches(matches, startIndex, chapterName, advData) {
+		let choice = {};
+		
+		// Loop over all of the options of where the player can go if
+		// they enter this choice string
+		// Each option is represented by two consecutive array elements
+		// starting from index 2 - the first element is the name of the
+		// chapter it goes to and the second element is the weight of
+		// that option, which determins the probability of it happening
+		for (let i = startIndex; i < matches.length; i += 2) {
+			if (!matches[i]) {
+				continue;
+			}
+			
+			let targetChapterName = matches[i];
+			
+			assert(
+				targetChapterName in advData.chapters,
+				`Target of choice definition in chapter "${chapterName}" is not a chapter name: ${targetChapterName}`);
+			
+			// The default weight, when not specified is 1 (we use
+			// string form because if we do get a specified weight, it's
+			// going to be found as a string which we will need to
+			// convert into a number, so this gives us a unified value
+			// type)
+			let weight = matches[i + 1] || '1';
+			choice[targetChapterName] = Number(weight);
+		}
+		
+		return choice;
+	}
+	
 	loadChapter(chapterName, advData) {
 		let chapter = advData.chapters[chapterName];
 		
@@ -427,6 +478,11 @@ class BranchingAdventure extends Effect {
 			chapter = {
 				parts: chapter,
 			}
+		}
+		
+		// Handle empty chapters
+		if (!chapter.parts) {
+			chapter.parts = [];
 		}
 		
 		let points = chapter.points;
@@ -448,12 +504,12 @@ class BranchingAdventure extends Effect {
 		let parts = [];
 		let matches = null;
 		chapter.parts.forEach(part => {
+			CHOICE_REGEX.lastIndex = 0;
 			while (matches = CHOICE_REGEX.exec(part)) {
-				// There should be at least 4 elements in the array, otherwise
-				// the choice is either not structured properly or it doesn't
-				// lead anywhere (which wouldn't make sense)
+				// There should be at least 2 elements in the array, otherwise
+				// the choice is not structured properly
 				assert(
-					matches.length >= 4,
+					matches.length >= 2,
 					`Bad choice definition in chapter "${chapterName}": ${matches[0]}`);
 				
 				// The user's choice should be in the element at index 1 (we
@@ -464,37 +520,25 @@ class BranchingAdventure extends Effect {
 				// once per chapter
 				assert(
 					!(choiceString in choices),
-					`The choice string "${choiceString}" appears in chapter "${chapterName}"!`);
+					`The choice string "${choiceString}" appears in chapter "${chapterName}" more than once!`);
 				
-				let choice = {};
-				
-				// Loop over all of the options of where the player can go if
-				// they enter this choice string
-				// Each option is represented by two consecutive array elements
-				// starting from index 2 - the first element is the name of the
-				// chapter it goes to and the second element is the weight of
-				// that option, which determins the probability of it happening
-				for (let i = 2; i < matches.length; i += 2) {
-					if (!matches[i]) {
-						continue;
-					}
-					
-					let targetChapterName = matches[i];
-					
+				// If there are choices given, parse them; otherwise treat the
+				// choice string itself as the chapter it leads to
+				if ((matches.length > 2) && matches[2]) {
+					choices[choiceString] = this.parseChoiceStringMatches(
+						matches,
+						2,
+						chapterName,
+						advData);
+				} else {
 					assert(
-						targetChapterName in advData.chapters,
-						`Target of choice definition in chapter "${chapterName}" is not a chapter name: ${targetChapterName}`);
+						choiceString in advData.chapters,
+						`Choice "${choiceString}" in chapter "${chapterName}" is defined without a target, but there is no chapter by that name.`);
 					
-					// The default weight, when not specified is 1 (we use
-					// string form because if we do get a specified weight, it's
-					// going to be found as a string which we will need to
-					// convert into a number, so this gives us a unified value
-					// type)
-					let weight = matches[i + 1] || '1';
-					choice[targetChapterName] = Number(weight);
+					choices[choiceString] = {
+						[choiceString]: 1,
+					};
 				}
-				
-				choices[choiceString] = choice;
 			}
 			
 			// Replace the structured choice definition with just the player's
@@ -536,7 +580,13 @@ class BranchingAdventure extends Effect {
 		}
 		
 		if (chapter.next) {
-			result.next = chapter.next;
+			CHAPTER_OPTIONS_REGEX.lastIndex = 0;
+			let matches = CHAPTER_OPTIONS_REGEX.exec(chapter.next);
+			result.next = this.parseChoiceStringMatches(
+				matches,
+				1,
+				chapterName,
+				advData);
 		}
 		
 		return result;
@@ -573,7 +623,9 @@ class BranchingAdventure extends Effect {
 	}
 	
 	sayAdventureMessage(message, userAdventure) {
-		this.say(`[@${userAdventure.user.displayName}'s Adventure] ${message}`);
+		this.fillSay(
+			`[${userAdventure.user.displayName}'s Adventure] ${message}`,
+			userAdventure);
 	}
 	
 	sayPointDiffMessage(points, userAdventure) {
@@ -658,7 +710,14 @@ class BranchingAdventure extends Effect {
 			this.sayPointDiffMessage(points, userAdventure);
 		}
 		
-		this.nextPart(userAdventure);
+		// If a chapter is empty, we go straight to end it (empty chapters are
+		// for making automatic decisions)
+		if (userAdventure.chapters[chapterName].parts.length == 0) {
+			this.endOfChapter(userAdventure);
+		} else {
+			// If it's not empty then we need to start showing each part
+			this.nextPart(userAdventure);
+		}
 	}
 	
 	// Sends the next part of the user's adventure to the chat.
@@ -692,12 +751,11 @@ class BranchingAdventure extends Effect {
 				// Handle final chapters
 				this.endAdventure(userAdventure);
 		} else if (userAdventure.chapters[chapterName].next) {
-			this.log('Has next');
 			// Handle chapters that specify another chapter that should
 			// immediately follow them - but there should still be the standard
 			// delay between parts
 			this.nextPartTimerHandle = setTimeout(
-				() => this.startChapter(
+				() => this.selectAndStartChapter(
 					userAdventure,
 					userAdventure.chapters[chapterName].next),
 				PARTS_PAUSE_LENGTH);
@@ -713,6 +771,11 @@ class BranchingAdventure extends Effect {
 		}
 	}
 	
+	selectAndStartChapter(userAdventure, choices) {
+		let nextChapterName = Utils.weightedRandomKey(choices);
+		this.startChapter(userAdventure, nextChapterName);
+	}
+	
 	processUserMessage(userAdventure, message) {
 		if (userAdventure.waitingForChoice) {
 			let choiceString = this.toChoiceString(message);
@@ -720,10 +783,10 @@ class BranchingAdventure extends Effect {
 			if (choiceString in chapter.choices) {
 				userAdventure.waitingForChoice = false;
 				this.clearTimers(userAdventure);
-				let nextChapterName = Utils.weightedRandomKey(
-					chapter.choices[choiceString]);
 				
-				this.startChapter(userAdventure, nextChapterName);
+				this.selectAndStartChapter(
+					userAdventure,
+					chapter.choices[choiceString]);
 			}
 		}
 	}

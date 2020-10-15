@@ -1,5 +1,6 @@
 {
 	"title": "test quest",
+	"active": false,
 	"adventures": {
 		"advy": {
 			"start": "first",
