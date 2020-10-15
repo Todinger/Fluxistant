@@ -146,6 +146,9 @@ const VICTORY_REWARD = 500;
 // Amount of points awarded upon loss
 const LOSS_PENALTY = VICTORY_REWARD;
 
+// If no start chapter name is specified, this is the one that will be used
+const DEFAULT_START_CHAPTER = 'start';
+
 // How long we wait between showing parts of the adventure
 const PARTS_PAUSE_LENGTH = 1 * SECONDS;
 // const PARTS_PAUSE_LENGTH = 5 * SECONDS;
@@ -241,7 +244,7 @@ class BranchingAdventure extends Effect {
 	constructor() {
 		super({
 			name: 'Branching Adventure',
-			enabled: false,
+			// enabled: false,
 			debug: true,
 		});
 		
@@ -323,6 +326,11 @@ class BranchingAdventure extends Effect {
 			} else {
 				// If we're here then either advData.active === true or it
 				// wasn't provided, which also means it's active
+				
+				// Default starting chapter, if one isn't provided
+				if (!advData.start) {
+					advData.start = DEFAULT_START_CHAPTER;
+				}
 				
 				// Data validation
 				this.validateAdventure(name, advname, advData);

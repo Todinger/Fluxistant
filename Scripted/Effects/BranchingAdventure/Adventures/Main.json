@@ -1,19 +1,17 @@
 {
-	"active": false,
 	"title": "personal adventure",
 	"adventures": {
 		"omreeny": {
-			"start": "first",
 			"chapters": {
-				"first": [
+				"start": [
 					"Each entry",
 					"is one message by the bot.",
 					"To define branches, use brackets to give the user their",
-					"options, like so:",
-					"Choose if you want to go [left:leftArea] or [right:rightArea]."
+					"options, like so:"
 				]
 			},
 			"winningChapters": [
+				"start"
 			],
 			"losingChapters": [
 			]
