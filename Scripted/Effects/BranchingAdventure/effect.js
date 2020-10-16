@@ -150,16 +150,16 @@ const LOSS_PENALTY = VICTORY_REWARD;
 const DEFAULT_START_CHAPTER = 'start';
 
 // How long we wait between showing parts of the adventure
-const PARTS_PAUSE_LENGTH = 1 * SECONDS;
-// const PARTS_PAUSE_LENGTH = 5 * SECONDS;
+// const PARTS_PAUSE_LENGTH = 1 * SECONDS;
+const PARTS_PAUSE_LENGTH = 5 * SECONDS;
 
 // How long we're willing to wait for user input before we cancel the adventure
-const PATIENCE = 2 * MINUTES;
-// const PATIENCE = 5 * MINUTES;
+// const PATIENCE = 2 * MINUTES;
+const PATIENCE = 5 * MINUTES;
 
 // How often we nag the user to make a choice while waiting for input
-const REMINDER_INTERVAL = 15 * SECONDS;
-// const REMINDER_INTERVAL = 1 * MINUTES;
+// const REMINDER_INTERVAL = 15 * SECONDS;
+const REMINDER_INTERVAL = 1 * MINUTES;
 
 // The bot will say one of these randomly when reminding the player to make a
 // choice
@@ -257,7 +257,7 @@ class BranchingAdventure extends Effect {
 		super({
 			name: 'Branching Adventure',
 			// enabled: false,
-			debug: true,
+			// debug: true,
 		});
 		
 		// Adventure data is stored here
@@ -314,7 +314,6 @@ class BranchingAdventure extends Effect {
 			});
 		});
 		
-		this.deepPrint(this.categories, 'CATEGORIES');
 		this.log('Branching adventures loaded, yay!');
 	}
 	
@@ -436,42 +435,15 @@ class BranchingAdventure extends Effect {
 		return str.trim().replace(/\s\s+/g, ' ').toLowerCase();
 	}
 	
-	// Parses the part of a choice string defined by the CHAPTER_OPTIONS_REGEX.
-	// This appears in both player choices and automatic "next" options, but it
-	// starts on different indices, so we need to get the index where the
-	// matching pairs are.
-	parseChoiceStringMatches(matches, startIndex, chapterName, advData) {
-		let choice = {};
-		
-		// Loop over all of the options of where the player can go if
-		// they enter this choice string
-		// Each option is represented by two consecutive array elements
-		// starting from index 2 - the first element is the name of the
-		// chapter it goes to and the second element is the weight of
-		// that option, which determins the probability of it happening
-		for (let i = startIndex; i < matches.length; i += 2) {
-			if (!matches[i]) {
-				continue;
-			}
-			
-			let targetChapterName = matches[i];
-			
-			assert(
-				targetChapterName in advData.chapters,
-				`Target of choice definition in chapter "${chapterName}" is not a chapter name: ${targetChapterName}`);
-			
-			// The default weight, when not specified is 1 (we use
-			// string form because if we do get a specified weight, it's
-			// going to be found as a string which we will need to
-			// convert into a number, so this gives us a unified value
-			// type)
-			let weight = matches[i + 1] || '1';
-			choice[targetChapterName] = Number(weight);
-		}
-		
-		return choice;
-	}
-	
+	// Parses the part of a choice string defined by the CHAPTER_OPTIONS.
+	// This appears in both player choices and automatic "next" options.
+	// 
+	// Parameters:
+	// 	optionsString	A string that should conform to CHAPTER_OPTIONS.
+	// 	chapterName		The chapter for which this is done. For error printing
+	// 					purposes.
+	// 	advData			Data of the adventure being loaded. Used for validation
+	// 					purposes.
 	parseChapterOptions(optionsString, chapterName, advData) {
 		let options = {};
 		
@@ -493,6 +465,11 @@ class BranchingAdventure extends Effect {
 			// optional and defaults to '1'
 			let optionChapterName = matches[1];
 			let weight = matches[2] || '1';
+			
+			// Make sure the desired chapter *is* indeed a chapter
+			assert(
+				optionChapterName in advData.chapters,
+				`Target of chapter options in chapter "${chapterName}" is not a chapter name: ${optionChapterName}`);
 			
 			// If the same optionChapterName appears more than once then while
 			// it doesn't necessarily need to be an error, we still treat it as
@@ -878,15 +855,20 @@ class BranchingAdventure extends Effect {
 		
 		
 		this.registerCommand({
-			cmdname: 'b',
-			// cmdname: 'choose',
+			// cmdname: 'b',
+			cmdname: 'choose',
 			// aliases: ['adv'],
+			filters: [Effect.Filters.isOneOf([
+				'omreeny',
+				'fluxlingkitten',
+				'yecatsmailbox',
+				'fluxistence'])],
 			callback: user => this.startAdventure(user),
 		});
 		
 		this.registerCommand({
-			cmdname: 'c',
-			// cmdname: 'chickenout',
+			// cmdname: 'c',
+			cmdname: 'chickenout',
 			filters: [user => this.userHasAdventure(user)],
 			callback: user => {
 				this.tell(user, "Alright, if that's what you want... *Cluck*");
