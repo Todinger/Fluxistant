@@ -227,13 +227,15 @@ class Adventure extends Effect {
 						.map(user => user.displayName)));
 				
 				// Same as the participants, only without the winner
-				result = result.replace(
-					LOSERS_PLACEHOLDER,
-					Utils.makeEnglishList(
-						Object.values(this.activeAdventure.participants)
-						.filter(user =>
-							user.name !== this.activeAdventure.winner.name)
-						.map(user => user.displayName)));
+				if (this.activeAdventure.winner) {
+					result = result.replace(
+						LOSERS_PLACEHOLDER,
+						Utils.makeEnglishList(
+							Object.values(this.activeAdventure.participants)
+							.filter(user =>
+								user.name !== this.activeAdventure.winner.name)
+							.map(user => user.displayName)));
+				}
 			}
 			
 			// For the purpose of this working, a winner should be chosen as
