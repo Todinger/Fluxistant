@@ -125,11 +125,7 @@ class CandyGame extends Effect {
 			let weight = this.winningWeightInflation(
 				candy.weight,
 				this.candyCount);
-			this.log(`Winning candy weight: ${weight}`);
 			return weight;
-			// return this.winningWeightInflation(
-			// 	candy.weight,
-			// 	this.candyCount);
 		} else {
 			return candy.weight;
 		}
