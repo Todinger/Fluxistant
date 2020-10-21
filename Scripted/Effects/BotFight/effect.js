@@ -115,10 +115,10 @@ const MINUTES = 60 * SECONDS;
 
 // Time to wait between conversations
 const CONVERSATIONS_INTERVAL = {
-	BASE: 15 * SECONDS,
-	VARIANCE: 5 * SECONDS,
-	// BASE: 45 * MINUTES,
-	// VARIANCE: 10 * MINUTES,
+	// BASE: 15 * SECONDS,
+	// VARIANCE: 5 * SECONDS,
+	BASE: 45 * MINUTES,
+	VARIANCE: 10 * MINUTES,
 }
 
 // Represents us
@@ -189,8 +189,8 @@ class MeBot extends Bot {
 	get delay() { return 0; }
 	
 	say(message) {
-		this.effect.say(`Fluxistant: ${message}`);
-		// this.effect.say(message);
+		// this.effect.say(`Fluxistant: ${message}`);
+		this.effect.say(message);
 	}
 }
 
@@ -205,8 +205,8 @@ class SEBot extends Bot {
 	get delay() { return 0; }
 	
 	say(message) {
-		this.effect.say(`StreamElements: ${message}`);
-		// this.sendSEMessage(message);
+		// this.effect.say(`StreamElements: ${message}`);
+		this.effect.sendSEMessage(message);
 	}
 }
 
@@ -222,7 +222,7 @@ class BotFight extends Effect {
 	constructor() {
 		super({
 			name: 'Bot Fight',
-			debug: true,
+			// debug: true,
 			// enabled: false,
 		});
 		
