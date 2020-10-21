@@ -55,9 +55,11 @@ class ImageDisplay extends EffectClient {
 	}
 	
 	playSound(url) {
-		let sound = new Audio(url);
-		$(sound).on('ended', () => this.soundDone());
-		sound.play().catch(() => this.soundDone());
+		// let sound = new Audio(url);
+		// $(sound).on('ended', () => this.soundDone());
+		// sound.play().catch(() => this.soundDone());
+		let markDone = () => this.soundDone();
+		this.sounds.playOneShot(url, markDone, markDone);
 	}
 	
 	imageDone(imageParameters) {
