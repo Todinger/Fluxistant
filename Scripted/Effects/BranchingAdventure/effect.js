@@ -858,11 +858,11 @@ class BranchingAdventure extends Effect {
 			// cmdname: 'b',
 			cmdname: 'choose',
 			// aliases: ['adv'],
-			filters: [Effect.Filters.isOneOf([
-				'omreeny',
-				'fluxlingkitten',
-				'yecatsmailbox',
-				'fluxistence'])],
+			// filters: [Effect.Filters.isOneOf([
+			// 	'omreeny',
+			// 	'fluxlingkitten',
+			// 	'yecatsmailbox',
+			// 	'fluxistence'])],
 			callback: user => this.startAdventure(user),
 		});
 		
