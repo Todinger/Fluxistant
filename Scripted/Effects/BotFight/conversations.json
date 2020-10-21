@@ -139,7 +139,7 @@
 		"vote": [
 			"Don't forget to vote in the upcoming elections!",
 			
-			"What are we voting for?",
+			"@Fluxistant What are we voting for?",
 			
 			"We're voting for change, peace and prosperity!",
 			
@@ -155,8 +155,8 @@
 		"monkeyisland": {
 			"startingBot": "SE",
 			"entries": [
-				"En garde! Touché!",
-				"Oh, that is so cliché.",
+				"@Fluxistant En garde! Touché!",
+				"@StreamElements Oh, that is so cliché.",
 				
 				"I'll skewer you like a sow at a buffet!",
 				"When I'm done with you, you'll be a boneless filet.",
@@ -180,9 +180,9 @@
 		},
 		
 		"shoutouts": [
-			"Hey, have you checked out twitch.tv/iAmLarcyn? Best place for taters!",
+			"@StreamElements Hey, have you checked out twitch.tv/iAmLarcyn? Best place for taters!",
 			
-			"Nice! You know what goes really well with taters? TEA! Check out twitch.tv/Huseyin_Gazi - he puts the 'tea' in 'Steam games'!",
+			"@Fluxistant Nice! You know what goes really well with taters? TEA! Check out twitch.tv/Huseyin_Gazi - he puts the 'tea' in 'Steam games'!",
 			
 			"Oh yeah, Gazi's great. You should also definitely visit twitch.tv/nglswt for a really upbeat streamer playing music and video games!",
 			
@@ -200,7 +200,7 @@
 			
 			"Speaking of music, you must have heard about twitch.tv/mikulski_! We use his music on this stream! Really sweet guy, go check him out. =)",
 			
-			"Will do. Another drawesome artist we must mention is twitch.tv/EryckWebb! He made the emotes! fluxis3YAY"
+			"Will do. Another drawesome artist we must mention is twitch.tv/EryckWebb! He made the emotes! fluxis3Yay"
 		],
 		
 		"pokemon": [
