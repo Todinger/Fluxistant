@@ -198,8 +198,15 @@ class SoundManager {
 		.prop('loop', loop)
 		.appendTo(`#${this._soundHolderID}`);
 		
+		// Add the key (name) to the sound object in case we need the key from
+		// the value later
+		sound.name = name;
+		
 		// Add extra features to our sounds
 		this._addFeaturesToSound(sound);
+		
+		// Apply current volume factor to the newly-created audio element
+		this._applyVolume(sound);
 		
 		this._sounds[name] = sound;
 	}
@@ -236,15 +243,69 @@ class SoundManager {
 		});
 	}
 	
-	// Invokes the given function on all the sounds we have
-	all(func) {
-		Object.values(this._sounds).forEach(sound => func(sound));
+	// Unloads a previously loaded sound.
+	// 
+	// Parameters:
+	// 	name	The name used on the call to loadSound() to identify the sound
+	unloadSound(name) {
+		console.assert(name in this._sounds, `Unknown sound name: ${name}`);
+		if (name in this._notYetLoaded) {
+			delete this._notYetLoaded[name];
+		}
+		
+		this._sounds[name].remove();
+		delete this._sounds[name];
 	}
 	
-	// Recalculates the volume of all the files and applies the new values
+	// Loads the given sound file, plays it and then unloads it.
+	// The URL is used as the name if none is given.
+	// 
+	playOneShot(url, onDone, onError, name) {
+		if (!name) {
+			name = url;
+		}
+		
+		this.loadSound(name, url, false, () => {
+			let endFunc = () => {
+				this.unloadSound(name);
+				if (onDone) {
+					onDone();
+				}
+			};
+			
+			this.play(
+				name,
+				() => {
+					this.unloadSound(name);
+					if (onDone) {
+						onDone();
+					}
+				},
+				() => {
+					this.unloadSound(name);
+					if (onError) {
+						onError();
+					}
+				});
+		});
+	}
+	
+	// Invokes the given function on all the sounds we have and forwards the
+	// given onDone and onError callbacks to it so it can use them if it
+	// supports them.
+	all(func, onDone, onError) {
+		Object.values(this._sounds).forEach(
+			sound => func(sound, onDone, onError));
+	}
+	
+	// Recalculates the volume of all the given sound and applies the new value.
+	_applyVolume(sound) {
+		sound.volumeFactor = this._masterVolume * (this._muted ? 0 : 1);
+	}
+	
+	// Recalculates the volume of all the files and applies the new values.
 	_applyVolumes() {
-		this.all(sound => sound.volumeFactor =
-			this._masterVolume * (this._muted ? 0 : 1));
+		this.all(sound => this._applyVolume(sound));
 	}
 	
 	// Sets the global volume of all the sounds in our system.
@@ -290,13 +351,15 @@ class SoundManager {
 	
 	// Performs the given function on either a specific target (sound) or on all
 	// of the sounds, depending on what the target is (sound name or undefined).
-	_singleOrAll(target, func) {
+	// When the process is done, the onDone callback is invoked.
+	// If there's an error, the onError callback is invoked instead.
+	_singleOrAll(target, func, onDone, onError) {
 		this._validate(target);
 		
 		if (isNonEmptyString(target)) {
-			func(this.getSound(target));
+			func(this.getSound(target), onDone, onError);
 		} else {
-			this.all(func);
+			this.all(func, onDone, onError);
 		}
 	}
 	
@@ -304,24 +367,49 @@ class SoundManager {
 	// 
 	// Parameters:
 	// 	target		The name of a sound (string) or undefined for all sounds.
-	play(target) {
-		this._singleOrAll(target, sound => sound.volume(1.0).play());
+	// 	onDone		Function to invoke when the sound finishes playing.
+	// 	onError		Function to invoke if there's an error playing the sound.
+	play(target, onDone, onError) {
+		this._singleOrAll(target, sound => {
+			sound.on('ended', onDone);
+			sound.volume(1.0);
+			let res = sound.get(0).play();
+			if (onError) {
+				res.catch(onError);
+			}
+		});
 	}
 	
 	// Pauses the target sound(s).
 	// 
 	// Parameters:
 	// 	target		The name of a sound (string) or undefined for all sounds.
-	pause(target) {
-		this._singleOrAll(target, sound => sound.pause());
+	// 	onDone		Function to invoke when the sound pauses (which is right
+	// 				away). This is used to comply with the general _singleOrAll
+	// 				template.
+	pause(target, onDone) {
+		this._singleOrAll(target, sound => {
+			sound.pause();
+			if (onDone) {
+				onDone(sound.name);
+			}
+		});
 	}
 	
 	// Stops the target sound(s).
 	// 
 	// Parameters:
 	// 	target		The name of a sound (string) or undefined for all sounds.
+	// 	onDone		Function to invoke when the sound stops (which is right
+	// 				away). This is used to comply with the general _singleOrAll
+	// 				template.
 	stop(target) {
-		this._singleOrAll(target, sound => sound.pause().rewind());
+		this._singleOrAll(target, sound => {
+			sound.pause().rewind();
+			if (onDone) {
+				onDone(sound.name);
+			}
+		});
 	}
 	
 	// Fades the target sound(s) in.
@@ -329,9 +417,10 @@ class SoundManager {
 	// Parameters:
 	// 	duration	Amount of time it should take to finish fading in.
 	// 	target		The name of a sound (string) or undefined for all sounds.
-	fadeIn(duration, target) {
+	// 	onDone		Function to call when the fade-in is finished.
+	fadeIn(duration, target, onDone) {
 		this._singleOrAll(target, sound => 
-			sound.volume(0.0).play().animateVolume(1.0, duration));
+			sound.volume(0.0).play().animateVolume(1.0, duration, onDone));
 	}
 	
 	// Fades the target sound(s) out.
@@ -339,9 +428,15 @@ class SoundManager {
 	// Parameters:
 	// 	duration	Amount of time it should take to finish fading out.
 	// 	target		The name of a sound (string) or undefined for all sounds.
-	fadeOut(duration, target) {
+	// 	onDone		Function to call when the fade-out is finished.
+	fadeOut(duration, target, onDone) {
 		this._singleOrAll(target, sound => 
-			sound.animateVolume(0.0, duration, () => sound.pause()));
+			sound.animateVolume(0.0, duration, () => {
+				sound.pause();
+				if (onDone) {
+					onDone(sound.name);
+				}
+			}));
 	}
 	
 	// Fades the target sound(s) out and then stops it.
@@ -349,12 +444,17 @@ class SoundManager {
 	// Parameters:
 	// 	duration	Amount of time it should take to finish fading out.
 	// 	target		The name of a sound (string) or undefined for all sounds.
-	fadeOutAndStop(duration, target) {
+	// 	onDone		Function to call when the fade-out is finished and the sound
+	// 				has stopped.
+	fadeOutAndStop(duration, target, onDone) {
 		this._singleOrAll(target, sound => sound.animateVolume(
 			0.0,
 			duration,
 			() => {
-				sound.pause().rewind()
+				sound.pause().rewind();
+				if (onDone) {
+					onDone(sound.name);
+				}
 			})
 		);
 	}
@@ -365,14 +465,14 @@ class SoundManager {
 	// Parameters:
 	// 	duration	Amount of time it should take to finish fade.
 	// 	name		The name of the sound file to switch *to*.
-	crossFade(duration, name) {
+	crossFade(duration, name, onDone) {
 		Object.keys(this._sounds).forEach(soundName => {
 			if (soundName != name) {
 				this.fadeOut(this._sounds[soundName]);
 			}
 		});
 		
-		this.fadeIn(duration, name);
+		this.fadeIn(duration, name, onDone);
 	}
 }
 
@@ -893,7 +993,7 @@ class EffectClient extends EventNotifier {
 				`Release of unrelated event '${eventName}`);
 			
 			if (eventDescriptor.eventFlags[eventName].done) {
-				console.warn(`Release of already-released event '${eventName}`);
+				console.warn(`Release of already-released event '${eventName}'`);
 			}
 			
 			eventDescriptor.eventFlags[eventName].done = true;

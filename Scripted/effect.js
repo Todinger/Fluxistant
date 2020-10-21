@@ -80,6 +80,14 @@ class Effect {
 				this.say(`@${user.displayName} ${msg}`);
 			}
 		}
+		
+		this.registerCommand({
+			cmdname: 'fxvol',
+			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
+			callback: (user, volume) => {
+				this.broadcastEvent('fxvol', { username: user.name, volume });
+			}
+		});
 	}
 	
 	// [For use by inheriting classes]
