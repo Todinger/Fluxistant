@@ -71,7 +71,7 @@ class Request {
 // Responsible for all interactions with StreamElements.
 class SEManager extends EventNotifier {
 	constructor() {
-		super();
+		super(true);
 		
 		// The data given in each of these eventns is the .data value supplied
 		// in the event message from StreamElements
