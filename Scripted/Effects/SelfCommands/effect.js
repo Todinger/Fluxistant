@@ -40,7 +40,6 @@ class SelfCommands extends Effect {
 					let factor = 300 / largerDimension;
 					requestData.image.width = dimensions.width * factor;
 					requestData.image.height = dimensions.height * factor;
-					this.log(`Enlarged ${userFiles.image.path} to ${requestData.image.width}x${requestData.image.height}`);
 				}
 			}
 			
