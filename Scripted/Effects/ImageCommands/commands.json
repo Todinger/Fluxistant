@@ -62,6 +62,10 @@
 		"sound": "/assets/sfx/xfiles.mp3"
 	},
 	
+	"subraid": {
+		"sound": "/assets/sfx/cavalry_charge.mp3"
+	},
+	
 	"nitsua": {
 		"image": {
 			"url": "/assets/image-display/nitsua.png"
