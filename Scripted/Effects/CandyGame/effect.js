@@ -112,6 +112,7 @@ class CandyGame extends Effect {
 	}
 	
 	announceWinner(user) {
+		this.say("The candy game has ended! The winner's name will be shown on-screen. Thank you for playing! =D");
 		this.broadcastEvent('showText', {
 			text: `${user.displayName} wins!`,
 			style: 'Creepy',
