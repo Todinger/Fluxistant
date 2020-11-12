@@ -1,0 +1,2 @@
+# File containing sensitive (but necessary!) user data that should be present, but not committed
+botConfig.json
