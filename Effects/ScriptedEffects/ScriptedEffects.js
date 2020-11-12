@@ -30,6 +30,16 @@ class ScriptedEffects extends EffectClient {
 		return this.scripts[scriptName];
 	}
 	
+	showErrorScreen() {
+		$('#errorScreen').show();
+		$('#frames').hide();
+	}
+	
+	hideErrorScreen() {
+		$('#frames').show();
+		$('#errorScreen').hide();
+	}
+	
 	start() {
 		// Expects a collection of objects, each with .source and optionally .zindex
 		this.server.on('scriptList', scriptList => {
@@ -61,6 +71,9 @@ class ScriptedEffects extends EffectClient {
 		this.server.on('show', scriptName => {
 			this.getScript(scriptName).frame.fadeIn(EffectClient.FADE_TIME);
 		});
+		
+		this.server.onDetached(() => this.showErrorScreen());
+		this.server.onAttached(() => this.hideErrorScreen());
 		
 		this.server.attach();
 	}
