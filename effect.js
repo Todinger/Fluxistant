@@ -289,7 +289,7 @@ class Effect {
 	
 	// [For use by inheriting classes]
 	// Unregisters a previously registered shortcut key callback.
-	unregisterShortcutKey(name, shortcut, callback) {
+	unregisterShortcutKey(name) {
 		KeyboardManager.unregisterShortcut(`${this.name}_${name}`);
 	}
 	
