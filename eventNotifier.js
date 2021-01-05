@@ -94,7 +94,7 @@ class EventNotifier {
 			eventName = eventName.toLowerCase();
 		}
 		
-		assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
+		// assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
 		
 		if (!this.silent) {
 			Globals.cli.log(`Invoking event: ${eventName}`);

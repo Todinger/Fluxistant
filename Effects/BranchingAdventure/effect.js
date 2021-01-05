@@ -863,7 +863,7 @@ class BranchingAdventure extends Effect {
 			// 	'fluxlingkitten',
 			// 	'yecatsmailbox',
 			// 	'fluxistence'])],
-			callback: user => this.startAdventure(user),
+			callback: (user, category) => this.startAdventure(user, category),
 		});
 		
 		this.registerCommand({

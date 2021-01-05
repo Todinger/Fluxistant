@@ -82,9 +82,9 @@
 	
 	"objection": {
 		"image": {
-			"url": "/assets/image-display/Objection - Flux.png"
+			"url": "/assets/image-display/Objection - Flux Edgeworth.png"
 		},
-		"sound": "/assets/sfx/objection.mp3"
+		"sound": "/assets/sfx/objection_edgeworth.mp3"
 	},
 	
 	"parrot": {
