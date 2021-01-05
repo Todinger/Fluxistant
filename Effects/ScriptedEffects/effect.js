@@ -13,6 +13,7 @@ class ScriptedEffects extends Effect {
 			'Image Display',
 			'Image Dropper',
 			'Text Display',
+			'Censor',
 			// 'Parrot Mate',
 		];
 		

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Show Image</title>
+	<!-- This is to stop a weird "favicon" error.
+		Solution taken from here:
+		https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
+	<link rel="shortcut icon" href="#" />
+	<style>
+		body {
+			overflow: hidden; /* Hide scrollbars */
+		}
+		
+		.cimage {
+			position: absolute;
+		}
+	</style>
+</head>
+
+<body>
+<div id="imageholder">
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/common/effectClient.js"></script>
+<script src="censor.js"></script>
+</body>
+</html>
