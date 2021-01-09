@@ -10,7 +10,7 @@
 		"filters": [
 			{
 				"name": "isOneOf",
-				"argument": ["omreeny", "fluxlingkitten", "fluxistence"]
+				"argument": ["omreeny", "fluxlingkitten", "yecatsmailbox"]
 			}
 		],
 		"image": {
@@ -21,6 +21,19 @@
 			}
 		},
 		"sound": "/assets/sfx/dundundun.mp3"
+	},
+	
+	"nudnudnud": {
+		"filters": [
+			{
+				"name": "isOneOf",
+				"argument": ["omreeny", "fluxlingkitten", "yecatsmailbox"]
+			}
+		],
+		"image": {
+			"url": "/assets/image-display/Omreenywtf.png"
+		},
+		"sound": "/assets/sfx/burpreeny.mp3"
 	},
 	
 	"saywhat": {
