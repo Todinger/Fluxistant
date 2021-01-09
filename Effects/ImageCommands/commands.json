@@ -1,26 +1,8 @@
 {
-	"besttwitchdrummer": {
-		"image": {
-			"url": "/assets/user-images/maxadrums.png"
-		}
-	},
-	
-	"besttwitchstreamer": {
-		"image": {
-			"url": "/assets/image-display/besttwitchstreamer.png"
-		}
-	},
-	
 	"besttwitchstreamers": {
 		"aliases": [ "cheers" ],
 		"image": {
 			"url": "/assets/image-display/MaxAndMaaz.png"
-		}
-	},
-	
-	"cool": {
-		"image": {
-			"url": "/assets/image-display/GumshoeSunglasses.png"
 		}
 	},
 	
@@ -41,17 +23,6 @@
 		"sound": "/assets/sfx/dundundun.mp3"
 	},
 	
-	"funnyjoke": {
-		"sound": "/assets/sfx/MmmhFUNNYJOKE.mp3"
-	},
-	
-	"holdit": {
-		"image": {
-			"url": "/assets/image-display/Hold It - Itor.png"
-		},
-		"sound": "/assets/sfx/holdit.mp3"
-	},
-	
 	"saywhat": {
 		"image": {
 			"url": "/assets/image-display/Mac.gif",
@@ -60,73 +31,5 @@
 			"duration": 6500
 		},
 		"sound": "/assets/sfx/xfiles.mp3"
-	},
-	
-	"subraid": {
-		"sound": "/assets/sfx/cavalry_charge.mp3"
-	},
-	
-	"nitsua": {
-		"image": {
-			"url": "/assets/image-display/nitsua.png"
-		}
-	},
-	
-	"nomnomnom": {
-		"image": {
-			"duration": 6500,
-			"url": "/assets/image-display/Cookiemonster.png"
-		},
-		"sound": "/assets/sfx/cookie.mp3"
-	},
-	
-	"objection": {
-		"image": {
-			"url": "/assets/image-display/Objection - Flux Edgeworth.png"
-		},
-		"sound": "/assets/sfx/objection_edgeworth.mp3"
-	},
-	
-	"parrot": {
-		"aliases": [ "🦜", "polly" ],
-		"image": {
-			"url": "/assets/image-display/Parrot.png",
-			"effects": {
-				"dundundun": {}
-			}
-		},
-		"sound": "/assets/sfx/parrot/squawk.mp3"
-	},
-	
-	"sheldon": {
-		"sound": "/assets/sfx/sheldon.mp3"
-	},
-	
-	"shop": {
-		"sound": "/assets/sfx/bapanada.mp3"
-	},
-	
-	"takethat": {
-		"image": {
-			"url": "/assets/image-display/Take That - Flux.png"
-		},
-		"sound": "/assets/sfx/takethat.mp3"
-	},
-	
-	"undercover": {
-		"image": {
-			"url": "/assets/image-display/GumshoeSunglasses.png"
-		}
-	},
-	
-	"whatislaw": {
-		"image": {
-			"url": "/assets/image-display/Saturday Wright Live.gif"
-		},
-		"sound": "/assets/sfx/whatislove.mp3"
-	},
-	
-	"yay": {
-		"sound": "/assets/sfx/hooray.mp3"
 	}
 }
