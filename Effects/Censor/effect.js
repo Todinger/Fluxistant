@@ -39,6 +39,7 @@ class MyEffect extends Effect {
 			
 			Object.keys(changes.remove).forEach(id => {
 				if (this.censorData[id].shortcut) {
+					this.log(`Registering censor key for ${id}...`);
 					this.unregisterShortcutKey(`Censor: ${id}`);
 				}
 				
@@ -59,6 +60,7 @@ class MyEffect extends Effect {
 						}
 					}
 					
+					this.log(`Registering censor key for ${id}...`);
 					this.registerShortcutKey(
 						`Censor: ${id}`,
 						cd.shortcut.map(name => Effect.Keycodes[name]),
@@ -69,6 +71,7 @@ class MyEffect extends Effect {
 				this.censors[id] = cd;
 			});
 			
+			this.censorData = newData;
 			this.log('Loaded censor data.');
 			
 		// } catch (err) {
