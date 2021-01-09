@@ -33,13 +33,12 @@ class MyEffect extends Effect {
 	}
 	
 	loadData() {
-		// try {
+		try {
 			let newData = this.readJSON(CENSOR_FILENAME);
 			let changes = Utils.oldNewSplit(this.censorData, newData);
 			
 			Object.keys(changes.remove).forEach(id => {
 				if (this.censorData[id].shortcut) {
-					this.log(`Registering censor key for ${id}...`);
 					this.unregisterShortcutKey(`Censor: ${id}`);
 				}
 				
@@ -60,7 +59,6 @@ class MyEffect extends Effect {
 						}
 					}
 					
-					this.log(`Registering censor key for ${id}...`);
 					this.registerShortcutKey(
 						`Censor: ${id}`,
 						cd.shortcut.map(name => Effect.Keycodes[name]),
@@ -73,11 +71,10 @@ class MyEffect extends Effect {
 			
 			this.censorData = newData;
 			this.log('Loaded censor data.');
-			
-		// } catch (err) {
-		// 	this.error('Failed to read censor data:');
-		// 	this.error(err);
-		// }
+		} catch (err) {
+			this.error('Failed to read censor data:');
+			this.error(err);
+		}
 	}
 	
 	load() {
