@@ -33,7 +33,7 @@ class MyEffect extends Effect {
 	}
 	
 	loadData() {
-		// try {
+		try {
 			let newData = this.readJSON(CENSOR_FILENAME);
 			let changes = Utils.oldNewSplit(this.censorData, newData);
 			
@@ -69,12 +69,12 @@ class MyEffect extends Effect {
 				this.censors[id] = cd;
 			});
 			
+			this.censorData = newData;
 			this.log('Loaded censor data.');
-			
-		// } catch (err) {
-		// 	this.error('Failed to read censor data:');
-		// 	this.error(err);
-		// }
+		} catch (err) {
+			this.error('Failed to read censor data:');
+			this.error(err);
+		}
 	}
 	
 	load() {
