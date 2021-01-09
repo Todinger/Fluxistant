@@ -11,6 +11,7 @@ class ParrotMate extends Effect {
 			webname: 'parrot',
 			source: 'parrot.html',
 			tags: ['imgdisp'],
+			enabled: false,
 		});
 		
 		this.whatWasThatCooldownActive = false;

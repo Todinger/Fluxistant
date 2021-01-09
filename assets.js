@@ -50,7 +50,7 @@ class AssetManager {
 		this.registerUserImages();
 		this.registerDisplayImages();
 		this.registerSoundEffects();
-		this.registerRandomImageCache();
+		// this.registerRandomImageCache();
 		this.registerFShowerImages();
 	}
 	

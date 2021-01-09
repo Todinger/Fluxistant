@@ -11,6 +11,7 @@ class RandomImage extends Effect {
 		super({
 			name: 'Random Image',
 			tags: ['imgdisp'],
+			enabled: false,
 		});
 	}
 	

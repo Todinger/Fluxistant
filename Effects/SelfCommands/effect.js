@@ -11,6 +11,7 @@ class SelfCommands extends Effect {
 		super({
 			name: 'Self-Commands',
 			tags: ['imgdisp'],
+			enabled: false,
 		});
 	}
 	

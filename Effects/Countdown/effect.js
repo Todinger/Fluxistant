@@ -13,6 +13,7 @@ class Countdown extends Effect {
 			name: 'Countdown',
 			webname: 'countdown',
 			source: 'countdown.html',
+			enabled: false,
 		});
 		
 		this.initialTime = 12 * HOURS;

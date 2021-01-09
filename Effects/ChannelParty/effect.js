@@ -7,6 +7,7 @@ class ChannelParty extends Effect {
 			webname: 'party',
 			source: 'party.html',
 			zindex: 10,
+			enabled: false,
 		});
 	}
 	
