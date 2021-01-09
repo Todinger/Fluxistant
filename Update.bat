@@ -1,5 +1,1 @@
-@ECHO OFF
-
-git pull origin main
-
-PAUSE
+git pull
