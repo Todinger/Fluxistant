@@ -25,7 +25,7 @@
 	
 	"lurk": {
 		"image": {
-			"url": "/assets/image-display/Mario-Pipe.gif",
+			"url": "/assets/image-display/Mario-Pipe.gif"
 		},
 		"sound": "/assets/sfx/SMB-Pipe.mp3"
 	},
