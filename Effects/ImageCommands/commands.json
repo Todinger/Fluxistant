@@ -23,6 +23,13 @@
 		"sound": "/assets/sfx/dundundun.mp3"
 	},
 	
+	"lurk": {
+		"image": {
+			"url": "/assets/image-display/Mario-Pipe.gif",
+		},
+		"sound": "/assets/sfx/SMB-Pipe.mp3"
+	},
+	
 	"nudnudnud": {
 		"filters": [
 			{
