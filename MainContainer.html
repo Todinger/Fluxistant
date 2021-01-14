@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<!-- This page serves as a gateway to the bot's main URL. It shows an error
+	screen if the bot is offline and when it comes online redirects to the bot's
+	main URL. -->
+
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Scripted Effects Container</title>
+	<!-- This is to stop a weird "favicon" error.
+		Solution taken from here:
+		https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
+	<link rel="shortcut icon" href="#" />
+	
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		
+		.fullTable {
+			display: table;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			background-color: red;
+			visibility: hidden;
+			text-align: center;
+			font-size: 20vw;
+		}
+		
+		.tableCellCenter {
+			display: table-cell;
+			vertical-align: middle;
+		}
+	</style>
+</head>
+
+<body>
+<div id="errorScreen" class="fullTable">
+	<div class="tableCellCenter">BOT OFFLINE</div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- This is to prevent the error screen from showing up when the page
+	 loads. Just using hide() here prevents it from showing up on Chrome,
+	 but not on OBS, so more drastic measures were necessary.
+ -->
+<script type="text/javascript">
+	$('#errorScreen').hide();
+	$('#errorScreen').css('visibility', 'visible');
+</script>
+
+<script type="text/javascript">
+	// Taken from: https://stackoverflow.com/questions/24296721/how-to-check-if-url-exists-using-javascript
+	
+	// Creates an object which can read files from the server
+	var reader = new XMLHttpRequest();
+	const MAIN_URL = "http://localhost:3333/fx/ScriptedEffects/ScriptedEffects.html";
+	
+	// Timer for testing when the bot comes online
+	const ONLINE_CHECK_INTERVAL = 500;
+	
+	// Opens the file and specifies the method (get)
+	// Asynchronous is true
+	reader.open('get', MAIN_URL, true);
+	
+	//check each time the ready state changes
+	//to see if the object is ready
+	reader.onreadystatechange = checkReadyState;
+	
+	function checkReadyState() {
+		if (reader.readyState === 4) {
+			//check to see whether request for the file failed or succeeded
+			if ((reader.status == 200) || (reader.status == 0)) {
+				// Page exists, i.e. the bot is working, so redirect to the bot
+				// main URL
+				document.location.href = MAIN_URL;
+			} else {
+				// Page doesn't exist, i.e. the bot is offline, so show the
+				// error screen
+				$('#errorScreen').show();
+				setTimeout(ONLINE_CHECK_INTERVAL, checkReadyState);
+			}
+		} //end of if (reader.readyState === 4)
+	} // end of checkReadyState()
+
+	// Sends the request for the file data to the server
+	// Use null for "get" mode
+	reader.send(null);
+
+</script>
+
+</body>
+</html>
