@@ -596,7 +596,7 @@ class ServerCommManager {
 		this._attachmentHandlers.attach.push(callback);
 	}
 	
-	// Register to be notified once we've attached to an Module by tag.
+	// Register to be notified once we've attached to a Module by tag.
 	// This will be invoked per Module we attach to.
 	onTagAttached(callback) {
 		this._attachmentHandlers.attach.push(callback);
@@ -659,7 +659,7 @@ class ServerCommManager {
 		}
 	}
 	
-	// Handles attachment to an Module on the server.
+	// Handles attachment to a Module on the server.
 	_attached(source) {
 		if (source === 'tag') {
 			this._notifyAttachmentEvent('tagAttach');

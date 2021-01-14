@@ -56,7 +56,7 @@ class ModuleManager {
 	// 				(basically moddir/module.js).
 	// 	webPrefix	URL to register all modules under. If set to, for example,
 	// 				"/mod/", then all the web URLs will begin with "/mod", so for
-	// 				example an Module with webname = "hellow" and
+	// 				example a Module with webname = "hellow" and
 	// 				source = "world.html" will be accessible at the URL
 	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
 	// 				running locally and listening on port 3333).
@@ -113,7 +113,7 @@ class ModuleManager {
 		module.workdir = moddir;
 		
 		// Let the Module load everything it needs
-		// We don't catch errors here because if an Module has a critical
+		// We don't catch errors here because if a Module has a critical
 		// problem then we want to know about it immediately and fix it before
 		// starting the server
 		module.preload();
@@ -128,15 +128,15 @@ class ModuleManager {
 	// Loads all the Modules, we have in the system, with all that entails.
 	// This function searches for any subfolder of the given modulesdir that
 	// has a file called <MODULE_MAIN_FILENAME> and loads each one it finds.
-	// If you want to add an Module called "ABC", add an "ABC" directory under
-	// <modulesdir> and put an "module.js" file in it as described in the
+	// If you want to add a Module called "ABC", add an "ABC" directory under
+	// <modulesdir> and put a "module.js" file in it as described in the
 	// "module.js" file in the same folder as this file.
 	// 
 	// Parameters:
 	// 	modulesdir	Path to search in.
 	// 	webPrefix	URL to register all modules under. If set to, for example,
 	// 				"/mod/", then all the web URLs will begin with "/mod", so for
-	// 				example an Module with webname = "hellow" and
+	// 				example a Module with webname = "hellow" and
 	// 				source = "world.html" will be accessible at the URL
 	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
 	// 				running locally and listening on port 3333).

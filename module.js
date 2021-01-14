@@ -15,7 +15,7 @@ const Log = require('./logger')
 // This is the base class for all server-side Module-specific logic classes.
 // 
 // To create a new Module, create a subdirectory within ./Modules/ from where
-// this file is, add an "module.js" file in it, require this file and inherit
+// this file is, add a "module.js" file in it, require this file and inherit
 // this class.
 class Module {
 	// Pass an object in the super() call in the concrete Module's constructor
@@ -118,7 +118,7 @@ class Module {
 	// be reloaded.
 	// 
 	// NOTE: ONLY SAVE VALID DATA!
-	// If an Module encounters an error while loading data, it should throw an
+	// If a Module encounters an error while loading data, it should throw an
 	// error and KEEP THE OLD DATA (if it has any).
 	// This is so that when we reload data during runtime we can aslert the user
 	// about faulty data and still keep running smoothly without crashing.
