@@ -10,13 +10,13 @@ Open the project directory and make a copy of botConfigTemplate.js called "botCo
 
 Open MongoDB Compass.
 Connect.
-Create a database called "Scripted-Effects" with a collection named "Logs".
+Create a database called "Scripted-Modules" with a collection named "Logs".
 
 
 
 Running
 -------
 Run the bot using the Start.bat file.
-In OBS, add overlays to the effects you wish to have:
-	All the overlays are located under: http://localhost:3333/fx/
-	One you may want in particular is the aggregating ScriptedEffects one: http://localhost:3333/fx/ScriptedEffects/ScriptedEffects.html
+In OBS, add overlays to the modules you wish to have:
+	All the overlays are located under: http://localhost:3333/mod/
+	One you may want in particular is the aggregating ScriptedModules one: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html

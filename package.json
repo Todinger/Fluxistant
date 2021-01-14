@@ -1,8 +1,8 @@
 {
-  "name": "scripted_effects",
+  "name": "scripted_modules",
   "version": "1.0.0",
-  "description": "Various effects I have for my Twitch streaming.",
-  "main": "EffectsServer.js",
+  "description": "Various modules I have for my Twitch streaming.",
+  "main": "fluxbot.js",
   "directories": {
     "lib": "lib"
   },

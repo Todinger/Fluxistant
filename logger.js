@@ -8,7 +8,7 @@ const dblogger = require('node-db-logger').createLogger({
 		options : {
 			useUnifiedTopology: true
 		},
-		database: 'Scripted-Effects',
+		database: 'Scripted-Modules',
 		collection: 'Logs'
 	}
 });

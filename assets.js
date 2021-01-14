@@ -10,7 +10,7 @@ const Utils = require('./utils');
 // The "_DIR" paths here can be changed freely and should point to the
 // relative (or absolute) paths where the corresponding directories are 
 // located, but the URLs are used as they are in client scripts, so changing
-// these would require changing some files in the Effects/ folder
+// these would require changing some files in the Modules/ folder
 
 // For self-images of users, used by self-commands and some other stuff
 const USERIMAGE_DIR = '../../Images/User-Specific';
@@ -24,11 +24,11 @@ const IMAGEDISPLAY_URL = '/assets/image-display/';
 const SOUNDEFFECTS_DIR = '../../sfx';
 const SOUNDEFFECTS_URL = '/assets/sfx/';
 
-// Used for displaying random images (the RandomImage effect)
+// Used for displaying random images (the RandomImage module)
 const RANDOMIMAGECACHE_DIR = '../../Images/Random Image Cache';
 const RANDOMIMAGECACHE_URL = '/assets/random-image-cache/';
 
-// Random image cache and user-specific images for the F Shower effect
+// Random image cache and user-specific images for the F Shower module
 const FSHOWER_DIR = '../../Images/F';
 const FSHOWER_URL = '/assets/fshower/';
 const FSHOWER_SUBDIR_CACHE = 'Defaults/';

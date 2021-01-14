@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Text Display: Creepy</title>
+		<!-- This is to stop a weird "favicon" error.
+			Solution taken from here:
+			https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
+	<!-- <link rel="shortcut icon" href="#" /> -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"> 
+	<link rel="stylesheet" type="text/css" href="./Creepy.css">
+</head>
+
+<body>
+<!-- <div class="test" contenteditable>
+	TheRealXAgent
+	<p class="small">– with – <p/>
+	SVG Filters 
+	<p class="small">(you can even edit this text)</p>
+	<p class="smaller">(only tested on Chrome so far)</p>
+</div>
+ -->
+
+<div id="textContainer" class="creepyText"></div>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+	<defs>
+		<filter id="squiggly-0">
+			<feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="0"/>
+			<feDisplacementMap id="displacement" in="SourceGraphic" in2="noise" scale="6" />
+		</filter>
+		<filter id="squiggly-1">
+			<feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="1"/>
+			<feDisplacementMap in="SourceGraphic" in2="noise" scale="8" />
+		</filter>
+		
+		<filter id="squiggly-2">
+			<feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="2"/>
+			<feDisplacementMap in="SourceGraphic" in2="noise" scale="6" />
+		</filter>
+		<filter id="squiggly-3">
+			<feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="3"/>
+			<feDisplacementMap in="SourceGraphic" in2="noise" scale="8" />
+		</filter>
+		
+		<filter id="squiggly-4">
+			<feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="4"/>
+			<feDisplacementMap in="SourceGraphic" in2="noise" scale="6" />
+		</filter>
+	</defs> 
+</svg>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/common/clientUtils.js"></script>
+<script src="/common/moduleClient.js"></script>
+<script src="Creepy.js"></script>
+
+</body>
+</html>

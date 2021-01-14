@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Parrot Mate</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<!-- This is to stop a weird "favicon" error.
+		Solution taken from here:
+		https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
+	<link rel="shortcut icon" href="#">
+	<link id='style' rel="stylesheet" type="text/css" href="">
+	<script type="text/javascript">
+		if (window.location.search.search(/[?&]flipped(?:$|&)/) === -1) {
+			$('#style').attr('href', 'parrot.css');
+		} else {
+			$('#style').attr('href', 'parrot-flipped.css');
+		}
+	</script>
+</head>
+<body>
+	<div id="soundholder"></div>
+	
+	<div id="imageholder" class="imgbox">
+		<img id="parrot" class="center-fit parrot" src="">
+		<div id="bubble" class="bubble-holder hide-on-startup">
+			<div id="bubbleText" class="bubble bubble-bottom-left bubble-text"></div>
+		</div>
+	</div>
+	
+	<!-- This is to prevent the speech bubble from showing up when the page
+		 loads. Just using hide() here prevents it from showing up on Chrome,
+		 but not on OBS, so more drastic measures were necessary.
+	 -->
+	<script type="text/javascript">
+		$('#bubble').hide();
+		$('#bubble').css('visibility', 'visible');
+	</script>
+	
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/common/clientUtils.js"></script>
+	<script src="/common/moduleClient.js"></script>
+	<script src="files.js"></script>
+	<script src="parrot.js"></script>
+	<script src="engine.js"></script>
+	<script src="sequences.js"></script>
+	<script type="text/javascript">
+		parrotMate.start();
+	</script>
+</body>
+</html>

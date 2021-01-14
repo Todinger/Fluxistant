@@ -107,7 +107,7 @@ class Utils {
 	// 						subsequent calls to this function on the same object
 	// 						can have different weight values with no concern, if
 	// 						that's something you need for some reason; see the
-	// 						Candy Game effect for an example of this).
+	// 						Candy Game module for an example of this).
 	// 						This parameter is optional. If it is omitted, the
 	// 						function assumes that the values in the object *are*
 	// 						the weights.

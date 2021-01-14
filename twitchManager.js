@@ -4,7 +4,7 @@ const _ = require('lodash');
 const EventNotifier = require('./eventNotifier');
 const cli = require('./cliManager');
 const User = require('./user').User;
-const EffectManager = require('./effectManager');
+const ModuleManager = require('./moduleManager');
 const SEManager = require('./seManager');
 const DBLog = require('./Logger');
 const Utils = require('./utils');
@@ -207,12 +207,12 @@ class TwitchManager extends EventNotifier {
 	// cmd structure:
 	// 		id			Unique identifier for this command registration
 	// 					Note: The same cmdname can be registered for multiple
-	// 					commands (so each effect can make e.g. '!start' do its
+	// 					commands (so each module can make e.g. '!start' do its
 	// 					own thing if desired), but this should be unique across
 	// 					ALL registrations - therefore it is recommended to use
-	// 					the effect's inherited registerCommand() function rather
-	// 					than this one, as it adds the name of the effect to the
-	// 					ID, preventing collision between different effects
+	// 					the module's inherited registerCommand() function rather
+	// 					than this one, as it adds the name of the module to the
+	// 					ID, preventing collision between different modules
 	// 					Another note: Putting this in the cmd object itself is
 	// 					optional (it will be added if it's not present)
 	// 		cmdname		Name used to invoke the command (e.g. 'bla' for '!bla')
@@ -551,10 +551,10 @@ class TwitchManager extends EventNotifier {
 				});
 		}
 		
-		// Let every effect examine the command and invoke it if it's one of
+		// Let every module examine the command and invoke it if it's one of
 		// its commands - if any of them did, then this is a command
-		Object.values(EffectManager.effects).forEach(effect => {
-			isCommand = isCommand || effect.invokeCommand(user, command);
+		Object.values(ModuleManager.modules).forEach(module => {
+			isCommand = isCommand || module.invokeCommand(user, command);
 		});
 		
 		// The handlers registered with the commands and the dynamic invocations

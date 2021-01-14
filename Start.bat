@@ -1,1 +1,1 @@
-node %~dp0\effectsServer.js
+node %~dp0\fluxbot.js

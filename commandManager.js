@@ -90,11 +90,11 @@ class Command {
 // only the things we need to in order for the new data to be represented
 // correctly with minimal changes.
 class CommandManager {
-	constructor(effect) {
-		// This class is meant to be used with a concrete Effect object (this
-		// is to allow for registration under the Effect's name as well as
+	constructor(module) {
+		// This class is meant to be used with a concrete Module object (this
+		// is to allow for registration under the Module's name as well as
 		// to facilitate printouts and such)
-		this.effect = effect;
+		this.module = module;
 		
 		// This keeps the actual Command objects
 		this.commands = {};
@@ -106,17 +106,17 @@ class CommandManager {
 	// Loads commands from a given file and registers all of them to invoke
 	// the same handler (the handler will be given the Command object of the
 	// command that was invoked upon invocation).
-	// NOTE: The location of the file is relative to the effect's working
-	// directory - i.e. the location of its 'effect.js' file.
+	// NOTE: The location of the file is relative to the module's working
+	// directory - i.e. the location of its 'module.js' file.
 	loadFile(filename, handler) {
 		let newCommandsData = null;
 		
 		// Read the new data
 		try {
-			newCommandsData = this.effect.readJSON(filename);
+			newCommandsData = this.module.readJSON(filename);
 		} catch (err) {
-			this.effect.error('Failed to read commands file:');
-			this.effect.error(err);
+			this.module.error('Failed to read commands file:');
+			this.module.error(err);
 			return;
 		}
 		
@@ -126,7 +126,7 @@ class CommandManager {
 		// Anything that needs to be removed is unregistered
 		Object.keys(changes.remove).forEach(cmdname => {
 			this.commands[cmdname].aliases.forEach(alias => {
-				this.effect.unregisterCommand(alias);
+				this.module.unregisterCommand(alias);
 			});
 			
 			delete this.commands[cmdname];
@@ -138,7 +138,7 @@ class CommandManager {
 			let cmd = new Command(cmdname, changes.add[cmdname]);
 			this.commands[cmdname] = cmd;
 			cmd.aliases.forEach(alias => {
-				this.effect.registerCommand({
+				this.module.registerCommand({
 					cmdname: alias,
 					filters: cmd.filters,
 					callback: () => handler(cmd),
@@ -149,7 +149,7 @@ class CommandManager {
 		// The new data now accurately represents the commands in the system,
 		// so we just save that as-is
 		this.commandsData = newCommandsData;
-		this.effect.log('Loaded commands.');
+		this.module.log('Loaded commands.');
 	}
 }
 

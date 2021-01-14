@@ -1,7 +1,7 @@
 // Represents a Twitch user.
 // This object is constructed from a tmi.js userstate object, which doesn't
 // always have all of the saved information and sometimes contains more which
-// might be useful to some Effects (none at the time of writing though).
+// might be useful to some Modules (none at the time of writing though).
 // For this reason the userstate object itself is also saved in the object.
 class User {
 	constructor(userstate) {
@@ -28,9 +28,9 @@ class User {
 // are decided by performing an "and" operation between the results of all the
 // filters).
 // That said, a filter does not necessarily have to take and use the given User
-// object. I've already added custom filters in certain Effects which disable
-// the usage of their commands based on Effect-specific conditions (for example,
-// the !join command in the Candy Game Effect has a filter that ignores the User
+// object. I've already added custom filters in certain Modules which disable
+// the usage of their commands based on Module-specific conditions (for example,
+// the !join command in the Candy Game Module has a filter that ignores the User
 // object and returns its "active" state, thus making the command work only when
 // the game is active).
 // 
