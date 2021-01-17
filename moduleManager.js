@@ -5,6 +5,7 @@ const urljoin = require('url-join');
 const cli = require('./cliManager');
 const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
+const ConfigManager = require('./configManager');
 const Utils = require('./utils');
 
 // Every Module needs to have a file by this name in its root directory
@@ -45,7 +46,7 @@ class ModuleManager {
 	// For validation purposes and to prevent collisions
 	webnameExists(webname) {
 		return Object.values(this.modules).filter(
-			module => module.webname == webname).length > 0;
+			mod => mod.webname == webname).length > 0;
 	}
 	
 	// Loads a single Module, with all that entails.
@@ -64,65 +65,68 @@ class ModuleManager {
 	// 	express		User in conjunction with app to register URLs.
 	_loadModule(moddir, modfile, webPrefix, app, express) {
 		// This loads the Module from file and invokes its constructor
-		let module = require('./' + modfile);
+		let mod = require('./' + modfile);
 		
 		// If the module is disabled we ignore it completely
-		if (!module.enabled) {
+		if (!mod.enabled) {
 			return;
 		}
 		
 		// Validation: Ensure there are no duplicate registrations
-		assert(!this.nameExists(module.name),
-			`Ambiguous module name: '${module.name}'`);
+		assert(!this.nameExists(mod.name),
+			`Ambiguous module name: '${mod.name}'`);
 		
 		// Handling of the web part of the loaded Module, if it has one
-		if (module.webname) {
+		if (mod.webname) {
 			// Validation: Ensure there are no duplicate registrations
-			assert(!this.webnameExists(module.webname),
-				`Web name already taken: '${module.webname}'`);
+			assert(!this.webnameExists(mod.webname),
+				`Web name already taken: '${mod.webname}'`);
 			
 			// Registers the access point (URL) for the Module directory
-			let webdir = urljoin(webPrefix, module.webname);
+			let webdir = urljoin(webPrefix, mod.webname);
 			app.use(webdir,
 				express.static(path.join(__dirname, moddir)));
 			
 			// Saves the description of the web properties, to be used later by
 			// the ScriptedModules aggragator to display them
-			this.clientModules[module.name] = {
-				webname: module.webname,
-				source: urljoin(webdir, module.source),
-				zindex: module.zindex,
+			this.clientModules[mod.name] = {
+				webname: mod.webname,
+				source: urljoin(webdir, mod.source),
+				zindex: mod.zindex,
 			}
 		}
 		
 		// Registers all the tags declared by the loaded Module (all the tags
 		// we have are collected from Modules here)
-		if (module.tags) {
-			module.tags.forEach(tag => {
+		if (mod.tags) {
+			mod.tags.forEach(tag => {
 				if (!(tag in this.tags)) {
 					this.tags[tag] = [];
 				}
 				
-				this.tags[tag].push(module);
+				this.tags[tag].push(mod);
 			});
 		}
 		
 		// Initialize the external values the Module needs before letting it
 		// perform its own loading
-		module.moduleManager = this;
-		module.workdir = moddir;
+		mod.moduleManager = this;
+		mod.workdir = moddir;
+		
+		// Load the module's configuration
+		
 		
 		// Let the Module load everything it needs
 		// We don't catch errors here because if a Module has a critical
 		// problem then we want to know about it immediately and fix it before
 		// starting the server
-		module.preload();
-		module.loadData(); // NOTE: MODULES SHOULD ONLY SAVE DATA IF IT IS VALID 
-		module.load();
+		mod.preload();
+		mod.loadData(); // NOTE: MODULES SHOULD ONLY SAVE DATA IF IT IS VALID 
+		mod.load();
 		
 		// Save the module and announce it to show success
-		this.modules[module.name] = module;
-		cli.log(`Loaded module: ${module.name}`);
+		this.modules[mod.name] = mod;
+		cli.log(`Loaded module: ${mod.name}`);
 	}
 	
 	// Loads all the Modules, we have in the system, with all that entails.
@@ -160,8 +164,8 @@ class ModuleManager {
 	// function, which is meant to be called only after all the Modules have
 	// loaded.
 	postloadAll() {
-		Object.values(this.modules).forEach(module => {
-			module.postload();
+		Object.values(this.modules).forEach(mod => {
+			mod.postload();
 		});
 	}
 	
@@ -177,7 +181,7 @@ class ModuleManager {
 	// Attaches the given client to all the Modules tagged by the given tag.
 	attachClientToTag(tag, socket) {
 		if (tag in this.tags) {
-			this.tags[tag].forEach(module => module.attachClient(socket, 'tag'));
+			this.tags[tag].forEach(mod => mod.attachClient(socket, 'tag'));
 		} else {
 			cli.warn(`Unknown tag: ${tag}`);
 		}
@@ -187,7 +191,7 @@ class ModuleManager {
 	// This is meant to refresh external data that is read by the Modules during
 	// runtime.
 	reloadAllModuleData() {
-		Object.values(this.modules).forEach(module => {
+		Object.values(this.modules).forEach(mod => {
 			// We do catch errors here because all the loaded Modules are
 			// currently already running with valid data from the last time they
 			// had .loadData() called, so if the data files have changed in a
@@ -197,9 +201,9 @@ class ModuleManager {
 			try {
 				// For the above reason, .loadData() should only save loaded
 				// data if the data is valid
-				module.loadData();
+				mod.loadData();
 			} catch (err) {
-				cli.log(`Error loading data in ${module.name}:`);
+				cli.log(`Error loading data in ${mod.name}:`);
 				cli.log(err);
 			}
 		});

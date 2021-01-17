@@ -1,5 +1,6 @@
 const path = require('path');
 const glob = require('glob');
+const fs = require('fs');
 
 // Basic server setup
 const express = require('express');
@@ -7,6 +8,25 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const PORT = 3333;
+
+
+
+// Config directory structure setup
+const APP_DATA_DIR = path.join(process.env.APPDATA, 'Fluxbot');
+const DATA_DIR_MAIN = APP_DATA_DIR;
+const DATA_DIR_MODULES = path.join(APP_DATA_DIR, 'Modules');
+
+function ensureDirExists(path) {
+	try {
+		fs.mkdirSync(path);
+	} catch(err) { }
+}
+
+ensureDirExists(APP_DATA_DIR);
+ensureDirExists(DATA_DIR_MAIN);
+ensureDirExists(DATA_DIR_MODULES);
+
+
 
 // Bot configuration - that is where you make it work with your bot and channel
 const Config = require('./botConfig.json');
@@ -20,6 +40,12 @@ Globals.cli = cli;
 cli.on(['q', 'quit', 'exit'], () => process.exit(0)); // Exit command
 
 cli.on('a', () => cli.log('\x08\x08\x08\nHello'));
+
+
+// Initialize configuration manager (do this BEFORE loading the modules)
+const ConfigManager = require('./configManager');
+ConfigManager.init('./', DATA_DIR_MAIN, './Modules/', DATA_DIR_MODULES);
+ConfigManager.loadMain();
 
 // Asset- and file-related registration
 const Assets = require('./assets');
@@ -63,6 +89,9 @@ TwitchManager.init(Config.channel, Config.username, Config.oAuth);
 // Set up StreamElements integration
 const SEManager = require('./seManager');
 SEManager.init();
+
+// Load all the configurations (do this AFTER loading the modules)
+ConfigManager.loadAll();
 
 
 // Register to handle general server events
