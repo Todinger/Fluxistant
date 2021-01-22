@@ -69,37 +69,38 @@ class Configuration extends EventNotifier {
 	load() {
 		// If we have no configuration description then this Configuration
 		// object is empty and should just not have anything
-		if (!fs.existsSync(this.descriptorPath)) {
-			return;
+		if (fs.existsSync(this.descriptorPath)) {
+			// Read the configuration descriptor - it describes the fields in
+			// the configuration (configuration and defaults need to adhere to
+			// it)
+			let desc = JSON.parse(descriptorPath);
+			
+			// Read the config and defaults from disk and apply the defaults
+			let cfg = {};
+			if (fs.existsSync(this.configPath)) {
+				cfg = JSON.parse(fs.readFileSync(this.configPath));
+			}
+			
+			let def = {};
+			if (fs.existsSync(this.defaultsPath)) {
+				def = JSON.parse(fs.readFileSync(this.defaultsPath));
+			}
+			Utils.applyDefaults(cfg, def);
+			
+			// Validate the configuration fits the descriptor and save the
+			// descriptor if so
+			this.validate(cfg, desc);
+			this.descriptor = desc;
+			
+			// Compare the result from the above with the current configuration
+			let changes = Utils.oldNewSplit(this.currConfig, cfg);
+			if (changes.add != null || changes.remove != null) {
+				this._notify('configChanged', Utils.clone(changes));
+				this.currConfig = cfg;
+			}
 		}
 		
-		// Read the configuration descriptor - it describes the fields in the
-		// configuration (configuration and defaults need to adhere to it)
-		let desc = JSON.parse(descriptorPath);
-		
-		// Read the config and defaults from disk and apply the defaults
-		let cfg = {};
-		if (fs.existsSync(this.configPath)) {
-			cfg = JSON.parse(fs.readFileSync(this.configPath));
-		}
-		
-		let def = {};
-		if (fs.existsSync(this.defaultsPath)) {
-			def = JSON.parse(fs.readFileSync(this.defaultsPath));
-		}
-		Utils.applyDefaults(cfg, def);
-		
-		// Validate the configuration fits the descriptor and save the
-		// descriptor if so
-		this.validate(cfg, desc);
-		this.descriptor = desc;
-		
-		// Compare the result from the above with the current configuration
-		let changes = Utils.oldNewSplit(this.currConfig, cfg);
-		if (changes.add != null || changes.remove != null) {
-			this._notify('configChanged', Utils.clone(changes));
-			this.currConfig = cfg;
-		}
+		return this;
 	}
 	
 	// Saves the current configuration to the config file

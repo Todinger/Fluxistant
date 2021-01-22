@@ -114,7 +114,7 @@ class ModuleManager {
 		mod.workdir = moddir;
 		
 		// Load the module's configuration
-		
+		ConfigManager.addAndLoadModule(mod.name);
 		
 		// Let the Module load everything it needs
 		// We don't catch errors here because if a Module has a critical

@@ -80,6 +80,12 @@ class ConfigManager {
 			this._getModDefaultsPath(moduleName),
 			this._getModDescriptorPath(moduleName)
 		);
+		
+		return this.moduleConfigs[moduleName];
+	}
+	
+	addAndLoadModule(moduleName) {
+		this.addModule(moduleName).load();
 	}
 	
 	onMainConfigChanged(handler) {

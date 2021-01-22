@@ -105,6 +105,28 @@ class Module {
 	}
 	
 	// [For external use (by ModuleManager), for override by inheriting classes]
+	// Invoked before preload and whenever the module is requested to reload its
+	// configuration.
+	// This is the first entry point the module has (the first code of the
+	// module that gets executed), and is meant for initialization normally, but
+	// there may be times when the configuration files are reloaded, in which
+	// case the module needs to know how to deal with this function being
+	// invoked during actual runtime.
+	// One specific case that should be noted is the config.enabled value, which
+	// can turn the module on and off at any time. When it gets turned off,
+	// it should no longer do anything at all (so cancel timers and such).
+	// 
+	// NOTE: ONLY SAVE VALID CONFIGURATIONS!
+	// If a Module encounters an error while loading the configuration, it
+	// should throw an error and KEEP THE OLD CONFIGURATION.
+	// This is so that when we reload configurations  during runtime we can
+	// alert the user about faulty values and still keep running smoothly
+	// without crashing.
+	loadConfig(config) {
+		
+	}
+	
+	// [For external use (by ModuleManager), for override by inheriting classes]
 	// Invoked after creation and assignment of basic values by ModuleManager.
 	preload() {
 		// Do nothing by default (for overriding where needed)
@@ -120,7 +142,7 @@ class Module {
 	// NOTE: ONLY SAVE VALID DATA!
 	// If a Module encounters an error while loading data, it should throw an
 	// error and KEEP THE OLD DATA (if it has any).
-	// This is so that when we reload data during runtime we can aslert the user
+	// This is so that when we reload data during runtime we can alert the user
 	// about faulty data and still keep running smoothly without crashing.
 	loadData() {
 		// Do nothing by default (for overriding where needed)
