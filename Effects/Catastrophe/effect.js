@@ -99,7 +99,7 @@ class Catastrophe extends Effect {
 		
 		this.onChannelReward(
 			CHANNEL_REWARD_NAME,
-			() => this.startGame()
+			() => this.start()
 		);
 	}
 }
