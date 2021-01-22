@@ -59,7 +59,6 @@ EffectManager.loadAll('/fx/', 'Effects', app, express);
 const TwitchManager = require('./twitchManager');
 TwitchManager.init(Config.channel, Config.username, Config.oAuth);
 
-
 // Set up StreamElements integration
 const SEManager = require('./seManager');
 SEManager.init();

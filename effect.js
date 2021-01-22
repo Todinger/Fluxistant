@@ -81,6 +81,9 @@ class Effect {
 			}
 		}
 		
+		// TODO: MOVE THIS SOMEWHERE ELSE!
+		// Right now it registers this command for every effect, where it should
+		// be registering it only once for the entire program
 		this.registerCommand({
 			cmdname: 'fxvol',
 			filters: [Effect.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
@@ -291,6 +294,31 @@ class Effect {
 	// Unregisters a previously registered shortcut key callback.
 	unregisterShortcutKey(name) {
 		KeyboardManager.unregisterShortcut(`${this.name}_${name}`);
+	}
+	
+	// [For use by inheriting classes]
+	// Registers a callback that will be invoked every time a key is held down
+	// (possibly repeating while the key is down, I'm not sure)
+	onKeyDown(handler) {
+		KeyboardManager.onKeyDown(handler);
+	}
+	
+	// [For use by inheriting classes]
+	// Removes a previously registered key-down handler
+	removeKeyDownHandler(handler) {
+		KeyboardManager.removeKeyDownHandler(handler);
+	}
+	
+	// [For use by inheriting classes]
+	// Registers a callback that will be invoked every time a key is released
+	onKeyUp(handler) {
+		KeyboardManager.onKeyUp(handler);
+	}
+	
+	// [For use by inheriting classes]
+	// Removes a previously registered key-up handler
+	removeKeyUpHandler(handler) {
+		KeyboardManager.removeKeyUpHandler(handler);
 	}
 	
 	// [For use by inheriting classes]

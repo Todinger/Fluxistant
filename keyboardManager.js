@@ -98,6 +98,22 @@ class KeyboardManager {
 			cli.log(event);
 		}
 	}
+	
+	onKeyDown(handler) {
+		ioHook.on('keydown', handler);
+	}
+	
+	removeKeyDownHandler(handler) {
+		ioHook.removeListener('keydown', handler);
+	}
+	
+	onKeyUp(handler) {
+		ioHook.on('keyup', handler);
+	}
+	
+	removeKeyUpHandler(handler) {
+		ioHook.removeListener('keyup', handler);
+	}
 }
 
 module.exports = new KeyboardManager();

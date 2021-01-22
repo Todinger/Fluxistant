@@ -76,7 +76,7 @@ class TwitchManager extends EventNotifier {
 		
 		// Set this to true if you want to see the custom reward IDs of all the
 		// rewards that have text messages that are redeemed in the channel
-		this.printRewardIDs = false;
+		this.printRewardIDs = true;
 	}
 	
 	// Starts... everything.

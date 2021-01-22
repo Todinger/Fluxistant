@@ -12,7 +12,7 @@
   "author": "Fluxistence",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "express": "^4.17.1",
     "glob": "^7.1.6",
     "image-size": "^0.9.1",
@@ -21,6 +21,7 @@
     "node-db-logger": "^1.2.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
+    "sound-play": "^1.1.0",
     "tmi.js": "^1.5.0",
     "url-join": "^4.0.1"
   }
