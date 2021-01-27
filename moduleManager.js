@@ -6,10 +6,15 @@ const cli = require('./cliManager');
 const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
 const ConfigManager = require('./configManager');
+const EntityFactory = require('./Config/entityFactory');
 const Utils = require('./utils');
 
 // Every Module needs to have a file by this name in its root directory
 const MODULE_MAIN_FILENAME = "module.js";
+
+// If a module has any custom configuration entities, they should all be in this
+// subdirectory and the filenames should all end in 'Entity.js'
+const MODULE_CONFIG_DIRNAME = "Config";
 
 // Loads, holds and manages all the various Modules in the system.
 class ModuleManager {
@@ -49,7 +54,8 @@ class ModuleManager {
 			mod => mod.webname == webname).length > 0;
 	}
 	
-	// Loads a single Module, with all that entails.
+	// Reads a single Module, with all that entails.
+	// Does not yet call any of the module's startup methods.
 	// 
 	// Parameters:
 	// 	moddir		Path of the root folder of the module (where module.js is).
@@ -63,7 +69,7 @@ class ModuleManager {
 	// 				running locally and listening on port 3333).
 	// 	app			Object used to register web access points URLs).
 	// 	express		User in conjunction with app to register URLs.
-	_loadModule(moddir, modfile, webPrefix, app, express) {
+	_readModule(moddir, modfile, webPrefix, app, express) {
 		// This loads the Module from file and invokes its constructor
 		let mod = require('./' + modfile);
 		
@@ -108,28 +114,25 @@ class ModuleManager {
 			});
 		}
 		
+		// Load custom configuration entities, if there are any
+		let configDir = path.join(moddir, MODULE_CONFIG_DIRNAME);
+		if (fs.existsSync(configDir)) {
+			EntityFactory.registerAll(configDir);
+		}
+		
 		// Initialize the external values the Module needs before letting it
 		// perform its own loading
 		mod.moduleManager = this;
 		mod.workdir = moddir;
 		
-		// Load the module's configuration
-		ConfigManager.addAndLoadModule(mod.name);
-		
-		// Let the Module load everything it needs
-		// We don't catch errors here because if a Module has a critical
-		// problem then we want to know about it immediately and fix it before
-		// starting the server
-		mod.preload();
-		mod.loadData(); // NOTE: MODULES SHOULD ONLY SAVE DATA IF IT IS VALID 
-		mod.load();
-		
-		// Save the module and announce it to show success
+		// Save the module and announce it to show initial success
 		this.modules[mod.name] = mod;
-		cli.log(`Loaded module: ${mod.name}`);
+		cli.log(`Read module: ${mod.name}`);
 	}
 	
-	// Loads all the Modules, we have in the system, with all that entails.
+	// Reads all the Modules, we have in the system, with all that entails.
+	// Does not yet call any of the module's startup methods.
+	// 
 	// This function searches for any subfolder of the given modulesdir that
 	// has a file called <MODULE_MAIN_FILENAME> and loads each one it finds.
 	// If you want to add a Module called "ABC", add an "ABC" directory under
@@ -146,24 +149,88 @@ class ModuleManager {
 	// 				running locally and listening on port 3333).
 	// 	app			Object used to register web access points URLs).
 	// 	express		User in conjunction with app to register URLs.
-	loadAll(webPrefix, modulesdir, app, express) {
+	_readAll(webPrefix, modulesdir, app, express) {
 		// Load all the modules in the given directory
 		let subdirs = Utils.getDirectories(modulesdir);
 		subdirs.forEach(subdir => {
 			let moddir = path.join(modulesdir, subdir);
 			let modfile = path.join(moddir, MODULE_MAIN_FILENAME);
 			if (fs.existsSync(modfile)) {
-				this._loadModule(moddir, modfile, webPrefix, app, express);
+				this._readModule(moddir, modfile, webPrefix, app, express);
 			}
 		});
-		
-		this.postloadAll();
+	}
+	
+	// Calls all the modules' configuration definition methods, effectively
+	// creating their default configurations, ready to be filled with actual
+	// values during _loadConfigs().
+	_defineConfigAll() {
+		Object.values(this.modules).forEach(mod => this._defineConfig(mod));
+	}
+	
+	// Calls the module's configuration definition method.
+	// This creats its ModuleConfig with all its fields, using default values
+	// for everything.
+	_defineConfig(mod) {
+		mod.defineConfig(mod.modConfig);
+	}
+	
+	// Loads all the modules' configurations from disk.
+	_loadConfigAll() {
+		ConfigManager.loadModules();
+	}
+	
+	// Loads the module's configuration from disk.
+	_loadConfig(mod) {
+		ConfigManager.loadModule(mod.name);
+	}
+	
+	// Loads the module's configuration and runs the module's loading functions.
+	// Should be invoked only after all the modules have been read.
+	_loadModule(mod) {
+		// Let the Module load everything it needs
+		// We don't catch errors here because if a Module has a critical
+		// problem then we want to know about it immediately and fix it before
+		// starting the server
+		console.log(`[ModuleManager] mod = ${mod}`);
+		mod.preload();
+		mod.loadData(); // NOTE: MODULES SHOULD ONLY SAVE DATA IF IT IS VALID 
+		mod.load();
+	}
+	
+	// Loads all pre-read modules and runs their initialization functions
+	// (everything except module.postload()).
+	_loadAll() {
+		Object.values(this.modules).forEach(mod => this._loadModule(mod));
+	}
+	
+	// Reads and loads all the Modules we have in the system, with all that
+	// entails.
+	// When this method finishes, all the modules are fully configured and have
+	// finished starting up.
+	// 
+	// Parameters:
+	// 	modulesdir	Path to search the modules in.
+	// 	webPrefix	URL to register all modules under. If set to, for example,
+	// 				"/mod/", then all the web URLs will begin with "/mod", so for
+	// 				example a Module with webname = "hellow" and
+	// 				source = "world.html" will be accessible at the URL
+	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
+	// 				running locally and listening on port 3333).
+	// 	app			Object used to register web access points URLs).
+	// 	express		User in conjunction with app to register URLs.
+	readAndLoadAll(webPrefix, modulesdir, app, express) {
+		this._readAll(webPrefix, modulesdir, app, express);
+		this._defineConfigAll();
+		this._loadConfigAll();
+		this._loadAll();
+		this._postloadAll();
 	}
 	
 	// Runs over all the previously loaded Modules and invoke their postload()
 	// function, which is meant to be called only after all the Modules have
 	// loaded.
-	postloadAll() {
+	_postloadAll() {
 		Object.values(this.modules).forEach(mod => {
 			mod.postload();
 		});

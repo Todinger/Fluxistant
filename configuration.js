@@ -1,11 +1,87 @@
 const fs = require('fs');
 const assert = require('assert').strict;
-const EventNotifier = require('./eventNotifier');
-const util = require('util');
+const Utils = require('./utils');
 
 // Holds and manages the configuration of a single entity (e.g. a specific
 // module, or the main program configuration).
-class Configuration extends EventNotifier {
+const ObjectEntity = requireConfig('objectEntity');
+const EntityFactory = require('./Config/entityFactory');
+
+class Configuration {
+	constructor() {
+		this.configRoot = new ObjectEntity();
+	}
+	
+	addChild(key, type, param) {
+		return this.configRoot.addChild(key, EntityFactory.build(type, param));
+	}
+	
+	// Supported fields in the data argument:
+	// 	cmdname		Command name. Used to invoke the command in the chat.
+	// 	aliases		Array of alias strings, each of which can also invoke it.
+	// 	cost		Non-negative integer, the cost of the command in SE points.
+	// 	filters		Array of user filters.
+	// 
+	// Supported user filter data structure:
+	// 	type		Identifies the filter (e.g. 'isUser' or 'isMod').
+	// 	argument	Filter-specific data (e.g. username for the isUser filter).
+	addCommand(data) {
+		if (!this.configRoot.hasChild('commands')) {
+			this.configRoot.addChild('commands', 'Array', 'Command')
+				.setDescription('Commands associated with this module.');
+		}
+		
+		this.getChild('commands').addElement(
+			EntityFactory.build('Command', data));
+	}
+	
+	toConf() {
+		return this.configRoot.toConf();
+	}
+	
+	import(descriptor) {
+		this.configRoot.import(descriptor);
+	}
+	
+	export() {
+		return this.configRoot.export();
+	}
+	
+	validate() {
+		this.configRoot.validate();
+	}
+	
+	// Saves the current configuration from the given config file.
+	load(filename) {
+		let descriptor = Utils.tryReadJSON(filename);
+		if (descriptor) {
+			// Read the configuration from disk and validate it before saving it
+			// as the new configuration
+			let newConfig = this.configRoot.clone();
+			newConfig.validate();
+			this.configRoot = newConfig;
+		}
+		
+		return this.configRoot;
+	}
+	
+	// Saves the current configuration to the given config file.
+	save(filename) {
+		let descriptor = this.export();
+		fs.writeFile(
+			filename,
+			JSON.stringify(descriptor, null, '\t'),
+			err => {
+				if (err) throw err;
+				console.log(`Configuration file saved to: ${filename}`);
+			}
+		);
+	}
+}
+
+
+/*
+class Configuration {
 	constructor(configPath, defaultsPath, descriptorPath) {
 		super();
 		this.configPath = configPath;
@@ -108,5 +184,6 @@ class Configuration extends EventNotifier {
 		fs.writeFile(this.configPath, JSON.stringify(this.cfg, null, '\t'));
 	}
 }
+*/
 
 module.exports = Configuration;

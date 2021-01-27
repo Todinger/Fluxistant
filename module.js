@@ -11,6 +11,7 @@ const CommandManager = require('./commandManager');
 const SEManager = require('./seManager');
 const RewardsManager = require('./rewardsManager');
 const Log = require('./logger')
+const ModuleConfig = require('./Config/moduleConfig');
 
 // This is the base class for all server-side Module-specific logic classes.
 // 
@@ -72,6 +73,9 @@ class Module {
 		this._clientDisconnectedHandlers = [];
 		this._connectedClients = {};
 		
+		// Configuration
+		this.modConfig = new ModuleConfig();
+		
 		// Loads the module in debug mode, replacing chat messages with
 		// console log printouts
 		if (description.debug) {
@@ -105,6 +109,16 @@ class Module {
 	}
 	
 	// [For external use (by ModuleManager), for override by inheriting classes]
+	// Invoked during initialization (before loadConfig).
+	// This is where the module describes its own configuration scheme.
+	// If the module requires anything beyond the basic "enabled/disabled"
+	// setting (which is automatically added, so don't add it in the modules),
+	// add them to the modConfig object passed here.
+	defineConfig(modConfig) {
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	// [For external use (by ModuleManager), for override by inheriting classes]
 	// Invoked before preload and whenever the module is requested to reload its
 	// configuration.
 	// This is the first entry point the module has (the first code of the
@@ -123,7 +137,7 @@ class Module {
 	// alert the user about faulty values and still keep running smoothly
 	// without crashing.
 	loadConfig(config) {
-		
+		// Do nothing by default (for overriding where needed)
 	}
 	
 	// [For external use (by ModuleManager), for override by inheriting classes]

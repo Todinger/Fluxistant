@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const assert = require('assert').strict;
 
 // A general-purpose "static" class with various paraphernalia functions useful
@@ -212,15 +213,35 @@ class Utils {
 	// https://stackoverflow.com/questions/18112204/get-all-directories-within-directory-nodejs/24594123
 	static getDirectories (source) {
 	  return fs.readdirSync(source, { withFileTypes: true })
-	    .filter(dirent => dirent.isDirectory())
-	    .map(dirent => dirent.name);
+		.filter(dirent => dirent.isDirectory())
+		.map(dirent => dirent.name);
 	}
 	
-	// Gets a list of file names in the given directory.
+	// Gets a list of file names (without the paths) in the given directory.
 	static getFiles (source) {
-	  return fs.readdirSync(source, { withFileTypes: true })
-	    .filter(dirent => dirent.isFile())
-	    .map(dirent => dirent.name);
+	 	return fs.readdirSync(source, { withFileTypes: true })
+			.filter(dirent => dirent.isFile())
+			.map(dirent => dirent.name);
+	}
+	
+	// Gets a list of file paths in the given directory.
+	static getFilePaths (source) {
+	 	return fs.readdirSync(source, { withFileTypes: true })
+			.filter(dirent => dirent.isFile())
+			.map(dirent => path.resolve(source, dirent.name));
+	}
+	
+	static tryReadJSON(path) {
+		let rawData = null;
+		
+		// If there's an error reading from file
+		try {
+			rawData = fs.readFileSync(path);
+		} catch (err) {
+			return null;
+		}
+		
+		return JSON.parse(rawData);
 	}
 	
 	// Turns an array into a correct form of a list in English.

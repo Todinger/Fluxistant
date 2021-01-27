@@ -1,3 +1,17 @@
+const { createRequireFromPath } = require('module');
+
+const CONFIG_ENTITIES_PATH = './Config/Entities/';
+
+// Global require() shortcuts
+global.requireMain = createRequireFromPath('./');
+global.requireMod = createRequireFromPath('./Modules/');
+
+let requireConfig = createRequireFromPath(CONFIG_ENTITIES_PATH);
+global.requireConfig = entityName => requireConfig(`./${entityName}`);
+global.requireModConfig = 
+	(modname, entityName) => global.requireMod(`./${modname}/Config/${entityName}`);
+
+// Basic libraries
 const path = require('path');
 const glob = require('glob');
 const fs = require('fs');
@@ -42,9 +56,14 @@ cli.on(['q', 'quit', 'exit'], () => process.exit(0)); // Exit command
 cli.on('a', () => cli.log('\x08\x08\x08\nHello'));
 
 
-// Initialize configuration manager (do this BEFORE loading the modules)
+// Initialize configurations (do this BEFORE loading the modules)
+const EntityFactory = require('./Config/entityFactory');
+EntityFactory.registerAll(CONFIG_ENTITIES_PATH);
+
+const Configuration = require('./configuration');
 const ConfigManager = require('./configManager');
-ConfigManager.init('./', DATA_DIR_MAIN, './Modules/', DATA_DIR_MODULES);
+ConfigManager.init(APP_DATA_DIR);
+ConfigManager.setMain(new Configuration());
 ConfigManager.loadMain();
 
 // Asset- and file-related registration
@@ -78,7 +97,7 @@ RewardsManager.init();
 
 // Load all the modules we have
 const ModuleManager = require('./moduleManager');
-ModuleManager.loadAll('/mod/', 'Modules', app, express);
+ModuleManager.readAndLoadAll('/mod/', 'Modules', app, express);
 
 
 // Load Twitch interaction
@@ -90,8 +109,9 @@ TwitchManager.init(Config.channel, Config.username, Config.oAuth);
 const SEManager = require('./seManager');
 SEManager.init();
 
-// Load all the configurations (do this AFTER loading the modules)
-ConfigManager.loadAll();
+// Save the current configuration (main and modules) - this is to create default
+// configuration files if they did not exist
+ConfigManager.saveAll();
 
 
 // Register to handle general server events
@@ -128,3 +148,16 @@ io.on('connection', socket => {
 server.listen(PORT);
 cli.log(`Listening on port ${PORT}...`);
 cli.start();
+
+// const Errors = require('./errors');
+// function Blabla() {
+// 	Errors.abstract();
+// }
+// class A {
+// 	B() {
+// 		Errors.abstract();
+// 	}
+// }
+// let a = new A();
+// a.B();
+// Errors.typeTest(3, 'boolean');

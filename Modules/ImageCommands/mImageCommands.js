@@ -44,6 +44,12 @@ class ImageCommands extends Module {
 		});
 	}
 	
+	defineConfig(modConfig) {
+		modConfig.addChild('imageCommands', 'Array', 'ImageCommand')
+			.setName('Image Commands')
+			.setDescription('Commands for showing images and/or playing sounds');
+	}
+	
 	loadData() {
 		this.commandManager.loadFile(
 			COMMANDS_FILENAME,
