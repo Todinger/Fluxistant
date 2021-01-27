@@ -1,7 +1,7 @@
 const assert = require('assert').strict;
 const Errors = requireMain('./errors');
 const ObjectEntity = require('./objectEntity');
-const ArrayEntity = require('./arrayEntity');
+const DynamicArrayEntity = require('./dynamicArrayEntity');
 const ValueEntity = require('./valueEntity');
 const CooldownEntity = require('./cooldownEntity');
 const UserFilter = require('./userFilterEntity');
@@ -15,13 +15,13 @@ class CommandEntity extends ObjectEntity {
 		this.addChild('cmdname', new ValueEntity(data.cmdname || ''))
 			.setName('Name')
 			.setDescription('The term that will invoke the command.');
-		this.addChild('aliases', new ArrayEntity('Value'))
+		this.addChild('aliases', new DynamicArrayEntity('Value'))
 			.setDescription('Optional additional names for the command.');
 		this.addChild('cost', new ValueEntity(data.cost || 0))
 			.setDescription('Cost in StreamElements loyalty points.');
 		this.addChild('cooldowns', new CooldownEntity())
 			.setDescription('How long it takes before the command can be used again.');
-		this.addChild('filters', new ArrayEntity('UserFilter'))
+		this.addChild('filters', new DynamicArrayEntity('UserFilter'))
 			.setName('User Filters')
 			.setDescription('Filters for which users may use the command.');
 		

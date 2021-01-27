@@ -1,0 +1,1 @@
+node --inspect --inspect-brk %~dp0\fluxbot.js

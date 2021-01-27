@@ -1,5 +1,5 @@
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
-const ArrayEntity = require('./arrayEntity');
+const DynamicArrayEntity = require('./dynamicArrayEntity');
 const ValueEntity = require('./valueEntity');
 
 class UserFilter_IsOneOfEntity extends UserFilter_BaseEntity {
@@ -8,7 +8,7 @@ class UserFilter_IsOneOfEntity extends UserFilter_BaseEntity {
 	
 	constructor() {
 		super(UserFilter_IsOneOfEntity.TYPE);
-		this.addChild('argument', new ArrayEntity('Value'))
+		this.addChild('argument', new DynamicArrayEntity('Value'))
 			.setName('Usernames')
 			.setDescription('Only this user will be able to invoke the command.');
 	}

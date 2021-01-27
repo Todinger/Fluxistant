@@ -33,9 +33,9 @@ class EntityFactory {
 		console.log(`[EntityFactory] Registered type: ${type}`);
 	}
 	
-	build(type, param) {
+	build(type, ...params) {
 		assert(type in this.builders, `Unknown entity type: ${type}`);
-		return this.builders[type](param);
+		return this.builders[type].apply(null, params);
 	}
 }
 

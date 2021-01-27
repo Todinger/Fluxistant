@@ -10,6 +10,7 @@ class ObjectEntity extends ConfigEntity {
 	constructor(type) {
 		super(type || ObjectEntity.TYPE);
 		this.children = {};
+		this.allowImportingNewChildren = false;
 	}
 	
 	getChild(key) {
@@ -58,17 +59,25 @@ class ObjectEntity extends ConfigEntity {
 		});
 	}
 	
-	import(descriptor) {
-		descriptor.keys.forEach(key => {
-			let child = ConfigEntity.readEntity(descriptor[key]);
-			this.addChild(child);
+	importDesc(descriptor) {
+		Object.keys(descriptor).forEach(key => {
+			console.log(`[ObjectEntity] Import key: ${key}`);
+			console.log(`[ObjectEntity] Import value: ${JSON.stringify(descriptor[key])}`);
+			if (key in this.children) {
+				this.children[key].import(descriptor[key]);
+			// } else if (this.allowImportingNewChildren) {
+			// 	let child = ConfigEntity.readEntity(descriptor[key]);
+			// 	this.addChild(child);
+			} else {
+				throw `Unknown child key: ${key}`;
+			}
 		});
 	}
 	
 	export() {
 		let data = {};
-		Object.keys(this.children).forEach(child => {
-			data[child] = child.export();
+		Object.keys(this.children).forEach(key => {
+			data[key] = this.children[key].export();
 		});
 		
 		return {

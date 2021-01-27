@@ -45,7 +45,7 @@ class ImageCommands extends Module {
 	}
 	
 	defineConfig(modConfig) {
-		modConfig.addChild('imageCommands', 'Array', 'ImageCommand')
+		modConfig.addChild('imageCommands', 'DynamicArray', 'ImageCommand')
 			.setName('Image Commands')
 			.setDescription('Commands for showing images and/or playing sounds');
 	}

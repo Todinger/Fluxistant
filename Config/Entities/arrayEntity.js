@@ -1,13 +1,13 @@
 const assert = require('assert').strict;
+const Errors = require('../../errors');
 const ConfigEntity = require('./configEntity');
 
 class ArrayEntity extends ConfigEntity {
-	static get TYPE()		{ return 'Array'; 										}
-	static get BUILDER()	{ return elementType => new ArrayEntity(elementType); 	}
+	static get TYPE() { return null; }	// Avoid construction (abstract type)
 	
 	constructor(elementType) {
 		// super(name, `${elementType}[]`);
-		super(ArrayEntity.TYPE, () => new ArrayEntity());
+		super(ArrayEntity.TYPE);
 		this.elementType = elementType || null;
 		this.elements = [];
 	}
@@ -57,15 +57,6 @@ class ArrayEntity extends ConfigEntity {
 	
 	toConf() {
 		return this.elements.map(element => element.toConf());
-	}
-	
-	import(descriptor) {
-		this.elementType = descriptor.elementType;
-		assert(this.elementType, 'An ArrayEntity must have an element type.');
-		descriptor.elements.forEach(entryDesc => {
-			let element = ConfigEntity.readEntity(entryDesc);
-			this.addElement(element);
-		});
 	}
 	
 	export() {

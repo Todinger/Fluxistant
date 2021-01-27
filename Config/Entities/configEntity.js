@@ -1,3 +1,4 @@
+const assert = require('assert').strict;
 const Errors = require('../../errors');
 const EntityFactory = require('../entityFactory');
 
@@ -31,7 +32,14 @@ class ConfigEntity {
 		Errors.abstract();
 	}
 	
-	import(descriptor) {
+	import(entityInfo) {
+		assert(
+			entityInfo.type === this.type,
+			`Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`);
+		this.importDesc(entityInfo.descriptor);
+	}
+	
+	importDesc(descriptor) {
 		Errors.abstract();
 	}
 	

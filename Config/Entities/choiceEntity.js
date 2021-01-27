@@ -49,7 +49,7 @@ class ChoiceEntity extends ConfigEntity {
 		}
 	}
 	
-	import(descriptor) {
+	importDesc(descriptor) {
 		// Every option in this.options should be an object that inherits from
 		// choiceValueEntity, which inherently has a .type property in its own
 		// descriptor, so we just use that instead of saving the type of the

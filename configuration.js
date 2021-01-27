@@ -16,6 +16,10 @@ class Configuration {
 		return this.configRoot.addChild(key, EntityFactory.build(type, param));
 	}
 	
+	getChild(key) {
+		return this.configRoot.getChild(key);
+	}
+	
 	// Supported fields in the data argument:
 	// 	cmdname		Command name. Used to invoke the command in the chat.
 	// 	aliases		Array of alias strings, each of which can also invoke it.
@@ -27,7 +31,7 @@ class Configuration {
 	// 	argument	Filter-specific data (e.g. username for the isUser filter).
 	addCommand(data) {
 		if (!this.configRoot.hasChild('commands')) {
-			this.configRoot.addChild('commands', 'Array', 'Command')
+			this.configRoot.addChild('commands', 'FixedArray', 'Command')
 				.setDescription('Commands associated with this module.');
 		}
 		
@@ -39,8 +43,14 @@ class Configuration {
 		return this.configRoot.toConf();
 	}
 	
-	import(descriptor) {
-		this.configRoot.import(descriptor);
+	import(rootDescriptor) {
+		if (rootDescriptor) {
+			assert(
+				rootDescriptor.type === this.configRoot.type,
+				`Bad configuration: Expected root object to have the type '${this.configRoot.type}', instead got '${rootDescriptor.type}'.`);
+			console.log(`[Configuration] rootDescriptor = ${JSON.stringify(rootDescriptor)}`);
+			this.configRoot.import(rootDescriptor.descriptor);
+		}
 	}
 	
 	export() {
@@ -53,14 +63,23 @@ class Configuration {
 	
 	// Saves the current configuration from the given config file.
 	load(filename) {
-		let descriptor = Utils.tryReadJSON(filename);
-		if (descriptor) {
-			// Read the configuration from disk and validate it before saving it
-			// as the new configuration
-			let newConfig = this.configRoot.clone();
-			newConfig.validate();
-			this.configRoot = newConfig;
-		}
+		// try {
+			let rootDescriptor = Utils.tryReadJSON(filename);
+			if (rootDescriptor) {
+				// assert(
+				// 	rootDescriptor.type === this.configRoot.type,
+				// 	`Bad configuration: Expected root object to have the type '${this.configRoot.type}', instead got '${rootDescriptor.type}'.`);
+				
+				// Read the configuration from disk and validate it before saving it
+				// as the new configuration
+				let newConfig = this.configRoot.clone();
+				newConfig.import(rootDescriptor);
+				newConfig.validate();
+				this.configRoot = newConfig;
+			}
+		// } catch (err) {
+			// console.log(`[Configuration] Failed to read JSON file: ${filename}`);
+		// }
 		
 		return this.configRoot;
 	}

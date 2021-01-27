@@ -42,11 +42,13 @@ class ValueEntity extends ConfigEntity {
 		return this.getValue();
 	}
 	
-	import(descriptor) {
+	importDesc(descriptor) {
+		console.log(`[ValueEntity] Imported value = ${descriptor}`);
 		this.setValue(descriptor);
 	}
 	
 	export() {
+		console.log(`[ValueEntity] Exported value = ${this.value}`);
 		return {
 			type: this.type,
 			descriptor: this.value,

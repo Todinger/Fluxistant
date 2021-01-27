@@ -62,8 +62,9 @@ EntityFactory.registerAll(CONFIG_ENTITIES_PATH);
 
 const Configuration = require('./configuration');
 const ConfigManager = require('./configManager');
+const MainConfig = require('./mainConfig');
 ConfigManager.init(APP_DATA_DIR);
-ConfigManager.setMain(new Configuration());
+ConfigManager.setMain(MainConfig);
 ConfigManager.loadMain();
 
 // Asset- and file-related registration
@@ -145,8 +146,9 @@ io.on('connection', socket => {
 });
 
 // Start the server
-server.listen(PORT);
-cli.log(`Listening on port ${PORT}...`);
+let port = MainConfig.getPort();
+server.listen(port);
+cli.log(`Listening on port ${port}...`);
 cli.start();
 
 // const Errors = require('./errors');

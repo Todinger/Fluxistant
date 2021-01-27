@@ -1,6 +1,6 @@
 const ObjectEntity = requireConfig('objectEntity');
 const ValueEntity = requireConfig('valueEntity');
-const ArrayEntity = requireConfig('arrayEntity');
+const DynamicArrayEntity = requireConfig('dynamicArrayEntity');
 
 class ImageEntity extends ObjectEntity {
 	static get TYPE()		{ return 'Image'; 					}
@@ -16,7 +16,7 @@ class ImageEntity extends ObjectEntity {
 			.setDescription('Display height on screen.');
 		this.addChild('duration', new ValueEntity())
 			.setDescription('Display height on screen.');
-		this.addChild('effects', new ArrayEntity('ImageEffect'))
+		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
 			.setDescription('Special effects to apply to the image.');
 	}
 	
