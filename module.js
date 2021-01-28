@@ -1,3 +1,4 @@
+const assert = require('assert').strict;
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -12,6 +13,7 @@ const SEManager = require('./seManager');
 const RewardsManager = require('./rewardsManager');
 const Log = require('./logger')
 const ModuleConfig = require('./Config/moduleConfig');
+const Command = require('./command');
 
 // This is the base class for all server-side Module-specific logic classes.
 // 
@@ -26,7 +28,7 @@ class Module {
 	// 	[enabled]	If set specifically to false, prevents the script from
 	// 				being loaded at all (as if the file wasn't there).
 	// 	[webname]	Web identifier. Should be URL-friendly.
-	// 	[zindex]	Used by the module aggragator page, ScriptedModule, this
+	// 	[zindex]	Used by the module aggregator page, ScriptedModule, this
 	// 				specifies th z-index of the Module's frame on the page.
 	// 				Use this to put things in front of or behind other things.
 	// 	[tags]		This specifies you wish to attach to any client that
@@ -94,6 +96,66 @@ class Module {
 		});
 	}
 	
+	filterDesc(type, arg) {
+		return {
+			type: type,
+			argument: arg,
+		}
+	}
+	
+	_addCommonCommands() {
+		if (!this.commands) {
+			this.commands = {};
+		}
+		
+		// The !fxvol command is only relevant to modules that have a web client part
+		if (this.webname) {
+			// TODO: Change name to 'fxvol' once finished moving to new command definition system
+			this.commands['fxvol2'] = {
+				description: 'Modifies the volume level of sounds produced by this module. Accepts a percentage number (0-100) for setting a specific volume, or differences with +/- (e.g. +20 would increase the volume by 20%, up to 100%).',
+				filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
+				callback: (user, volume) => {
+					this.broadcastEvent('fxvol', {username: user.name, volume});
+				}
+			}
+		}
+	}
+	
+	registerCommands(commandObjects) {
+		commandObjects = commandObjects || this.commandObjects;
+		if (commandObjects) {
+			Object.values(commandObjects).forEach(co => this.registerCommand(co));
+		}
+	}
+	
+	unregisterCommands(commandObjects) {
+		commandObjects = commandObjects || this.commandObjects;
+		if (commandObjects) {
+			Object.keys(commandObjects).forEach(cmdid => this.unregisterCommand(cmdid));
+		}
+	}
+	
+	createCommandObjects(commands) {
+		if (commands) {
+			let cmdObjects = {};
+			Object.keys(commands).forEach(cmdid => {
+				cmdObjects[cmdid] = new Command(commands[cmdid]);
+			});
+			return cmdObjects;
+		}
+	}
+	
+	importCommandInfo(data, commandObjects) {
+		commandObjects = commandObjects || this.commandObjects;
+		if (commandObjects && data) {
+			Object.keys(data).forEach(cmdid => {
+				if (cmdid in commandObjects) {
+					commandObjects.import(data);
+				}
+			});
+		}
+	}
+	
 	// [For use by inheriting classes]
 	// Invokes the given handler when a client is attached to this Module.
 	// The handler should accept a (socket) argument with the attached client.
@@ -108,19 +170,67 @@ class Module {
 		this._clientDisconnectedHandlers.push(handler);
 	}
 	
-	// [For external use (by ModuleManager), for override by inheriting classes]
+	// [For external use (by ModuleManager), NOT for override by inheriting classes!]
 	// Invoked during initialization (before loadConfig).
+	// Lets the concrete module define its configuration and then adds some common
+	// things that all modules need.
+	defineConfig(modConfig) {
+		this._addCommonCommands();
+		this.defineModConfig(modConfig); // Common commands may be overridden here - that's fine
+		if (this.commands) {
+			Object.keys(this.commands).forEach(
+				cmdid => this.commands[cmdid].cmdname = cmdid);
+			this.commandObjects = this.createCommandObjects(this.commands);
+			this.registerCommands();
+			modConfig.addCommands(this.commands);
+		}
+	}
+	
+	// [For override by inheriting classes]
 	// This is where the module describes its own configuration scheme.
 	// If the module requires anything beyond the basic "enabled/disabled"
 	// setting (which is automatically added, so don't add it in the modules),
 	// add them to the modConfig object passed here.
-	defineConfig(modConfig) {
+	defineModConfig(modConfig) {
 		// Do nothing by default (for overriding where needed)
 	}
 	
-	// [For external use (by ModuleManager), for override by inheriting classes]
+	// [For external use (by ModuleManager)]
 	// Invoked before preload and whenever the module is requested to reload its
 	// configuration.
+	// This performs some common tasks related to loading module configurations
+	// and lets the concrete inheriting module do the rest.
+	loadConfig(config) {
+		if (this.enabled && !config.enabled) {
+			// Module activation
+			this.unregisterCommands();
+		}
+		
+		this.loadModConfig();
+		
+		if (config.commands && this.commandObjects) {
+			this.unregisterCommands();
+			this.importCommandInfo(config.commands);
+			if (config.enabled) {
+				// Commands updated and module activated or remains active
+				this.registerCommands();
+			}
+		} else if (!this.enabled && config.enabled) {
+			// Commands not updated, but module activated
+			this.registerCommands();
+		}
+	}
+	
+	// [For override by inheriting classes]
+	// Inheriting classes should implement this if they implemented the
+	// defineModConfig() function. Here you get a filled-out configuration object
+	// with real values. This happens at startup and whenever the user changes
+	// the configuration during runtime, so you need to "undo" the current
+	// configuration and configure the module again based on the values in the
+	// given config object here.
+	// The config object doesn't contain ConfigEntities, but rather the plain
+	// values that it describes.
+	//
 	// This is the first entry point the module has (the first code of the
 	// module that gets executed), and is meant for initialization normally, but
 	// there may be times when the configuration files are reloaded, in which
@@ -129,14 +239,14 @@ class Module {
 	// One specific case that should be noted is the config.enabled value, which
 	// can turn the module on and off at any time. When it gets turned off,
 	// it should no longer do anything at all (so cancel timers and such).
-	// 
+	//
 	// NOTE: ONLY SAVE VALID CONFIGURATIONS!
 	// If a Module encounters an error while loading the configuration, it
 	// should throw an error and KEEP THE OLD CONFIGURATION.
 	// This is so that when we reload configurations  during runtime we can
 	// alert the user about faulty values and still keep running smoothly
 	// without crashing.
-	loadConfig(config) {
+	loadModConfig(config) {
 		// Do nothing by default (for overriding where needed)
 	}
 	

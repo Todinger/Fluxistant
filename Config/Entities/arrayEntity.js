@@ -1,13 +1,12 @@
 const assert = require('assert').strict;
-const Errors = require('../../errors');
 const ConfigEntity = require('./configEntity');
+const EntityFactory = require('../entityFactory');
 
 class ArrayEntity extends ConfigEntity {
 	static get TYPE() { return null; }	// Avoid construction (abstract type)
 	
-	constructor(elementType) {
-		// super(name, `${elementType}[]`);
-		super(ArrayEntity.TYPE);
+	constructor(type, elementType) {
+		super(type);
 		this.elementType = elementType || null;
 		this.elements = [];
 	}
@@ -40,6 +39,10 @@ class ArrayEntity extends ConfigEntity {
 		this.validateType(value);
 		this.elements.push(value);
 		return value;
+	}
+	
+	clear() {
+		this.elements = [];
 	}
 	
 	map(func) {
@@ -75,7 +78,7 @@ class ArrayEntity extends ConfigEntity {
 	}
 	
 	clone() {
-		let copy = new ArrayEntity(this.elementType);
+		let copy = EntityFactory.build(this.type, this.elementType);
 		this.elements.forEach(element => copy.addElement(element.clone()));
 		return copy;
 	}

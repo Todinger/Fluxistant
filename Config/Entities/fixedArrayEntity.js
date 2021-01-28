@@ -1,12 +1,12 @@
 const assert = require('assert').strict;
-const ConfigEntity = require('./configEntity');
+const ArrayEntity = require('./arrayEntity');
 
-class FixedArrayEntity extends ConfigEntity {
+class FixedArrayEntity extends ArrayEntity {
 	static get TYPE()		{ return 'FixedArray'; 										}
 	static get BUILDER()	{ return elementType => new FixedArrayEntity(elementType); 	}
 	
 	constructor(elementType, allowImportingNewElements) {
-		super(FixedArrayEntity.TYPE);
+		super(FixedArrayEntity.TYPE, elementType);
 		this.elementType = elementType || null;
 		this.elements = [];
 	}
@@ -29,7 +29,7 @@ class FixedArrayEntity extends ConfigEntity {
 				descriptor.elements[i].type == this.elements[i].type,
 				`Element types in a FixedArrayEntity configuration must match the types of the original configuration.`);
 			
-			this.elements[i].import(descriptor.elements[i].descriptor);
+			this.elements[i].import(descriptor.elements[i]);
 		}
 	}
 }

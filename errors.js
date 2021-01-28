@@ -1,10 +1,11 @@
+const assert = require('assert').strict;
 
 function _getStack() {
-	var orig = Error.prepareStackTrace;
+	let orig = Error.prepareStackTrace;
 	Error.prepareStackTrace = function(_, stack){ return stack; };
-	var err = new Error;
+	let err = new Error;
 	Error.captureStackTrace(err, arguments.callee);
-	var stack = err.stack;
+	let stack = err.stack;
 	Error.prepareStackTrace = orig;
 	return stack;
 }
@@ -34,7 +35,7 @@ class Errors {
 	}
 	
 	ensureRegexString(str, regex, message) {
-		assert(typeof value == 'string', message);
+		assert(typeof str == 'string', message);
 		assert(regex.test(str), message);
 	}
 }

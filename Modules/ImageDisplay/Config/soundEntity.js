@@ -1,7 +1,7 @@
-const ObjectEntity = requireConfig('objectEntity');
+const StaticObjectEntity = requireConfig('staticObjectEntity');
 const ValueEntity = requireConfig('valueEntity');
 
-class SoundEntity extends ObjectEntity {
+class SoundEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Sound'; 					}
 	static get BUILDER()	{ return () => new SoundEntity(); 	}
 	

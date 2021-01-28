@@ -7,13 +7,13 @@ class UserFilterEntity extends ChoiceEntity {
 	
 	constructor() {
 		super(UserFilterEntity.TYPE);
-		this._addOptions([
-			'UserFilter_IsMod',
-			'UserFilter_IsAtLeastMod',
-			'UserFilter_IsSub',
-			'UserFilter_IsUser',
-			'UserFilter_IsOneOf',
-		]);
+		this._addOptions({
+			["isMod"]:          'UserFilter_IsMod',
+			["isAtLeastMod"]:   'UserFilter_IsAtLeastMod',
+			["isSub"]:          'UserFilter_IsSub',
+			["isUser"]:         'UserFilter_IsUser',
+			["isOneOf"]:        'UserFilter_IsOneOf',
+		});
 	}
 }
 

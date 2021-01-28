@@ -3,7 +3,7 @@ const tmi = require('tmi.js');
 const _ = require('lodash');
 const EventNotifier = require('./eventNotifier');
 const cli = require('./cliManager');
-const User = require('./user').User;
+const { User, UserFilters } = require('./user');
 const ModuleManager = require('./moduleManager');
 const SEManager = require('./seManager');
 const DBLog = require('./Logger');
@@ -248,8 +248,21 @@ class TwitchManager extends EventNotifier {
 		// This is to make all commands case-insensitive
 		cmd.cmdname = cmd.cmdname.toLowerCase();
 		
-		// Default value if omitted
-		cmd.filters = cmd.filters || [];
+		// Each filter can either be a function or a description for a user filter,
+		// which is an object that has a .type and an optional .argument parameters
+		// that specifies which user filter to use and provides the necessary data
+		// if it is needed
+		let filters = [];
+		if (cmd.filters) {
+			cmd.filters.forEach(filter => {
+				if (typeof filter === 'function') {
+					filters.push(filter);
+				} else {
+					assert(filter.type, 'Bad filter for command: not a function or a filter descriptor.');
+					filters.push(UserFilters.fromDataSingle(filter.type, filter.argument));
+				}
+			});
+		}
 		
 		cli.log(`Registering command '${COMMAND_PREFIX}${cmd.cmdname}' for '${id}'`);
 		
@@ -270,7 +283,7 @@ class TwitchManager extends EventNotifier {
 		//		In order to support deleting registrations, we need to be able
 		//		to tell which command is registered under which ID. Instead of
 		//		going over all the registered commands to look for the given ID
-		//		when unregsitering a command, we keep a record of ID-to-cmdname
+		//		when unregistering a command, we keep a record of ID-to-cmdname
 		//		which we then use to delete the command from the collection it's
 		//		in.
 		this._commandHandlerIDs[id] = cmd.cmdname;

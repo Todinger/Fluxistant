@@ -1,8 +1,8 @@
-const ObjectEntity = requireConfig('objectEntity');
+const StaticObjectEntity = requireConfig('staticObjectEntity');
 const ValueEntity = requireConfig('valueEntity');
 const DynamicArrayEntity = requireConfig('dynamicArrayEntity');
 
-class ImageEntity extends ObjectEntity {
+class ImageEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Image'; 					}
 	static get BUILDER()	{ return () => new ImageEntity(); 	}
 	

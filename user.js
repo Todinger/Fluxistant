@@ -61,7 +61,7 @@ class Filters {
 	
 	// Given a filter name and a single argument, returns the filter returned
 	// from calling a function in this Filters class with the given name and
-	// prividing the given argument.
+	// providing the given argument.
 	// This is a more specific version of the fromData function, but it's the
 	// one we normally use since it's simpler and all of the functions here
 	// take at most one argument (at the time of writing).

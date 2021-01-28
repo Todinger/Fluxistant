@@ -86,7 +86,7 @@ class Utils {
 	}
 	
 	// Returns a random real number in the range:
-	// 	base - vairance <= num < base + variance
+	// 	base - variance <= num < base + variance
 	static randomInRadius(base, variance) {
 		return Utils.randomRange(base - variance, base + variance);
 	}
@@ -237,11 +237,10 @@ class Utils {
 		// If there's an error reading from file
 		try {
 			rawData = fs.readFileSync(path);
+			return JSON.parse(rawData);
 		} catch (err) {
 			return null;
 		}
-		
-		return JSON.parse(rawData);
 	}
 	
 	// Turns an array into a correct form of a list in English.
@@ -281,6 +280,12 @@ class Utils {
 	static isArraySubset(sub, arr) {
 		return sub.reduce(
 			(soFar, element) => soFar && arr.includes(element), true);
+	}
+	
+	static ensureDirExists(path) {
+		try {
+			fs.mkdirSync(path);
+		} catch(err) { }
 	}
 	
 	

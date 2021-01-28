@@ -30,15 +30,11 @@ const APP_DATA_DIR = path.join(process.env.APPDATA, 'Fluxbot');
 const DATA_DIR_MAIN = APP_DATA_DIR;
 const DATA_DIR_MODULES = path.join(APP_DATA_DIR, 'Modules');
 
-function ensureDirExists(path) {
-	try {
-		fs.mkdirSync(path);
-	} catch(err) { }
-}
+const Utils = require('./utils');
 
-ensureDirExists(APP_DATA_DIR);
-ensureDirExists(DATA_DIR_MAIN);
-ensureDirExists(DATA_DIR_MODULES);
+Utils.ensureDirExists(APP_DATA_DIR);
+Utils.ensureDirExists(DATA_DIR_MAIN);
+Utils.ensureDirExists(DATA_DIR_MODULES);
 
 
 
@@ -114,6 +110,17 @@ SEManager.init();
 // configuration files if they did not exist
 ConfigManager.saveAll();
 
+// Alt + WinKey + F5 = Reload all configurations
+KeyboardManager.registerShortcut(
+	'ModuleManager:ReloadConfigs',
+	[
+		KEYCODES.VC_ALT_L,
+		KEYCODES.VC_META_L,
+		KEYCODES.VC_F5
+	],
+	() => ConfigManager.loadAll()
+);
+
 
 // Register to handle general server events
 io.on('connection', socket => {
@@ -150,6 +157,32 @@ let port = MainConfig.getPort();
 server.listen(port);
 cli.log(`Listening on port ${port}...`);
 cli.start();
+
+/*
+class Test {
+	constructor() {
+		this.bla = 7;
+	}
+	
+	hello = 9;
+	
+	thing = {
+		hi: 3,
+	}
+}
+
+class X extends Test {
+	yo = {
+		hi: 5,
+	}
+}
+
+let t = new X();
+console.log(`t.bla = ${t.bla}`);
+console.log(`t.hello = ${t.hello}`);
+console.log(`t.thing = ${t.thing}`);
+console.log(`t.thing.hi = ${t.thing.hi}`);
+*/
 
 // const Errors = require('./errors');
 // function Blabla() {

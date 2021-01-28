@@ -4,8 +4,7 @@ const ValueEntity = require('./valueEntity');
 const EntityFactory = require('../entityFactory');
 
 class ObjectEntity extends ConfigEntity {
-	static get TYPE()		{ return 'Object'; 								}
-	static get BUILDER()	{ return elementType => new ObjectEntity(); 	}
+	static get TYPE() { return null; }	// Avoid construction (abstract type)
 	
 	constructor(type) {
 		super(type || ObjectEntity.TYPE);
@@ -96,10 +95,6 @@ class ObjectEntity extends ConfigEntity {
 			copy.addChild(key, this.children[key].clone());
 		});
 		return copy;
-	}
-	
-	fromJSON() {
-		this.setValue(JSON.parse(jsonValue));
 	}
 }
 

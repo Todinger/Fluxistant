@@ -1,11 +1,12 @@
-const ObjectEntity = require('./objectEntity');
+const StaticObjectEntity = require('./staticObjectEntity');
 const Errors = require('../../errors');
 
-class ChoiceValueEntity extends ObjectEntity {
+class ChoiceValueEntity extends StaticObjectEntity {
 	static get TYPE() { return null; }	// Avoid construction (abstract type)
 	
-	constructor(type) {
+	constructor(type, optionName) {
 		super(type);
+		this.optionName = optionName;
 	}
 	
 	// _makeBasicData() {
@@ -39,7 +40,7 @@ class ChoiceValueEntity extends ObjectEntity {
 	
 	toConf() {
 		let conf = super.toConf();
-		conf.type = this.type;
+		conf.optionName = this.optionName;
 		return conf;
 	}
 	

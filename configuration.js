@@ -4,12 +4,12 @@ const Utils = require('./utils');
 
 // Holds and manages the configuration of a single entity (e.g. a specific
 // module, or the main program configuration).
-const ObjectEntity = requireConfig('objectEntity');
+const StaticObjectEntity = requireConfig('staticObjectEntity');
 const EntityFactory = require('./Config/entityFactory');
 
 class Configuration {
 	constructor() {
-		this.configRoot = new ObjectEntity();
+		this.configRoot = new StaticObjectEntity();
 	}
 	
 	addChild(key, type, param) {
@@ -31,12 +31,27 @@ class Configuration {
 	// 	argument	Filter-specific data (e.g. username for the isUser filter).
 	addCommand(data) {
 		if (!this.configRoot.hasChild('commands')) {
-			this.configRoot.addChild('commands', 'FixedArray', 'Command')
+			this.configRoot.addChild('commands', EntityFactory.build('FixedArray', 'Command'))
 				.setDescription('Commands associated with this module.');
 		}
 		
 		this.getChild('commands').addElement(
 			EntityFactory.build('Command', data));
+	}
+	
+	// Uses addCommand() to add all of the commands in the given object while assuming
+	// that the keys represent each command's cmdid.
+	addCommands(commandsMap) {
+		Object.keys(commandsMap).forEach(cmdid => {
+			if (!commandsMap[cmdid].cmdid) {
+				commandsMap[cmdid].cmdid = cmdid;
+			}
+			if (!commandsMap[cmdid].cmdname) {
+				commandsMap[cmdid].cmdname = cmdid;
+			}
+			
+			this.addCommand(commandsMap[cmdid]);
+		});
 	}
 	
 	toConf() {

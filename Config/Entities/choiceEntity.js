@@ -9,29 +9,35 @@ class ChoiceEntity extends ConfigEntity {
 		super(type);
 		this.options = {};
 		this.selectedValue = null;
+		this.selectedOption = null;
 	}
 	
 	getOptions() {
 		return this.options;
 	}
 	
-	_addOption(type) {
-		assert(!(type in this.options), `Duplicate option type: ${type}`);
-		this.options[type] = EntityFactory.build(type);
+	_addOption(option, type) {
+		assert(!(option in this.options), `Duplicate option type: ${option}`);
+		this.options[option] = EntityFactory.build(type);
+		this.options[option].optionName = option;
 	}
 	
-	_addOptions(types) {
-		types.forEach(type => this._addOption(type));
+	_addOptions(options) {
+		Object.keys(options).forEach(option => this._addOption(option, options[option]));
 	}
 	
-	select(type) {
-		assert(type in this.options, `Invalid type for choice: ${type}`);
-		this.selectedValue = this.options[type];
-		return this.selectedValue;
+	select(option) {
+		assert(option in this.options, `Invalid type for choice: ${option}`);
+		this.selectedOption = option;
+		return this.getSelection();
+	}
+	
+	hasSelection() {
+		return this.selectedOption !== null;
 	}
 	
 	getSelection() {
-		return this.selectedValue;
+		return this.options[this.selectedOption];
 	}
 	
 	
@@ -42,8 +48,8 @@ class ChoiceEntity extends ConfigEntity {
 	}
 	
 	toConf() {
-		if (this.selectedValue) {
-			return this.selectedValue.toConf();
+		if (this.hasSelection()) {
+			return this.getSelection().toConf();
 		} else {
 			return null;
 		}
@@ -51,28 +57,39 @@ class ChoiceEntity extends ConfigEntity {
 	
 	importDesc(descriptor) {
 		// Every option in this.options should be an object that inherits from
-		// choiceValueEntity, which inherently has a .type property in its own
-		// descriptor, so we just use that instead of saving the type of the
-		// selection ourselves (it'd be redundant data)
-		let selectedType = descriptor.type;
+		// choiceValueEntity, which inherently has an .option property in its
+		// own descriptor, so we just use that instead of saving the type of
+		// the selection ourselves (it'd be redundant data)
 		assert(
-			selectedType in this.options,
-			`Unknown selected type for ${this.type}: ${selectedType}`);
-		
-		this.options[selectedType].import(descriptor);
+			descriptor.selectedOption in this.options,
+			`Unknown selected type for ${this.type}: ${descriptor.selectedOption}`);
+		this.selectedOption = descriptor.selectedOption;
+		Object.keys(descriptor.options).forEach(option => {
+			this.options[option].import(descriptor.options[option]);
+		});
 	}
 	
 	export() {
-		return {
+		let result = {
 			type: this.type,
-			descriptor: this.selectedValue.export(),
-		};
+			descriptor: {
+				selectedOption: this.selectedOption,
+				options: {},
+			},
+		}
+		
+		Object.keys(this.options).forEach(option => {
+			result.descriptor.options[option] = this.options[option].export();
+		});
+		
+		return result;
 	}
 	
 	clone() {
-		let copy = new ChoiceEntity(this.type);
-		this.options.forEach(option => copy._addOption(option.clone()));
-		copy.selectedValue = copy.options[this.selectedValue.type];
+		let copy = EntityFactory.build(this.type);
+		Object.keys(this.options).forEach(
+			option => copy.options[option] = this.options[option].clone());
+		copy.selectedOption = this.selectedOption;
 		return copy;
 	}
 }

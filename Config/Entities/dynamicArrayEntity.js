@@ -1,12 +1,13 @@
 const assert = require('assert').strict;
+const ArrayEntity = require('./arrayEntity');
 const ConfigEntity = require('./configEntity');
 
-class DynamicArrayEntity extends ConfigEntity {
+class DynamicArrayEntity extends ArrayEntity {
 	static get TYPE()		{ return 'DynamicArray'; 										}
 	static get BUILDER()	{ return elementType => new DynamicArrayEntity(elementType); 	}
 	
 	constructor(elementType, allowImportingNewElements) {
-		super(DynamicArrayEntity.TYPE);
+		super(DynamicArrayEntity.TYPE, elementType);
 		this.elementType = elementType || null;
 		this.elements = [];
 	}
@@ -17,6 +18,9 @@ class DynamicArrayEntity extends ConfigEntity {
 	importDesc(descriptor) {
 		this.elementType = descriptor.elementType;
 		assert(this.elementType, 'A DynamicArrayEntity must have an element type.');
+		
+		// Override the contents of the array with those imported
+		this.clear();
 		descriptor.elements.forEach(entryDesc => {
 			let element = ConfigEntity.readEntity(entryDesc);
 			this.addElement(element);

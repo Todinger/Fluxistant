@@ -41,6 +41,10 @@ class ModuleManager {
 			],
 			() => this.reloadAllModuleData()
 		);
+		
+		// Register to configuration updates
+		ConfigManager.onModConfigLoaded(
+			(modName, modConfig) => this._onConfigLoaded(modName, modConfig));
 	}
 	
 	// For validation purposes and to prevent collisions
@@ -58,20 +62,20 @@ class ModuleManager {
 	// Does not yet call any of the module's startup methods.
 	// 
 	// Parameters:
-	// 	moddir		Path of the root folder of the module (where module.js is).
-	// 	modfile		Path to the Module's module.js file
-	// 				(basically moddir/module.js).
+	// 	modDir		Path of the root folder of the module (where module.js is).
+	// 	modFile		Path to the Module's module.js file
+	// 				(basically modDir/module.js).
 	// 	webPrefix	URL to register all modules under. If set to, for example,
 	// 				"/mod/", then all the web URLs will begin with "/mod", so for
-	// 				example a Module with webname = "hellow" and
+	// 				example a Module with webname = "hello" and
 	// 				source = "world.html" will be accessible at the URL
 	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
 	// 				running locally and listening on port 3333).
 	// 	app			Object used to register web access points URLs).
 	// 	express		User in conjunction with app to register URLs.
-	_readModule(moddir, modfile, webPrefix, app, express) {
+	_readModule(modDir, modFile, webPrefix, app, express) {
 		// This loads the Module from file and invokes its constructor
-		let mod = require('./' + modfile);
+		let mod = require('./' + modFile);
 		
 		// If the module is disabled we ignore it completely
 		if (!mod.enabled) {
@@ -91,10 +95,10 @@ class ModuleManager {
 			// Registers the access point (URL) for the Module directory
 			let webdir = urljoin(webPrefix, mod.webname);
 			app.use(webdir,
-				express.static(path.join(__dirname, moddir)));
+				express.static(path.join(__dirname, modDir)));
 			
 			// Saves the description of the web properties, to be used later by
-			// the ScriptedModules aggragator to display them
+			// the ScriptedModules aggregator to display them
 			this.clientModules[mod.name] = {
 				webname: mod.webname,
 				source: urljoin(webdir, mod.source),
@@ -115,7 +119,7 @@ class ModuleManager {
 		}
 		
 		// Load custom configuration entities, if there are any
-		let configDir = path.join(moddir, MODULE_CONFIG_DIRNAME);
+		let configDir = path.join(modDir, MODULE_CONFIG_DIRNAME);
 		if (fs.existsSync(configDir)) {
 			EntityFactory.registerAll(configDir);
 		}
@@ -123,7 +127,7 @@ class ModuleManager {
 		// Initialize the external values the Module needs before letting it
 		// perform its own loading
 		mod.moduleManager = this;
-		mod.workdir = moddir;
+		mod.workdir = modDir;
 		
 		// Save the module and announce it to show initial success
 		this.modules[mod.name] = mod;
@@ -133,30 +137,30 @@ class ModuleManager {
 	// Reads all the Modules, we have in the system, with all that entails.
 	// Does not yet call any of the module's startup methods.
 	// 
-	// This function searches for any subfolder of the given modulesdir that
+	// This function searches for any subfolder of the given modulesDir that
 	// has a file called <MODULE_MAIN_FILENAME> and loads each one it finds.
 	// If you want to add a Module called "ABC", add an "ABC" directory under
-	// <modulesdir> and put a "module.js" file in it as described in the
+	// <modulesDir> and put a "module.js" file in it as described in the
 	// "module.js" file in the same folder as this file.
 	// 
 	// Parameters:
-	// 	modulesdir	Path to search in.
+	// 	modulesDir	Path to search in.
 	// 	webPrefix	URL to register all modules under. If set to, for example,
 	// 				"/mod/", then all the web URLs will begin with "/mod", so for
-	// 				example a Module with webname = "hellow" and
+	// 				example a Module with webname = "hello" and
 	// 				source = "world.html" will be accessible at the URL
 	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
 	// 				running locally and listening on port 3333).
 	// 	app			Object used to register web access points URLs).
 	// 	express		User in conjunction with app to register URLs.
-	_readAll(webPrefix, modulesdir, app, express) {
+	_readAll(webPrefix, modulesDir, app, express) {
 		// Load all the modules in the given directory
-		let subdirs = Utils.getDirectories(modulesdir);
-		subdirs.forEach(subdir => {
-			let moddir = path.join(modulesdir, subdir);
-			let modfile = path.join(moddir, MODULE_MAIN_FILENAME);
-			if (fs.existsSync(modfile)) {
-				this._readModule(moddir, modfile, webPrefix, app, express);
+		let subDirs = Utils.getDirectories(modulesDir);
+		subDirs.forEach(subdir => {
+			let modDir = path.join(modulesDir, subdir);
+			let modFile = path.join(modDir, MODULE_MAIN_FILENAME);
+			if (fs.existsSync(modFile)) {
+				this._readModule(modDir, modFile, webPrefix, app, express);
 			}
 		});
 	}
@@ -169,10 +173,11 @@ class ModuleManager {
 	}
 	
 	// Calls the module's configuration definition method.
-	// This creats its ModuleConfig with all its fields, using default values
+	// This creates its ModuleConfig with all its fields, using default values
 	// for everything.
 	_defineConfig(mod) {
 		mod.defineConfig(mod.modConfig);
+		ConfigManager.addModule(mod.name, mod.modConfig);
 	}
 	
 	// Loads all the modules' configurations from disk.
@@ -181,8 +186,8 @@ class ModuleManager {
 	}
 	
 	// Loads the module's configuration from disk.
-	_loadConfig(mod) {
-		ConfigManager.loadModule(mod.name);
+	_onConfigLoaded(modName, modConfig) {
+		this.modules[modName].loadConfig(modConfig);
 	}
 	
 	// Loads the module's configuration and runs the module's loading functions.
@@ -210,17 +215,17 @@ class ModuleManager {
 	// finished starting up.
 	// 
 	// Parameters:
-	// 	modulesdir	Path to search the modules in.
+	// 	modulesDir	Path to search the modules in.
 	// 	webPrefix	URL to register all modules under. If set to, for example,
 	// 				"/mod/", then all the web URLs will begin with "/mod", so for
-	// 				example a Module with webname = "hellow" and
+	// 				example a Module with webname = "hello" and
 	// 				source = "world.html" will be accessible at the URL
 	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
 	// 				running locally and listening on port 3333).
 	// 	app			Object used to register web access points URLs).
 	// 	express		User in conjunction with app to register URLs.
-	readAndLoadAll(webPrefix, modulesdir, app, express) {
-		this._readAll(webPrefix, modulesdir, app, express);
+	readAndLoadAll(webPrefix, modulesDir, app, express) {
+		this._readAll(webPrefix, modulesDir, app, express);
 		this._defineConfigAll();
 		this._loadConfigAll();
 		this._loadAll();

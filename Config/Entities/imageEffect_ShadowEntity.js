@@ -1,4 +1,5 @@
 const ChoiceValueEntity = require('./choiceValueEntity');
+const ValueEntity = require('./ValueEntity');
 
 class ImageEffect_ShadowEntity extends ChoiceValueEntity {
 	static get TYPE()		{ return 'ImageEffect_Shadow'; 					}

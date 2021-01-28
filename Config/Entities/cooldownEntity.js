@@ -1,8 +1,8 @@
 const assert = require('assert').strict;
-const ObjectEntity = require('./objectEntity');
+const StaticObjectEntity = require('./staticObjectEntity');
 const ValueEntity = require('./valueEntity');
 
-class CooldownEntity extends ObjectEntity {
+class CooldownEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Cooldown'; 					}
 	static get BUILDER()	{ return () => new CooldownEntity(); 	}
 	

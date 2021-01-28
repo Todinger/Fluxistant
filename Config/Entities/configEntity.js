@@ -33,6 +33,9 @@ class ConfigEntity {
 	}
 	
 	import(entityInfo) {
+		if (entityInfo.type !== this.type) {
+			console.log('');
+		}
 		assert(
 			entityInfo.type === this.type,
 			`Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`);
@@ -61,7 +64,7 @@ class ConfigEntity {
 	static readEntity(entityObject) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
-		instance.import(entityObject.descriptor);
+		instance.import(entityObject);
 		instance.validate();
 		return instance;
 	}

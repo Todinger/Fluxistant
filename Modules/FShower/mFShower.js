@@ -10,17 +10,17 @@ class FShower extends Module {
 		});
 	}
 	
-	sendFile(fileurl) {
-		this.broadcastEvent('dropImage', { url: fileurl });
+	sendFile(fileURL) {
+		this.broadcastEvent('dropImage', { url: fileURL });
 	}
 	
 	findAndSendFile(user) {
 		Module.Assets.getUserFShowerFile(
 			user.name,
-			(filename, fileurl) => this.sendFile(fileurl),
+			(filename, fileURL) => this.sendFile(fileURL),
 			() => {
 				Module.Assets.getRandomFShowerImage(
-					(filename, fileurl) => this.sendFile(fileurl),
+					(filename, fileURL) => this.sendFile(fileURL),
 					() => this.error('No FShower images found in cache'));
 			});
 	}
@@ -30,6 +30,13 @@ class FShower extends Module {
 			cmdname: 'f',
 			callback: user => this.findAndSendFile(user),
 		});
+	}
+	
+	commands = {
+		['g']: {
+			description: 'Drops down user-specific or a randomly selected F image from the top of the screen.',
+			callback: user => this.findAndSendFile(user),
+		}
 	}
 }
 

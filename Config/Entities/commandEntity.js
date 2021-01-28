@@ -1,23 +1,24 @@
 const assert = require('assert').strict;
 const Errors = requireMain('./errors');
-const ObjectEntity = require('./objectEntity');
+const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 const ValueEntity = require('./valueEntity');
 const CooldownEntity = require('./cooldownEntity');
 const UserFilter = require('./userFilterEntity');
 
-class CommandEntity extends ObjectEntity {
-	static get TYPE()		{ return 'Command'; 					}
-	static get BUILDER()	{ return () => new CommandEntity(); 	}
+class CommandEntity extends StaticObjectEntity {
+	static get TYPE()		{ return 'Command'; 				    	}
+	static get BUILDER()	{ return data => new CommandEntity(data); 	}
 	
 	constructor(data) {
 		super(CommandEntity.TYPE, () => new CommandEntity());
-		this.addChild('cmdname', new ValueEntity(data.cmdname || ''))
+		this.addChild('cmdid', new ValueEntity(data && data.cmdid || '')); // Identifies the command for functional purposes
+		this.addChild('cmdname', new ValueEntity(data && data.cmdname || ''))
 			.setName('Name')
 			.setDescription('The term that will invoke the command.');
 		this.addChild('aliases', new DynamicArrayEntity('Value'))
 			.setDescription('Optional additional names for the command.');
-		this.addChild('cost', new ValueEntity(data.cost || 0))
+		this.addChild('cost', new ValueEntity(data && data.cost || 0))
 			.setDescription('Cost in StreamElements loyalty points.');
 		this.addChild('cooldowns', new CooldownEntity())
 			.setDescription('How long it takes before the command can be used again.');
@@ -25,16 +26,22 @@ class CommandEntity extends ObjectEntity {
 			.setName('User Filters')
 			.setDescription('Filters for which users may use the command.');
 		
-		if (data.aliases) {
-			data.aliases.forEach(alias => this.addAlias(alias));
-		}
-		
-		if (data.cooldowns) {
-			this.getCooldowns().set(data.cooldowns);
-		}
-		
-		if (data.filters) {
-			data.filters.forEach(filter => this.addUserFilter(filter));
+		if (data) {
+			if (data.aliases) {
+				data.aliases.forEach(alias => this.addAlias(alias));
+			}
+			
+			if (data.cooldowns) {
+				this.getCooldowns().set(data.cooldowns);
+			}
+			
+			if (data.filters) {
+				data.filters.forEach(filter => this.addUserFilter(filter));
+			}
+			
+			if (data.description) {
+				this.setDescription(data.description);
+			}
 		}
 	}
 	
@@ -64,8 +71,8 @@ class CommandEntity extends ObjectEntity {
 	
 	addUserFilter(filter) {
 		let filterEntity = this.getChild('filters').addElement(new UserFilter());
-		filterEntity.select(filter.type);
-		filterEntity.setData(filter);
+		let selectedFilter = filterEntity.select(filter.type);
+		selectedFilter.setData(filter);
 	}
 	
 	// ---- Overrides ---- //

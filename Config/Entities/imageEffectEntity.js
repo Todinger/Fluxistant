@@ -6,11 +6,11 @@ class ImageEffectEntity extends ChoiceEntity {
 	
 	constructor() {
 		super(ImageEffectEntity.TYPE);
-		this._addOptions([
-			'ImageEffect_Glow',
-			'ImageEffect_Shadow',
-			'ImageEffect_DunDunDun',
-		]);
+		this._addOptions({
+			["glow"]:       'ImageEffect_Glow',
+			["shadow"]:     'ImageEffect_Shadow',
+			["dundundun"]:  'ImageEffect_DunDunDun',
+		});
 	}
 }
 
