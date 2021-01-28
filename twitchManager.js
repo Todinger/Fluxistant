@@ -263,6 +263,8 @@ class TwitchManager extends EventNotifier {
 						cmd.filters[i].argument);
 				}
 			}
+		} else {
+			cmd.filters = [];
 		}
 		
 		cli.log(`Registering command '${COMMAND_PREFIX}${cmd.cmdname}' for '${id}'`);

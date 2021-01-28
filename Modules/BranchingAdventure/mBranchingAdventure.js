@@ -871,8 +871,10 @@ class BranchingAdventure extends Module {
 			cmdname: 'chickenout',
 			filters: [user => this.userHasAdventure(user)],
 			callback: user => {
-				this.tell(user, "Alright, if that's what you want... *Cluck*");
-				this.endAdventure(user);
+				if (this.userHasAdventure(user)) {
+					this.tell(user, "Alright, if that's what you want... *Cluck*");
+					this.endAdventure(this.activeAdventures[user.name]);
+				}
 			},
 		});
 	}
