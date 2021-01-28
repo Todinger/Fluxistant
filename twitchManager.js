@@ -298,6 +298,8 @@ class TwitchManager extends EventNotifier {
 	unregisterCommand(id) {
 		assert(id in this._commandHandlerIDs, `Unknown handler ID: ${id}`);
 		
+		cli.log(`Unregistering command '${COMMAND_PREFIX}${this._commandHandlerIDs[id]}' for '${id}'`);
+		
 		delete this._commandHandlers[this._commandHandlerIDs[id]];
 		delete this._commandHandlerIDs[id];
 		delete this._cooldownData[id];

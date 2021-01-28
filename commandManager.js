@@ -34,7 +34,7 @@ class Command {
 		// we shouldn't reload
 		this.aliases = Utils.clone(data.aliases);
 		
-		// Ensure that the maind command name is in the list of aliases (that
+		// Ensure that the main command name is in the list of aliases (that
 		// way we can just look at the aliases)
 		if (this.aliases) {
 			if (!(this.cmdname in this.aliases)) {

@@ -66,7 +66,8 @@ class ConfigManager extends EventNotifier {
 			`Unknown module: ${moduleName}`);
 		
 		this.moduleConfigs[moduleName].load(this._getModConfigPath(moduleName));
-		this._notify('modConfigLoaded', moduleName, this.moduleConfigs[moduleName]);
+		let conf = this.moduleConfigs[moduleName].toConf();
+		this._notify('modConfigLoaded', moduleName, conf);
 		return this.moduleConfigs[moduleName];
 	}
 	

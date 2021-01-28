@@ -33,6 +33,8 @@ class ObjectEntity extends ConfigEntity {
 		Object.keys(this.children).map(key => {
 			conf[key] = this.children[key].toConf();
 		});
+		
+		return conf;
 	}
 	
 	export() {
