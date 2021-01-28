@@ -16,7 +16,9 @@ class ArrayEntity extends ConfigEntity {
 	}
 	
 	validateType(value) {
-		assert(value.type == this.elementType, `Bad array element: expected value of type '${this.elementType}', got value of type '${value.type}'`);
+		assert(
+			value.type === this.elementType,
+			`Bad array element: expected value of type '${this.elementType}', got value of type '${value.type}'`);
 	}
 	
 	getElements() {

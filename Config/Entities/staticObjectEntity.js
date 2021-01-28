@@ -3,8 +3,8 @@ const ObjectEntity = require('./objectEntity');
 const EntityFactory = require('../entityFactory');
 
 class StaticObjectEntity extends ObjectEntity {
-	static get TYPE()		{ return 'StaticObject'; 			    			}
-	static get BUILDER()	{ return elementType => new StaticObjectEntity(); 	}
+	static get TYPE()		{ return 'StaticObject';	    			}
+	static get BUILDER()	{ return () => new StaticObjectEntity(); 	}
 	
 	constructor(type) {
 		super(type || StaticObjectEntity.TYPE);

@@ -1,4 +1,3 @@
-const Errors = requireMain('./errors');
 const ChoiceEntity = require('./choiceEntity');
 
 class UserFilterEntity extends ChoiceEntity {

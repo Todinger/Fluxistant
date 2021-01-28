@@ -8,7 +8,7 @@ class User {
     	this.name			= userstate.username;
     	this.displayName	= userstate['display-name'];
     	this.isBroadcaster	= userstate.badges &&
-    						  userstate.badges.broadcaster == '1';
+    						  userstate.badges.broadcaster === '1';
     	this.isMod			= userstate.mod;
     	this.isSub			= userstate.subscriber;
     	this.hasTurbo		= userstate.turbo;
@@ -47,7 +47,7 @@ class Filters {
 	static isSub() { return (user) => user.isSub; }
 	
 	// Returns a filter that only accepts the specified user
-	static isUser(username) { return (user) => user.name == username; }
+	static isUser(username) { return (user) => user.name === username; }
 	
 	// Returns a filter that only accepts one of the given users
 	static isOneOf(usernames) { return (user) => usernames.includes(user.name); }

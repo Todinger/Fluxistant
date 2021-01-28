@@ -55,7 +55,7 @@ class ModuleManager {
 	// For validation purposes and to prevent collisions
 	webnameExists(webname) {
 		return Object.values(this.modules).filter(
-			mod => mod.webname == webname).length > 0;
+			mod => mod.webname === webname).length > 0;
 	}
 	
 	// Reads a single Module, with all that entails.

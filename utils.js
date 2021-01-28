@@ -128,7 +128,7 @@ class Utils {
 			if (choice < sum) {
 				return key;
 			}
-		};
+		}
 	}
 	
 	// Returns true iff the given value is of the object type.
@@ -254,7 +254,7 @@ class Utils {
 			'An array of at least one item is required to make an English list.');
 		
 		// A list of one item is just that item itself
-		if (items.length == 1) {
+		if (items.length === 1) {
 			return items[0];
 		}
 		

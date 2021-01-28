@@ -13,15 +13,15 @@ global.requireModConfig =
 
 // Basic libraries
 const path = require('path');
-const glob = require('glob');
-const fs = require('fs');
+// const glob = require('glob');
+// const fs = require('fs');
 
 // Basic server setup
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const PORT = 3333;
+// const PORT = 3333;
 
 
 
@@ -56,7 +56,7 @@ cli.on('a', () => cli.log('\x08\x08\x08\nHello'));
 const EntityFactory = require('./Config/entityFactory');
 EntityFactory.registerAll(CONFIG_ENTITIES_PATH);
 
-const Configuration = require('./configuration');
+// const Configuration = require('./configuration');
 const ConfigManager = require('./configManager');
 const MainConfig = require('./mainConfig');
 ConfigManager.init(APP_DATA_DIR);

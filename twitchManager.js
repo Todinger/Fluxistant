@@ -252,16 +252,17 @@ class TwitchManager extends EventNotifier {
 		// which is an object that has a .type and an optional .argument parameters
 		// that specifies which user filter to use and provides the necessary data
 		// if it is needed
-		let filters = [];
 		if (cmd.filters) {
-			cmd.filters.forEach(filter => {
-				if (typeof filter === 'function') {
-					filters.push(filter);
-				} else {
-					assert(filter.type, 'Bad filter for command: not a function or a filter descriptor.');
-					filters.push(UserFilters.fromDataSingle(filter.type, filter.argument));
+			for (let i = 0; i < cmd.filters.length; i++) {
+				if (typeof cmd.filters[i] !== 'function') {
+					assert(
+						cmd.filters[i].type,
+						'Bad filter for command: not a function or a filter descriptor.');
+					cmd.filters[i] = UserFilters.fromDataSingle(
+						cmd.filters[i].type,
+						cmd.filters[i].argument);
 				}
-			});
+			}
 		}
 		
 		cli.log(`Registering command '${COMMAND_PREFIX}${cmd.cmdname}' for '${id}'`);
