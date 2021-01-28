@@ -43,10 +43,6 @@ class ChoiceEntity extends ConfigEntity {
 	
 	// ---- Overrides ---- //
 	
-	toJSON() {
-		return JSON.stringify(this.selectedValue);
-	}
-	
 	toConf() {
 		if (this.hasSelection()) {
 			return this.getSelection().toConf();

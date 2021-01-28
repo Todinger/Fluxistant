@@ -10,13 +10,6 @@ class ChoiceValueEntity extends StaticObjectEntity {
 	
 	// ---- Overrides ---- //
 	
-	// Inject our 'type' field into the data
-	_contentsToJSON() {
-		let typeJSON = `"type": "${this.type}"`;
-		let contentsJSON = super._contentsToJSON();
-		return `${typeJSON},${contentsJSON}`;
-	}
-	
 	toConf() {
 		let conf = super.toConf();
 		conf.optionName = this.optionName;

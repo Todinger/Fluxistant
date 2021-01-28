@@ -21,10 +21,6 @@ class ConfigEntity {
 		return this;
 	}
 	
-	toJSON() {
-		Errors.abstract();
-	}
-	
 	// Returns the contents of this entity as a module-ready configuration for
 	// actual use (the current contents are for reading/writing to disk and user
 	// configuration during runtime).
@@ -33,9 +29,6 @@ class ConfigEntity {
 	}
 	
 	import(entityInfo) {
-		if (entityInfo.type !== this.type) {
-			console.log('');
-		}
 		assert(
 			entityInfo.type === this.type,
 			`Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`);

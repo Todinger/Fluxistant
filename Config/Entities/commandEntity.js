@@ -75,6 +75,7 @@ class CommandEntity extends StaticObjectEntity {
 		selectedFilter.setData(filter);
 	}
 	
+	
 	// ---- Overrides ---- //
 	
 	validate() {

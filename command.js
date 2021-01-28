@@ -13,7 +13,7 @@ class Command {
 		
 		// this.enabled = data.enabled ?? true;
 		// TODO: Change to ?? after updating Node.js to v14.
-		this.enabled = data.enabled === undefined ? true : data.enabled;
+		this.enabled = data.enabled ?? true;
 		this.cmdname = data.cmdname;
 		this.aliases = data.aliases || [];
 		this.cost = data.cost || 0;

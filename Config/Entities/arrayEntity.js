@@ -54,12 +54,6 @@ class ArrayEntity extends ConfigEntity {
 	
 	// ---- Overrides ---- //
 	
-	toJSON() {
-		let elementsJSON = this.elements.map(element => element.toJSON());
-		let contents = elementsJSON.join();
-		return `[ ${contents} ]`;
-	}
-	
 	toConf() {
 		return this.elements.map(element => element.toConf());
 	}

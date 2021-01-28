@@ -1,4 +1,10 @@
-const { createRequireFromPath } = require('module');
+// Basic libraries
+// const { createRequire } = require('module');
+const path = require('path');
+// const createRequireFromPath = relativePath => createRequire(path.resolve(relativePath));
+function createRequireFromPath(relativePath) {
+	return modulePath => require('./' + path.join(relativePath, modulePath));
+}
 
 const CONFIG_ENTITIES_PATH = './Config/Entities/';
 
@@ -11,8 +17,6 @@ global.requireConfig = entityName => requireConfig(`./${entityName}`);
 global.requireModConfig = 
 	(modname, entityName) => global.requireMod(`./${modname}/Config/${entityName}`);
 
-// Basic libraries
-const path = require('path');
 // const glob = require('glob');
 // const fs = require('fs');
 
