@@ -1,4 +1,3 @@
-const assert = require('assert').strict;
 const io = require('socket.io-client');
 const axios = require('axios');
 const Config = require('./botConfig.json');

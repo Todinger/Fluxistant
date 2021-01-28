@@ -222,14 +222,14 @@ const TIMEOUT_MESSAGES = [
 // 		// Process the matches array expecting the above structure
 // 	}
 // const CHOICE_REGEX = /\[([^:\|]+?)\s*(?:(?:\:\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)*\s*)?\]/g;
-const CHOICE_REGEX = /\[([^:\|]+?)\s*(?::([^\]]+))?\]/g;
-const CHAPTER_OPTIONS = /(?:\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?\s*)/g;
+const CHOICE_REGEX = /\[([^:|]+?)\s*(?::([^\]]+))?]/g;
+const CHAPTER_OPTIONS = /(?:\s*([a-zA-Z0-9_$]+)\s*(?:\|\s*(\d+))?\s*)/g;
 
 // This is for "next" values for a chapter.
 // It's the same as the part in CHOICE_REGEX that describes the options of which
 // chapters can be chosen and their weights (since it has the same meaning here,
 // only without the player's choice).
-const CHAPTER_OPTIONS_REGEX = /(?:\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z0-9_\$]+)\s*(?:\|\s*(\d+))?)*\s*/g;
+const CHAPTER_OPTIONS_REGEX = /(?:\s*([a-zA-Z0-9_$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z0-9_$]+)\s*(?:\|\s*(\d+))?)*\s*/g;
 
 // Branching Adventure Game
 // ------------------------
@@ -324,7 +324,7 @@ class BranchingAdventure extends Module {
 	// 	data	The contents of the JSON file.
 	loadAdventureFile(name, data) {
 		// Inactive files are ignored
-		if (data.active == false) {
+		if (data.active === false) {
 			return;
 		}
 		
@@ -644,7 +644,7 @@ class BranchingAdventure extends Module {
 			return;
 		}
 		
-		let message = null;
+		let message;
 		if (points > 0) {
 			message = `Rejoice! $player gains ${this.pointsString(points)} on their adventure!`;
 		} else {
@@ -723,7 +723,7 @@ class BranchingAdventure extends Module {
 		
 		// If a chapter is empty, we go straight to end it (empty chapters are
 		// for making automatic decisions)
-		if (userAdventure.chapters[chapterName].parts.length == 0) {
+		if (userAdventure.chapters[chapterName].parts.length === 0) {
 			this.endOfChapter(userAdventure);
 		} else {
 			// If it's not empty then we need to start showing each part

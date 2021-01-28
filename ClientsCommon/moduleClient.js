@@ -74,7 +74,7 @@ class SoundManager {
 	_dataLoaded(name) {
 		if (this._notYetLoaded[name]) {
 			delete this._notYetLoaded[name];
-			if (Object.keys(this._notYetLoaded).length == 0) {
+			if (Object.keys(this._notYetLoaded).length === 0) {
 				this._loadingFinished();
 			}
 		}
@@ -403,7 +403,7 @@ class SoundManager {
 	// 	onDone		Function to invoke when the sound stops (which is right
 	// 				away). This is used to comply with the general _singleOrAll
 	// 				template.
-	stop(target) {
+	stop(target, onDone) {
 		this._singleOrAll(target, sound => {
 			sound.pause().rewind();
 			if (onDone) {
@@ -467,7 +467,7 @@ class SoundManager {
 	// 	name		The name of the sound file to switch *to*.
 	crossFade(duration, name, onDone) {
 		Object.keys(this._sounds).forEach(soundName => {
-			if (soundName != name) {
+			if (soundName !== name) {
 				this.fadeOut(this._sounds[soundName]);
 			}
 		});
@@ -725,9 +725,11 @@ class ModuleClient extends EventNotifier {
 			}
 			
 			let volNum = Number(data.volume);
-			if (volNum === NaN) {
+			if (Number.isNaN(volNum)) {
 				// Give some error
-				this.sayTo(username, `Please specify volume as a number (0-100). Prefix with + or - to increase/decrease it.`);
+				this.sayTo(
+					data.username,
+					`Please specify volume as a number (0-100). Prefix with + or - to increase/decrease it.`);
 			}
 			
 			// Support for offsets rather than just direct volume numbers
@@ -776,7 +778,7 @@ class ModuleClient extends EventNotifier {
 	}
 	
 	// Log an error message to the console, marked as coming from this Module.
-	warn(message) {
+	error(message) {
 		console.error(this._printForm(message));
 	}
 	
@@ -923,7 +925,7 @@ class ModuleClient extends EventNotifier {
 			// Place the blocking event at the end of each queue it's requested
 			this.blockingEventQueues[eventName].push(eventDescriptor);
 			
-			if (this.blockingEventQueues[eventName].length == 1) {
+			if (this.blockingEventQueues[eventName].length === 1) {
 				// If our event is the only one in the queue then nothing was in
 				// it before, so it's ready on that front
 				eventDescriptor.eventFlags[eventName].ready = true;
@@ -977,7 +979,7 @@ class ModuleClient extends EventNotifier {
 		// now is the one that is telling us that it's done and we can remove it
 		// from the queue
 		let queue = this.blockingEventQueues[eventNames[0]];
-		if (queue.length == 0) {
+		if (queue.length === 0) {
 			console.warn(`Freeing of empty queue for '${eventNames[0]}`);
 			return;
 		}

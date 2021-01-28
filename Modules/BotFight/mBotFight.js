@@ -519,7 +519,7 @@ class BotFight extends Module {
 		
 		// Assuming that the conversation data is ok, this should actually never
 		// happen
-		if (ac.currentEntryIndex == ac.entries.length) {
+		if (ac.currentEntryIndex === ac.entries.length) {
 			this.endConversation();
 			return;
 		}
@@ -538,11 +538,11 @@ class BotFight extends Module {
 		speakerBot.say(lineEntry.line);
 		
 		// Determine what to do next
-		let nextFunc = null;
-		if (ac.currentLineIndex == entry.lines.length) {
+		let nextFunc;
+		if (ac.currentLineIndex === entry.lines.length) {
 			// Reached the end of the current entry
 			ac.currentEntryIndex++;
-			if (ac.currentEntryIndex == ac.entries.length) {
+			if (ac.currentEntryIndex === ac.entries.length) {
 				// Reached the end of the conversation
 				nextFunc = () => this.endConversation();
 			} else {

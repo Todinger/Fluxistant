@@ -124,7 +124,7 @@ class Adventure extends Module {
 	// 	data	The contents of the JSON file.
 	loadAdventureFile(name, data) {
 		// Inactive files are ignored
-		if (data.active == false) {
+		if (data.active === false) {
 			return;
 		}
 		
@@ -419,7 +419,7 @@ class Adventure extends Module {
 		this.registerCommand({
 			cmdname: 'endadventure',
 			filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-			callback: user => this.endAdventure(),
+			callback: () => this.endAdventure(),
 		});
 	}
 }

@@ -47,10 +47,6 @@ class ValueEntity extends ConfigEntity {
 	clone() {
 		return new ValueEntity(this.value);
 	}
-	
-	fromJSON() {
-		this.setValue(JSON.parse(jsonValue));
-	}
 }
 
 module.exports = ValueEntity;

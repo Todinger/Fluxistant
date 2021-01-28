@@ -71,7 +71,7 @@ class ParrotMate extends Module {
 		
 		this.onClientAttached(socket => {
 			socket.on('imgdispDone', url => {
-				if (PARROT_IMAGE_URL == url && !this.whatWasThatCooldownActive) {
+				if (PARROT_IMAGE_URL === url && !this.whatWasThatCooldownActive) {
 					this.whatWasThatCooldownActive = true;
 					setTimeout(
 						() => this.broadcastEvent('playSequence', 'what'),

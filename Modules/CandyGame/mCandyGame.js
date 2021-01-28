@@ -9,7 +9,6 @@ const Utils = require('../../utils');
 // 		"CandyName"
 // 	}
 const CANDY_FILENAME = 'candy.json';
-const START_COMMAND = 'candy';
 
 const CANDY_DEFAULTS = {
 	weight: 25,
@@ -21,10 +20,6 @@ const CANDY_DEFAULTS = {
 	userBonus: {
 		amount: 500,
 	},
-};
-
-const USERBONUS_DEFAULTS = {
-	amount: 500,
 };
 
 const INFLATIONS = {

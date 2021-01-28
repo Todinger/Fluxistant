@@ -78,10 +78,6 @@ class ArrayEntity extends ConfigEntity {
 		this.elements.forEach(element => copy.addElement(element.clone()));
 		return copy;
 	}
-	
-	fromJSON() {
-		this.setValue(JSON.parse(jsonValue));
-	}
 }
 
 module.exports = ArrayEntity;

@@ -74,7 +74,7 @@ class ClearTextAction extends Action {
 		clearText();
 	}
 }
-function ClearText() { return new ClearTextAction() };
+function ClearText() { return new ClearTextAction(); }
 
 class TimedEvent {
 	constructor(time, actions) {
@@ -124,7 +124,7 @@ class TimedSequence {
 	}
 	
 	play() {
-		if (this.events.length == 0) return;
+		if (this.events.length === 0) return;
 		
 		this._next(0);
 	}
