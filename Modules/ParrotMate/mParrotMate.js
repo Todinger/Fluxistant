@@ -46,8 +46,6 @@ class ParrotMate extends Module {
 			filters: [Module.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
 			callback: (user, variance) => {
 				if (isNaN(variance)) {
-					// TODO: Give the use an error, once we're ready to reveal
-					// Fluxistant to the world
 					this.error(`Bad command by ${user.name}: '${variance}' is not a number`);
 				} else {
 					this.broadcastEvent('setVariance', Number(variance));
