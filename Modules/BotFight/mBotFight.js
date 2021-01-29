@@ -573,16 +573,30 @@ class BotFight extends Module {
 			this.scheduleNextConversation();
 		}
 		
-		this.registerCommand({
+		// this.registerCommand({
+		// 	cmdname: 'botfight',
+		// 	filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
+		// 	callback: () => {
+		// 		if (!this.active) {
+		// 			this.active = true;
+		// 			this.startRandomConversation();
+		// 		}
+		// 	},
+		// });
+	}
+	
+	commands = {
+		['botfight']: {
 			cmdname: 'botfight',
-			filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
+			description: 'Makes the bots initiate a random conversation.',
+			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
 			callback: () => {
 				if (!this.active) {
 					this.active = true;
 					this.startRandomConversation();
 				}
 			},
-		});
+		}
 	}
 }
 

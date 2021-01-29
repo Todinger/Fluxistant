@@ -26,14 +26,14 @@ class FShower extends Module {
 	}
 	
 	load() {
-		this.registerCommand({
-			cmdname: 'f',
-			callback: user => this.findAndSendFile(user),
-		});
+		// this.registerCommand({
+		// 	cmdname: 'f',
+		// 	callback: user => this.findAndSendFile(user),
+		// });
 	}
 	
 	commands = {
-		['g']: {
+		['f']: {
 			description: 'Drops down user-specific or a randomly selected F image from the top of the screen.',
 			callback: user => this.findAndSendFile(user),
 		}

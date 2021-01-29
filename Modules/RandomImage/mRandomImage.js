@@ -28,12 +28,21 @@ class RandomImage extends Module {
 	}
 	
 	load() {
-		this.registerCommand({
-			cmdname: COMMAND_NAME,
+		// this.registerCommand({
+		// 	cmdname: COMMAND_NAME,
+		// 	callback: user => this.showRandomImage(user),
+		// 	cost: COMMAND_COST,
+		// 	descFunc: user => this.describeCommand(user)
+		// });
+	}
+	
+	commands = {
+		[COMMAND_NAME]: {
 			callback: user => this.showRandomImage(user),
 			cost: COMMAND_COST,
-			descFunc: user => this.describeCommand(user)
-		});
+			// TODO: Give commands the option to show a message when invoked, add variables that messages can use, and have both global variables and module-specific ones.
+			// descFunc: user => this.describeCommand(user)
+		},
 	}
 }
 

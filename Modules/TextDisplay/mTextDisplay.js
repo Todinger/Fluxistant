@@ -27,20 +27,6 @@ class TextDisplay extends Module {
 				socket.emit('styleList', this.styles);
 			});
 		});
-		
-		this.registerCommand({
-			cmdname: 'z',
-			filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-			callback: user => this.broadcastEvent('showText', {
-				style: 'Creepy',
-				text: 'Hello world!',
-				color: '#EF8D01',
-				displayModule: {
-					name: 'fade',
-				},
-				sound: "/assets/sfx/xfiles.mp3",
-			}),
-		});
 	}
 }
 

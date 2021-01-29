@@ -128,6 +128,10 @@ class CandyGame extends Module {
 	}
 	
 	candyRequest(user) {
+		if (!this.ongoing) {
+			return;
+		}
+		
 		let candyName = Utils.weightedRandomKey(
 			this.candyData,
 			candy => this.getCandyWeight(candy));
@@ -180,33 +184,33 @@ class CandyGame extends Module {
 	}
 	
 	load() {
-		this.registerCommand({
-			cmdname: 'trickortreat',
-			filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-			callback: user => this.startGame(user),
-		});
-		
-		this.registerCommand({
-			cmdname: 'nomorecandy',
-			filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-			callback: user => this.endGame(user),
-		});
-		
-		this.registerCommand({
-			cmdname: 'gimme',
-			
-			// This makes the command inactive while the game isn't on
-			filters: [() => this.ongoing],
-			
-			cost: 10,
-			silent: true,
-			
-			cooldowns: {
-				user: 3000,
-			},
-			
-			callback: user => this.candyRequest(user),
-		});
+		// this.registerCommand({
+		// 	cmdname: 'trickortreat',
+		// 	filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
+		// 	callback: user => this.startGame(user),
+		// });
+		//
+		// this.registerCommand({
+		// 	cmdname: 'nomorecandy',
+		// 	filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
+		// 	callback: user => this.endGame(user),
+		// });
+		//
+		// this.registerCommand({
+		// 	cmdname: 'gimme',
+		//
+		// 	// This makes the command inactive while the game isn't on
+		// 	filters: [() => this.ongoing],
+		//
+		// 	cost: 10,
+		// 	silent: true,
+		//
+		// 	cooldowns: {
+		// 		user: 3000,
+		// 	},
+		//
+		// 	callback: user => this.candyRequest(user),
+		// });
 		
 		this.onChannelReward(
 			'Start a Candy Game',
@@ -218,6 +222,30 @@ class CandyGame extends Module {
 				}
 			}
 		);
+	}
+	
+	commands = {
+		['trickortreat']: {
+			description: 'Starts a candy game.',
+			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+			callback: user => this.startGame(user),
+		},
+		
+		['nomorecandy']: {
+			description: 'Stops the currently ongoing candy game.',
+			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+			callback: user => this.endGame(user),
+		},
+		
+		['gimme']: {
+			description: 'Randomly chooses a piece of candy for the user and drops it down from above.',
+			cost: 10,
+			silent: true,
+			cooldowns: {
+				user: 3000,
+			},
+			callback: user => this.candyRequest(user),
+		},
 	}
 }
 

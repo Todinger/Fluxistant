@@ -316,7 +316,7 @@ class Adventure extends Module {
 	// Parameters:
 	// 	user	The user signing up.
 	join(user) {
-		if (!(user.name in this.activeAdventure.participants)) {
+		if (this.recruiting && !(user.name in this.activeAdventure.participants)) {
 			this.activeAdventure.participants[user.name] = user;
 			this.fillSay('$user joins the $title!', user);
 		}
@@ -404,23 +404,42 @@ class Adventure extends Module {
 	// [Inherited, called externally]
 	// Module entry point.
 	load() {
-		this.registerCommand({
-			cmdname: 'adventure',
+		// this.registerCommand({
+		// 	cmdname: 'adventure',
+		// 	aliases: ['adv'],
+		// 	callback: user => this.startRecruiting(user),
+		// });
+		//
+		// this.registerCommand({
+		// 	cmdname: JOIN_COMMAND,
+		// 	filters: [() => this.recruiting],
+		// 	callback: user => this.join(user),
+		// });
+		//
+		// this.registerCommand({
+		// 	cmdname: 'endadventure',
+		// 	filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
+		// 	callback: () => this.endAdventure(),
+		// });
+	}
+	
+	commands = {
+		['adventure']: {
 			aliases: ['adv'],
+			description: 'Starts the adventure by the user.',
 			callback: user => this.startRecruiting(user),
-		});
+		},
 		
-		this.registerCommand({
-			cmdname: JOIN_COMMAND,
-			filters: [() => this.recruiting],
+		[JOIN_COMMAND]: {
+			description: 'Joins the currently active adventure.',
 			callback: user => this.join(user),
-		});
+		},
 		
-		this.registerCommand({
-			cmdname: 'endadventure',
-			filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
+		['endadventure']: {
+			description: 'Cancels the currently ongoing adventure.',
+			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
 			callback: () => this.endAdventure(),
-		});
+		},
 	}
 }
 

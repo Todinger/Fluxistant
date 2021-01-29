@@ -1,6 +1,0 @@
-{
-	"enabled": "boolean",
-	"variables": {
-		"$reward": "integer"
-	}
-}
