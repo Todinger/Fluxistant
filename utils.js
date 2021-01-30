@@ -288,6 +288,39 @@ class Utils {
 		} catch(err) { }
 	}
 	
+	// From MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+	static escapeRegExp(string) {
+		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+	}
+	
+	// Finds all the matches of the given regular expression in the given string, invokes the given
+	// replacement function on the match (parameters: matchString, matchObject) and replaces the
+	// found match with its return value. Basically, it's a smart-replace with a function saying
+	// what should go in place of each found instance of the search expression.
+	static regExpGroupReplace(regex, str, replaceFunc) {
+		// If the 'g' flag isn't included, the loop will run forever since the RegExp isn't stateful
+		if (!regex.flags.includes('g')) {
+			regex = new RegExp(regex.source, regex.flags + 'g');
+		}
+		
+		let match;
+		let result = '';
+		let lastStartIndex = 0;
+		while ((match = regex.exec(str)) !== null) {
+			result += str.substring(lastStartIndex, match.index);
+			result += replaceFunc(match[0], match);
+			lastStartIndex = match.index + match[0].length;
+		}
+		
+		// If the last expression didn't cover the rest of the string, we need to add the suffix
+		// to our result string
+		if (lastStartIndex < str.length) {
+			result += str.substring(lastStartIndex);
+		}
+		
+		return result;
+	}
+	
 	
 	// Checks for equality between two values.
 	// Only supports basic value types.

@@ -85,14 +85,6 @@ class Module {
 				this.say(`@${user.displayName} ${msg}`);
 			}
 		}
-		
-		// this.registerCommand({
-		// 	cmdname: 'fxvol',
-		// 	filters: [Module.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-		// 	callback: (user, volume) => {
-		// 		this.broadcastEvent('fxvol', { username: user.name, volume });
-		// 	}
-		// });
 	}
 	
 	filterDesc(type, arg) {
@@ -109,7 +101,6 @@ class Module {
 		
 		// The !fxvol command is only relevant to modules that have a web client part
 		if (this.webname) {
-			// TODO: Change name to 'fxvol' once finished moving to new command definition system
 			this.commands['fxvol'] = {
 				description: 'Modifies the volume level of sounds produced by this module. Accepts a percentage number (0-100) for setting a specific volume, or differences with +/- (e.g. +20 would increase the volume by 20%, up to 100%).',
 				filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
@@ -140,7 +131,7 @@ class Module {
 		if (commands) {
 			let cmdObjects = {};
 			Object.keys(commands).forEach(cmdid => {
-				cmdObjects[cmdid] = new Command(commands[cmdid]);
+				cmdObjects[cmdid] = new Command(this, commands[cmdid]);
 			});
 			return cmdObjects;
 		}

@@ -20,8 +20,10 @@ class CommandEntity extends StaticObjectEntity {
 			.setDescription('Optional additional names for the command.');
 		this.addChild('cost', new ValueEntity(data && data.cost || 0))
 			.setDescription('Cost in StreamElements loyalty points.');
-		this.addChild('silent', new ValueEntity(false))
-			.setDescription('Whether or not to suppress the bot from announcing point usage for this command.');
+		this.addChild('message', new ValueEntity(data && data.message))
+			.setDescription('A message the bot will send to the chat when the command is invoked.');
+		// this.addChild('silent', new ValueEntity(false))
+		// 	.setDescription('Whether or not to suppress the bot from announcing point usage for this command.');
 		this.addChild('cooldowns', new CooldownEntity())
 			.setDescription('How long it takes before the command can be used again.');
 		this.addChild('filters', new DynamicArrayEntity('UserFilter'))

@@ -333,7 +333,7 @@ class TwitchManager extends EventNotifier {
 		let args = parts.slice(1);
 		
 		return {
-			// The name of the command (withotu the prefix)
+			// The name of the command (without the prefix)
 			cmdname: cmdname,
 			
 			// Any arguments supplied with the command (all in text form)
@@ -360,6 +360,9 @@ class TwitchManager extends EventNotifier {
 		// said User object
 		let fullargs = [user].concat(command.args);
 		
+		// Marker for if the command was successful, for post-command handling
+		let success = false;
+		
 		// Handle commands with a cost
 		if (handler.cost && handler.cost > 0) {
 			// Commands with a cost normally show a response, to let the user
@@ -380,7 +383,7 @@ class TwitchManager extends EventNotifier {
 				handler.cost,
 				// Success
 				(oldAmount, newAmount) => {
-					// If the command is silent, no repsonse is sent to the chat
+					// If the command is silent, no response is sent to the chat
 					// nor is an entry added to the database log
 					if (!handler.silent) {
 						DBLog.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
@@ -391,8 +394,9 @@ class TwitchManager extends EventNotifier {
 					// the command
 					handler.callback.apply(null, fullargs);
 					
-					// If it has any cooldowns, they need to be activated
-					this._applyCooldowns(user, handler);
+					// At this point, if nothing went wrong during the callback
+					// invocation, the command has successfully run
+					success = true;
 				},
 				// Failure do to lack of points
 				(amount, points) => {
@@ -404,9 +408,20 @@ class TwitchManager extends EventNotifier {
 				});
 		// Handle free commands
 		} else {
-			// Here we only need to invoke the command and initiate cooldowns
+			// Here we only need to invoke the command and we're done
 			handler.callback.apply(null, fullargs);
+			success = true;
+		}
+		
+		// Things to do if the invocation of the command went well
+		if (success) {
+			// If the command has any cooldowns, they need to be activated
 			this._applyCooldowns(user, handler);
+			
+			// Send a configured message to the chat as defined by the command
+			if (handler.message) {
+				this.say(handler.createResponse(user, command, handler));
+			}
 		}
 	}
 	
