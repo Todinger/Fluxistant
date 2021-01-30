@@ -12,7 +12,6 @@ class FShower extends Effect {
 	}
 	
 	sendFile(filename, fileurl) {
-		this.log(`Filename: ${filename}`);
 		let match = filename.match(SIZE_REGEX);
 		let image = { url: fileurl };
 		if (match) {
@@ -22,7 +21,6 @@ class FShower extends Effect {
 		
 		image.count = 15;
 		
-		this.log(`Dropping image ${image.url} with size ${image.width}x${image.height}`)
 		this.broadcastEvent('dropImage', image);
 	}
 	
