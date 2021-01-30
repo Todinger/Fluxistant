@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="fd22bf18-b86c-4eac-963a-dcffb8f736f2" name="Default Changelist" comment="Started implementing command messages." />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1nf9V84wxZmct4aaIRFmwwQrkGo" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="javascript.nodejs.core.library.configured.version" value="14.15.4" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Modules/CandyGame/Config" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Dropbox\Streaming\Effects\Scripted\Modules\CandyGame\Config" />
+      <recent name="D:\Dropbox\Streaming\Effects\Scripted\Config\Entities" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Fluxbot" type="NodeJSConfigurationType" path-to-js-file="fluxbot.js" working-dir="$PROJECT_DIR$">
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fd22bf18-b86c-4eac-963a-dcffb8f736f2" name="Default Changelist" comment="" />
+      <created>1611770299093</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1611770299093</updated>
+      <workItem from="1611770301306" duration="83000" />
+      <workItem from="1611770464529" duration="32205000" />
+      <workItem from="1611862728132" duration="13058000" />
+      <workItem from="1611937023489" duration="5046000" />
+    </task>
+    <task id="LOCAL-00001" summary="Created a WebStorm project for the, um, project.">
+      <created>1611770609628</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1611770609628</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Exporting and importing configurations work for a module with a command.&#10;&#10;Going to update Node.js now... hope it doesn't break anything. ._.">
+      <created>1611860379557</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1611860379557</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Before updating Node, some cleanup from code analysis">
+      <created>1611861155794</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1611861155794</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Deleted old comment">
+      <created>1611861243338</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1611861243338</updated>
+    </task>
+    <task id="LOCAL-00005" summary="A couple of small fixes&#10;&#10;Filters weren't working, and neither was the !chickenout command for BranchingAdventure.">
+      <created>1611862329804</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1611862329804</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Some code cleanup (finally deleted those toJSON methods)">
+      <created>1611864390795</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1611864390795</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Some code changes based on automatic code inspection">
+      <created>1611866111222</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1611866111222</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Commands registered through configs now actually work...">
+      <created>1611871415960</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1611871415960</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Switched all the commands to the new registration system.">
+      <created>1611918323279</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1611918323279</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Started implementing command messages.">
+      <created>1612014836475</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1612014836475</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Created a WebStorm project for the, um, project." />
+    <MESSAGE value="Exporting and importing configurations work for a module with a command.&#10;&#10;Going to update Node.js now... hope it doesn't break anything. ._." />
+    <MESSAGE value="Before updating Node, some cleanup from code analysis" />
+    <MESSAGE value="Deleted old comment" />
+    <MESSAGE value="A couple of small fixes&#10;&#10;Filters weren't working, and neither was the !chickenout command for BranchingAdventure." />
+    <MESSAGE value="Some code cleanup (finally deleted those toJSON methods)" />
+    <MESSAGE value="Some code changes based on automatic code inspection" />
+    <MESSAGE value="Commands registered through configs now actually work..." />
+    <MESSAGE value="Switched all the commands to the new registration system." />
+    <MESSAGE value="Started implementing command messages." />
+    <option name="LAST_COMMIT_MESSAGE" value="Started implementing command messages." />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="414" y="174" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611772968637">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="414" y="174" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611772968637" />
+    <state x="590" y="246" key="#com.intellij.ide.util.ExportDialog" timestamp="1611861150846">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="590" y="246" key="#com.intellij.ide.util.ExportDialog/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611861150846" />
+    <state x="707" y="374" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1611864179176">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="707" y="374" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611864179176" />
+    <state width="1266" height="466" key="DebuggerActiveHint" timestamp="1611871221847">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1266" height="466" key="DebuggerActiveHint/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611871221847" />
+    <state x="92" y="92" width="1736" height="856" key="DiffContextDialog" timestamp="1611864330071">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="92" y="92" width="1736" height="856" key="DiffContextDialog/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611864330071" />
+    <state x="740" y="274" key="FileChooserDialogImpl" timestamp="1611772965190">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611772965190" />
+    <state width="1899" height="282" key="GridCell.Tab.0.bottom" timestamp="1612014842626">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1612014842626" />
+    <state width="1899" height="282" key="GridCell.Tab.0.center" timestamp="1612014842626">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1612014842626" />
+    <state width="1899" height="282" key="GridCell.Tab.0.left" timestamp="1612014842626">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1612014842626" />
+    <state width="1899" height="282" key="GridCell.Tab.0.right" timestamp="1612014842626">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1612014842626" />
+    <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state width="1899" height="348" key="GridCell.Tab.1.center" timestamp="1611922007519">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.1.center/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007519" />
+    <state width="1899" height="348" key="GridCell.Tab.1.left" timestamp="1611922007519">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.1.left/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007519" />
+    <state width="1899" height="348" key="GridCell.Tab.1.right" timestamp="1611922007519">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007519" />
+    <state width="1899" height="348" key="GridCell.Tab.2.bottom" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.2.bottom/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state width="1899" height="348" key="GridCell.Tab.2.center" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.2.center/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state width="1899" height="348" key="GridCell.Tab.2.left" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.2.left/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state width="1899" height="348" key="GridCell.Tab.2.right" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.2.right/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state width="1899" height="348" key="GridCell.Tab.3.bottom" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.3.bottom/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state width="1899" height="348" key="GridCell.Tab.3.center" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.3.center/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state width="1899" height="348" key="GridCell.Tab.3.left" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.3.left/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state width="1899" height="348" key="GridCell.Tab.3.right" timestamp="1611922007520">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.3.right/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611922007520" />
+    <state x="811" y="159" key="SettingsEditor" timestamp="1611831743748">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="811" y="159" key="SettingsEditor/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611831743748" />
+    <state x="618" y="330" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1611871123266">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="618" y="330" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611871123266" />
+    <state x="89" y="104" width="1736" height="856" key="dock-window-1" timestamp="1611821940249">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="89" y="104" width="1736" height="856" key="dock-window-1/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611821940249" />
+    <state x="1235" y="143" width="585" height="795" key="find.popup" timestamp="1611831101670">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1235" y="143" width="585" height="795" key="find.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611831101670" />
+    <state x="601" y="246" width="700" height="530" key="recent.locations.popup" timestamp="1611863087119">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="601" y="246" width="700" height="530" key="recent.locations.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611863087119" />
+    <state x="616" y="240" key="run.anything.popup" timestamp="1611857797574">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611857797574" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1611864946334">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1611864946334" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint enabled="true" type="javascript-exception" />
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

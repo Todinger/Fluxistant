@@ -2,8 +2,8 @@
 const DEFAULTS = {
 	minDuration: 500,
 	maxDuration: 6000,
-	width: 50,
-	height: 50,
+	width: 150,
+	height: 150,
 	count: 30,
 };
 
@@ -13,6 +13,7 @@ class FShower extends EffectClient {
 	}
 	
 	dropImage(image) {
+		console.log(image);
 		// We use double this duration along with double the distance
 		// to avoid the slowing at the end of the default easing
 		let duration = randomInt(image.minDuration, image.maxDuration);
