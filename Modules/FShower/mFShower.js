@@ -35,6 +35,7 @@ class FShower extends Module {
 	commands = {
 		['f']: {
 			description: 'Drops down user-specific or a randomly selected F image from the top of the screen.',
+			message: 'Args: $all',
 			callback: user => this.findAndSendFile(user),
 		}
 	}
