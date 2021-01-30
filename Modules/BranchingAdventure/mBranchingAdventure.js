@@ -844,7 +844,6 @@ class BranchingAdventure extends Module {
 	// [Inherited, called externally]
 	// Module entry point.
 	load() {
-		
 		this.onTwitchEvent('message', (user, message) => {
 			if (this.userHasAdventure(user)) {
 				this.processUserMessage(
@@ -852,31 +851,6 @@ class BranchingAdventure extends Module {
 					message);
 			}
 		});
-		
-		
-		// this.registerCommand({
-		// 	// cmdname: 'b',
-		// 	cmdname: 'choose',
-		// 	// aliases: ['adv'],
-		// 	// filters: [Module.Filters.isOneOf([
-		// 	// 	'omreeny',
-		// 	// 	'fluxlingkitten',
-		// 	// 	'yecatsmailbox',
-		// 	// 	'fluxistence'])],
-		// 	callback: (user, category) => this.startAdventure(user, category),
-		// });
-		//
-		// this.registerCommand({
-		// 	// cmdname: 'c',
-		// 	cmdname: 'chickenout',
-		// 	filters: [user => this.userHasAdventure(user)],
-		// 	callback: user => {
-		// 		if (this.userHasAdventure(user)) {
-		// 			this.tell(user, "Alright, if that's what you want... *Cluck*");
-		// 			this.endAdventure(this.activeAdventures[user.name]);
-		// 		}
-		// 	},
-		// });
 	}
 	
 	commands = {

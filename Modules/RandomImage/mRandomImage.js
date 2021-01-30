@@ -27,15 +27,6 @@ class RandomImage extends Module {
 		return `${_.capitalize(COMMAND_NAME)} redeemed by ${user.displayName} for ${this.pointsString(COMMAND_COST)}! One random drawing by Yecats coming up!`;
 	}
 	
-	load() {
-		// this.registerCommand({
-		// 	cmdname: COMMAND_NAME,
-		// 	callback: user => this.showRandomImage(user),
-		// 	cost: COMMAND_COST,
-		// 	descFunc: user => this.describeCommand(user)
-		// });
-	}
-	
 	commands = {
 		[COMMAND_NAME]: {
 			callback: user => this.showRandomImage(user),

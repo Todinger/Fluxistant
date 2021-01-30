@@ -21,45 +21,6 @@ class Countdown extends Module {
 	load() {
 		this.onClientAttached(() => this.broadcastEvent('setTime', this.initialTime));
 		
-		// this.registerCommand({
-		// 	cmdname: 'settime',
-		// 	filters: [Module.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-		// 	callback: (user, time) => {
-		// 		if (isNaN(time)) {
-		// 			this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
-		// 			return;
-		// 		}
-		//
-		// 		this.broadcastEvent('setTime', Number(time) * MINUTES);
-		// 	},
-		// });
-		//
-		// this.registerCommand({
-		// 	cmdname: 'addtime',
-		// 	filters: [Module.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-		// 	callback: (user, time) => {
-		// 		if (isNaN(time)) {
-		// 			this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
-		// 			return;
-		// 		}
-		//
-		// 		this.broadcastEvent('offsetTime', Number(time) * MINUTES);
-		// 	},
-		// });
-		//
-		// this.registerCommand({
-		// 	cmdname: 'subtracttime',
-		// 	filters: [Module.Filters.isOneOf(['fluxistence', 'yecatsmailbox'])],
-		// 	callback: (user, time) => {
-		// 		if (isNaN(time)) {
-		// 			this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
-		// 			return;
-		// 		}
-		//
-		// 		this.broadcastEvent('offsetTime', -Number(time) * MINUTES);
-		// 	},
-		// });
-		
 		this.registerShortcutKey(
 			'addTime',
 			[

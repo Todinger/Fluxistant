@@ -184,34 +184,6 @@ class CandyGame extends Module {
 	}
 	
 	load() {
-		// this.registerCommand({
-		// 	cmdname: 'trickortreat',
-		// 	filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-		// 	callback: user => this.startGame(user),
-		// });
-		//
-		// this.registerCommand({
-		// 	cmdname: 'nomorecandy',
-		// 	filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-		// 	callback: user => this.endGame(user),
-		// });
-		//
-		// this.registerCommand({
-		// 	cmdname: 'gimme',
-		//
-		// 	// This makes the command inactive while the game isn't on
-		// 	filters: [() => this.ongoing],
-		//
-		// 	cost: 10,
-		// 	silent: true,
-		//
-		// 	cooldowns: {
-		// 		user: 3000,
-		// 	},
-		//
-		// 	callback: user => this.candyRequest(user),
-		// });
-		
 		this.onChannelReward(
 			'Start a Candy Game',
 			user => {

@@ -401,28 +401,6 @@ class Adventure extends Module {
 		this.activeAdventure = null;
 	}
 	
-	// [Inherited, called externally]
-	// Module entry point.
-	load() {
-		// this.registerCommand({
-		// 	cmdname: 'adventure',
-		// 	aliases: ['adv'],
-		// 	callback: user => this.startRecruiting(user),
-		// });
-		//
-		// this.registerCommand({
-		// 	cmdname: JOIN_COMMAND,
-		// 	filters: [() => this.recruiting],
-		// 	callback: user => this.join(user),
-		// });
-		//
-		// this.registerCommand({
-		// 	cmdname: 'endadventure',
-		// 	filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-		// 	callback: () => this.endAdventure(),
-		// });
-	}
-	
 	commands = {
 		['adventure']: {
 			aliases: ['adv'],

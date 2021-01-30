@@ -572,17 +572,6 @@ class BotFight extends Module {
 		if (this.active) {
 			this.scheduleNextConversation();
 		}
-		
-		// this.registerCommand({
-		// 	cmdname: 'botfight',
-		// 	filters: [Module.Filters.isOneOf(['yecatsmailbox', 'fluxistence'])],
-		// 	callback: () => {
-		// 		if (!this.active) {
-		// 			this.active = true;
-		// 			this.startRandomConversation();
-		// 		}
-		// 	},
-		// });
 	}
 	
 	commands = {
