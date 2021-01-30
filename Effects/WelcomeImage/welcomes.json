@@ -1,0 +1,140 @@
+{
+	"huseyin_gazi": {
+		"image": {
+			"url": "/assets/image-display/HuseyinGazi.png"
+		},
+		"messages": [
+			"Hello, Huseyin_Gazi. I've received a letter for you from a Ms. \"Loli Ghost\" - I'll just leave it here... it smells like human decomposition.",
+			"MEOW! Meow... meow, meow? Meow meow meow! Meow. Meow meow... meow... Meeeyoooooooow! Meow meow! ^_^",
+			"Here he is, ladies and gentleman! The Phasmophobia KING! Make way for King Gazi!",
+			"I spent all night making you tea, Huseyin_Gazi. Please take it and enjoy your stay! yecatsMmm",
+			"I can haz hug? Meow Huseyin_Gazi?"
+		]
+	},
+	
+	"yecatsmailbox": {
+		"image": {
+			"url": "/assets/image-display/Mac.gif",
+			"width": 480,
+			"height": 360,
+			"duration": 6500
+		},
+		"sound": "/assets/sfx/xfiles.mp3",
+		"messages": [
+			"YES! YECATS! WE MISSED YOU!",
+			"OMG, the most beautiful person is here! fluxis3Yay Hello Yecats! fluxis3ItorLove"
+		]
+	},
+	
+	"fluxistence": {
+		"image": {
+			"url": "/assets/image-display/Objection - Flux.png"
+		},
+		"sound": "/assets/sfx/bapanada.mp3",
+		"messages": [
+			"Stop typing and stream. <_<",
+			"Don't I know you from somewhere?",
+			"You're the best! And I'm not just saying it because I'm programmed to! Well... maybe I am. <_<"
+		]
+	},
+	
+	"omreeny": {
+		"messages": [
+			"Meow! It's Slenderman. Cancel McDonalds order. Meow.",
+			"Meow! Omnomnomnom, Omreeny must not be eating or he wouldn't be typing. Mrowr.",
+			"Meow? Is that a gorilla I hear? D:",
+			"Me-yooow... The Hamburglar is here!",
+			"MEOW! All hail the King of the kitty litter box!"
+		]
+	},
+	
+	"fluxlingkitten": {
+		"messages": [
+			"Fluxlingkitten, shouldn't you be working, young man?",
+			"Oh, fluxlingkitten, hello! It is so nice to see you! Your boss must be so pleased that you've completed all of your work for the day and decided to jo-- oh, what? You aren't done yet? Can I please have the CFO's number?",
+			"Look who it is... wish I could watch Twitch from work... *growls*",
+			"What is a FluxlingKitten, anyway? Is that some sort of weird digital Fluxistence-Yecats baby? Did you come from Yecats?! OH MY GOD, you're an ADULT? WHAT IS REAL?!?!",
+			"Meow. You smell good. Purrrrr..."
+		]
+	},
+	
+	"iamlarcyn": {
+		"messages": [
+			"Meow! It's iAmLarcyn. Hide your potatoes! Meow.",
+			"OOGA DABOOGA! iAmY3C4T5B0T and iAmL1V3",
+			"Everyone, quick! Say hi to Yecats' favorite spud!",
+			"It's MC Larcyn! Throw down dem bars, Curly Fry!",
+			"Please bow before our mod Larcyn, the holiest tater to ever set foot in this unholy land."
+		]
+	},
+	
+	"illfinity": {
+		"messages": [
+			"Meow! Illfinity is that guy from Brooklyn, right? Meow.",
+			"Meow! Thunderbutt's daddy has arrived. I can haz play with Thunderbutt?",
+			"Mroowrrr... Play with me, Illfinity. yecatsMailbox",
+			"HISSS! He locked my Yecats in a room with a ghost!",
+			"Have you heard Illfinity's music? What are you waiting for?! Go right meow."
+		]
+	},
+	
+	"therealxagent": {
+		"messages": [
+			"It's a twin, it's a twin! Run for the hills, he is just as crazy!",
+			"Nyyyyyeeauuuu!",
+			"Wow. Kappa",
+			"The Germans are coming, the Germans are coming! Hide!",
+			"Where is X? yecatsLost Yecats? A little help? Oh, wait, there he is!"
+		]
+	},
+	
+	"maaz28": {
+		"messages": [
+			"Cheers, everybody! It is time to refresh your beverage, grab a snack, and sit around for story time. Wait, no, that's Mon-Fri 8:30 CST over on MAAz28's channel.",
+			"Maaz! Why, what an honor... Please, allow me! *pulls out the red carpet* This way, your majesty!",
+			"When I grow up, I wanna be just like maaz_b0t. yecatsMmm",
+			"MAAz taught Yecats everything she knows... especially how to swear like a fuckin' sailor. ;)",
+			"It's MAAz, the God of chatting, drinking wine and caressing his Les Paul. I wish someone played with me like that. yecatsMeow"
+		]
+	},
+	
+	"maxadrums": {
+		"messages": [
+		]
+	},
+	
+	"facelessclown": {
+		"messages": [
+		]
+	},
+	
+	"nglswt": {
+		"messages": [
+		]
+	},
+	
+	"ttrm8k": {
+		"messages": [
+		]
+	},
+	
+	"jeffyard": {
+		"messages": [
+		]
+	},
+	
+	"sl_im_me": {
+		"messages": [
+		]
+	},
+	
+	"thelostsoul80s": {
+		"messages": [
+		]
+	},
+	
+	"eryckwebb": {
+		"messages": [
+		]
+	}
+}
