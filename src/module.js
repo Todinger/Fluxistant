@@ -199,7 +199,6 @@ class Module {
 		}
 		
 		this.loadModConfig();
-		if (this.name === 'Random Image') debugger;
 		if (config.commands && this.commandObjects) {
 			this.unregisterCommands();
 			this.importCommandInfo(config.commands);
