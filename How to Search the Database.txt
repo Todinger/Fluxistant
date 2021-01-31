@@ -1,5 +1,0 @@
-Open Robo 3T and enter:
-
-db.Logs.find({ $text: { $search: "TEXT" } })
-
-With TEXT being what you want to find.

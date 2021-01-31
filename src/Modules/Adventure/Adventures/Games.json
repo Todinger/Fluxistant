@@ -1,0 +1,25 @@
+{
+	"title": "video game adventure",
+	"startDesc": "$user has started a $title!",
+	"adventures": {
+		
+		"mario": [
+			"$all are on a quest to find the elusive Yoshi!",
+			"They climb down drain pipes, stomp on turtle shells and consume stars!",
+			"\"It's-a me, $winner!\" shouts $winner as they hop on Yoshi and ride him into the sunset."
+		],
+		
+		"mk": [
+			"$all have been chosen to represent the realms in deadly Mortal Kombat!",
+			"They must all fight to the death to protect their realms from invasion.",
+			"/me makes some punching, kicking and grunting sounds.",
+			"When all is said and done, $winner is left alone in a room full of blood. Just... take your pixels and leave, please. o_o"
+		],
+		
+		"phasmophobia": [
+			"Oh, it's terrible news! Yecats has been kidnapped by one of the demons from Phasmophobia! $all pile into a clown car to try and rescue her.", 
+			"They know that if they climb down the seven layers of Hell, they will surely find her!", 
+			"Heck! It's so hot! Everyone chickens out except $winner - who dies trying to save Yecats. fluxis3DIED Gone but never forgotten."
+		]
+	}
+}

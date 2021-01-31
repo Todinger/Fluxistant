@@ -1,0 +1,221 @@
+{
+	"CandyCorn": {
+		"image": {
+			"url": "CandyCorn.png"
+		},
+		"reward": -100,
+		"weight": 1
+	},
+	
+	"ChocoFlux": {
+		"image": {
+			"url": "ChocoFlux.png"
+		}
+	},
+	
+	"Flux's": {
+		"image": {
+			"url": "Flux's.png"
+		}
+	},
+	
+	"GummiBear": {
+		"image": {
+			"url": "GummiBear.png"
+		}
+	},
+	
+	"GummiWorms": {
+		"image": {
+			"url": "GummiWorms.png"
+		}
+	},
+	
+	"JellyBean": {
+		"image": {
+			"url": "JellyBean.png"
+		}
+	},
+	
+	"Lollibat": {
+		"image": {
+			"url": "Lollibat.png"
+		}
+	},
+	
+	"MnM_Ciandal": {
+		"image": {
+			"url": "MnM_Ciandal.png"
+		},
+		"userBonus": {
+			"username": "ciandal206"
+		}
+	},
+	
+	"MnM_Flux": {
+		"image": {
+			"url": "MnM_Flux.png"
+		},
+		"userBonus": {
+			"username": "fluxistence"
+		}
+	},
+	
+	"MnM_Huseyin": {
+		"image": {
+			"url": "MnM_Huseyin.png"
+		},
+		"userBonus": {
+			"username": "huseyin_gazi"
+		}
+	},
+	
+	"MnM_iamlarcyn": {
+		"image": {
+			"url": "MnM_iamlarcyn.png"
+		},
+		"userBonus": {
+			"username": "iamlarcyn"
+		}
+	},
+	
+	"MnM_MAAz": {
+		"image": {
+			"url": "MnM_MAAz.png"
+		},
+		"userBonus": {
+			"username": "maaz28"
+		}
+	},
+	
+	"MnM_max": {
+		"image": {
+			"url": "MnM_max.png"
+		},
+		"userBonus": {
+			"username": "maxadrums"
+		}
+	},
+	
+	"MnM_mynameistait": {
+		"image": {
+			"url": "MnM_mynameistait.png"
+		},
+		"userBonus": {
+			"username": "mynameistait"
+		}
+	},
+	
+	"MnM_neo": {
+		"image": {
+			"url": "MnM_neo.png"
+		},
+		"userBonus": {
+			"username": "neolycan"
+		}
+	},
+	
+	"MnM_nglswt": {
+		"image": {
+			"url": "MnM_nglswt.png"
+		},
+		"userBonus": {
+			"username": "nglswt"
+		}
+	},
+	
+	"MnM_Omreeny": {
+		"image": {
+			"url": "MnM_Omreeny.png"
+		},
+		"userBonus": {
+			"username": "omreeny"
+		}
+	},
+	
+	"MnM_puma": {
+		"image": {
+			"url": "MnM_puma.png"
+		},
+		"userBonus": {
+			"username": "puma008"
+		}
+	},
+	
+	"MnM_Ratha": {
+		"image": {
+			"url": "MnM_Ratha.png"
+		},
+		"userBonus": {
+			"username": "rathawynter"
+		}
+	},
+	
+	"MnM_steampunmonk": {
+		"image": {
+			"url": "MnM_steampunmonk.png"
+		},
+		"userBonus": {
+			"username": "steampunk_monk"
+		}
+	},
+	
+	"MnM_thelostsoul80s": {
+		"image": {
+			"url": "MnM_thelostsoul80s.png"
+		},
+		"userBonus": {
+			"username": "thelostsoul80s"
+		}
+	},
+	
+	"MnM_TTRM": {
+		"image": {
+			"url": "MnM_TTRM.png"
+		},
+		"userBonus": {
+			"username": "ttrm8k"
+		}
+	},
+	
+	"MnM_XAgent": {
+		"image": {
+			"url": "MnM_XAgent.png"
+		},
+		"userBonus": {
+			"username": "therealxagent"
+		}
+	},
+	
+	"MnM_Yecats": {
+		"image": {
+			"url": "MnM_Yecats.png"
+		},
+		"userBonus": {
+			"username": "yecatsmailbox"
+		}
+	},
+	
+	"VampireMouth": {
+		"image": {
+			"url": "VampireMouth.png"
+		}
+	},
+	
+	"WrappedCandy": {
+		"image": {
+			"url": "WrappedCandy.png"
+		}
+	},
+	
+	"Coin": {
+		"image": {
+			"url": "Coin.png",
+			"width": 100,
+			"height": 100
+		},
+		"reward": 1000,
+		"weight": 5,
+		"winning": true
+	}
+}

@@ -1,0 +1,232 @@
+{
+	"title": "personal adventure",
+	"adventures": {
+		"omweenie": {
+			"chapters": {
+				"start": [
+					"You step into the dungeon in search of loot for your dungeoneering guild.",
+					"You see three passages ahead of you. Do you go [left:loot | 2, monster | 1], [right:monster | 2, loot | 1] or [righter:empty]?"
+				],
+				
+				
+				
+				"empty": [
+					"You find nothing here. Do you want to stay and [stare:empty] at the wall or go [back:start]?"
+				],
+				"loot": {
+					"points": 100,
+					"parts": [
+						"You find a cologne bottle of unimaginable worth!"
+					],
+					"next": "room2"
+				},
+				"monster": {
+					"parts": [
+						"You come across an angry, vicious, ENORMOUS 1-inch cockroach that is clearly in charge of this spacious, 30-acre room. You can see by the way it doesn't move that it's planning something nefarious."
+					],
+					"next": "bug"
+				},
+				
+				
+				
+				"bug": [
+					"Do you freeze and [stare: staringContest] at it, [scream: screamingContest] in terror, dart to the [left: facebug | 3, passedBug | 1] or somersault to the [right: facebug | 1, passedBug | 3]?"
+				],
+				"staringContest": {
+					"parts": [
+						"You stare at the bug. The bug stares at you.",
+						"You stare at the bug. The bug stares at you.",
+						"You stare at the bug. The bug stares at you.",
+						"Nope, it's not moving. It must be waiting for you to move first."
+					],
+					"next": "bug"
+				},
+				"screamingContest": {
+					"parts": [
+						"$player: \"AAAAAAAAAAAAAAAHHHHH!!!\"",
+						"Bug: \"AAAAAAAAAAAAAAAHHHHH!!!\"",
+						"$player: \"AAAAAAAAAAAAAAAHHHHH!!!\"",
+						"Bug: \"AAAAAAAAAAAAAAAHHHHH!!!\"",
+						"$player: \"AAAAAAAAAAAAAAAHHHHH!!!\"",
+						"Bug: \"AAAAAAAAAAAAAAAHHHHH!!!\"",
+						"Well, now that we've gotten that out of the way..."
+					],
+					"next": "bug"
+				},
+				"facebug": {
+					"points": -10,
+					"parts": [
+						"The bug flies right at you and latches onto your face! You'd scream, but you're worried it'd get into your mouth. So you pass out instead. When you wake up, the bug is gone, and so is the spare change you had in your pockets.",
+						"You proceed into the next room with that trauma firmly entrenched in your mind for the rest of your days."
+					],
+					"next": "room2"
+				},
+				"passedBug": {
+					"parts": [
+						"The bug flies with incredible speed to the other side of the room - good thing you didn't go in that direction! You safely exit the room and leave the bug and a good portion of your dignity behind."
+					],
+					"next": "room2"
+				},
+				
+				
+				
+				"room2": [
+					"Before you is an inviting bench, surrounded by three doors.",
+					"Do you [sit down: sit] or [enter: doors] one of the doors?"
+				],
+				"sit": [
+					"...",
+					"...",
+					"...",
+					"...",
+					"...",
+					"Are you done yet? [yes: room2] / [no: sit]"
+				],
+				"doors": [
+					"Which door do you want to enter - the [right:randomRoom] one, the [righter:randomRoom] one or the [righterer:randomRoom] one? There's also one on the so-called \"left\" but that one is clearly a trap so it's not an option."
+				],
+				"randomRoom": {
+					"parts": ["You slowly open the door and find..."],
+					"next": "loot2 | 2, monster2 | 3, exit | 1"
+				},
+				
+				"exit": {
+					"points": 0,
+					"parts": [
+						"The exit. You have a vague feeling that there should be more to a dungeon, but looking at your watch you realize there's an episode of TMNT in ~30 minutes so you make haste and leave so you can catch it."
+					]
+				},
+				
+				"loot2": {
+					"points": 200,
+					"parts": [
+						"A cologne bottle of INCONCEIVABLE value!"
+					],
+					"next": "boss"
+				},
+				
+				"monster2": [
+					"Your psychotic coworker in SCUBA diving gear! O_O",
+					"Quickly! Do you [throw] a cockroach that just happens to be in your pocket at him, kindly [ask] for directions to the exit or challenge him to a [game] of Rock, Paper, Scissors?"
+				],
+				"throw": {
+					"parts": [
+						"The cockroach lands next to him and strikes up conversation. Apparently they're old friends, and they start reminiscing about old shoes and microwaved pizza.",
+						"You quickly and quietly slip past them."
+					],
+					"next": "boss"
+				},
+				"ask": [
+					"Your coworker pauses for a while, pondering your question and smiles slowly.",
+					"He then jumps right at you and starts beating you with his snorkel.",
+					"You die wondering what possibly possessed you to ask this obviously deranged being for directions. fluxis3DIED"
+				],
+				
+				
+				
+				"game": {
+					"parts": [
+						"He accepts! You both get ready and present your clenched fists in preparation for the match. From the look in his eyes you know exactly what that clenched thing will be doing if you lose the game."
+					],
+					"next": "match"
+				},
+				"match": [
+					"You both yell \"Rock, paper, scissors!\" and you thrust your hand forward showing... [rock] / [paper] / [scissors]?"
+				],
+				"rock": {
+					"next": "RR, RP, RS"
+				},
+				"paper": {
+					"next": "PR, PP, PS"
+				},
+				"scissors": {
+					"next": "SR, SP, SS"
+				},
+				"RR": {
+					"parts": [
+						"He shoots his fist forward, also presenting 'rock'. He looks at you, grunts, and gears up to go again."
+					],
+					"next": "match"
+				},
+				"RP": [
+					"He shoots his fist forward, presenting 'paper'. You smile faintly and turn your rock into the musical 'rock' symbol (\\m/). He smiles widely, pulls out a wicked awesome electric guitar and proceeds to beat you to death with it. fluxis3DIED"
+				],
+				"RS": {
+					"parts": [
+						"He shoots his fist forward, presenting 'scissors'."
+					],
+					"next": "rpswin"
+				},
+				"PR": {
+					"parts": [
+						"He shoots his fist forward, presenting 'rock'."
+					],
+					"next": "rpswin"
+				},
+				"PP": {
+					"parts": [
+						"He shoots his fist forward, also presenting 'paper'. He looks at you, grunts, and gears up to go again."
+					],
+					"next": "match"
+				},
+				"PS": [
+					"He shoots his fist forward, presenting 'scissors'. Your mind is filled with images of shredding - which is kinda funny, because right then your body follows suit when he shoves you into a bloody shredder in the corner of the room that you really should have noticed. fluxis3DIED"
+				],
+				"SR": [
+					"He shoots his fist forward, presenting 'rock'. You shudder as you realize you're about to meet the same fate as your scissors. And indeed you do. fluxis3DIED"
+				],
+				"SS": {
+					"parts": [
+						"He shoots his fist forward, also presenting 'scissors'. He looks at you, grunts, and gears up to go again."
+					],
+					"next": "match"
+				},
+				"SP": {
+					"parts": [
+						"He shoots his fist forward, presenting 'scissors'."
+					],
+					"next": "rpswin"
+				},
+				
+				"rpswin": {
+					"parts": [
+						"He looks at you, grunts, and moves out of the way, letting you pass."
+					],
+					"next": "boss"
+				},
+				
+				
+				
+				"boss": [
+					"As you proceed you come across a massive, ornate door inlaid with gold and ivory and the mysterious title \"BOSS\".",
+					"While you cannot fathom what this could possibly mean, you are quite certain that it must involve many riches and little chance of bodily harm.",
+					"Therefore the only question is whether you [open:bossRoom] the door or brazenly open the door with a [flair]! Choose now."
+				],
+				"flair": {
+					"parts": ["... Yeah, nothing special happens when you do."],
+					"next": "bossRoom"
+				},
+				"bossRoom": [
+					"Before you stands a large and imposing yet thin and elegant figure. You recognize it from all the horror stories and cookie franchises: THE SLENDERMAN!",
+					"While you are immobile with great (yet understandable) fear, it slowly turns towards you. If it had a face, you're certain it would be smiling.",
+					"Realizing that your life is at stake, you snap yourself back to reality in preparation of the upcoming epic battle.",
+					"Do you [throw: victory | 2, defeat | 8] a spear at him, grab a [sword: victory | 3, defeat | 7] and rush him, launch a [goat: victory | 1, defeat | 9] at him using the nearest available catapult, fill a bucket with [goat milk: milk] and hold it up threateningly or grab a buckler and bang it repeatedly while shouting \"[oi! oi! oi!: victory | 8, defeat | 2]\"?"
+				],
+				"milk": [
+					"Seriously? Milk? And GOAT'S MILK on top of that? The Slenderman looks offended. He blinks and you vanish out of existence. There's a lesson to be learned here... NO TO GOAT MILK! <_<"
+				],
+				"victory": [
+					"YES! YOU'VE DONE IT! That was the right choice! I mean, obviously... Anyone who has even the slightest bit of brain in their heads would know that.",
+					"The Slenderman is mortally wounded by your vicious attack! It cries to the heavens despite his shortage on mouths, blood gushing everywhere as it shrinks and shrinks until it poofs out of existence!",
+					"The room now safe from slender evilness, you find yourself surrounded by scores of cologne bottles which will undoubtedly fetch a high price, so your guild leader will most likely give you a slightly higher pay this month. Maybe. Good job!"
+				],
+				"defeat": [
+					"NO! WHAT WERE YOU THINKING?! That was the *worst* thing you could have done! Anyone who has even the slightest bit of brain in their heads would know that.",
+					"Well, as expected, The Slenderman shrugs off your meager attempts at an \"attack\", somehow manages to laugh without a face and promptly decapitates you using the very thing you tried to attack him with. fluxis3DIED"
+				]
+			},
+			"winningChapters": ["exit", "victory"],
+			"losingChapters": ["ask", "RP", "PS", "SR", "milk", "defeat"]
+		}
+	}
+}

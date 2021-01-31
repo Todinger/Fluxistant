@@ -1,1 +1,6 @@
-node %~dp0\fluxbot.js
+PUSHD .
+
+CD /D %~dp0\src
+node fluxbot.js
+
+POPD

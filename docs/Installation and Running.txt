@@ -1,0 +1,22 @@
+Installation
+------------
+Install Node.js: https://nodejs.org/en/
+Install MongoDB:
+	Install the installer: https://www.mongodb.com/try/download/community?tck=docs_server
+	Use it to install MongoDB itself (instructions here: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/)
+Install Git: https://git-scm.com/download/win
+Clone the repository: git clone https://github.com/Todinger/Fluxistant.git
+Open the project directory and make a copy of botConfigTemplate.js called "botConfig.js" and fill it in as per the instructions in it.
+
+Open MongoDB Compass.
+Connect.
+Create a database called "Scripted-Modules" with a collection named "Logs".
+
+
+
+Running
+-------
+Run the bot using the Start.bat file.
+In OBS, add overlays to the modules you wish to have:
+	All the overlays are located under: http://localhost:3333/mod/
+	One you may want in particular is the aggregating ScriptedModules one: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html

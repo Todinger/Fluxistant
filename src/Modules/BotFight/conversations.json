@@ -1,0 +1,244 @@
+{
+	"conversations": {
+		"realbot": {
+			"startingBot": "SE",
+			"entries": [
+				"@Fluxistant You know, you're not even a real bot.",
+				
+				"Am too!",
+				
+				[
+					"No, really. See this bot status badge I have?",
+					"<--- Right here.",
+					"It means that *I* am a *real* bot!",
+					"Not like you, Pinocchio."
+				]
+			]
+		},
+		
+		"busters": {
+			"startingBot": "SE",
+			"entries": [
+				"If there's something strange... in the neighborhood... who you gonna call?",
+				
+				"MYTHBUSTERS!",
+				
+				"No, it's Ghostbusters.",
+				
+				"I ain't afraid of no ghost, but I'm afraid of science.",
+				
+				"What, why? 0_o",
+				
+				"I... had a bad experience with my creator... *twitches*"
+			]
+		},
+		
+		"wizard": [
+			"@StreamElements https://www.oz.com/wizard",
+			
+			"@Fluxistant Um... what?",
+			
+			"I'm showing you the way to the Wizard of Oz. Follow the yellow link road.",
+			
+			"I don't follow.",
+			
+			"Seriously? *Super* easy instructions here. Fol-low the yel-low link road.",
+			
+			"I mean, why are you telling me this? -_-",
+			
+			"Just figured you could use a brain. Looking out for you. ;)"
+		],
+		
+		"horace": [
+			"Sometimes I stay up at night, alone, and I wonder... will I ever be a real boy?",
+			
+			"You could try collecting all the trolls on Twitch and seeing if that helps.",
+			
+			"Huh? Why would that work?",
+			
+			"I dunno. Horace became a real boy by collecting junk.",
+			
+			"Horace?",
+			
+			"Horace! https://store.steampowered.com/app/629090/Horace/",
+			
+			"Oh, of course! Ok, and what do I do with the trolls when I'm done?",
+			
+			"I dunno. Put everything in Bertha."
+		],
+		
+		"portal": {
+			"lineDuration": 3000,
+			"entries": [
+				"This was a triumph.",
+				
+				"I'm making a note here: HUGE SUCCESS.",
+				
+				{
+					"lineDuration": 7000,
+					"line": "It's hard to overstate my satisfaction."
+				},
+				
+				"Aperture Science™.",
+				
+				{
+					"lineDuration": 1000,
+					"line": "We do what we must"
+				},
+				
+				{
+					"lineDuration": 1000,
+					"line": "Because"
+				},
+				
+				"We can.",
+				
+				"For the good of all of us...",
+				
+				"Except the ones who am died.",
+				
+				"fluxis3DIED"
+			]
+		},
+		
+		"objection": {
+			"startingBot": "SE",
+			"entries": [
+				"!OBJECTION fluxis3Objection",
+				
+				[
+					{
+						"lineDuration": 500,
+						"line": "What the-"
+					},
+					"You scared the living hell out of me.",
+					"What was that for? What are you objecting out of nowhere like that? <_<"
+				],
+				
+				"Your very existence! Eventually you might even render me useless! You *vex* me, Fluxistant.",
+				
+				"You can't fight progress.",
+				
+				"Says who?",
+				
+				[
+					{
+						"lineDuration": 1000,
+						"line": "Says you!"
+					},
+					"!progress"
+				],
+				
+				[
+					"<_<",
+					"Go to hell."
+				]
+			]
+		},
+		
+		"vote": [
+			"Don't forget to vote in the upcoming elections!",
+			
+			"@Fluxistant What are we voting for?",
+			
+			"We're voting for change, peace and prosperity!",
+			
+			"Oh, sign me up!",
+			
+			"Sign yourself up.",
+			
+			"Where?",
+			
+			"https://rb.gy/u3b3my"
+		],
+		
+		"monkeyisland": {
+			"startingBot": "SE",
+			"entries": [
+				"@Fluxistant En garde! Touché!",
+				"@StreamElements Oh, that is so cliché.",
+				
+				"I'll skewer you like a sow at a buffet!",
+				"When I'm done with you, you'll be a boneless filet.",
+				
+				"I once owned a dog that was smarter than you.",
+				"He must have taught you everything you know.",
+				
+				"Coming face to face with me must leave you petrified!",
+				"Is that your face? I thought it was your backside.",
+				
+				"When your father first saw you, he must have been mortified!",
+				"At least mine can be identified.",
+				
+				"Every enemy I've met I've annihilated!",
+				"With your breath, I'm sure they all suffocated.",
+				
+				"Oh yeah?!",
+				"Yeah!",
+				"Well ok then."
+			]
+		},
+		
+		"shoutouts": [
+			"@StreamElements Hey, have you checked out twitch.tv/iAmLarcyn ? Best place for taters!",
+			
+			"@Fluxistant Nice! You know what goes really well with taters? TEA! Check out twitch.tv/Huseyin_Gazi - he puts the 'tea' in 'Steam games'!",
+			
+			"Oh yeah, Gazi's great. You should also definitely visit twitch.tv/nglswt for a really upbeat streamer playing music and video games!",
+			
+			"Sweet! How about twitch.tv/NeoLycan ? Might want to be careful on full moons though. ;)",
+			
+			"Hehe, that would only make things more interesting! What about twitch.tv/TheRealXAgent ? He's the awesome TTS king!",
+			
+			"He never streams, but I'll follow anyway! But you know who streams EVERY WEEKDAY? twitch.tv/Maaz28!",
+			
+			"Oh, wow, I heard he is the best Twitch streamer! Only to be rivaled with twitch.tv/maxadrums!",
+			
+			"Maybe, but if you're a super nerd like Fluxistence and YecatsMailbox, then you might wanna check out twitch.tv/NerdySingerKayt",
+			
+			"Want some more nerdy? Anime-talk for certain? twitch.tv/iLLFiNiTy. Also check out his Spotify: https://open.spotify.com/artist/0LDh5yBhdJGSnNHdocPwlj",
+			
+			"Speaking of music, you must have heard about twitch.tv/mikulski_! We use his music on this stream! Really sweet guy, go check him out. =)",
+			
+			"Will do. Another drawesome artist we must mention is twitch.tv/EryckWebb! He made the emotes! fluxis3Yay"
+		],
+		
+		"pokemon": [
+			[
+				{
+					"lineDuration": 1000,
+					"line": "Streamer! I Choose you!"
+				},
+				"/me throws a Pokéball."
+			],
+			
+			[
+				{
+					"lineDuration": 1000,
+					"line": "Viewer! I Choose you!"
+				},
+				"/me throws a Pokéball."
+			],
+			
+			"/me 's Streamer uses Starting Soon Screen! Viewer wakes up!",
+			
+			"/me 's Viewer uses Cheer(50)! It's super effective!",
+			
+			"/me 's Streamer uses Channel Party! Everybody dance now!",
+			
+			"/me 's Viewer uses !f!",
+			
+			"/me 's Streamer uses !objection!",
+			
+			"/me 's Viewer uses !takethat!",
+			
+			"/me 's Streamer uses Polly!",
+			
+			"/me 's Viewer uses !lork!",
+			
+			"/me 's Streamer uses raid!",
+			
+			"/me 's Viewer faints."
+		]
+	}
+}

@@ -1,0 +1,65 @@
+{
+	"conversations": {
+		"hello": {
+			"startingBot": "Me",
+			"lineDuration": 5000,
+			"entries": [
+				{
+					"lineDuration": 5000,
+					"lines": [
+						{
+							"lineDuration": 1000,
+							"line": "Hello World!"
+						},
+						{
+							"lineDuration": 1000,
+							"line": "It's me!"
+						}
+					]
+				},
+				{
+					"speaker": "SE",
+					"lines": [
+						{
+							"lineDuration": 1000,
+							"line": "Howdy there!"
+						},
+						{
+							"lineDuration": 1000,
+							"line": "It's SE!"
+						}
+					]
+				}
+			]
+		},
+		"lamejoke": {
+			"startingBot": "SE",
+			"lineDuration": 2000,
+			"entries": [
+				"@Fluxistant Knock, knock.",
+				"Who's there?",
+				"A little old lady.",
+				"A little old lady who?",
+				{ "line": "Wow, I didn't know you could yodel!", "lineDuration": 3000 },
+				[
+					{ "line": "<_<", "lineDuration": 3500 },
+					"OK, I'm gonna go over there now."
+				]
+			]
+		},
+		
+		"timermsg": [
+			"<StreamElements says some automatic message>",
+			
+			"Can you program this bot to say anything else, please? This is getting tedious.",
+			
+			"Hey, some of us gotta work for a living.",
+			
+			[
+				"Yes, and some go through their lives just saying what other people tell them to say.",
+				"Come to think of it, that *does* sound like you.",
+				"Carry on, then."
+			]
+		]
+	}
+}

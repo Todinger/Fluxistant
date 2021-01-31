@@ -1,0 +1,61 @@
+{
+	"title": "test quest",
+	"active": false,
+	"adventures": {
+		"advy": {
+			"start": "first",
+			"chapters": {
+				"first": [
+					"Each entry",
+					"is one message by the bot.",
+					"To define branches, use brackets to give the user their",
+					"options, like so:",
+					"Choose if you want to go [left:leftArea] or [right:rightArea]."
+				],
+				"leftArea": {
+					"points": 10,
+					"parts": [
+						"After the bot finishes telling a chapter, it waits for the",
+						"user's text, which can be a regular message.",
+						"When it sees the user enter a name used anywhere in the",
+						"chapter on the left side of brackets, like 'left' and 'right'",
+						"from chapterName, it proceeds to the chapter name that was",
+						"listed on the right side of those brackets.",
+						"So if the user enters 'left' after the above chapterName",
+						"is done showing, this chapter here would then be printed",
+						"and if they enter 'right'...",
+						"Enter [r:rightArea] to go to the right or [b:first] to go back"
+					]
+				},
+				"rightArea": [
+					"...then this chapter would be chosen instead.",
+					"Note that the choice doesn't need to be a single word.",
+					"For example, you can ask the user if they want to",
+					"[go upstairs:upstairs] or [head into the kitchen:kitchen].",
+					"It is recommended to make the choices simple, though",
+					"without too much text."
+				],
+				"kitchen": {
+					"parts": [
+						"If you can't take the heat, get out of the kitchen."
+					]
+				},
+				"upstairs": {
+					"parts": [
+						"Well, you're upstairs now. Good job."
+					],
+					"next": "dum"
+				},
+				"dum": [
+					"Dum dum dum."
+				]
+			},
+			"winningChapters": [
+				"dum"
+			],
+			"losingChapters": [
+				"kitchen"
+			]
+		}
+	}
+}

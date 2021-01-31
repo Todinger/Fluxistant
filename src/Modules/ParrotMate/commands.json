@@ -1,0 +1,15 @@
+{
+	"box": {
+		"aliases": [ "7" ],
+		"filters": [
+			{
+				"name": "isUser",
+				"argument": "yecatsmailbox"
+			}
+		],
+		"sequence": "box"
+	},
+	"tater": {
+		"sequence": "tater"
+	}
+}
