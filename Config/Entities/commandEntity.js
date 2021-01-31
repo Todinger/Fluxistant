@@ -99,6 +99,10 @@ class CommandEntity extends StaticObjectEntity {
 		
 		assert(this.getCost() >= 0, 'Cost must be a non-negative integer');
 	}
+	
+	importDesc(descriptor) {
+		super.importDesc(descriptor);
+	}
 }
 
 module.exports = CommandEntity;

@@ -137,12 +137,12 @@ class Module {
 		}
 	}
 	
-	importCommandInfo(data, commandObjects) {
+	importCommandInfo(commandList, commandObjects) {
 		commandObjects = commandObjects || this.commandObjects;
-		if (commandObjects && data) {
-			Object.keys(data).forEach(cmdid => {
-				if (cmdid in commandObjects) {
-					commandObjects.import(data);
+		if (commandObjects && commandList) {
+			commandList.forEach(commandData => {
+				if (commandData.cmdid in commandObjects) {
+					commandObjects[commandData.cmdid].import(commandData);
 				}
 			});
 		}
@@ -199,7 +199,7 @@ class Module {
 		}
 		
 		this.loadModConfig();
-		
+		if (this.name === 'Random Image') debugger;
 		if (config.commands && this.commandObjects) {
 			this.unregisterCommands();
 			this.importCommandInfo(config.commands);

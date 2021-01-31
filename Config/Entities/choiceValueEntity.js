@@ -12,7 +12,7 @@ class ChoiceValueEntity extends StaticObjectEntity {
 	
 	toConf() {
 		let conf = super.toConf();
-		conf.optionName = this.optionName;
+		conf.type = this.optionName;
 		return conf;
 	}
 	
