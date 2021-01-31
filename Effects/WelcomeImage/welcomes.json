@@ -12,32 +12,6 @@
 		]
 	},
 	
-	"yecatsmailbox": {
-		"image": {
-			"url": "/assets/image-display/Mac.gif",
-			"width": 480,
-			"height": 360,
-			"duration": 6500
-		},
-		"sound": "/assets/sfx/xfiles.mp3",
-		"messages": [
-			"YES! YECATS! WE MISSED YOU!",
-			"OMG, the most beautiful person is here! fluxis3Yay Hello Yecats! fluxis3ItorLove"
-		]
-	},
-	
-	"fluxistence": {
-		"image": {
-			"url": "/assets/image-display/Objection - Flux.png"
-		},
-		"sound": "/assets/sfx/bapanada.mp3",
-		"messages": [
-			"Stop typing and stream. <_<",
-			"Don't I know you from somewhere?",
-			"You're the best! And I'm not just saying it because I'm programmed to! Well... maybe I am. <_<"
-		]
-	},
-	
 	"omreeny": {
 		"messages": [
 			"Meow! It's Slenderman. Cancel McDonalds order. Meow.",
@@ -128,28 +102,139 @@
 		]
 	},
 	
+	"eryckwebb": {
+		"messages": [
+			"It's a hat! It's a pen! It's EryckWebb!",
+			"Meow... Eryck! You drew me... Gave me a face, a life. D-daddy...?",
+			"What do we say to the God of Draws? \"Sauce today!\"",
+			"Be still, my heart! I am in the presence of greatness!",
+			"EW! EW! EW! Mew..."
+		]
+	},
+	
 	"ttrm8k": {
 		"messages": [
+			"Meow... Got any treats, TTRM?",
+			"It's the esteemed lurker, popping out to say hi! Hello, TTRM! Meow!",
+			"TTRrrRrRRrRMeeeoooow...",
+			"Did you really want to say that, TTRM?",
+			"Oh, it's you. You [REDACTED] [REDACTED] [REDACTED]!"
+		]
+	},
+	
+	"rathawynter": {
+		"messages": [
+			"It's that non-adult. I wanna be a non-adult, too. Hey, wait... how old am I?",
+			"Mew mew, Ratha! Purrrr... I like you!",
+			"Meow. RathaWynter, wanna take me for a walk? I be a good kitty.",
+			"Good mewning, Ratha! Here's a fresh coffee + hot chocolate, on the house! yecatsMmm",
+			"Ratha. Fancy meeting you here..."
 		]
 	},
 	
 	"jeffyard": {
 		"messages": [
+			"Hey, everyone! It's Jeffyard! Go check him out and see what this crazy guy is up to!",
+			"I heard about your interest in the lovechild of Sonic and Tails... Sick!",
+			"Yarrrrrrrr! It be Jeffy!",
+			"Work is for those who don't like to play, Jeff. We know you like to play!",
+			"Meow... Can I haz some tuna, Jeff?"
 		]
 	},
 	
 	"sl_im_me": {
 		"messages": [
+			"She has style, she has grace! She will SLIME YOU IN THE FACE!",
+			"Meow... Hewwo, SL_IM_ME!",
+			"You know what's so awesome about Slime? It's an anagram for smile, and miles... cause she brings miles of smiles! ^_^",
+			"What is slime? Baby, don't ooze me... don't ooze me... no mo'.",
+			"Good morning, Slime! Will you pet my belly? PWeeeeease? yecatsMeow"
+		]
+	},
+	
+	"goranksinabox": {
+		"messages": [
+			"Goranks! May I join you in your box?",
+			"G0R4NK5... yecatsMailbox",
+			"Welcome, goranksinabox! Good to see you, meow!"
+		]
+	},
+	
+	"steampunk_monk": {
+		"messages": [
+			"Can I get an itty bitty belly rub on this kitty? Meownk.",
+			"Legend has it, every so often, a mysterious Steampunky Monk will appear, and the Yecats shall rejoice!",
+			"Give me an M! Give me an O! Give me an N! Give me a K! What does that... *falls asleep*",
+			"Our favoUrite Brit is in the box, ladies and gentlemen! Hellooooo, Monk!",
+			"Can I interest you in some tea, Steampunk_Monk? It's mewy fwesh. yecatsMmm"
+		]
+	},
+	
+	"ymustuhatemee": {
+		"messages": [
+			"Hate is such a strong word... ymustyouuseit? yecatsMeow",
+			"AAAAAAAH! SPEEDRUN FAR AWAY FROM THIS MAN!",
+			"Dun... dundundundun dun dun dun... dun dun dun dun dun dun dun... dun dun dun dunnnnnn!",
+			"Hey, listen! Yecats said you're pretty cool!",
+			"Sp33DRUNN3R IN D4 M41LB0X."
+		]
+	},
+	
+	"peageons": {
+		"messages": [
+			"Is it a pea? Is it a pigeon? Nobody knows...",
+			"Give me a P! Give me an E! Give me a P! Give me a P! Give me a P! I just want some peas... yecatsMeow",
+			"Hi Peageons! Seen any ghosts lately? ...there's one right behind me isn't there? GET IT OFF! GET IT OFF! GET IT OFF! yecatsScared"
+		]
+	},
+	
+	"amorablade": {
+		"messages": [
+			"Everyone, may I have your attention, please? Say hello to our resident kitsune, Amora!"
+		]
+	},
+	
+	"mrdrbeard": {
+		"messages": [
+			"Meoooow... I wanna see the turtle!"
+		]
+	},
+	
+	"mel_on_cake4": {
+		"messages": [
+			"Now I want a melon... and a cake... Look what you're doing to me. <_<",
+			"How many Mels can fit on a cake? Cake? What cake? I don't see a cake.",
+			"ONION LOVER! YOU ARE SO WELCOME HERE!"
+		]
+	},
+	
+	"ann_marie33": {
+		"messages": [
+			"Hey, it's Yecats' partner in crime! I know all about you. All your secrets. All your dreams. All your fears... for I am really Yecats, just as a robot. yecatsMailbox",
+			"Meow! Meow? Meoooow... Meow!!! Meow!? Ann-Marie! MEOOOOOOW.",
+			"Oh, we have an alien in the chat! Attention, we have an alien in the chat! Ann_Marie33, please identify yourself!",
+			"Ehh, Squidward...",
+			"Ann_Marie33 is here? LOG ME OUT!"
+		]
+	},
+	
+	"1nag1bator": {
+		"messages": [
+			"NaGGy! Another numbers name lover! Put it there! yecatsMailbox"
 		]
 	},
 	
 	"thelostsoul80s": {
 		"messages": [
+			"Has anyone seen a lost soul? I lost my soul... I did too have one! I'M NOT JUST A ROBOT! yecatsMeow",
+			"I've finally found the best thing anyone's ever lost since the 80's!"
 		]
 	},
 	
-	"eryckwebb": {
+	"ohbubblenuggets": {
 		"messages": [
+			"Oh, nuggets of bubbles! You are the guest of honor!",
+			"The coolest Minecrafter is in the house!"
 		]
 	}
 }
