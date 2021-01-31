@@ -27,7 +27,7 @@ class WelcomeImage extends Effect {
 				});
 				
 				if (userWelcome.messages && userWelcome.messages.length > 0) {
-					this.tell(user, Utils.randomValue(userWelcome.messages));
+					this.say(Utils.randomValue(userWelcome.messages));
 				}
 				
 				// Consider putting this outside this if statement if we want to
