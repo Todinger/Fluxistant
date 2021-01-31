@@ -533,11 +533,7 @@ class Module {
 	// of the user points.
 	// Also adjusts for singular when the quantity is 1 or -1.
 	pointsString(points) {
-		let name = 
-			Math.abs(points) === 1 ?
-			Module.USERPOINTS_NAME_SINGULAR :
-			Module.USERPOINTS_NAME;
-		return `${points} ${name}`;
+		return SEManager.pointsString(points);
 	}
 	
 	// [For use by inheriting classes]
@@ -553,7 +549,7 @@ class Module {
 	}
 	
 	// [For use by inheriting classes]
-	// Utility access to the AssetManageer.
+	// Utility access to the AssetManager.
 	static get Assets() {
 		return Assets;
 	}

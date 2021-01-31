@@ -23,16 +23,11 @@ class RandomImage extends Module {
 		});
 	}
 	
-	describeCommand(user) {
-		return `${_.capitalize(COMMAND_NAME)} redeemed by ${user.displayName} for ${this.pointsString(COMMAND_COST)}! One random drawing by Yecats coming up!`;
-	}
-	
 	commands = {
 		[COMMAND_NAME]: {
 			callback: user => this.showRandomImage(user),
+			message: `${_.capitalize(COMMAND_NAME)} redeemed by $user for $pcost! One random drawing by Yecats coming up!`,
 			cost: COMMAND_COST,
-			// TODO: Give commands the option to show a message when invoked, add variables that messages can use, and have both global variables and module-specific ones.
-			// descFunc: user => this.describeCommand(user)
 		},
 	}
 }

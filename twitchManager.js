@@ -344,6 +344,17 @@ class TwitchManager extends EventNotifier {
 		};
 	}
 	
+	// Things to do if the invocation of the command went well
+	_commandSuccessful(user, command, handler) {
+		// If the command has any cooldowns, they need to be activated
+		this._applyCooldowns(user, handler);
+		
+		// Send a configured message to the chat as defined by the command
+		if (handler.message) {
+			this.say(handler.createResponse(user, command, handler));
+		}
+	}
+	
 	// Once we know something is, indeed, a command, and has passed basic tests
 	// for running (filters, cooldowns), this is where we handle invoking it,
 	// taking the points for it, etc.
@@ -360,23 +371,8 @@ class TwitchManager extends EventNotifier {
 		// said User object
 		let fullargs = [user].concat(command.args);
 		
-		// Marker for if the command was successful, for post-command handling
-		let success = false;
-		
 		// Handle commands with a cost
 		if (handler.cost && handler.cost > 0) {
-			// Commands with a cost normally show a response, to let the user
-			// that the points they used were, indeed, received
-			// When registering a command (our 'handler'), one of the parameters
-			// is a description function that customizes the response that is
-			// displayed, so if one has been provided we use that; otherwise we
-			// will show the default one (assuming everything is in order and
-			// the command wasn't marked as 'silent', which means we shouldn't
-			// show any feedback at all)
-			let response = handler.descFunc
-				? handler.descFunc(user, command.cmdname)
-				: `${user.name} has invoked ${command.fullname} for ${handler.cost} ${SEManager.POINTS_NAME}!`;
-			
 			// Attempt to deduct the cost of the command from the user
 			SEManager.consumeUserPoints(
 				user.name,
@@ -387,7 +383,6 @@ class TwitchManager extends EventNotifier {
 					// nor is an entry added to the database log
 					if (!handler.silent) {
 						DBLog.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
-						this.say(response);
 					}
 					
 					// Now that everything is finished, we can finally invoke
@@ -396,7 +391,7 @@ class TwitchManager extends EventNotifier {
 					
 					// At this point, if nothing went wrong during the callback
 					// invocation, the command has successfully run
-					success = true;
+					this._commandSuccessful(user, command, handler);
 				},
 				// Failure do to lack of points
 				(amount, points) => {
@@ -410,18 +405,7 @@ class TwitchManager extends EventNotifier {
 		} else {
 			// Here we only need to invoke the command and we're done
 			handler.callback.apply(null, fullargs);
-			success = true;
-		}
-		
-		// Things to do if the invocation of the command went well
-		if (success) {
-			// If the command has any cooldowns, they need to be activated
-			this._applyCooldowns(user, handler);
-			
-			// Send a configured message to the chat as defined by the command
-			if (handler.message) {
-				this.say(handler.createResponse(user, command, handler));
-			}
+			this._commandSuccessful(user, command, handler);
 		}
 	}
 	

@@ -255,6 +255,17 @@ class SEManager extends EventNotifier {
 			onError);
 	}
 	
+	// Returns a string specifying the given amount of points along with
+	// the name of the user points.
+	// Also adjusts for singular when the quantity is 1 or -1.
+	pointsString(points) {
+		let name =
+			Math.abs(points) === 1 ?
+				this.POINTS_NAME_SINGULAR :
+				this.POINTS_NAME;
+		return `${points} ${name}`;
+	}
+	
 	// Makes the StreamElements bot say something in our channel.
 	// 
 	// Parameters:
