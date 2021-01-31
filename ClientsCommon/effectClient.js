@@ -184,7 +184,7 @@ class SoundManager {
 	// 	location	URL of the actual sound file.
 	// 	[loop]		Set to true if the sound should loop when playing.
 	// 	[onLoaded]	Function to call once the file finishes loading.
-	loadSound(name, location, loop, onLoaded) {
+	loadSound(name, location, loop, onLoaded, onError) {
 		console.assert(!(name in this._sounds),
 			`Duplicate loading of the sound ${name}`);
 		
@@ -194,6 +194,10 @@ class SoundManager {
 			if (onLoaded) {
 				onLoaded(name);
 			}
+		})
+		.on('error', () => {
+			this.unloadSound(name);
+			onError();
 		})
 		.prop('loop', loop)
 		.appendTo(`#${this._soundHolderID}`);
@@ -265,29 +269,34 @@ class SoundManager {
 			name = url;
 		}
 		
-		this.loadSound(name, url, false, () => {
-			let endFunc = () => {
-				this.unloadSound(name);
-				if (onDone) {
-					onDone();
-				}
-			};
-			
-			this.play(
-				name,
-				() => {
+		this.loadSound(
+			name,
+			url,
+			false,
+			() => {
+				let endFunc = () => {
 					this.unloadSound(name);
 					if (onDone) {
 						onDone();
 					}
-				},
-				() => {
-					this.unloadSound(name);
-					if (onError) {
-						onError();
-					}
-				});
-		});
+				};
+				
+				this.play(
+					name,
+					() => {
+						this.unloadSound(name);
+						if (onDone) {
+							onDone();
+						}
+					},
+					() => {
+						this.unloadSound(name);
+						if (onError) {
+							onError();
+						}
+					});
+			},
+			onError);
 	}
 	
 	// Invokes the given function on all the sounds we have and forwards the
