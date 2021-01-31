@@ -1,5 +1,5 @@
 + Basic usage test (going to configure the server port)
-- Uniform configuration-supporting command registration for modules: I'm
++ Uniform configuration-supporting command registration for modules: I'm
   going to add a "commands" object to modules that will include all the
   information about the commands along with the callbacks for them. Then
   I'll link command registration to configuration loading.
