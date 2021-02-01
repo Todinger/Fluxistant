@@ -224,9 +224,15 @@ class ModuleManager {
 	// 				running locally and listening on port 3333).
 	// 	app			Object used to register web access points URLs).
 	// 	express		User in conjunction with app to register URLs.
-	readAndLoadAll(webPrefix, modulesDir, app, express) {
+	//  configOnly  Directs the Module Manager to stop after reading all the
+	//              modules' configurations. This is meant to be used for
+	//              generating configuration code to later be used by the
+	//              configuration GUI.
+	readAndLoadAll(webPrefix, modulesDir, app, express, configOnly) {
 		this._readAll(webPrefix, modulesDir, app, express);
 		this._defineConfigAll();
+		if (configOnly) return;
+		
 		this._loadConfigAll();
 		this._loadAll();
 		this._postloadAll();
