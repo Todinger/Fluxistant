@@ -6,7 +6,7 @@ const cli = require('./cliManager');
 const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
 const ConfigManager = require('./configManager');
-const EntityFactory = require('./Config/entityFactory');
+const EntityFileManager = require('./entityFileManager');
 const Utils = require('./utils');
 
 // Every Module needs to have a file by this name in its root directory
@@ -62,18 +62,21 @@ class ModuleManager {
 	// Does not yet call any of the module's startup methods.
 	// 
 	// Parameters:
-	// 	modDir		Path of the root folder of the module (where module.js is).
-	// 	modFile		Path to the Module's module.js file
-	// 				(basically modDir/module.js).
-	// 	webPrefix	URL to register all modules under. If set to, for example,
-	// 				"/mod/", then all the web URLs will begin with "/mod", so for
-	// 				example a Module with webname = "hello" and
-	// 				source = "world.html" will be accessible at the URL
-	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
-	// 				running locally and listening on port 3333).
-	// 	app			Object used to register web access points URLs).
-	// 	express		User in conjunction with app to register URLs.
-	_readModule(modDir, modFile, webPrefix, app, express) {
+	// 	modDir		    Path of the root folder of the module (where module.js is).
+	// 	modFile		    Path to the Module's module.js file
+	// 				    (basically modDir/module.js).
+	// 	webPrefix	    URL to register all modules under. If set to, for example,
+	// 				    "/mod/", then all the web URLs will begin with "/mod", so for
+	// 				    example a Module with webname = "hello" and
+	// 				    source = "world.html" will be accessible at the URL
+	// 				    "localhost:3333/mod/hello/world.html" (assuming the server is
+	// 				    running locally and listening on port 3333).
+	// 	app			    Object used to register web access points URLs).
+	// 	express		    User in conjunction with app to register URLs.
+	//  generationDir   Specifies that the we should generate files for all the
+	//                  module entities, in this specified directory, which can later be
+	//                  used in the configuration web page.
+	_readModule(modDir, modFile, webPrefix, app, express, generationDir) {
 		// This loads the Module from file and invokes its constructor
 		let mod = require('./' + modFile);
 		
@@ -121,7 +124,7 @@ class ModuleManager {
 		// Load custom configuration entities, if there are any
 		let configDir = path.join(modDir, MODULE_CONFIG_DIRNAME);
 		if (fs.existsSync(configDir)) {
-			EntityFactory.registerAll(configDir);
+			EntityFileManager.registerEntities(configDir, generationDir);
 		}
 		
 		// Initialize the external values the Module needs before letting it
@@ -144,23 +147,26 @@ class ModuleManager {
 	// "module.js" file in the same folder as this file.
 	// 
 	// Parameters:
-	// 	modulesDir	Path to search in.
-	// 	webPrefix	URL to register all modules under. If set to, for example,
-	// 				"/mod/", then all the web URLs will begin with "/mod", so for
-	// 				example a Module with webname = "hello" and
-	// 				source = "world.html" will be accessible at the URL
-	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
-	// 				running locally and listening on port 3333).
-	// 	app			Object used to register web access points URLs).
-	// 	express		User in conjunction with app to register URLs.
-	_readAll(webPrefix, modulesDir, app, express) {
+	// 	modulesDir	    Path to search in.
+	// 	webPrefix	    URL to register all modules under. If set to, for example,
+	// 				    "/mod/", then all the web URLs will begin with "/mod", so for
+	// 				    example a Module with webname = "hello" and
+	// 				    source = "world.html" will be accessible at the URL
+	// 				    "localhost:3333/mod/hello/world.html" (assuming the server is
+	// 				    running locally and listening on port 3333).
+	// 	app			    Object used to register web access points URLs).
+	// 	express		    User in conjunction with app to register URLs.
+	//  generationDir   Specifies that the we should generate files for all the
+	//                  module entities, in this specified directory, which can later be
+	//                  used in the configuration web page.
+	_readAll(webPrefix, modulesDir, app, express, generationDir) {
 		// Load all the modules in the given directory
 		let subDirs = Utils.getDirectories(modulesDir);
 		subDirs.forEach(subdir => {
 			let modDir = path.join(modulesDir, subdir);
 			let modFile = path.join(modDir, MODULE_MAIN_FILENAME);
 			if (fs.existsSync(modFile)) {
-				this._readModule(modDir, modFile, webPrefix, app, express);
+				this._readModule(modDir, modFile, webPrefix, app, express, generationDir);
 			}
 		});
 	}
@@ -215,24 +221,23 @@ class ModuleManager {
 	// finished starting up.
 	// 
 	// Parameters:
-	// 	modulesDir	Path to search the modules in.
-	// 	webPrefix	URL to register all modules under. If set to, for example,
-	// 				"/mod/", then all the web URLs will begin with "/mod", so for
-	// 				example a Module with webname = "hello" and
-	// 				source = "world.html" will be accessible at the URL
-	// 				"localhost:3333/mod/hello/world.html" (assuming the server is
-	// 				running locally and listening on port 3333).
-	// 	app			Object used to register web access points URLs).
-	// 	express		User in conjunction with app to register URLs.
-	//  configOnly  Directs the Module Manager to stop after reading all the
-	//              modules' configurations. This is meant to be used for
-	//              generating configuration code to later be used by the
-	//              configuration GUI.
-	readAndLoadAll(webPrefix, modulesDir, app, express, configOnly) {
-		this._readAll(webPrefix, modulesDir, app, express);
-		this._defineConfigAll();
-		if (configOnly) return;
+	// 	modulesDir	    Path to search the modules in.
+	// 	webPrefix	    URL to register all modules under. If set to, for example,
+	// 				    "/mod/", then all the web URLs will begin with "/mod", so for
+	// 				    example a Module with webname = "hello" and
+	// 				    source = "world.html" will be accessible at the URL
+	// 				    "localhost:3333/mod/hello/world.html" (assuming the server is
+	// 				    running locally and listening on port 3333).
+	// 	app			    Object used to register web access points URLs).
+	// 	express		    User in conjunction with app to register URLs.
+	//  generationDir   Specifies that the we should generate files for all the
+	//                  module entities, in this specified directory, which can later be
+	//                  used in the configuration web page.
+	readAndLoadAll(webPrefix, modulesDir, app, express, generationDir) {
+		this._readAll(webPrefix, modulesDir, app, express, generationDir);
+		if (generationDir) return;
 		
+		this._defineConfigAll();
 		this._loadConfigAll();
 		this._loadAll();
 		this._postloadAll();

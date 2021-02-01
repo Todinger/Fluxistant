@@ -211,24 +211,35 @@ class Utils {
 	// 
 	// Taken from:
 	// https://stackoverflow.com/questions/18112204/get-all-directories-within-directory-nodejs/24594123
-	static getDirectories (source) {
+	static getDirectories(source) {
 	  return fs.readdirSync(source, { withFileTypes: true })
 		.filter(dirent => dirent.isDirectory())
 		.map(dirent => dirent.name);
 	}
 	
 	// Gets a list of file names (without the paths) in the given directory.
-	static getFiles (source) {
+	static getFiles(source) {
 	 	return fs.readdirSync(source, { withFileTypes: true })
 			.filter(dirent => dirent.isFile())
 			.map(dirent => dirent.name);
 	}
 	
 	// Gets a list of file paths in the given directory.
-	static getFilePaths (source) {
+	static getFilePaths(source) {
 	 	return fs.readdirSync(source, { withFileTypes: true })
 			.filter(dirent => dirent.isFile())
 			.map(dirent => path.resolve(source, dirent.name));
+	}
+	
+	// Gets a list of file paths in the given directory.
+	static getFileNamesAndPaths(source) {
+	 	let fileNames = fs.readdirSync(source, { withFileTypes: true })
+			.filter(dirent => dirent.isFile());
+	 	let res = {};
+	 	fileNames.forEach(dirent => {
+	 		res[dirent.name] = path.resolve(source, dirent.name);
+	    });
+	 	return res;
 	}
 	
 	static tryReadJSON(path) {

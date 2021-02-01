@@ -21,7 +21,10 @@ const FluxBot = require('./fluxbot');
 
 const args = process.argv.slice(2).map(arg => arg.toLowerCase());
 if (args.includes('--compile-configs')) {
-	FluxBot.setupConfigOnly();
+	FluxBot.setupConfigOnly(
+		'./Config/WebEntities',
+		'./Config/webEntitiesList.js',
+		'./WebEntities');
 	process.exit(0);
 } else {
 	FluxBot.setupAllAndStart();

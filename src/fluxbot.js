@@ -33,11 +33,14 @@ class FluxBot {
 		Utils.ensureDirExists(DATA_DIR_MODULES);
 	}
 	
+	// Read configuration entities and generate web client files if prompted to
+	readConfigEntities(generationOutputDir) {
+		this.entityFileManager = require('./entityFileManager');
+		this.entityFileManager.registerEntities(CONFIG_ENTITIES_PATH, generationOutputDir);
+	}
+	
 	// Initialize configurations (do this BEFORE loading the modules)
 	loadConfig() {
-		this.entityFactory = require('./Config/entityFactory');
-		this.entityFactory.registerAll(CONFIG_ENTITIES_PATH);
-
 		this.configManager = require('./configManager');
 		this.mainConfig = require('./mainConfig');
 		this.configManager.init(APP_DATA_DIR);
@@ -78,7 +81,7 @@ class FluxBot {
 	setupKeyboard() {
 		this.keyboardManager = require('./keyboardManager');
 		this.keyboardManager.start();
-
+		
 		// Alt + WinKey + F5 = Reload all configurations
 		this.keyboardManager.registerShortcut(
 			'ModuleManager:ReloadConfigs',
@@ -100,14 +103,14 @@ class FluxBot {
 	}
 	
 	// Load all the modules we have
-	setupModules(configOnly) {
+	setupModules(generationOutputDir) {
 		this.moduleManager = require('./moduleManager');
 		this.moduleManager.readAndLoadAll(
 			'/mod/',
 			'Modules',
 			this.app,
 			this.express,
-			configOnly);
+			generationOutputDir);
 	}
 	
 	// Load Twitch interaction
@@ -172,6 +175,7 @@ class FluxBot {
 	
 	setupAllAndStart() {
 		this.prepareDirectories();
+		this.readConfigEntities();
 		this.loadConfig();
 		this.setupCLI();
 		this.setupAssets();
@@ -186,10 +190,11 @@ class FluxBot {
 		this.startServer();
 	}
 	
-	setupConfigOnly() {
-		this.prepareDirectories();
-		this.loadConfig();
-		this.setupModules(true);
+	setupConfigOnly(generationOutputDir, requirementsFilePath, relativeGenerationDirPath) {
+		Utils.ensureDirExists(generationOutputDir);
+		this.readConfigEntities(generationOutputDir);
+		this.setupModules(generationOutputDir);
+		this.entityFileManager.createRequirementsFile(requirementsFilePath, relativeGenerationDirPath);
 	}
 }
 
