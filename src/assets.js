@@ -12,24 +12,28 @@ const Utils = require('./utils');
 // located, but the URLs are used as they are in client scripts, so changing
 // these would require changing some files in the Modules/ folder
 
+const ASSET_BASE_DIR = '../../../';
+const IMAGE_ASSETS_DIR = ASSET_BASE_DIR + 'Images/';
+const SOUND_ASSETS_DIR = ASSET_BASE_DIR + 'sfx/';
+
 // For self-images of users, used by self-commands and some other stuff
-const USERIMAGE_DIR = '../../Images/User-Specific';
+const USERIMAGE_DIR = IMAGE_ASSETS_DIR + 'User-Specific';
 const USERIMAGE_URL = '/assets/user-images/';
 
 // Used for displaying images on command
-const IMAGEDISPLAY_DIR = '../../Images/Display Images';
+const IMAGEDISPLAY_DIR = IMAGE_ASSETS_DIR + 'Display Images';
 const IMAGEDISPLAY_URL = '/assets/image-display/';
 
 // Used for... well... sound effects
-const SOUNDEFFECTS_DIR = '../../sfx';
+const SOUNDEFFECTS_DIR = SOUND_ASSETS_DIR + 'sfx';
 const SOUNDEFFECTS_URL = '/assets/sfx/';
 
 // Used for displaying random images (the RandomImage module)
-const RANDOMIMAGECACHE_DIR = '../../Images/Random Image Cache';
+const RANDOMIMAGECACHE_DIR = IMAGE_ASSETS_DIR + 'Images/Random Image Cache';
 const RANDOMIMAGECACHE_URL = '/assets/random-image-cache/';
 
 // Random image cache and user-specific images for the F Shower module
-const FSHOWER_DIR = '../../Images/F';
+const FSHOWER_DIR = IMAGE_ASSETS_DIR + 'Images/F';
 const FSHOWER_URL = '/assets/fshower/';
 const FSHOWER_SUBDIR_CACHE = 'Defaults/';
 const FSHOWER_SUBDIR_USERS = 'User-Specific/';
@@ -209,7 +213,7 @@ class AssetManager {
 				return;
 			}
 			
-			if (!files || files.length == 0) {
+			if (!files || files.length === 0) {
 				if (onNotFound) {
 					onNotFound();
 				}
