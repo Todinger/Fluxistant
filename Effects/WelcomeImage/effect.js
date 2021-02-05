@@ -22,7 +22,7 @@ class WelcomeImage extends Effect {
 			let userWelcome = this.welcomeData[user.name];
 			if (!(user.name in this.lastMessageTimes)) {
 				this.broadcastEvent('showImage', {
-					image: userWelcome.image,
+					image: Utils.randomValue(userWelcome.images),
 					sound: userWelcome.sound,
 				});
 				

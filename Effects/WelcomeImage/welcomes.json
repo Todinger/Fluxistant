@@ -1,8 +1,13 @@
 {
 	"huseyin_gazi": {
-		"image": {
-			"url": "/assets/image-display/HuseyinGazi.png"
-		},
+		"images": [
+			{
+				"url": "/assets/image-display/HuseyinGazi.png"
+			},
+			{
+				"url": "/assets/image-display/HuseyinGazi-SCP.png"
+			}
+		],
 		"messages": [
 			"Hello, Huseyin_Gazi. I've received a letter for you from a Ms. \"Loli Ghost\" - I'll just leave it here... it smells like human decomposition.",
 			"MEOW! Meow... meow, meow? Meow meow meow! Meow. Meow meow... meow... Meeeyoooooooow! Meow meow! ^_^",
