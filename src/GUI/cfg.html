@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Fluxbot Configuration Page</title>
+	<!-- This is to stop a weird "favicon" error.
+		Solution taken from here:
+		https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
+	<link rel="shortcut icon" href="#" />
+
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="css/uikit.min.css" />
+	<script src="js/uikit.min.js"></script>
+	<script src="js/uikit-icons.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+
+	<!-- This loads all the configuration entity classes from the server side into
+	     window.Ents, which we then place in the global variable Entities. -->
+	<script src="/common/clientUtils.js"></script>
+	<script src="/common/configEntities.js"></script>
+	<script>
+		const Entities = window.Ents.Entities;
+		const EntityFactory = window.Ents.Factory;
+		window.Ents.RegisterAll();
+	</script>
+
+	<script type="module" src="./entityGuis/guiElements/guiElements.mjs"></script>
+	<script type="module" src="./entityGuis/entityGuis.mjs"></script>
+	<script type="module" src="./config.mjs"></script>
+</head>
+<body>
+<!--<form class="uk-form-horizontal">-->
+
+<div class="uk-light uk-background-secondary uk-padding-small uk-height-viewport">
+	<h1 class="uk-heading-line uk-text-center">
+		<span class="uk-padding-small">Fluxbot Configuration Tool</span>
+	</h1>
+	<div class="uk-padding-small">
+		<div class="uk-child-width-1-2@s uk-padding-small" uk-grid>
+			<ul class="uk-width-auto@m uk-tab-left uk-width-auto@m" uk-tab uk-switcher="connect: #configView">
+				<li class="uk-active"><a href="#">Main</a></li>
+				<li><a href="#">Modules</a></li>
+			</ul>
+			<ul id="configView" class="uk-switcher switcher-container uk-width-expand@m">
+				<li id="main" class="uk-child-width-expand" uk-grid>
+				</li>
+				<li id="modules" class="uk-child-width-1-2 uk-padding-small" uk-grid>
+					<ul id="modules-tabs" class="uk-width-auto@m uk-tab-left uk-width-auto" uk-tab uk-switcher="connect: #moduleSelection">
+					</ul>
+
+					<ul id="modules-contents" class="uk-switcher switcher-container uk-width-expand@m">
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<!--</form>-->
+</body>
+</html>

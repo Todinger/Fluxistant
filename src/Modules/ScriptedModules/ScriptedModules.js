@@ -31,8 +31,8 @@ class ScriptedModules extends ModuleClient {
 	}
 	
 	showErrorScreen() {
-		$('#errorScreen').show();
-		$('#frames').hide();
+		// $('#errorScreen').show();
+		// $('#frames').hide();
 	}
 	
 	hideErrorScreen() {

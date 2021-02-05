@@ -332,6 +332,10 @@ class Utils {
 		return result;
 	}
 	
+	static baseName(filename) {
+		return filename.split('.').slice(0, -1).join('.');
+	}
+	
 	
 	// Checks for equality between two values.
 	// Only supports basic value types.

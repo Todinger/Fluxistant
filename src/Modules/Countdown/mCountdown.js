@@ -54,6 +54,8 @@ class Countdown extends Module {
 	
 	commands = {
 		['settime']: {
+			name: 'Set Time',
+			description: 'Sets the current time of the countdown timer.',
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: (user, time) => {
 				if (isNaN(time)) {
@@ -66,6 +68,8 @@ class Countdown extends Module {
 		},
 		
 		['addtime']: {
+			name: 'Add Time',
+			description: 'Adds to the current time of the countdown timer.',
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: (user, time) => {
 				if (isNaN(time)) {
@@ -78,6 +82,8 @@ class Countdown extends Module {
 		},
 		
 		['subtracttime']: {
+			name: 'Subtract Time',
+			description: 'Subtracts from the current time of the countdown timer.',
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: (user, time) => {
 				if (isNaN(time)) {

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const _ = require('lodash');
 const Utils = requireMain('./utils');
 const EntityFactory = require('./Config/entityFactory');
 
@@ -62,11 +63,32 @@ class EntityFileManager {
 	}
 	
 	createRequirementsFile(outputFilePath, relativeGenerationDirPath) {
-		let data = this.files
-			.map(filename => `require('${relativeGenerationDirPath}/${filename}');`)
-			.join('\n');
+		let classes = this.files
+			.map(filename => {
+				let className = _.upperFirst(Utils.baseName(filename));
+				return `\t${className}: require('${relativeGenerationDirPath}${filename}'),`;
+			});
 		
-		fs.writeFileSync(outputFilePath, data, 'utf8');
+		let fileText =
+`const entities = {
+${classes.join('\n')}
+};
+
+const factory = require('./entityFactory');
+
+function registerAll() {
+	Object.values(entities).forEach(entity => {
+		factory.processEntityClass(entity, 'server');
+	});
+}
+
+module.exports = {
+	Entities: entities,
+	Factory: factory,
+	RegisterAll: registerAll,
+}`;
+		
+		fs.writeFileSync(outputFilePath, fileText, 'utf8');
 	}
 }
 

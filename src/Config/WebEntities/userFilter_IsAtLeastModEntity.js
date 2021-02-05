@@ -5,7 +5,7 @@ class UserFilter_IsAtLeastModEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsAtLeastModEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsAtLeastModEntity.TYPE);
+		super(UserFilter_IsAtLeastModEntity.TYPE, 'Mods and Streamer Only');
 	}
 }
 

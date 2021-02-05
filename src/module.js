@@ -102,6 +102,7 @@ class Module {
 		// The !fxvol command is only relevant to modules that have a web client part
 		if (this.webname) {
 			this.commands['fxvol'] = {
+				name: 'Set Volume',
 				description: 'Modifies the volume level of sounds produced by this module. Accepts a percentage number (0-100) for setting a specific volume, or differences with +/- (e.g. +20 would increase the volume by 20%, up to 100%).',
 				filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 				callback: (user, volume) => {

@@ -110,6 +110,26 @@ class ConfigManager extends EventNotifier {
 		return this.moduleConfigs[moduleName];
 	}
 	
+	exportMainConfig() {
+		return this.getMainConfig().export();
+	}
+	
+	exportModuleConfigs() {
+		let moduleConfigs = {};
+		Object.keys(this.moduleConfigs).forEach(moduleName => {
+			moduleConfigs[moduleName] = this.moduleConfigs[moduleName].export();
+		});
+		
+		return moduleConfigs;
+	}
+	
+	exportAll() {
+		return {
+			main: this.exportMainConfig(),
+			modules: this.exportModuleConfigs(),
+		}
+	}
+	
 	onModConfigLoaded(callback) {
 		this.on('modConfigLoaded', callback);
 	}

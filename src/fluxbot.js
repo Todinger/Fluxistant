@@ -5,7 +5,15 @@ const Utils = require('./utils');
 const APP_DATA_DIR = path.join(process.env.APPDATA, 'Fluxbot');
 const DATA_DIR_MAIN = APP_DATA_DIR;
 const DATA_DIR_MODULES = path.join(APP_DATA_DIR, 'Modules');
-const CONFIG_ENTITIES_PATH = './Config/Entities/';
+
+const CONFIG_DIR = './Config/';
+const WEB_ENTITIES_SUBDIR = 'WebEntities/';
+const CONFIG_ENTITIES_PATH = CONFIG_DIR + 'Entities/';
+const CONFIG_WEB_ENTITIES_PATH = CONFIG_DIR + WEB_ENTITIES_SUBDIR;
+const CONFIG_WEB_ENTITIES_LIST_FILE = CONFIG_DIR + 'webEntitiesList.js';
+
+const GUI_DIR = './GUI';
+const GUI_DIR_WEB = '/gui/';
 
 // TODO: Remove
 // Bot configuration - that is where you make it work with your bot and channel
@@ -64,10 +72,9 @@ class FluxBot {
 	}
 	
 	setupWebDirs() {
-		this.app.use('/cfg/', this.express.static('./Config'));
-		
 		// The files here are needed by the HTML pages of the various modules
 		this.assets.registerDir(path.join(__dirname, 'ClientsCommon'), '/common');
+		this.app.use(GUI_DIR_WEB, this.express.static(GUI_DIR));
 	}
 	
 	// Gets a collection of { username: imageurl } pairs for all the users who have
@@ -133,6 +140,10 @@ class FluxBot {
 		this.configManager.saveAll();
 	}
 	
+	exportConfig() {
+	
+	}
+	
 	// Register to handle general server events
 	registerServerEvents() {
 		this.io.on('connection', socket => {
@@ -162,6 +173,11 @@ class FluxBot {
 			socket.on('sayTo', data => {
 				this.twitchManager.say(`@${data.username} ${data.message}`);
 			});
+			
+			socket.on('configRequest', () => {
+				let data = this.configManager.exportAll();
+				socket.emit('loadConfig', data);
+			});
 		});
 	}
 	
@@ -190,11 +206,13 @@ class FluxBot {
 		this.startServer();
 	}
 	
-	setupConfigOnly(generationOutputDir, requirementsFilePath, relativeGenerationDirPath) {
-		Utils.ensureDirExists(generationOutputDir);
-		this.readConfigEntities(generationOutputDir);
-		this.setupModules(generationOutputDir);
-		this.entityFileManager.createRequirementsFile(requirementsFilePath, relativeGenerationDirPath);
+	setupConfigOnly() {
+		Utils.ensureDirExists(CONFIG_WEB_ENTITIES_PATH);
+		this.readConfigEntities(CONFIG_WEB_ENTITIES_PATH);
+		this.setupModules(CONFIG_WEB_ENTITIES_PATH);
+		this.entityFileManager.createRequirementsFile(
+			CONFIG_WEB_ENTITIES_LIST_FILE,
+			'./' + WEB_ENTITIES_SUBDIR);
 	}
 }
 

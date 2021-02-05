@@ -1,4 +1,6 @@
+const assert = require('assert').strict;
 const ConfigEntity = require('./configEntity');
+const EntityFactory = require('../entityFactory');
 
 class ValueEntity extends ConfigEntity {
 	static get TYPE()		{ return 'Value'; 							}
@@ -9,9 +11,10 @@ class ValueEntity extends ConfigEntity {
 	}
 	
 	// constructor(valueType) {
-	constructor(value) {
-		super(ValueEntity.TYPE);
+	constructor(value, entityType, javascriptValueType) {
+		super(entityType || ValueEntity.TYPE);
 		this.value = value;
+		this.javascriptValueType = javascriptValueType;
 	}
 	
 	getValue() {
@@ -19,6 +22,12 @@ class ValueEntity extends ConfigEntity {
 	}
 	
 	setValue(value) {
+		if (this.javascriptValueType && value !== undefined) {
+			assert(
+				typeof value === this.javascriptValueType,
+				`Illegal value: expected type '${this.javascriptValueType}', got ${value}`);
+		}
+		
 		this.value = value;
 	}
 	
@@ -37,15 +46,18 @@ class ValueEntity extends ConfigEntity {
 		this.setValue(descriptor);
 	}
 	
-	export() {
+	exportDesc() {
 		return {
-			type: this.type,
 			descriptor: this.value,
 		};
 	}
 	
-	clone() {
-		return new ValueEntity(this.value);
+	cloneImpl() {
+		return EntityFactory.build(this.type, this.value);
+	}
+	
+	buildFrom(descriptor) {
+		this.setValue(descriptor);
 	}
 }
 

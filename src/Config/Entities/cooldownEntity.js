@@ -1,6 +1,6 @@
 const assert = require('assert').strict;
 const StaticObjectEntity = require('./staticObjectEntity');
-const ValueEntity = require('./valueEntity');
+const IntegerEntity = require('./integerEntity');
 
 class CooldownEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Cooldown'; 					}
@@ -8,9 +8,9 @@ class CooldownEntity extends StaticObjectEntity {
 	
 	constructor() {
 		super(CooldownEntity.TYPE);
-		this.addChild('user', new ValueEntity())
+		this.addChild('user', new IntegerEntity())
 			.setDescription('Time in milliseconds before the same user can use the command.');
-		this.addChild('global', new ValueEntity())
+		this.addChild('global', new IntegerEntity())
 			.setDescription('Time in milliseconds before the command can be used again at all.');
 	}
 	

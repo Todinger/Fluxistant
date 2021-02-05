@@ -1,0 +1,27 @@
+import GuiElement from './guiElement.mjs';
+
+export default class LabeledContainerElement extends GuiElement {
+	build(data) {
+		if (!data) data = {}; // To avoid needing to test if data is valid everywhere
+		
+		let outerContainer = $(`<div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap"></div>`);
+		
+		if (data.label && data.label !== '') {
+			let label = $(`<h4 class="uk-width-1-6"></h4>`);
+			label.append(data.label);
+			if (data.tooltip) {
+				label.attr('uk-tooltip', data.tooltip);
+			}
+			
+			outerContainer.append(label);
+		}
+		
+		if (data.contents) {
+			let innerContainer = $(`<div class="uk-width-expand"></div>`);
+			innerContainer.append(data.contents);
+			outerContainer.append(innerContainer);
+		}
+		
+		return outerContainer;
+	}
+}

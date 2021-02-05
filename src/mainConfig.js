@@ -5,7 +5,9 @@ const DEFAULT_PORT = 3333;
 class MainConfig extends Configuration {
 	constructor() {
 		super();
-		this.addChild('port', 'Value', DEFAULT_PORT);
+		this.addChild('port', 'Integer', DEFAULT_PORT)
+			.setName('Port')
+			.setDescription('Server port to listen on');
 	}
 	
 	getPort() {

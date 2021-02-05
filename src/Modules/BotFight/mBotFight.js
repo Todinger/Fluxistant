@@ -576,6 +576,7 @@ class BotFight extends Module {
 	
 	commands = {
 		['botfight']: {
+			name: 'Start Conversation',
 			cmdname: 'botfight',
 			description: 'Makes the bots initiate a random conversation.',
 			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],

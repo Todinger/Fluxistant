@@ -4,6 +4,7 @@ const EntityFactory = require('../entityFactory');
 
 class DynamicObjectEntity extends ObjectEntity {
 	static get TYPE()		{ return 'DynamicObject'; 		   			}
+	static get GUITYPE()	{ return 'DynamicObject'; 		   			}
 	static get BUILDER()	{ return () => new DynamicObjectEntity(); 	}
 	
 	constructor(type) {
@@ -16,11 +17,15 @@ class DynamicObjectEntity extends ObjectEntity {
 	importDesc(descriptor) {
 		Object.keys(descriptor).forEach(key => {
 			let child = ConfigEntity.readEntity(descriptor[key]);
-			this.addChild(child);
+			if (this.hasChild(key)) {
+				this.setChild(key, child);
+			} else {
+				this.addChild(key, child);
+			}
 		});
 	}
 	
-	clone() {
+	cloneImpl() {
 		let copy = EntityFactory.build(this.type);
 		Object.keys(this.children).forEach(key => {
 			copy.addChild(key, this.children[key].clone());

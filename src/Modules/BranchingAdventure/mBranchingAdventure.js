@@ -855,12 +855,14 @@ class BranchingAdventure extends Module {
 	
 	commands = {
 		['choose']: {
+			name: 'Start Adventure',
 			cmdname: 'choose',
 			description: 'Starts a choose-your-own branching, solo adventure for the user.',
 			callback: (user, category) => this.startAdventure(user, category),
 		},
 		
 		['chickenout']: {
+			name: 'Cancel Adventure',
 			description: "Cancels the user's currently ongoing branching adventure.",
 			callback: user => {
 				if (this.userHasAdventure(user)) {

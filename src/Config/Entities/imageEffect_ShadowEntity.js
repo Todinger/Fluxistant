@@ -1,5 +1,5 @@
 const ChoiceValueEntity = require('./choiceValueEntity');
-const ValueEntity = require('./ValueEntity');
+const IntegerEntity = require('./integerEntity');
 
 class ImageEffect_ShadowEntity extends ChoiceValueEntity {
 	static get TYPE()		{ return 'ImageEffect_Shadow'; 					}
@@ -7,7 +7,7 @@ class ImageEffect_ShadowEntity extends ChoiceValueEntity {
 	
 	constructor() {
 		super(ImageEffect_ShadowEntity.TYPE);
-		this.addChild('size', new ValueEntity())
+		this.addChild('size', new IntegerEntity())
 			.setDescription("Spread of the shadow effect (warning: doesn't work that well).");
 	}
 }

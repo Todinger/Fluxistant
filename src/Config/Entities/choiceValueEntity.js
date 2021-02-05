@@ -1,11 +1,18 @@
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class ChoiceValueEntity extends StaticObjectEntity {
-	static get TYPE() { return null; }	// Avoid construction (abstract type)
+	static get TYPE()		{ return null;			}	// Avoid construction (abstract type)
+	static get GUITYPE()	{ return 'RawObject';	}
 	
-	constructor(type, optionName) {
+	// constructor(type, optionName) {
+	constructor(type, displayText) {
 		super(type);
-		this.optionName = optionName;
+		// this.optionName = optionName;
+		this.displayText = displayText;
+	}
+	
+	getDisplayText() {
+		return this.displayText;
 	}
 	
 	// ---- Overrides ---- //
@@ -17,11 +24,11 @@ class ChoiceValueEntity extends StaticObjectEntity {
 	}
 	
 	// Inject our 'type' field into the data
-	export() {
-		let descriptor = super.export();
-		descriptor.type = this.type;
-		return descriptor;
-	}
+	// export() {
+	// 	let descriptor = super.export();
+	// 	descriptor.type = this.type;
+	// 	return descriptor;
+	// }
 }
 
 module.exports = ChoiceValueEntity;

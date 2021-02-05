@@ -403,17 +403,20 @@ class Adventure extends Module {
 	
 	commands = {
 		['adventure']: {
+			name: 'Start Adventure',
 			aliases: ['adv'],
 			description: 'Starts the adventure by the user.',
 			callback: user => this.startRecruiting(user),
 		},
 		
 		[JOIN_COMMAND]: {
+			name: 'Join Adventure',
 			description: 'Joins the currently active adventure.',
 			callback: user => this.join(user),
 		},
 		
 		['endadventure']: {
+			name: 'End Adventure',
 			description: 'Cancels the currently ongoing adventure.',
 			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
 			callback: () => this.endAdventure(),

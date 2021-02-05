@@ -5,7 +5,7 @@ class UserFilter_IsModEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsModEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsModEntity.TYPE);
+		super(UserFilter_IsModEntity.TYPE, 'Mods Only');
 	}
 }
 

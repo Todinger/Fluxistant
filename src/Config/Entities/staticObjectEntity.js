@@ -20,7 +20,7 @@ class StaticObjectEntity extends ObjectEntity {
 		});
 	}
 	
-	clone() {
+	cloneImpl() {
 		let copy = EntityFactory.build(this.type);
 		Object.keys(this.children).forEach(key => {
 			copy.children[key] = this.children[key].clone();

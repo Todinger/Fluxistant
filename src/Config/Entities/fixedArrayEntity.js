@@ -3,6 +3,7 @@ const ArrayEntity = require('./arrayEntity');
 
 class FixedArrayEntity extends ArrayEntity {
 	static get TYPE()		{ return 'FixedArray'; 										}
+	static get GUITYPE()	{ return 'FixedArray'; 										}
 	static get BUILDER()	{ return elementType => new FixedArrayEntity(elementType); 	}
 	
 	constructor(elementType) {

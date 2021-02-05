@@ -43,6 +43,18 @@ class ArrayEntity extends ConfigEntity {
 		return value;
 	}
 	
+	removeElementAt(index) {
+		this.elements.splice(index, 1);
+	}
+	
+	forEach(func) {
+		this.elements.forEach(func);
+	}
+	
+	get length() {
+		return this.elements.length;
+	}
+	
 	clear() {
 		this.elements = [];
 	}
@@ -58,10 +70,9 @@ class ArrayEntity extends ConfigEntity {
 		return this.elements.map(element => element.toConf());
 	}
 	
-	export() {
+	exportDesc() {
 		let elementsDesc = this.elements.map(element => element.export());
 		return {
-			type: this.type,
 			descriptor: {
 				elementType: this.elementType,
 				elements: elementsDesc,
@@ -73,10 +84,23 @@ class ArrayEntity extends ConfigEntity {
 		this.elements.forEach(element => element.validate());
 	}
 	
-	clone() {
+	cloneImpl() {
 		let copy = EntityFactory.build(this.type, this.elementType);
 		this.elements.forEach(element => copy.addElement(element.clone()));
 		return copy;
+	}
+	
+	buildFrom(descriptor) {
+		assert(this.elements.length === 0, 'buildFrom called on a non-empty object.');
+		
+		this.elementType = descriptor.elementType;
+		assert(this.elementType, 'An ArrayEntity must have an element type.');
+		
+		// Build the elements from the given array
+		descriptor.elements.forEach(entryDesc => {
+			let element = ConfigEntity.buildEntity(entryDesc);
+			this.addElement(element);
+		});
 	}
 }
 

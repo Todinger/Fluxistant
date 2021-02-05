@@ -3,7 +3,8 @@ const ConfigEntity = require('./configEntity');
 const EntityFactory = require('../entityFactory');
 
 class ChoiceEntity extends ConfigEntity {
-	static get TYPE() { return null; }	// Avoid construction (abstract type)
+	static get TYPE()		{ return null;		}	// Avoid construction (abstract type)
+	static get GUITYPE()	{ return 'Choice'; 	}
 	
 	constructor(type) {
 		super(type);
@@ -24,6 +25,15 @@ class ChoiceEntity extends ConfigEntity {
 	
 	_addOptions(options) {
 		Object.keys(options).forEach(option => this._addOption(option, options[option]));
+	}
+	
+	getOption(option) {
+		return this.options[option];
+	}
+	
+	forEach(func) {
+		Object.keys(this.options).forEach(
+			optionName => func(optionName, this.options[optionName]));
 	}
 	
 	select(option) {
@@ -65,9 +75,8 @@ class ChoiceEntity extends ConfigEntity {
 		});
 	}
 	
-	export() {
+	exportDesc() {
 		let result = {
-			type: this.type,
 			descriptor: {
 				selectedOption: this.selectedOption,
 				options: {},
@@ -81,12 +90,26 @@ class ChoiceEntity extends ConfigEntity {
 		return result;
 	}
 	
-	clone() {
+	cloneImpl() {
 		let copy = EntityFactory.build(this.type);
 		Object.keys(this.options).forEach(
 			option => copy.options[option] = this.options[option].clone());
 		copy.selectedOption = this.selectedOption;
 		return copy;
+	}
+	
+	buildFrom(descriptor) {
+		// Every option in this.options should be an object that inherits from
+		// choiceValueEntity, which inherently has an .option property in its
+		// own descriptor, so we just use that instead of saving the type of
+		// the selection ourselves (it'd be redundant data)
+		assert(
+			descriptor.selectedOption in this.options,
+			`Unknown selected type for ${this.type}: ${descriptor.selectedOption}`);
+		this.selectedOption = descriptor.selectedOption;
+		Object.keys(descriptor.options).forEach(option => {
+			this.options[option] = ConfigEntity.buildEntity(descriptor.options[option]);
+		});
 	}
 }
 

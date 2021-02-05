@@ -45,6 +45,8 @@ class ParrotMate extends Module {
 	
 	commands = {
 		['parrottime']: {
+			name: 'Set Interval Base',
+			description: 'The delay (ms) between sequences is chosen randomly from (Base - Variance, Base + Variance).',
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: (user, delay) => {
 				if (isNaN(delay)) {
@@ -57,6 +59,8 @@ class ParrotMate extends Module {
 		},
 		
 		['parrotoffset']: {
+			name: 'Set Interval Variance',
+			description: 'The delay (ms) between sequences is chosen randomly from (Base - Variance, Base + Variance).',
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: (user, variance) => {
 				if (isNaN(variance)) {
@@ -68,6 +72,8 @@ class ParrotMate extends Module {
 		},
 		
 		['parrotstart']: {
+			name: 'Enable Random Sequences',
+			description: 'Starts the parrot playing a random sequence at intervals.',
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: () => {
 				this.broadcastEvent('play');
@@ -75,6 +81,8 @@ class ParrotMate extends Module {
 		},
 		
 		['parrotstop']: {
+			name: 'Disable Random Sequences',
+			description: 'Stops the parrot playing a random sequence at intervals.',
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: () => {
 				this.broadcastEvent('stop');

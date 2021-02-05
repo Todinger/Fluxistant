@@ -2,7 +2,8 @@ const assert = require('assert').strict;
 const Errors = requireMain('./errors');
 const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
-const ValueEntity = require('./valueEntity');
+const StringEntity = require('./stringEntity');
+const IntegerEntity = require('./integerEntity');
 const CooldownEntity = require('./cooldownEntity');
 const UserFilter = require('./userFilterEntity');
 
@@ -12,15 +13,15 @@ class CommandEntity extends StaticObjectEntity {
 	
 	constructor(data) {
 		super(CommandEntity.TYPE, () => new CommandEntity());
-		this.addChild('cmdid', new ValueEntity(data && data.cmdid || '')); // Identifies the command for functional purposes
-		this.addChild('cmdname', new ValueEntity(data && data.cmdname || ''))
+		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')); // Identifies the command for functional purposes
+		this.addChild('cmdname', new StringEntity(data && data.cmdname || ''))
 			.setName('Name')
 			.setDescription('The term that will invoke the command.');
-		this.addChild('aliases', new DynamicArrayEntity('Value'))
+		this.addChild('aliases', new DynamicArrayEntity('String'))
 			.setDescription('Optional additional names for the command.');
-		this.addChild('cost', new ValueEntity(data && data.cost || 0))
+		this.addChild('cost', new IntegerEntity(data && data.cost || 0))
 			.setDescription('Cost in StreamElements loyalty points.');
-		this.addChild('message', new ValueEntity(data && data.message))
+		this.addChild('message', new StringEntity(data && data.message))
 			.setDescription('A message the bot will send to the chat when the command is invoked.');
 		// this.addChild('silent', new ValueEntity(false))
 		// 	.setDescription('Whether or not to suppress the bot from announcing point usage for this command.');
@@ -31,6 +32,10 @@ class CommandEntity extends StaticObjectEntity {
 			.setDescription('Filters for which users may use the command.');
 		
 		if (data) {
+			if (data.name) {
+				this.setName(data.name);
+			}
+			
 			if (data.aliases) {
 				data.aliases.forEach(alias => this.addAlias(alias));
 			}
@@ -49,7 +54,7 @@ class CommandEntity extends StaticObjectEntity {
 		}
 	}
 	
-	getName() {
+	getCmdName() {
 		return this.getChild('cmdname').getValue();
 	}
 	
@@ -70,7 +75,7 @@ class CommandEntity extends StaticObjectEntity {
 	}
 	
 	addAlias(alias) {
-		this.getChild('aliases').addElement(new ValueEntity(alias));
+		this.getChild('aliases').addElement(new StringEntity(alias));
 	}
 	
 	addUserFilter(filter) {
@@ -83,21 +88,23 @@ class CommandEntity extends StaticObjectEntity {
 	// ---- Overrides ---- //
 	
 	validate() {
-		let name = this.getName();
+		let cmdname = this.getCmdName();
 		// Errors.ensureNonEmptyString(
 		// 	this.getName(),
 		// 	`Command name must be a non-empty string.`);
 		Errors.ensureRegexString(
-			name,
+			cmdname,
 			/[^\s]+/,
-			`Command name must be a non-empty single-word string. Got: ${name}`);
+			`Command name must be a non-empty single-word string. Got: ${cmdname}`);
 		
 		this.getAliases().forEach(
 			alias => Errors.ensureNonEmptyString(
 				alias,
 				'Command aliases must be non-empty strings.'));
 		
-		assert(this.getCost() >= 0, 'Cost must be a non-negative integer');
+		assert(
+			this.getCost() >= 0,
+			`Cost must be a non-negative integer (got: ${this.getCost()}).`);
 	}
 	
 	importDesc(descriptor) {

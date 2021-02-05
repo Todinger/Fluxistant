@@ -25,6 +25,8 @@ class RandomImage extends Module {
 	
 	commands = {
 		[COMMAND_NAME]: {
+			name: 'Show Image',
+			description: 'Shows a randomly selected picture from the image pool.',
 			callback: user => this.showRandomImage(user),
 			message: `${_.capitalize(COMMAND_NAME)} redeemed by $user for $pcost! One random drawing by Yecats coming up!`,
 			cost: COMMAND_COST,

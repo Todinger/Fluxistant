@@ -5,7 +5,7 @@ class UserFilter_IsSubEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsSubEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsSubEntity.TYPE);
+		super(UserFilter_IsSubEntity.TYPE, 'Subs Only');
 	}
 }
 

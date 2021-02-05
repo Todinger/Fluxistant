@@ -1,9 +1,11 @@
 const assert = require('assert').strict;
 const ArrayEntity = require('./arrayEntity');
 const ConfigEntity = require('./configEntity');
+const EntityFactory = require('../entityFactory');
 
 class DynamicArrayEntity extends ArrayEntity {
 	static get TYPE()		{ return 'DynamicArray'; 										}
+	static get GUITYPE()	{ return 'DynamicArray'; 										}
 	static get BUILDER()	{ return elementType => new DynamicArrayEntity(elementType); 	}
 	
 	constructor(elementType) {
@@ -12,6 +14,11 @@ class DynamicArrayEntity extends ArrayEntity {
 		this.elements = [];
 	}
 	
+	createAndAddElement() {
+		let newElement = EntityFactory.build(this.elementType);
+		this.addElement(newElement);
+		return newElement;
+	}
 	
 	// ---- Overrides ---- //
 	

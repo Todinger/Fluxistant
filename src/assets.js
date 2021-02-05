@@ -25,7 +25,7 @@ const IMAGEDISPLAY_DIR = IMAGE_ASSETS_DIR + 'Display Images';
 const IMAGEDISPLAY_URL = '/assets/image-display/';
 
 // Used for... well... sound effects
-const SOUNDEFFECTS_DIR = SOUND_ASSETS_DIR + 'sfx';
+const SOUNDEFFECTS_DIR = SOUND_ASSETS_DIR;
 const SOUNDEFFECTS_URL = '/assets/sfx/';
 
 // Used for displaying random images (the RandomImage module)
@@ -33,7 +33,7 @@ const RANDOMIMAGECACHE_DIR = IMAGE_ASSETS_DIR + 'Images/Random Image Cache';
 const RANDOMIMAGECACHE_URL = '/assets/random-image-cache/';
 
 // Random image cache and user-specific images for the F Shower module
-const FSHOWER_DIR = IMAGE_ASSETS_DIR + 'Images/F';
+const FSHOWER_DIR = IMAGE_ASSETS_DIR + 'F';
 const FSHOWER_URL = '/assets/fshower/';
 const FSHOWER_SUBDIR_CACHE = 'Defaults/';
 const FSHOWER_SUBDIR_USERS = 'User-Specific/';

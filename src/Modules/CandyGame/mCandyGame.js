@@ -198,18 +198,21 @@ class CandyGame extends Module {
 	
 	commands = {
 		['trickortreat']: {
+			name: 'Start Game',
 			description: 'Starts a candy game.',
 			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
 			callback: user => this.startGame(user),
 		},
 		
 		['nomorecandy']: {
+			name: 'Stop Game',
 			description: 'Stops the currently ongoing candy game.',
 			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
 			callback: user => this.endGame(user),
 		},
 		
 		['gimme']: {
+			name: 'Drop Candy',
 			description: 'Randomly chooses a piece of candy for the user and drops it down from above.',
 			cost: 10,
 			silent: true,

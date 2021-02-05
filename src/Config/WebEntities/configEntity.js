@@ -3,12 +3,21 @@ const Errors = require('../../errors');
 const EntityFactory = require('../entityFactory');
 
 class ConfigEntity {
-	static get TYPE() { return null; }	// Avoid construction (abstract type)
+	static get TYPE()       { return null; }	// Avoid construction (abstract type)
+	static get GUITYPE()    { return null; }    // Specifies which GUI class to use to edit entities of this type
 	
 	constructor(type) {
 		this.type = type;
-		this.description = null;
-		this.name = null;
+		this.description = undefined;
+		this.name = undefined;
+	}
+	
+	hasName() {
+		return this.name && this.name !== '';
+	}
+	
+	getName() {
+		return this.name;
 	}
 	
 	setName(name) {
@@ -16,11 +25,15 @@ class ConfigEntity {
 		return this;
 	}
 	
+	getDescription() {
+		return this.description;
+	}
+	
+	
 	setDescription(description) {
 		this.description = description;
 		return this;
 	}
-	
 	// Returns the contents of this entity as a module-ready configuration for
 	// actual use (the current contents are for reading/writing to disk and user
 	// configuration during runtime).
@@ -33,6 +46,14 @@ class ConfigEntity {
 			entityInfo.type === this.type,
 			`Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`);
 		this.importDesc(entityInfo.descriptor);
+		
+		if (entityInfo.name) {
+			this.setName(entityInfo.name);
+		}
+		
+		if (entityInfo.description) {
+			this.setDescription(entityInfo.description);
+		}
 	}
 	
 	importDesc(descriptor) {
@@ -40,6 +61,14 @@ class ConfigEntity {
 	}
 	
 	export() {
+		let descriptor = this.exportDesc();
+		descriptor.type = this.type;
+		descriptor.name = this.name;
+		descriptor.description = this.description;
+		return descriptor;
+	}
+	
+	exportDesc() {
 		Errors.abstract();
 	}
 	
@@ -51,7 +80,28 @@ class ConfigEntity {
 	
 	// Creates a copy of this entity with all of its contents.
 	clone() {
+		let copy = this.cloneImpl();
+		copy.setName(this.getName());
+		copy.setDescription(this.getDescription());
+		return copy;
+	}
+	
+	cloneImpl() {
 		Errors.abstract();
+	}
+	
+	buildFrom(descriptor) {
+		Errors.abstract();
+	}
+	
+	static buildEntity(entityObject) {
+		let type = entityObject.type;
+		let instance = EntityFactory.build(type);
+		instance.buildFrom(entityObject.descriptor);
+		instance.setName(entityObject.name);
+		instance.setDescription(entityObject.description);
+		instance.validate();
+		return instance;
 	}
 	
 	static readEntity(entityObject) {
