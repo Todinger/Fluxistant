@@ -69,6 +69,8 @@ export default class ChoiceGui extends EntityGui {
 			let optionItem = $(`<li></li>`);
 			optionItem.append(optionGUIs[optionName].getGUI());
 			optionsContainer.append(optionItem);
+			
+			index++;
 		});
 		
 		selector.change(() => {
@@ -83,15 +85,16 @@ export default class ChoiceGui extends EntityGui {
 			this._setDescriptionTooltip(selector, initialSelection.getDescription());
 		}
 		
+		UIkit.switcher(switcher).show(this.optionIndices[this.entity.selectedOption]);
 		container.append(selector);
 		container.append(switcher);
 		container.append(optionsContainer);
 		return container;
 	}
 	
-	loadData() {
-		this.elementGUIs.forEach(elementGUI => elementGUI.loadData());
-	}
+	// loadData() {
+	// 	this.elementGUIs.forEach(elementGUI => elementGUI.loadData());
+	// }
 	
 	// readInput(configEntity, guiID) {
 	// 	configEntity.setValue(document.getElementById(`${guiID}-${configEntity.getName()}`).checked);
