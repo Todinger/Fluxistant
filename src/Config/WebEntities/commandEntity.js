@@ -13,7 +13,8 @@ class CommandEntity extends StaticObjectEntity {
 	
 	constructor(data) {
 		super(CommandEntity.TYPE, () => new CommandEntity());
-		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')); // Identifies the command for functional purposes
+		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')) // Identifies the command for functional purposes
+			.hide();
 		this.addChild('cmdname', new StringEntity(data && data.cmdname || ''))
 			.setName('Name')
 			.setDescription('The term that will invoke the command.');

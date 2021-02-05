@@ -18867,7 +18867,8 @@ class CommandEntity extends StaticObjectEntity {
 	
 	constructor(data) {
 		super(CommandEntity.TYPE, () => new CommandEntity());
-		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')); // Identifies the command for functional purposes
+		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')) // Identifies the command for functional purposes
+			.hide();
 		this.addChild('cmdname', new StringEntity(data && data.cmdname || ''))
 			.setName('Name')
 			.setDescription('The term that will invoke the command.');
@@ -18981,6 +18982,7 @@ class ConfigEntity {
 		this.type = type;
 		this.description = undefined;
 		this.name = undefined;
+		this.hidden = false;
 	}
 	
 	hasName() {
@@ -19005,6 +19007,21 @@ class ConfigEntity {
 		this.description = description;
 		return this;
 	}
+	
+	get isHidden() {
+		return this.hidden;
+	}
+	
+	hide() {
+		this.hidden = true;
+		return this;
+	}
+	
+	show() {
+		this.hidden = false;
+		return this;
+	}
+	
 	// Returns the contents of this entity as a module-ready configuration for
 	// actual use (the current contents are for reading/writing to disk and user
 	// configuration during runtime).
@@ -19025,6 +19042,8 @@ class ConfigEntity {
 		if (entityInfo.description) {
 			this.setDescription(entityInfo.description);
 		}
+		
+		this.hidden = !!entityInfo.hidden;
 	}
 	
 	importDesc(descriptor) {
@@ -19036,6 +19055,10 @@ class ConfigEntity {
 		descriptor.type = this.type;
 		descriptor.name = this.name;
 		descriptor.description = this.description;
+		if (this.hidden) {
+			descriptor.hidden = true;
+		}
+		
 		return descriptor;
 	}
 	
@@ -19054,6 +19077,7 @@ class ConfigEntity {
 		let copy = this.cloneImpl();
 		copy.setName(this.getName());
 		copy.setDescription(this.getDescription());
+		copy.hidden = this.hidden;
 		return copy;
 	}
 	
@@ -19728,7 +19752,6 @@ class UserFilter_IsSubEntity extends UserFilter_BaseEntity {
 module.exports = UserFilter_IsSubEntity;
 
 },{"./userFilter_BaseEntity":32}],37:[function(require,module,exports){
-const Errors = require('../../errors');
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 const StringEntity = require('./stringEntity');
 
@@ -19752,7 +19775,7 @@ class UserFilter_IsUserEntity extends UserFilter_BaseEntity {
 
 module.exports = UserFilter_IsUserEntity;
 
-},{"../../errors":41,"./stringEntity":30,"./userFilter_BaseEntity":32}],38:[function(require,module,exports){
+},{"./stringEntity":30,"./userFilter_BaseEntity":32}],38:[function(require,module,exports){
 const assert = require('assert').strict;
 const ConfigEntity = require('./configEntity');
 const EntityFactory = require('../entityFactory');

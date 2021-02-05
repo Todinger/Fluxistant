@@ -2,8 +2,6 @@ import EntityGui from "./entityGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 import GuiElements from "./guiElements/guiElements.mjs";
 
-console.log('ObjectGui here!');
-
 export default class ObjectGui extends EntityGui {
 	static get GUITYPE()    { return 'Object';                                          }
 	static get BUILDER()    { return (entity, guiID) => new ObjectGui(entity, guiID);   }
@@ -19,9 +17,11 @@ export default class ObjectGui extends EntityGui {
 	
 	_buildChildrenGUIs() {
 		this.entity.forEach((key, value) => {
-			this.childrenGUIs[key] = GuiRegistry.buildGui(
-				value,
-				`${this.guiID}-${key}`);
+			if (!value.isHidden) {
+				this.childrenGUIs[key] = GuiRegistry.buildGui(
+					value,
+					`${this.guiID}-${key}`);
+			}
 		});
 		
 		return this.childrenGUIs;

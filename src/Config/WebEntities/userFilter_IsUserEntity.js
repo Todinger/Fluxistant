@@ -1,4 +1,3 @@
-const Errors = require('../../errors');
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 const StringEntity = require('./stringEntity');
 

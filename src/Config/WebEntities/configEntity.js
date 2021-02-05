@@ -10,6 +10,7 @@ class ConfigEntity {
 		this.type = type;
 		this.description = undefined;
 		this.name = undefined;
+		this.hidden = false;
 	}
 	
 	hasName() {
@@ -34,6 +35,21 @@ class ConfigEntity {
 		this.description = description;
 		return this;
 	}
+	
+	get isHidden() {
+		return this.hidden;
+	}
+	
+	hide() {
+		this.hidden = true;
+		return this;
+	}
+	
+	show() {
+		this.hidden = false;
+		return this;
+	}
+	
 	// Returns the contents of this entity as a module-ready configuration for
 	// actual use (the current contents are for reading/writing to disk and user
 	// configuration during runtime).
@@ -54,6 +70,8 @@ class ConfigEntity {
 		if (entityInfo.description) {
 			this.setDescription(entityInfo.description);
 		}
+		
+		this.hidden = !!entityInfo.hidden;
 	}
 	
 	importDesc(descriptor) {
@@ -65,6 +83,10 @@ class ConfigEntity {
 		descriptor.type = this.type;
 		descriptor.name = this.name;
 		descriptor.description = this.description;
+		if (this.hidden) {
+			descriptor.hidden = true;
+		}
+		
 		return descriptor;
 	}
 	
@@ -83,6 +105,7 @@ class ConfigEntity {
 		let copy = this.cloneImpl();
 		copy.setName(this.getName());
 		copy.setDescription(this.getDescription());
+		copy.hidden = this.hidden;
 		return copy;
 	}
 	

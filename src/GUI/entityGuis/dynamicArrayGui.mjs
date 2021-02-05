@@ -25,8 +25,10 @@ export default class DynamicArrayGui extends EntityGui {
 	_buildElementGUIs() {
 		for (let i = 0; i < this.entity.length; i++) {
 			let element = this.entity.getElement(i);
-			let elementGui = this._buildElementGUI(element, i);
-			this.elementGUIs.push(elementGui);
+			if (!element.isHidden) {
+				let elementGui = this._buildElementGUI(element, i);
+				this.elementGUIs.push(elementGui);
+			}
 		}
 		
 		return this.elementGUIs;
@@ -98,7 +100,7 @@ export default class DynamicArrayGui extends EntityGui {
 		}
 		
 		// Before finishing, add the "Add Element" button
-		let addButton = $(`<button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-top">Add Element</button>`);
+		let addButton = $(`<button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Add Element</button>`);
 		addButton.click(() => this._addButtonPressed());
 		this.childrenContainer.append(addButton);
 		

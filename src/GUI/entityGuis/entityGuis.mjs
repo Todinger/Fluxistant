@@ -1,5 +1,3 @@
-console.log('EntityGuis here!');
-
 import GuiRegistry from "./guiRegistry.mjs";
 import EntityGui from "./entityGui.mjs";
 import ValueGui from "./valueGui.mjs";
@@ -28,4 +26,3 @@ export default {
 	ConfigGui,
 };
 
-console.log('EntityGuis here!');

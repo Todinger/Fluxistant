@@ -18,10 +18,12 @@ export default class FixedArrayGui extends EntityGui {
 	_buildElementGUIs() {
 		for (let i = 0; i < this.entity.length; i++) {
 			let element = this.entity.getElement(i);
-			let elementGui = GuiRegistry.buildGui(
-				element,
-				`${this.guiID}-${i}`);
-			this.elementGUIs.push(elementGui);
+			if (!element.isHidden) {
+				let elementGui = GuiRegistry.buildGui(
+					element,
+					`${this.guiID}-${i}`);
+				this.elementGUIs.push(elementGui);
+			}
 		}
 		
 		return this.elementGUIs;
