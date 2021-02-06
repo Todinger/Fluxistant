@@ -15,7 +15,7 @@ export default class ChoiceGui extends EntityGui {
 		this.entity.forEach((optionName, optionEntity) => {
 			this.optionGUIs[optionName] = GuiRegistry.buildGui(
 				optionEntity,
-				`${this.guiID}-${optionName}`);
+				`${this.guiID}-option-${optionName}`);
 		});
 		
 		return this.optionGUIs;
@@ -48,12 +48,12 @@ export default class ChoiceGui extends EntityGui {
 				</ul>
 		 */
 		
-		let container = $(`<div></div>`);
+		let container = $(`<div id="${this.guiID}"></div>`);
 		
 		let optionGUIs = this._buildOptionGUIs();
 		
 		let selector = $(`<select class="uk-select"></select>`);
-		let switcher = $(`<ul id="hey" uk-switcher="toggle: > *" hidden></ul>`);
+		let switcher = $(`<ul id="${this.guiID}-switcher" uk-switcher="toggle: > *" hidden></ul>`);
 		let optionsContainer = $(`<ul class="uk-switcher"></ul>`);
 		
 		let index = 0;
@@ -73,11 +73,12 @@ export default class ChoiceGui extends EntityGui {
 			index++;
 		});
 		
-		selector.change(() => {
+		let _this = this;
+		selector.change(function() {
 			let selectedOption = $('select option:selected').val();
-			UIkit.switcher(switcher).show(this.optionIndices[selectedOption]);
-			let selection = this.entity.select(selectedOption);
-			this._setDescriptionTooltip(selector, selection.getDescription());
+			UIkit.switcher(switcher).show(_this.optionIndices[this.value]);
+			let selection = _this.entity.select(selectedOption);
+			_this._setDescriptionTooltip(selector, selection.getDescription());
 		});
 		
 		let initialSelection = this.entity.getSelection();
