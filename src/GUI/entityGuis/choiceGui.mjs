@@ -75,8 +75,8 @@ export default class ChoiceGui extends EntityGui {
 		
 		let _this = this;
 		selector.change(function() {
-			let selectedOption = $('select option:selected').val();
-			UIkit.switcher(switcher).show(_this.optionIndices[this.value]);
+			let selectedOption = this.value;
+			UIkit.switcher(switcher).show(_this.optionIndices[selectedOption]);
 			let selection = _this.entity.select(selectedOption);
 			_this._setDescriptionTooltip(selector, selection.getDescription());
 		});
@@ -86,7 +86,16 @@ export default class ChoiceGui extends EntityGui {
 			this._setDescriptionTooltip(selector, initialSelection.getDescription());
 		}
 		
-		UIkit.switcher(switcher).show(this.optionIndices[this.entity.selectedOption]);
+		// Set initial selection
+		selector.val(this.entity.selectedOption);
+		
+		// Changing the switcher doesn't seem to work when we haven't yet attached
+		// these elements to the page, so for the initial selection we do this with
+		// a tiny delay to make sure it's done after loading is finished
+		setTimeout(
+			() => UIkit.switcher(switcher).show(this.optionIndices[this.entity.selectedOption]),
+			10);
+		
 		container.append(selector);
 		container.append(switcher);
 		container.append(optionsContainer);

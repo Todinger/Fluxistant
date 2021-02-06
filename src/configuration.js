@@ -63,8 +63,7 @@ class Configuration {
 			assert(
 				rootDescriptor.type === this.configRoot.type,
 				`Bad configuration: Expected root object to have the type '${this.configRoot.type}', instead got '${rootDescriptor.type}'.`);
-			console.log(`[Configuration] rootDescriptor = ${JSON.stringify(rootDescriptor)}`);
-			this.configRoot.import(rootDescriptor.descriptor);
+			this.configRoot.import(rootDescriptor);
 		}
 	}
 	

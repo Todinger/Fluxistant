@@ -19661,6 +19661,8 @@ class UserFilterEntity extends ChoiceEntity {
 			["isUser"]:         'UserFilter_IsUser',
 			["isOneOf"]:        'UserFilter_IsOneOf',
 		});
+		
+		this.select('isMod');
 	}
 }
 

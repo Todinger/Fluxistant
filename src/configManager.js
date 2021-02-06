@@ -130,6 +130,24 @@ class ConfigManager extends EventNotifier {
 		}
 	}
 	
+	importMainConfig(mainConfig) {
+		assert(mainConfig, 'Null main configuration received.');
+		this.mainConfig.import(mainConfig);
+	}
+	
+	importModuleConfigs(moduleConfigs) {
+		assert(moduleConfigs, 'Null modules configuration received.');
+		Object.keys(moduleConfigs).forEach(moduleName => {
+			this.moduleConfigs[moduleName].import(moduleConfigs[moduleName]);
+		});
+	}
+	
+	importAll(config) {
+		assert(config, 'Null configuration received.');
+		this.importMainConfig(config.main);
+		this.importModuleConfigs(config.modules);
+	}
+	
 	onModConfigLoaded(callback) {
 		this.on('modConfigLoaded', callback);
 	}

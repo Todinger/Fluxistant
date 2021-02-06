@@ -178,6 +178,13 @@ class FluxBot {
 				let data = this.configManager.exportAll();
 				socket.emit('loadConfig', data);
 			});
+			
+			socket.on('saveConfig', config => {
+				this.cli.log('Received configuration for saving.');
+				this.configManager.importAll(config);
+				this.configManager.saveAll();
+				socket.emit('configSaved');
+			});
 		});
 	}
 	

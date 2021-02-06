@@ -19,6 +19,34 @@ class Configurator {
 		}
 	}
 	
+	init() {
+		$('#btn-apply').click(() => this.applyButtonClicked());
+		$('#btn-revert').click(() => this.revertButtonClicked());
+		this.configViewSwitcher = $('#configViewSwitcher');
+	}
+	
+	disableButton(btn) {
+		btn.addClass('uk-text-muted');
+		btn.attr('disabled', '');
+	}
+	
+	enableButton(btn) {
+		btn.removeAttr('disabled');
+		btn.removeClass('uk-text-muted');
+	}
+	
+	applyButtonClicked() {
+		this.saveConfigs();
+	}
+	
+	revertButtonClicked() {
+		this.buildPageFromActive();
+	}
+	
+	showMain() {
+		UIkit.switcher(this.configViewSwitcher).show(0);
+	}
+	
 	buildPage() {
 		let mainContainer = $('#main');
 		mainContainer.empty();
@@ -56,12 +84,18 @@ class Configurator {
 	
 	copyConfigs(src, dest) {
 		dest.main = src.main.clone();
+		
 		dest.modules = {};
-		if (src.modules) {
-			Object.keys(src.modules).forEach(modName => {
-				dest.modules[modName] = src.modules[modName].clone();
-			});
-		}
+		let mods = src.modules || {};
+		Object.keys(src.modules).forEach(modName => {
+			dest.modules[modName] = mods[modName].clone();
+		});
+	}
+	
+	buildPageFromActive() {
+		this.copyConfigs(this.activeConfigs, this.displayedConfig);
+		this.buildPage();
+		this.showMain();
 	}
 	
 	createFromData(exportedData) {
@@ -74,6 +108,18 @@ class Configurator {
 		let entity = Entities.ConfigEntity.buildEntity(exportedData);
 		entity.import(exportedData);
 		return entity;
+	}
+	
+	exportConfigs(cfg) {
+		let main = cfg.main.export();
+		
+		let modules = {};
+		let cfgMods = cfg.modules || {};
+		Object.keys(cfg.modules).forEach(modName => {
+			modules[modName] = cfgMods[modName].export();
+		});
+		
+		return { main, modules };
 	}
 	
 	loadConfigs(data) {
@@ -93,18 +139,21 @@ class Configurator {
 				});
 			}
 			
-			this.copyConfigs(this.activeConfigs, this.displayedConfig);
-			this.buildPage();
+			this.buildPageFromActive();
 		}
 	}
 	
 	saveConfigs() {
-		this.socket.emit('saveConfig', this.displayedConfig.export());
+		this.socket.emit('saveConfig', this.exportConfigs(this.displayedConfig));
 	}
 	
 	configsSaved() {
 		this.copyConfigs(this.displayedConfig, this.activeConfigs);
-		// TODO: Show confirmation to user
+		UIkit.notification({
+			message: '<span uk-icon=\'icon: check\'></span> Configuration saved',
+			status: 'success',
+			timeout: 5000,
+		});
 	}
 	
 	start() {
@@ -117,6 +166,7 @@ class Configurator {
 let cfg = new Configurator();
 
 $(document).ready(function() {
+	cfg.init();
 	cfg.start();
 });
 

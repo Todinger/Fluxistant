@@ -38,12 +38,22 @@
 <!--<form class="uk-form-horizontal">-->
 
 <div class="uk-light uk-background-secondary uk-padding-small uk-height-viewport">
-	<h1 class="uk-heading-line uk-text-center">
+	<h1 class="uk-heading-line uk-text-center uk-margin-remove-bottom">
 		<span class="uk-padding-small">Fluxbot Configuration Tool</span>
 	</h1>
+	<div class="uk-flex uk-flex-center">
+		<div>
+			<button id="btn-revert" class="uk-button uk-button-default uk-width-small">Revert</button>
+		</div>
+		<div class="uk-padding-small"></div>
+		<div>
+			<button id="btn-apply" class="uk-button uk-button-default uk-width-small">Apply</button>
+		</div>
+	</div>
+	<hr>
 	<div class="uk-padding-small">
 		<div class="uk-child-width-1-2@s uk-padding-small" uk-grid>
-			<ul class="uk-width-auto@m uk-tab-left uk-width-auto@m" uk-tab uk-switcher="connect: #configView">
+			<ul id="configViewSwitcher" class="uk-width-auto@m uk-tab-left uk-width-auto@m" uk-tab uk-switcher="connect: #configView">
 				<li class="uk-active"><a href="#">Main</a></li>
 				<li><a href="#">Modules</a></li>
 			</ul>
