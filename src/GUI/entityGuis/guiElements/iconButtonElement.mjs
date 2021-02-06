@@ -14,6 +14,10 @@ export default class IconButtonElement extends GuiElement {
 			icon.attr('uk-icon', `icon: ${data.icon}`);
 		}
 		
+		button.guiData = {
+			icon,
+		}
+		
 		return button;
 	}
 }

@@ -9,13 +9,6 @@ export default class NumberGui extends ValueGui {
 		super(entity, guiID);
 	}
 	
-	_guiValueChanged() {
-		let newValue = this.jInput.val();
-		if (newValue && newValue !== '') {
-			this.entity.setValue(Number(newValue));
-		}
-	}
-	
 	_setupInput() {
 		this.jInput = $(`<input id="${this.guiID}-input" class="uk-input" type="number" value="${this.entity.getValue() || ''}" placeholder="Value...">`);
 		let description = this.entity.getDescription();
@@ -23,7 +16,12 @@ export default class NumberGui extends ValueGui {
 			this.jInput.attr('uk-tooltip', description);
 		}
 		
-		this.jInput.change(() => this._guiValueChanged());
+		this.jInput.change(() => {
+			let newValue = this.jInput.val();
+			if (newValue && newValue !== '') {
+				this._guiValueChanged(Number(newValue));
+			}
+		});
 	}
 }
 

@@ -22,7 +22,6 @@
 	     window.Ents, which we then place in the global variable Entities. -->
 	<script src="./jQueryExtensions.js"></script>
 	<script src="/common/clientUtils.js"></script>
-	<script src="/common/clientUtils.js"></script>
 	<script src="/common/configEntities.js"></script>
 	<script>
 		const Entities = window.Ents.Entities;
@@ -54,8 +53,8 @@
 	<div class="uk-padding-small">
 		<div class="uk-child-width-1-2@s uk-padding-small" uk-grid>
 			<ul id="configViewSwitcher" class="uk-width-auto@m uk-tab-left uk-width-auto@m" uk-tab uk-switcher="connect: #configView">
-				<li class="uk-active"><a href="#">Main</a></li>
-				<li><a href="#">Modules</a></li>
+				<li class="uk-active"><a id="mainTabTitle" href="#">Main</a></li>
+				<li><a id="modulesTabTitle" href="#">Modules</a></li>
 			</ul>
 			<ul id="configView" class="uk-switcher switcher-container uk-width-expand@m">
 				<li id="main" class="uk-child-width-expand" uk-grid>

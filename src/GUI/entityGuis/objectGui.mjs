@@ -9,10 +9,17 @@ export default class ObjectGui extends EntityGui {
 	constructor(entity, guiID) {
 		super(entity, guiID);
 		this.childrenGUIs = {};
+		this.childrenEntries = {};
+		this.mainGui = null;
 	}
 	
 	get isContainer() {
 		return true;
+	}
+	
+	_contentsChanged() {
+		EntityGui.addChangeIndicator(this.mainGui.guiData.header);
+		super._changed();
 	}
 	
 	_buildChildrenGUIs() {
@@ -27,10 +34,14 @@ export default class ObjectGui extends EntityGui {
 		return this.childrenGUIs;
 	}
 	
-	_buildChildEntry(childLabeledContainer) {
-		return GuiElements.child({
+	_buildChildEntry(childGui, childLabeledContainer) {
+		let childEntry = GuiElements.child({
 			contents: childLabeledContainer,
 		});
+		
+		childGui.onChanged(() => EntityGui.addChangeIndicator(childEntry.guiData.marker));
+		
+		return childEntry;
 	}
 	
 	_buildChildrenContainer() {
@@ -43,16 +54,27 @@ export default class ObjectGui extends EntityGui {
 			
 			let childEntry;
 			if (childrenGUIs[key].isContainer) {
-				childEntry = childrenGUIs[key].getGUI();
+				childEntry = this._buildChildEntry(this.childrenGUIs[key], childrenGUIs[key].getGUI());
+				
+				this.childrenGUIs[key].onChanged(() => {
+					this._contentsChanged();
+				});
 			} else {
-				childEntry = this._buildChildEntry(
-					GuiElements.labeledContainer({
-						label: childName,
-						contents: childrenGUIs[key].getGUI(),
-						tooltip: childDescription,
-					})
-				);
+				let labeledContainer = GuiElements.labeledContainer({
+					label: childName,
+					contents: childrenGUIs[key].getGUI(),
+					tooltip: childDescription,
+				});
+				
+				childEntry = this._buildChildEntry(this.childrenGUIs[key], labeledContainer);
+				
+				this.childrenGUIs[key].onChanged(() => {
+					EntityGui.addChangeIndicator(labeledContainer.guiData.label);
+					this._contentsChanged();
+				});
 			}
+			
+			this.childrenEntries[key] = childEntry;
 			
 			childrenContainer.append(childEntry);
 		});
@@ -63,87 +85,28 @@ export default class ObjectGui extends EntityGui {
 	_buildGUI() {
 		let childrenContainer = this._buildChildrenContainer();
 		
-		return GuiElements.folder({
+		this.mainGui = GuiElements.folder({
 			header: this.entity.getName(),
 			contents: childrenContainer,
 			tooltip: this.entity.getDescription(),
 		});
 		
-		
-/*
-		let objectGui = $(
-			`<ul uk-accordion class="uk-margin-small-top">
-				<li>
-					<a class="uk-accordion-title" href="#">${this.entity.getName()}</a>
-					<div class="uk-accordion-content">
-					</div>
-				</li>
-			</ul>`);
-		let childrenContainer = objectGui.find('ul > li > div');
-		
-		this.entity.forEach((key, value) => {
-			let childGui = GuiRegistry.buildGui(value.type).makeEditor(
-				value,
-				`${this.guiID}-${key}`);
-			this.childrenGUIs[key] = childGui;
-			childrenContainer.push(childGui);
-		});
-		
-		return objectGui;
-*/
+		return this.mainGui;
 	}
 	
-	// loadData() {
-	// 	Object.values(this.childrenGUIs).forEach(childGUI => childGUI.loadData());
-	// }
-	
-	// readInput(configEntity, guiID) {
-	// 	configEntity.setValue(document.getElementById(`${guiID}-${configEntity.getName()}`).checked);
-	// }
+	// Clear the indication that this value has been changed
+	clearChangedIndicators() {
+		Object.keys(this.childrenGUIs).forEach(key => {
+			this.childrenGUIs[key].clearChangedIndicators();
+			EntityGui.clearChangeIndicator(this.childrenEntries[key].guiData.marker);
+			if (!this.childrenGUIs[key].isContainer) {
+				EntityGui.clearChangeIndicator(
+					this.childrenEntries[key].guiData.contents.guiData.label);
+			}
+		});
+		
+		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);
+	}
 }
 
 GuiRegistry.register(ObjectGui);
-
-
-/*
-class ObjectGuiDefiner {
-	childID(guiID, key) {
-		return `${guiID}-${key}`;
-	}
-	
-	makeEditor(configEntity, guiID) {
-		let name = configEntity.getName();
-		let description = configEntity.getDescription();
-		let childrenGUIs = [];
-		configEntity.forEach((key, value) => {
-			childrenGUIs.push(
-				GuiDefiners.getDefiner(value.type).makeEditor(
-					value,
-					this.childID(guiID, key)));
-		});
-		
-		let objectGui =
-			`<ul uk-accordion class="uk-margin-small-top">
-				<li>
-					<a class="uk-accordion-title" href="#">${configEntity.getName()}</a>
-					<div class="uk-accordion-content">
-						${childrenGUIs.join('\n')}
-					</div>
-				</li>
-			</ul>`;
-		
-		return objectGui;
-	}
-	
-	readInput(configEntity, guiID) {
-		configEntity.forEach((key, value) =>
-			GuiDefiners.getDefiner(value.type).readInput(
-				value,
-				this.childID(guiID, key)));
-	}
-}
-
-let objectGuiDefiner = new ObjectGuiDefiner();
-GuiDefiners.register(objectGuiDefiner, StaticObjectEntity.TYPE);
-GuiDefiners.register(objectGuiDefiner, DynamicObjectEntity.TYPE);
-*/

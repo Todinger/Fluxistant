@@ -30,6 +30,14 @@ export default class ChildElement extends GuiElement {
 			outerContainer.append(data.post);
 		}
 		
+		outerContainer.guiData = {
+			marker,
+			innerContainer,
+			pre: data.pre,
+			contents: data.contents,
+			post: data.post,
+		};
+		
 		return outerContainer;
 	}
 }

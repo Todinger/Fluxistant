@@ -3,17 +3,23 @@ import GuiRegistry from "./guiRegistry.mjs";
 import GuiElements from "./guiElements/guiElements.mjs";
 
 export default class DynamicArrayGui extends EntityGui {
-	static get GUITYPE()    { return 'DynamicArray';                                                }
-	static get BUILDER()    { return (entity, guiID) => new DynamicArrayGui(entity, guiID);   }
+	static get GUITYPE()    { return 'DynamicArray';                                        }
+	static get BUILDER()    { return (entity, guiID) => new DynamicArrayGui(entity, guiID); }
 	
 	constructor(entity, guiID) {
 		super(entity, guiID);
 		this.elementGUIs = [];
 		this.elementRows = [];
+		this.mainGui = null;
 	}
 	
 	get isContainer() {
 		return true;
+	}
+	
+	_changed() {
+		EntityGui.addChangeIndicator(this.mainGui.guiData.header);
+		super._changed();
 	}
 	
 	_buildElementGUI(element, index) {
@@ -43,12 +49,14 @@ export default class DynamicArrayGui extends EntityGui {
 	
 	_deleteButtonPressed(context) {
 		this._deleteItem(context.elementRow.index());
+		this._changed();
 	}
 	
 	_addButtonPressed() {
 		let newIndex = this.entity.length;
 		let newElement = this.entity.createAndAddElement();
 		let newElementGui = this._buildElementGUI(newElement, newIndex);
+		this.elementGUIs.push(newElementGui);
 		let newElementRow = this._buildElementRow(newElementGui);
 		this.elementRows.push(newElementRow);
 		
@@ -57,6 +65,9 @@ export default class DynamicArrayGui extends EntityGui {
 			this.childrenContainer,
 			newIndex,
 			newElementRow);
+		
+		EntityGui.addChangeIndicator(newElementRow.guiData.marker);
+		this._changed();
 	}
 	
 	_buildElementRow(elementGui) {
@@ -82,6 +93,10 @@ export default class DynamicArrayGui extends EntityGui {
 		});
 		
 		context.elementRow = elementRow;
+		elementGui.onChanged(() => {
+			EntityGui.addChangeIndicator(elementRow.guiData.marker);
+			this._changed();
+		});
 		
 		return elementRow;
 	}
@@ -105,42 +120,24 @@ export default class DynamicArrayGui extends EntityGui {
 		this.childrenContainer.append(addButton);
 		
 		// Lastly, put all of this into a neat folder that can open all pretty like
-		return GuiElements.folder({
+		this.mainGui = GuiElements.folder({
 			header: this.entity.getName(),
 			contents: this.childrenContainer,
 			tooltip: this.entity.getDescription(),
 		});
-	}
-	//
-	// loadData() {
-	// 	this.elementGUIs.forEach(elementGUI => elementGUI.loadData());
-	// }
-}
-
-GuiRegistry.register(DynamicArrayGui);
-
-
-/*
-class DynamicArrayGui extends FixedArrayGui {
-	static get TYPE()       { return DynamicArrayEntity.TYPE;                                        }
-	static get BUILDER()    { return (entity, guiID) => new DynamicArrayGui(entity, guiID);    }
-	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+		
+		return this.mainGui;
 	}
 	
-	_makeAddElementButton() {
-	
-	}
-	
-	_buildElementGUIs() {
-		let elementGUIs = super._buildElementGUIs();
-		let addElementButton = this._makeAddElementButton();
-		this._addElementGui(addElementButton);
-		elementGUIs.push(addElementButton);
-		return elementGUIs;
+	// Clear the indication that this value has been changed
+	clearChangedIndicators() {
+		for (let i = 0; i < this.entity.length; i++) {
+			EntityGui.clearChangeIndicator(this.elementRows[i].guiData.marker);
+			this.elementGUIs[i].clearChangedIndicators();
+		}
+		
+		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);
 	}
 }
 
 GuiRegistry.register(DynamicArrayGui);
-*/

@@ -10,10 +10,6 @@ export default class StringGui extends ValueGui {
 		this.jInput = null;
 	}
 	
-	_guiValueChanged() {
-		this.entity.setValue(this.jInput.val());
-	}
-	
 	_setupInput() {
 		this.jInput = $(`<input id="${this.guiID}-input" class="uk-input" type="text" value="${this.entity.getValue() || ''}" placeholder="Value...">`);
 		let description = this.entity.getDescription();
@@ -21,7 +17,7 @@ export default class StringGui extends ValueGui {
 			this.jInput.attr('uk-tooltip', description);
 		}
 		
-		this.jInput.change(() => this._guiValueChanged());
+		this.jInput.change(() => this._guiValueChanged(this.jInput.val()));
 	}
 	
 	// readInput(configEntity, guiID) {

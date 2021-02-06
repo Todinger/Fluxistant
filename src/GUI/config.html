@@ -42,16 +42,16 @@
 	<div class="uk-padding-small">
 		<div class="uk-child-width-1-2@s uk-padding-small" uk-grid>
 			<ul class="uk-width-auto@m uk-tab-left uk-width-auto@m" uk-tab uk-switcher="connect: #configView">
-				<li class="uk-active"><a href="#">Main</a></li>
+				<li class="uk-active"><a class="uk-text-warning" href="#">Main</a></li>
 				<li><a href="#">Modules</a></li>
 			</ul>
 			<ul id="configView" class="uk-switcher switcher-container uk-width-expand@m">
 				<li id="main" class="uk-child-width-expand" uk-grid>
 						<div>
 							<!-- Number --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Server port">
-								<h3 class="uk-width-1-6">Port</h3>
+								<h3 class="uk-width-1-6 uk-text-warning">Port</h3>
 								<div class="uk-width-expand">
-									<input id="main-number" class="uk-input" type="number" placeholder="Value...">
+									<input id="main-number" class="uk-input uk-text-warning" type="number" placeholder="Value...">
 								</div>
 							</div>
 							<!-- Boolean --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
@@ -83,12 +83,12 @@
 								</ul>
 							</div>
 							<!-- Static Array --> <!-- <div> Not really necessary, I think -->
-								<ul uk-accordion class="uk-margin-small-top">
+								<ul uk-accordion class="uk-margin-small-top uk-border-rounded uk-box-shadow-hover-large uk-padding-small">
 									<li>
-										<a class="uk-accordion-title" href="#">Static Array</a>
+										<a class="uk-accordion-title uk-background-primary uk-border-rounded uk-padding-small" href="#">Static Array</a>
 										<div class="uk-accordion-content"> <div>
 											<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
-												<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
+												<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-text-warning" uk-icon="icon: triangle-right"></span>
 												<div>
 													<input id="static-1" class="uk-input uk-width-expand" type="number" placeholder="Number...">
 												</div>
@@ -144,7 +144,7 @@
 								</ul>
 							</div>
 							<!-- Choice --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
-							<h3 class="uk-width-1-6" uk-tooltip="User Filter">User Filter</h3>
+							<h3 class="uk-width-1-6 uk-text-warning" uk-tooltip="User Filter">User Filter</h3>
 							<div class="uk-width-expand">
 								<select class="uk-select" onchange="UIkit.switcher($('#hey')).show(Number(this.value));">
 									<option value="0">Mods Only</option>

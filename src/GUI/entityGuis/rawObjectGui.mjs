@@ -9,6 +9,7 @@
 
 import ObjectGui from "./objectGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
+import EntityGui from "./entityGui.mjs";
 
 export default class RawObjectGui extends ObjectGui {
 	static get GUITYPE()    { return 'RawObject';                                         }
@@ -18,12 +19,28 @@ export default class RawObjectGui extends ObjectGui {
 		super(entity, guiID);
 	}
 	
-	_buildChildEntry(childLabeledContainer) {
+	_contentsChanged() {
+		// Skip the modification of the main GUI since we don't have one
+		super._changed();
+	}
+	
+	_buildChildEntry(childGui, childLabeledContainer) {
 		return childLabeledContainer;
 	}
 	
 	_buildGUI() {
 		return this._buildChildrenContainer();
+	}
+	
+	// Clear the indication that this value has been changed
+	clearChangedIndicators() {
+		Object.keys(this.childrenGUIs).forEach(key => {
+			this.childrenGUIs[key].clearChangedIndicators();
+			if (!this.childrenGUIs[key].isContainer) {
+				EntityGui.clearChangeIndicator(
+					this.childrenEntries[key].guiData.label);
+			}
+		});
 	}
 }
 

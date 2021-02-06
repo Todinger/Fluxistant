@@ -1,4 +1,5 @@
 import GuiRegistry from "./entityGuis/guiRegistry.mjs";
+import EntityGui from "./entityGuis/entityGui.mjs";
 
 class Configurator {
 	constructor() {
@@ -16,6 +17,7 @@ class Configurator {
 		this.guis = {
 			main: null,
 			modules: null,
+			tabTitles: null,
 		}
 	}
 	
@@ -23,6 +25,8 @@ class Configurator {
 		$('#btn-apply').click(() => this.applyButtonClicked());
 		$('#btn-revert').click(() => this.revertButtonClicked());
 		this.configViewSwitcher = $('#configViewSwitcher');
+		this.mainTabTitle = $('#mainTabTitle');
+		this.allModulesTabTitle = $('#allModulesTabTitle');
 	}
 	
 	disableButton(btn) {
@@ -43,6 +47,24 @@ class Configurator {
 		this.buildPageFromActive();
 	}
 	
+	clearTabChangeIndicators() {
+		EntityGui.clearChangeIndicator(this.mainTabTitle);
+		EntityGui.clearChangeIndicator(this.allModulesTabTitle);
+	}
+	
+	clearContentsChangeIndicators() {
+		this.guis.main.clearChangedIndicators();
+		Object.keys(this.guis.modules).forEach(modName => {
+			this.guis.modules[modName].clearChangedIndicators();
+			EntityGui.clearChangeIndicator(this.guis.tabTitles[modName]);
+		});
+	}
+	
+	clearChangeIndicators() {
+		this.clearTabChangeIndicators();
+		this.clearContentsChangeIndicators();
+	}
+	
 	showMain() {
 		UIkit.switcher(this.configViewSwitcher).show(0);
 	}
@@ -52,8 +74,11 @@ class Configurator {
 		mainContainer.empty();
 		let mainGUI = GuiRegistry.buildGui(this.displayedConfig.main, 'main-contents', 'RawObject');
 		mainContainer.append(mainGUI.getGUI());
+		mainGUI.onChanged(() => EntityGui.addChangeIndicator(this.mainTabTitle));
+		this.guis.main = mainGUI;
 		
-		
+		this.guis.modules = {};
+		this.guis.tabTitles = {};
 		let moduleTabs = $('#modules-tabs');
 		moduleTabs.empty();
 		let allModulesContainer = $('#modules-contents');
@@ -61,7 +86,11 @@ class Configurator {
 		if (this.displayedConfig.modules) {
 			let moduleNames = Object.keys(this.displayedConfig.modules).sort();
 			moduleNames.forEach(modName => {
-				moduleTabs.append($(`<li><a href="#">${modName}</a></li>`));
+				let moduleTabTitle = $(`<a href="#">${modName}</a>`);
+				let moduleTabItem = $(`<li></li>`);
+				moduleTabItem.append(moduleTabTitle);
+				moduleTabs.append(moduleTabItem);
+				
 				let moduleID = `mod-${modName}`;
 				let moduleContainer = $(`<li id="${moduleID}"></li>`);
 				let moduleGUI = GuiRegistry.buildGui(
@@ -69,6 +98,12 @@ class Configurator {
 					moduleID,
 					'RawObject');
 				let moduleGUIContents = moduleGUI.getGUI();
+				moduleGUI.onChanged(() => {
+					EntityGui.addChangeIndicator(moduleTabTitle);
+					EntityGui.addChangeIndicator(this.allModulesTabTitle);
+				});
+				this.guis.modules[modName] = moduleGUI;
+				this.guis.tabTitles[modName] = moduleTabTitle;
 				
 				// The GUI construction method normally adds the GUI's ID as
 				// the id attribute of the root element returned, but in this
@@ -80,6 +115,8 @@ class Configurator {
 				allModulesContainer.append(moduleContainer);
 			});
 		}
+		
+		this.clearTabChangeIndicators();
 	}
 	
 	copyConfigs(src, dest) {
@@ -149,6 +186,7 @@ class Configurator {
 	
 	configsSaved() {
 		this.copyConfigs(this.displayedConfig, this.activeConfigs);
+		this.clearChangeIndicators();
 		UIkit.notification({
 			message: '<span uk-icon=\'icon: check\'></span> Configuration saved',
 			status: 'success',

@@ -21,6 +21,12 @@ export default class FolderElement extends GuiElement {
 		}
 		accordionItem.append(contentsContainer);
 		
+		accordion.guiData = {
+			accordionItem,
+			header,
+			contentsContainer,
+		};
+		
 		return accordion;
 	}
 }

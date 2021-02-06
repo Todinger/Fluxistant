@@ -16,6 +16,7 @@ export default class ChoiceGui extends EntityGui {
 			this.optionGUIs[optionName] = GuiRegistry.buildGui(
 				optionEntity,
 				`${this.guiID}-option-${optionName}`);
+			this.optionGUIs[optionName].onChanged(() => this._changed());
 		});
 		
 		return this.optionGUIs;
@@ -30,24 +31,6 @@ export default class ChoiceGui extends EntityGui {
 	}
 	
 	_buildGUI() {
-		/*
-				<select class="uk-select" onchange="UIkit.switcher($('#hey')).show(Number(this.value));">
-					<option value="0">Mods Only</option>
-					<option value="1">Mods and Above</option>
-					<option value="2">Specific Users</option>
-				</select>
-				<ul id="hey" uk-switcher="toggle: > *" hidden>
-					<li></li>
-					<li></li>
-					<li></li>
-				</ul>
-				<ul id="bla" class="uk-switcher">
-					<li>First</li>
-					<li>Second</li>
-					<li>Third</li>
-				</ul>
-		 */
-		
 		let container = $(`<div id="${this.guiID}"></div>`);
 		
 		let optionGUIs = this._buildOptionGUIs();
@@ -79,6 +62,7 @@ export default class ChoiceGui extends EntityGui {
 			UIkit.switcher(switcher).show(_this.optionIndices[selectedOption]);
 			let selection = _this.entity.select(selectedOption);
 			_this._setDescriptionTooltip(selector, selection.getDescription());
+			_this._changed();
 		});
 		
 		let initialSelection = this.entity.getSelection();
@@ -102,13 +86,10 @@ export default class ChoiceGui extends EntityGui {
 		return container;
 	}
 	
-	// loadData() {
-	// 	this.elementGUIs.forEach(elementGUI => elementGUI.loadData());
-	// }
-	
-	// readInput(configEntity, guiID) {
-	// 	configEntity.setValue(document.getElementById(`${guiID}-${configEntity.getName()}`).checked);
-	// }
+	// Clear the indication that this value has been changed
+	clearChangedIndicators() {
+		Object.values(this.optionGUIs).forEach(gui => gui.clearChangedIndicators());
+	}
 }
 
 GuiRegistry.register(ChoiceGui);

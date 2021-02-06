@@ -9,10 +9,6 @@ export default class BooleanGui extends ValueGui {
 		super(entity, guiID);
 	}
 	
-	_guiValueChanged(checked) {
-		this.entity.setValue(checked);
-	}
-	
 	_setupInput() {
 		this.jInput = $(`<input id="${this.guiID}-input" class="uk-checkbox uk-height-1-1 uk-margin-auto-top" type="checkbox" placeholder="Value...">`);
 		this.jInput.prop('checked', !!this.entity.getValue());
@@ -37,27 +33,3 @@ export default class BooleanGui extends ValueGui {
 }
 
 GuiRegistry.register(BooleanGui);
-
-
-/*
-class BooleanGuiDefiner {
-	TYPE = BooleanEntity.TYPE;
-	
-	makeEditor(configEntity, guiID) {
-		let name = configEntity.getName();
-		let description = configEntity.getDescription();
-		return `<div class="uk-child-width-expand@s uk-grid uk-margin-small-top">
-	<h4 class="uk-width-1-6@m" uk-tooltip="${description}">${name}</h4>
-	<div class="uk-width-expand@m">
-		<input id="${guiID}-${name}" class="uk-checkbox uk-height-1-1 uk-margin-auto-top" type="checkbox" checked="${configEntity.getValue() ? true : false}" placeholder="Value..." uk-tooltip="${description}">
-	</div>
-</div>`;
-	}
-	
-	readInput(configEntity, guiID) {
-		configEntity.setValue(document.getElementById(`${guiID}-${configEntity.getName()}`).checked);
-	}
-}
-
-GuiDefiners.register(new BooleanGuiDefiner());
-*/
