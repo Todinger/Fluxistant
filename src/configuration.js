@@ -54,6 +54,26 @@ class Configuration {
 		});
 	}
 	
+	add(type, key, defaultValue) {
+		return this.configRoot.addChild(key, EntityFactory.build(type, defaultValue));
+	}
+	
+	addString(key, defaultValue) {
+		return this.add('String', key, defaultValue);
+	}
+	
+	addNumber(key, defaultValue) {
+		return this.add('Number', key, defaultValue);
+	}
+	
+	addInteger(key, defaultValue) {
+		return this.add('Integer', key, defaultValue);
+	}
+	
+	addBoolean(key, defaultValue) {
+		return this.add('Boolean', key, defaultValue);
+	}
+	
 	toConf() {
 		return this.configRoot.toConf();
 	}

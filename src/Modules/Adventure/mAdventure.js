@@ -2,11 +2,12 @@
 
 const path = require('path');
 const assert = require('assert').strict;
-const Module = require('../../module');
+const Module = requireMain('module');
 const Utils = require('../../utils');
 
-const SECONDS = 1000;
+const SECONDS = 1;
 const MINUTES = 60 * SECONDS;
+const USER_SECONDS = 1000;
 
 // Adventures file structure:
 //	{
@@ -49,22 +50,7 @@ const REWARD_PLACEHOLDER = /\$reward/g;
 
 // The command people use to join the adventure
 const JOIN_COMMAND_PLACEHOLDER = /\$cmd/g;
-const JOIN_COMMAND = 'join';
 
-// Amount of points awarded to the winner
-const VICTORY_REWARD = 500;
-
-// How long we wait for users to join the adventure
-const RECRUITMENT_DURATION = 1 * MINUTES;
-
-// How often we remind people to join
-const REMINDER_INTERVAL = 30 * SECONDS;
-
-// The minimum amount of participants we are willing to start the adventure with
-const MINIMUM_PARTICIPANTS = 2;
-
-// How long we wait between showing parts of the adventure
-const PARTS_PAUSE_LENGTH = 5 * SECONDS;
 
 // Adventure Game
 // --------------
@@ -74,10 +60,10 @@ const PARTS_PAUSE_LENGTH = 5 * SECONDS;
 // adventure, and a recruitment phase begins.
 // During this phase, other users can use !join to join the adventure.
 // There is a minimum number of participants, indicated by the
-// MINIMUM_PARTICIPANTS constant. Failure to meet this amount results in the
+// this.config.minimumParticipants constant. Failure to meet this amount results in the
 // adventure being cancelled when the recruitment phase is over.
 // 
-// The recruitment phase lasts for RECRUITMENT_DURATION.
+// The recruitment phase lasts for this.config.recruitmentDuration.
 // Once it's over, assuming enough people entered, a random adventure is
 // selected from the collection of adventures in the ADVENTURES_DIR subfolder
 // (each file is a category of adventures which can be disabled by setting its
@@ -85,8 +71,8 @@ const PARTS_PAUSE_LENGTH = 5 * SECONDS;
 // 
 // Once the adventure begins, a winner is selected from the participants.
 // The adventure is sent to the chat by the bot one part at a time, with a pause
-// of PARTS_PAUSE_LENGTH between them.
-// Once the final part is sent the winner is awarded VICTORY_REWARD
+// of this.config.pauseLength between them.
+// Once the final part is sent the winner is awarded this.config.victoryReward
 // StreamElements loyalty points.
 // 
 // Another adventure can start afterwards, but there can't be two of them active
@@ -115,6 +101,42 @@ class Adventure extends Module {
 		// Used to stop the the adventure, if it's cancelled
 		this.startAdventureTimerHandle = null;
 		this.nextPartTimerHandle = null;
+	}
+	
+	disable() {
+		this.endAdventure();
+	}
+	
+	defineModConfig(modConfig) {
+		modConfig.addInteger('victoryReward', 500)
+			.setName('Victory Reward')
+			.setDescription('The amount of StreamElements points a user gets upon winning the adventure');
+		modConfig.addNumber('recruitmentDuration', 1 * MINUTES)
+			.setName('Recruitment Duration')
+			.setDescription('The amount of time in seconds in which users can join the adventure');
+		modConfig.addNumber('reminderInterval', 30 * SECONDS)
+			.setName('Reminder Interval')
+			.setDescription('How many seconds between reminders by the bot to join the adventure');
+		modConfig.addInteger('minimumParticipants', 2)
+			.setName('Minimum Participants')
+			.setDescription('Minimum amount of users required for the adventure to start (includes the user who started it)');
+		modConfig.addNumber('pauseLength', 30 * SECONDS)
+			.setName('Adventure Message Interval')
+			.setDescription('How many seconds between messages on the adventure itself');
+	}
+	
+	loadModConfig(conf) {
+		if (this.reminderIntervalHandle) {
+			this.startReminderInterval();
+		}
+		
+		if (this.startAdventureTimerHandle) {
+			this.startAdventureTimer();
+		}
+		
+		if (this.nextPartTimerHandle) {
+			this.startNextPartTimer();
+		}
 	}
 	
 	// Loads a single JSON file with adventure data.
@@ -205,8 +227,8 @@ class Adventure extends Module {
 	fillText(text, user) {
 		let result = text;
 		
-		result = result.replace(JOIN_COMMAND_PLACEHOLDER, `!${JOIN_COMMAND}`);
-		result = result.replace(REWARD_PLACEHOLDER, VICTORY_REWARD);
+		result = result.replace(JOIN_COMMAND_PLACEHOLDER, `!${this.getCommandName('join')}`);
+		result = result.replace(REWARD_PLACEHOLDER, this.config.victoryReward);
 		
 		if (user) {
 			result = result.replace(USER_PLACEHOLDER, user.displayName);
@@ -266,6 +288,31 @@ class Adventure extends Module {
 		return Utils.randomElement(this.adventureCache);
 	}
 	
+	startReminderInterval() {
+		if (this.reminderIntervalHandle) {
+			clearInterval(this.reminderIntervalHandle);
+		}
+		
+		this.reminderIntervalHandle = setInterval(
+			() => this.remind(), this.config.reminderInterval * USER_SECONDS);
+	}
+	
+	startAdventureTimer() {
+		if (this.startAdventureTimerHandle) {
+			clearTimeout(this.startAdventureTimerHandle);
+		}
+		
+		this.startAdventureTimerHandle = setTimeout(
+			() => this.startAdventure(),
+			this.config.recruitmentDuration * USER_SECONDS);
+	}
+	
+	startNextPartTimer() {
+		this.nextPartTimerHandle = setTimeout(
+			() => this.nextPart(),
+			this.config.pauseLength * USER_SECONDS);
+	}
+	
 	// Begins the recruitment phase.
 	// 
 	// Parameters:
@@ -294,12 +341,8 @@ class Adventure extends Module {
 		this.fillSay(this.activeAdventure.startDesc, user);
 		this.fillSay('Use $cmd to join!');
 		
-		this.reminderIntervalHandle = setInterval(
-			() => this.remind(), REMINDER_INTERVAL);
-		
-		this.startAdventureTimerHandle = setTimeout(
-			() => this.startAdventure(),
-			RECRUITMENT_DURATION);
+		this.startReminderInterval();
+		this.startAdventureTimer();
 	}
 	
 	// Sends a timed reminder to the Twitch chat to tell people to join the
@@ -342,8 +385,8 @@ class Adventure extends Module {
 		
 		this.stopRecruiting();
 		
-		if (Object.keys(this.activeAdventure.participants).length < MINIMUM_PARTICIPANTS) {
-			this.fillSay(`Oh no, we don't have enough people! We need at least ${MINIMUM_PARTICIPANTS} to start the $title.`);
+		if (Object.keys(this.activeAdventure.participants).length < this.config.minimumParticipants) {
+			this.fillSay(`Oh no, we don't have enough people! We need at least ${this.config.minimumParticipants} to start the $title.`);
 			this.endAdventure();
 			return;
 		}
@@ -370,12 +413,10 @@ class Adventure extends Module {
 		if (adv.currentPart < adv.parts.length) {
 			// If we haven't reached the end of the adventure then schedule the
 			// next part
-			this.nextPartTimerHandle = setTimeout(
-				() => this.nextPart(),
-				PARTS_PAUSE_LENGTH);
+			this.startNextPartTimer();
 		} else {
 			// Otherwise we give the winner their points and end the adventure
-			this.modifyUserPoints(this.activeAdventure.winner, VICTORY_REWARD);
+			this.modifyUserPoints(this.activeAdventure.winner, this.config.victoryReward);
 			this.endAdventure();
 		}
 	}
@@ -409,7 +450,7 @@ class Adventure extends Module {
 			callback: user => this.startRecruiting(user),
 		},
 		
-		[JOIN_COMMAND]: {
+		['join']: {
 			name: 'Join Adventure',
 			description: 'Joins the currently active adventure.',
 			callback: user => this.join(user),

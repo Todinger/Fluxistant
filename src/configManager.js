@@ -139,6 +139,10 @@ class ConfigManager extends EventNotifier {
 		assert(moduleConfigs, 'Null modules configuration received.');
 		Object.keys(moduleConfigs).forEach(moduleName => {
 			this.moduleConfigs[moduleName].import(moduleConfigs[moduleName]);
+			this._notify(
+				'modConfigLoaded',
+				moduleName,
+				this.moduleConfigs[moduleName].toConf());
 		});
 	}
 	

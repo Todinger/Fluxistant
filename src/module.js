@@ -138,6 +138,10 @@ class Module {
 		}
 	}
 	
+	getCommandName(cmdid) {
+		return this.commandObjects && this.commandObjects[cmdid].cmdname || null;
+	}
+	
 	importCommandInfo(commandList, commandObjects) {
 		commandObjects = commandObjects || this.commandObjects;
 		if (commandObjects && commandList) {
@@ -177,6 +181,8 @@ class Module {
 			this.registerCommands();
 			modConfig.addCommands(this.commands);
 		}
+		
+		this.config = modConfig.toConf();
 	}
 	
 	// [For override by inheriting classes]
@@ -193,24 +199,48 @@ class Module {
 	// configuration.
 	// This performs some common tasks related to loading module configurations
 	// and lets the concrete inheriting module do the rest.
-	loadConfig(config) {
-		if (this.enabled && !config.enabled) {
+	loadConfig(conf) {
+		if (this.enabled && !conf.enabled) {
 			// Module activation
 			this.unregisterCommands();
 		}
 		
-		this.loadModConfig();
-		if (config.commands && this.commandObjects) {
+		this.config = conf;
+		this.loadModConfig(conf);
+		
+		if (conf.commands && this.commandObjects) {
 			this.unregisterCommands();
-			this.importCommandInfo(config.commands);
-			if (config.enabled) {
+			this.importCommandInfo(conf.commands);
+			if (conf.enabled) {
 				// Commands updated and module activated or remains active
 				this.registerCommands();
 			}
-		} else if (!this.enabled && config.enabled) {
+		} else if (!this.enabled && conf.enabled) {
 			// Commands not updated, but module activated
 			this.registerCommands();
 		}
+	}
+	
+	// [For override by inheriting classes]
+	// This is called when the configuration changes and its .enabled
+	// value went from true to false.
+	// This is called in addition to loadModConfig(), so you can either
+	// use this or check the .enabled flag in the loaded configuration.
+	// This is here for convenience, so that mods than only care about
+	// enabling/disabling can use this instead of loadConfig().
+	disable() {
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	// [For override by inheriting classes]
+	// This is called when the configuration changes and its .enabled
+	// value went from false to true.
+	// This is called in addition to loadModConfig(), so you can either
+	// use this or check the .enabled flag in the loaded configuration.
+	// This is here for convenience, so that mods than only care about
+	// enabling/disabling can use this instead of loadConfig().
+	enable() {
+		// Do nothing by default (for overriding where needed)
 	}
 	
 	// [For override by inheriting classes]
