@@ -80,11 +80,6 @@ class ModuleManager {
 		// This loads the Module from file and invokes its constructor
 		let mod = require('./' + modFile);
 		
-		// If the module is disabled we ignore it completely
-		if (!mod.enabled) {
-			return;
-		}
-		
 		// Validation: Ensure there are no duplicate registrations
 		assert(!this.nameExists(mod.name),
 			`Ambiguous module name: '${mod.name}'`);

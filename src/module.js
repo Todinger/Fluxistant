@@ -45,12 +45,12 @@ class Module {
 	// "/mod/webname/source" (e.g. http://localhost:3333/mod/hellow/world.html for
 	// webname = "hello" and source = "world.html").
 	constructor(description) {
-		if (description.enabled === false) {
-			this.enabled = false;
-			return;
-		} else {
-			this.enabled = true;
-		}
+		// if (description.enabled === false) {
+		// 	this.enabled = false;
+		// 	return;
+		// } else {
+		// 	this.enabled = true;
+		// }
 		
 		this.name = description.name;
 		this.webname = description.webname;
@@ -75,6 +75,7 @@ class Module {
 		this._connectedClients = {};
 		
 		// Configuration
+		this.config = {};
 		this.modConfig = new ModuleConfig();
 		
 		// Loads the module in debug mode, replacing chat messages with
@@ -85,6 +86,16 @@ class Module {
 				this.say(`@${user.displayName} ${msg}`);
 			}
 		}
+		
+		// This is set to true once the configuration has been loaded for
+		// the first time - it's used to invoke the enabled() function
+		// on startup, in case we don't switch from enabled=false to
+		// enabled=true then
+		this.active = false;
+	}
+	
+	get enabled() {
+		return this.config.enabled;
 	}
 	
 	filterDesc(type, arg) {
@@ -200,25 +211,43 @@ class Module {
 	// This performs some common tasks related to loading module configurations
 	// and lets the concrete inheriting module do the rest.
 	loadConfig(conf) {
-		if (this.enabled && !conf.enabled) {
-			// Module activation
+		// Handle command re-registrations
+		if (this.config.enabled && !conf.enabled) {
+			// Module deactivation
 			this.unregisterCommands();
-		}
-		
-		this.config = conf;
-		this.loadModConfig(conf);
-		
-		if (conf.commands && this.commandObjects) {
+		} else if (!this.config.enabled && conf.enabled) {
+			// Commands not updated, but module activated
+			this.registerCommands();
+		} else if (conf.enabled && conf.commands && this.commandObjects) {
+			// Module is active, import the updated commands and
+			// re-register all of them
 			this.unregisterCommands();
 			this.importCommandInfo(conf.commands);
 			if (conf.enabled) {
 				// Commands updated and module activated or remains active
 				this.registerCommands();
 			}
-		} else if (!this.enabled && conf.enabled) {
-			// Commands not updated, but module activated
-			this.registerCommands();
 		}
+		
+		// Invoke the enable/disable convenience functions
+		if (this.config.enabled && !conf.enabled) {
+			// Module deactivation
+			this.disable();
+		} else if ((!this.config.enabled || !this.active) && conf.enabled) {
+			// Module activation - happens when switching 'enabled' value
+			// for the module from false to true, and when the configuration
+			// is loaded for the first time, if the module is enabled then
+			this.enable();
+		}
+		
+		// Save the new configuration
+		this.config = conf;
+		
+		// Update the module itself about the configuration changes
+		this.loadModConfig(conf);
+		
+		// The first configuration loading is done (and possibly more)
+		this.active = true;
 	}
 	
 	// [For override by inheriting classes]

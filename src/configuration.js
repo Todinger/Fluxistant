@@ -54,24 +54,37 @@ class Configuration {
 		});
 	}
 	
-	add(type, key, defaultValue) {
-		return this.configRoot.addChild(key, EntityFactory.build(type, defaultValue));
+	add(key, type, ...params) {
+		let buildParams = params;
+		buildParams.unshift(type);
+		return this.configRoot.addChild(key, EntityFactory.build.apply(EntityFactory, buildParams));
 	}
 	
 	addString(key, defaultValue) {
-		return this.add('String', key, defaultValue);
+		return this.add(key, 'String', defaultValue);
 	}
 	
 	addNumber(key, defaultValue) {
-		return this.add('Number', key, defaultValue);
+		return this.add(key, 'Number', defaultValue);
 	}
 	
 	addInteger(key, defaultValue) {
-		return this.add('Integer', key, defaultValue);
+		return this.add(key, 'Integer', defaultValue);
 	}
 	
 	addBoolean(key, defaultValue) {
-		return this.add('Boolean', key, defaultValue);
+		return this.add(key, 'Boolean', defaultValue);
+	}
+	
+	addDynamicArray(key, valueType, values) {
+		let array = this.add(key, 'DynamicArray', valueType);
+		if (values) {
+			values.forEach(value => {
+				array.addElement(EntityFactory.build(valueType, value));
+			});
+		}
+		
+		return array;
 	}
 	
 	toConf() {

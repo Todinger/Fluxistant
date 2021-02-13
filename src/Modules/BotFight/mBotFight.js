@@ -110,29 +110,15 @@ const Utils = require('../../utils');
 // 
 const CONVERSATIONS_FILE = 'conversations.json';
 
-const SECONDS = 1000;
+const SECONDS = 1;
 const MINUTES = 60 * SECONDS;
-
-// Time to wait between conversations
-const CONVERSATIONS_INTERVAL = {
-	// BASE: 15 * SECONDS,
-	// VARIANCE: 5 * SECONDS,
-	BASE: 45 * MINUTES,
-	VARIANCE: 10 * MINUTES,
-}
+const USER_SECONDS = 1000;
 
 // Represents us
 const BOTNAME_SELF = 'Me';
 
-// Represents the StreamElements bot conencted to our channel
+// Represents the StreamElements bot connected to our channel
 const BOTNAME_STREAMELEMENTS = 'SE';
-
-// Global defaults for conversations, in case they aren't provided in the
-// conversation data
-const DEFAULTS = {
-	startingBot: BOTNAME_SELF,
-	lineDuration: 5 * SECONDS,
-};
 
 // Represents a bot in the channel - either us or StreamElements.
 class Bot {
@@ -176,7 +162,7 @@ class BotManager {
 		return this.bots[name];
 	}
 }
-var botManager = new BotManager();
+const botManager = new BotManager();
 
 // The full Bot object representing us.
 class MeBot extends Bot {
@@ -223,13 +209,23 @@ class BotFight extends Module {
 		super({
 			name: 'Bot Fight',
 			// debug: true,
-			enabled: false,
 		});
 		
 		this.conversations = {};
 		this.activeConversation = null;
-		
-		this.active = true;
+		this.currentTimer = null;
+	}
+	
+	defineModConfig(modConfig) {
+		modConfig.addNumber('intervalBase', 45 * MINUTES)
+			.setName('Conversation Interval Base')
+			.setDescription('The break between each two conversations is in the range of (Base - Variance, Base + Variance)');
+		modConfig.addNumber('intervalVariance', 10 * MINUTES)
+			.setName('Conversation Interval Variance')
+			.setDescription('The break between each two conversations is in the range of (Base - Variance, Base + Variance)');
+		modConfig.addNumber('defaultLineDuration', 5 * SECONDS)
+			.setName('Default Line Duration')
+			.setDescription('How long a line is shown before the next one by default (this is overridden by specific duration settings in the conversation data)');
 	}
 	
 	// --------------------------------------------------------------------- //
@@ -244,8 +240,8 @@ class BotFight extends Module {
 	// The process starts at the top level with the conversations file and
 	// drills down to the "leaves" which are line entries.
 	// Anything that isn't in the data of a certain level is filled with the
-	// defaults of the previous level (the topmost level uses the global
-	// DEFAULTS constant). Any value present in a level overrides the
+	// defaults of the previous level (the topmost level uses the configured
+	// this.config.defaults object). Any value present in a level overrides the
 	// corresponding defaults from the previous level.
 	
 	// [Inherited, called externally]
@@ -277,7 +273,10 @@ class BotFight extends Module {
 		Object.keys(conversations).forEach(name => {
 			result[name] = this.loadConversation(
 				conversations[name],
-				DEFAULTS);
+				{
+					startingBot: BOTNAME_SELF,
+					lineDuration: this.config.defaultLineDuration,
+				});
 		});
 		
 		return result;
@@ -426,7 +425,8 @@ class BotFight extends Module {
 	// taken from somewhere else - more precisely, the value of lineDuration for
 	// any specific line will always be equal to the first lineDuration setting
 	// found when climbing up the tree to the root "conversations" object (and
-	// if there are none then it's taken from the global DEFAULTS constant).
+	// if there are none then it's taken from the configured this.config.defaults
+	// object).
 	// 
 	// Returns a <Line Object>.
 	// Final structure:
@@ -461,19 +461,22 @@ class BotFight extends Module {
 	// Schedules a timed call to startRandomConversation based on out
 	// conversation interval times.
 	scheduleNextConversation() {
-		setTimeout(
+		this.currentTimer = setTimeout(
 			() => this.startRandomConversation(),
 			Utils.randomInRadius(
-				CONVERSATIONS_INTERVAL.BASE,
-				CONVERSATIONS_INTERVAL.VARIANCE));
+				this.config.intervalBase * USER_SECONDS,
+				this.config.intervalVariance * USER_SECONDS));
 	}
 	
 	// Starts a random conversation (right now).
 	startRandomConversation() {
-		if (this.active) {
-			let conversationName = Utils.randomKey(this.conversations);
-			this.startConversation(conversationName);
+		this.currentTimer = null;
+		if (!this.enabled) {
+			return;
 		}
+		
+		let conversationName = Utils.randomKey(this.conversations);
+		this.startConversation(conversationName);
 	}
 	
 	// Starts a conversation with the given name.
@@ -481,6 +484,10 @@ class BotFight extends Module {
 	// Parameters:
 	// 	conversationName	The name of... well, guess. <_<
 	startConversation(conversationName) {
+		if (!this.enabled) {
+			return;
+		}
+		
 		if (this.activeConversation) {
 			this.error('There is already a conversation taking place.');
 			return;
@@ -513,6 +520,11 @@ class BotFight extends Module {
 	// valid entry.
 	// After sending, advances the indices and determines when to stop.
 	nextLine() {
+		this.currentTimer = null;
+		if (!this.enabled) {
+			return;
+		}
+		
 		assert(this.activeConversation, 'No conversation is active!');
 		
 		let ac = this.activeConversation;
@@ -557,20 +569,27 @@ class BotFight extends Module {
 		
 		// Schedule the next thing we want to do to happen after the delay of
 		// the bot "saying" the line
-		setTimeout(nextFunc, lineEntry.lineDuration + speakerBot.delay);
+		this.currentTimer = setTimeout(nextFunc, lineEntry.lineDuration + speakerBot.delay);
 	}
 	
 	// Ends the current conversation and schedules the next one
 	endConversation() {
 		this.activeConversation = null;
-		this.scheduleNextConversation();
+		if (this.active) {
+			this.scheduleNextConversation();
+		}
 	}
 	
 	// [Inherited, called externally]
-	// Module entry point.
-	load() {
-		if (this.active) {
-			this.scheduleNextConversation();
+	// Module activation.
+	enable() {
+		this.scheduleNextConversation();
+	}
+	
+	disable() {
+		if (this.currentTimer) {
+			clearTimeout(this.currentTimer);
+			this.currentTimer = null;
 		}
 	}
 	
@@ -580,22 +599,17 @@ class BotFight extends Module {
 			cmdname: 'botfight',
 			description: 'Makes the bots initiate a random conversation.',
 			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
-			callback: () => {
-				if (!this.active) {
-					this.active = true;
-					this.startRandomConversation();
-				}
-			},
+			callback: () => this.startRandomConversation(),
 		}
 	}
 }
 
-var bf = new BotFight();
+const bf = new BotFight();
 
 // Create and register the Bot objects (they need the Module object we just
 // defined, bf, which is why we do it all the way down here)
-var meBot = new MeBot(bf);
-var seBot = new SEBot(bf);
+const meBot = new MeBot(bf);
+const seBot = new SEBot(bf);
 botManager.register(meBot);
 botManager.register(seBot);
 

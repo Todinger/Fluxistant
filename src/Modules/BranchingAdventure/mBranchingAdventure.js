@@ -3,11 +3,13 @@
 const path = require('path');
 const assert = require('assert').strict;
 const _ = require('lodash');
-const Module = require('../../module');
-const Utils = require('../../utils');
+const Module = requireMain('./module');
+const Utils = requireMain('./utils');
+const Timers = requireMain('./timers');
 
-const SECONDS = 1000;
+const SECONDS = 1;
 const MINUTES = 60 * SECONDS;
+const USER_SECONDS = 1000;
 
 // Adventures file structure:
 //	{
@@ -140,47 +142,9 @@ const REWARD_PLACEHOLDER = /\$reward/g;
 // Represents the amount of points lost if the venture is unsuccessful
 const PENALTY_PLACEHOLDER = /\$penalty/g;
 
-// Amount of points awarded upon victory
-const VICTORY_REWARD = 500;
-
-// Amount of points awarded upon loss
-const LOSS_PENALTY = VICTORY_REWARD;
-
 // If no start chapter name is specified, this is the one that will be used
 const DEFAULT_START_CHAPTER = 'start';
 
-// How long we wait between showing parts of the adventure
-// const PARTS_PAUSE_LENGTH = 1 * SECONDS;
-const PARTS_PAUSE_LENGTH = 5 * SECONDS;
-
-// How long we're willing to wait for user input before we cancel the adventure
-// const PATIENCE = 2 * MINUTES;
-const PATIENCE = 5 * MINUTES;
-
-// How often we nag the user to make a choice while waiting for input
-// const REMINDER_INTERVAL = 15 * SECONDS;
-const REMINDER_INTERVAL = 1 * MINUTES;
-
-// The bot will say one of these randomly when reminding the player to make a
-// choice
-const REMINDER_MESSAGES = [
-	"$player, are you there? I'm waiting.",
-	"/me looks at $player impatiently.",
-	"@$player Well, tell me when you're ready. I'll just be here, rewriting some stuff. <_<",
-	"Earth calling $player, Earth calling $player... Houston, I think we have a problem.",
-];
-
-// The bot will say one of these randomly when cancelling the adventure
-const TIMEOUT_MESSAGES = [
-	"@$player Alright, that's it. I got better things to do. Adventure over.",
-	"@$player Oh no! Some bot here sneezed and your character blinked out of existence (*whisper* I think it's StreamElements)! Guess the adventure is over now.",
-	"Apparently $player is giving me the silent treatment, so... See you on the next adventure!",
-	"@$player I don't have to take this. I'm going home. *Adventure goes poof*",
-	"@$player No adventure for you! Come back, one year!",
-	"Trying to contact $player... No response. Abort adventure! Abort adventure!",
-	"@$player The adventure you seek has now moved to another castle.",
-	"$player failed to complete the adventure (404 error, adventurer not found).",
-];
 
 // This regular expression matches the chapter choices syntax.
 // For example, for this string:
@@ -225,12 +189,6 @@ const TIMEOUT_MESSAGES = [
 const CHOICE_REGEX = /\[([^:|]+?)\s*(?::([^\]]+))?]/g;
 const CHAPTER_OPTIONS = /(?:\s*([a-zA-Z0-9_$]+)\s*(?:\|\s*(\d+))?\s*)/g;
 
-// This is for "next" values for a chapter.
-// It's the same as the part in CHOICE_REGEX that describes the options of which
-// chapters can be chosen and their weights (since it has the same meaning here,
-// only without the player's choice).
-const CHAPTER_OPTIONS_REGEX = /(?:\s*([a-zA-Z0-9_$]+)\s*(?:\|\s*(\d+))?)(?:\s*,\s*([a-zA-Z0-9_$]+)\s*(?:\|\s*(\d+))?)*\s*/g;
-
 // Branching Adventure Game
 // ------------------------
 // Lets users have a personal text adventure with branching choices.
@@ -256,7 +214,6 @@ class BranchingAdventure extends Module {
 	constructor() {
 		super({
 			name: 'Branching Adventure',
-			// enabled: false,
 			// debug: true,
 		});
 		
@@ -268,16 +225,57 @@ class BranchingAdventure extends Module {
 		
 		// Not null for a user when there's an ongoing adventure for them
 		this.activeAdventures = {};
-		
-		// Used to stop the reminders to enter selection
-		this.reminderIntervalHandle = null;
-		
-		// Used to stop the the adventure, if it's cancelled
-		this.nextPartTimerHandle = null;
 	}
 	
-	endAllAdventures() {
-		
+	defineModConfig(modConfig) {
+		modConfig.addInteger('victoryReward', 500)
+			.setName('Victory Reward')
+			.setDescription('Amount of StreamElements loyalty points to be awarded to the player upon victory');
+		modConfig.addInteger('lossPenalty', 500)
+			.setName('Loss Penalty')
+			.setDescription('Amount of StreamElements loyalty points to be deducted from the player upon loss');
+		modConfig.addNumber('partsPauseLength', 5 * SECONDS)
+			.setName('Pause Between Parts')
+			.setDescription('Number of seconds to wait between sending the adventure messages to the chat');
+		modConfig.addNumber('patience', 5 * MINUTES)
+			.setName('User Inactivity Timeout')
+			.setDescription('Amount of seconds to wait for user input before cancelling the adventure');
+		modConfig.addNumber('reminderInterval', 1 * MINUTES)
+			.setName('Action Reminder Interval')
+			.setDescription('How often we nag the user to make a choice while waiting for input (seconds between messages)');
+		modConfig.addDynamicArray('reminderMessages', 'String', [
+				"$player, are you there? I'm waiting.",
+				"/me looks at $player impatiently.",
+				"@$player Well, tell me when you're ready. I'll just be here, rewriting some stuff. <_<",
+				"Earth calling $player, Earth calling $player... Houston, I think we have a problem.",
+			])
+			.setName('Reminder Messages')
+			.setDescription('When the bot reminds players to enter a choice, one of these messages will be selected at random');
+		modConfig.addDynamicArray('timeoutMessages', 'String', [
+				"@$player Alright, that's it. I got better things to do. Adventure over.",
+				"@$player Oh no! Some bot here sneezed and your character blinked out of existence (*whisper* I think it's StreamElements)! Guess the adventure is over now.",
+				"Apparently $player is giving me the silent treatment, so... See you on the next adventure!",
+				"@$player I don't have to take this. I'm going home. *Adventure goes poof*",
+				"@$player No adventure for you! Come back, one year!",
+				"Trying to contact $player... No response. Abort adventure! Abort adventure!",
+				"@$player The adventure you seek has now moved to another castle.",
+				"$player failed to complete the adventure (404 error, adventurer not found).",
+			])
+			.setName('Timeout Messages')
+			.setDescription("If the player doesn't enter a choice in time, the adventure is cancelled and one of these messages will be shown at random");
+	}
+	
+	disable() {
+		this.endAllAdventures();
+	}
+	
+	loadModConfig(config) {
+		// Adjust active timers to fit the new configuration
+		Object.values(this.activeAdventures).forEach(userAdventure => {
+			userAdventure.timeoutHandle.change(this.config.patience * USER_SECONDS);
+			userAdventure.reminderHandle.change(this.config.reminderInterval * USER_SECONDS);
+			userAdventure.nextPartTimerHandle.change(this.config.partsPauseLength * USER_SECONDS);
+		});
 	}
 	
 	// [Inherited, called externally]
@@ -507,11 +505,11 @@ class BranchingAdventure extends Module {
 		// Default point values for winning and losing chapters
 		if (points === undefined) {
 			if (winningChapters && winningChapters.includes(chapterName)) {
-				points = VICTORY_REWARD;
+				points = this.config.victoryReward;
 			}
 			
 			if (losingChapters && losingChapters.includes(chapterName)) {
-				points = -LOSS_PENALTY;
+				points = -this.config.lossPenalty;
 			}
 		}
 		
@@ -612,8 +610,8 @@ class BranchingAdventure extends Module {
 	fillText(text, userAdventure) {
 		let result = text;
 		
-		result = result.replace(REWARD_PLACEHOLDER, VICTORY_REWARD);
-		result = result.replace(PENALTY_PLACEHOLDER, LOSS_PENALTY);
+		result = result.replace(REWARD_PLACEHOLDER, this.config.victoryReward);
+		result = result.replace(PENALTY_PLACEHOLDER, this.config.lossPenalty);
 		
 		if (userAdventure) {
 			result = result.replace(USER_PLACEHOLDER, userAdventure.user.displayName);
@@ -697,10 +695,11 @@ class BranchingAdventure extends Module {
 			user: user,
 			waitingForChoice: false,
 			
-			// Handles obtained from setTimeout() and setInterval, to be used to
-			// cancel invocation of things when they lose relevant
-			timeoutHandle: null,
-			reminderHandle: null,
+			// Timers to be used to set, change and cancel invocation of
+			// time-related parts of the user's adventure
+			timeoutHandle: Timers.oneShot(),
+			reminderHandle: Timers.repeating(),
+			nextPartTimerHandle: Timers.oneShot(),
 		};
 		
 		// We save each adventure under the initiating user's name - that way we
@@ -733,9 +732,6 @@ class BranchingAdventure extends Module {
 	
 	// Sends the next part of the user's adventure to the chat.
 	nextPart(userAdventure) {
-		userAdventure.reminderHandle = null;
-		userAdventure.timeoutHandle = null;
-		
 		let chapter = userAdventure.chapters[userAdventure.currentChapter];
 		
 		this.sayAdventureMessage(
@@ -745,9 +741,9 @@ class BranchingAdventure extends Module {
 		if (userAdventure.currentPart < chapter.parts.length) {
 			// If we haven't reached the end of the chapter then schedule the
 			// next part
-			this.nextPartTimerHandle = setTimeout(
-				() => this.nextPart(userAdventure),
-				PARTS_PAUSE_LENGTH);
+			userAdventure.nextPartTimerHandle.set(
+				this.config.partsPauseLength * USER_SECONDS,
+				() => this.nextPart(userAdventure));
 		} else {
 			// Otherwise we start waiting for the user's choice, or end the
 			// adventure, depending on what kind of chapter this is
@@ -765,20 +761,20 @@ class BranchingAdventure extends Module {
 			// Handle chapters that specify another chapter that should
 			// immediately follow them - but there should still be the standard
 			// delay between parts
-			this.nextPartTimerHandle = setTimeout(
+			userAdventure.nextPartTimerHandle.set(
+				this.config.partsPauseLength * USER_SECONDS,
 				() => this.selectAndStartChapter(
 					userAdventure,
-					userAdventure.chapters[chapterName].next),
-				PARTS_PAUSE_LENGTH);
+					userAdventure.chapters[chapterName].next));
 		} else {
 			// Wait for the user to enter their choice
 			userAdventure.waitingForChoice = true;
-			userAdventure.timeoutHandle = setTimeout(
-				() => this.adventureTimedOut(userAdventure),
-				PATIENCE);
-			userAdventure.reminderHandle = setInterval(
-				() => this.remind(userAdventure),
-				REMINDER_INTERVAL);
+			userAdventure.timeoutHandle.set(
+				this.config.patience * USER_SECONDS,
+				() => this.adventureTimedOut(userAdventure));
+			userAdventure.reminderHandle.set(
+				this.config.reminderInterval * USER_SECONDS,
+				() => this.remind(userAdventure));
 		}
 	}
 	
@@ -803,26 +799,20 @@ class BranchingAdventure extends Module {
 	}
 	
 	clearTimers(userAdventure) {
-		if (userAdventure.timeoutHandle) {
-			clearTimeout(userAdventure.timeoutHandle);
-			userAdventure.timeoutHandle = null;
-		}
-		
-		if (userAdventure.reminderHandle) {
-			clearInterval(userAdventure.reminderHandle);
-			userAdventure.reminderHandle = null;
-		}		
+		userAdventure.timeoutHandle.clear();
+		userAdventure.reminderHandle.clear();
+		userAdventure.nextPartTimerHandle.clear();
 	}
 	
 	// Sends a timed reminder to the Twitch chat to tell the user to make his
 	// choice.
 	remind(userAdventure) {
-		let reminderText = Utils.randomElement(REMINDER_MESSAGES);
+		let reminderText = Utils.randomElement(this.config.reminderMessages);
 		this.fillSay(reminderText, userAdventure);
 	}
 	
 	adventureTimedOut(userAdventure) {
-		let timeoutMessage = Utils.randomElement(TIMEOUT_MESSAGES);
+		let timeoutMessage = Utils.randomElement(this.config.timeoutMessages);
 		this.sayAdventureMessage(timeoutMessage, userAdventure);
 		this.endAdventure(userAdventure);
 	}
@@ -835,6 +825,14 @@ class BranchingAdventure extends Module {
 		
 		// Mark that there is no active adventure
 		delete this.activeAdventures[userAdventure.user.name];
+	}
+	
+	// Ends all the active the adventures of all users
+	endAllAdventures() {
+		let adventurerNames = Object.keys(this.activeAdventures);
+		adventurerNames.forEach(name => {
+			this.endAdventure(this.activeAdventures[name]);
+		});
 	}
 	
 	userHasAdventure(user) {

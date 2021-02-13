@@ -18619,6 +18619,10 @@ class ArrayEntity extends ConfigEntity {
 		return value;
 	}
 	
+	addElements(values) {
+		values.forEach(value => this.addElement(value));
+	}
+	
 	removeElementAt(index) {
 		this.elements.splice(index, 1);
 	}
