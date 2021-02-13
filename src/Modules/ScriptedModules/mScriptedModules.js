@@ -1,4 +1,4 @@
-var Module = require('../../module.js');
+const Module = requireMain('module');
 
 class ScriptedModules extends Module {
 	constructor() {

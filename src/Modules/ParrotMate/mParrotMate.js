@@ -1,4 +1,4 @@
-var Module = require('../../module.js');
+const Module = requireMain('module');
 
 const USER_COMMANDS_FILE = "commands.json";
 const PARROT_IMAGE_URL = "/assets/image-display/Parrot.png";

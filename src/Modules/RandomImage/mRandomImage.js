@@ -1,10 +1,9 @@
 'use strict';
 
 const _ = require('lodash');
-const Module = require('../../module');
+const Module = requireMain('module');
 
 const COMMAND_NAME = 'pixelate';
-const COMMAND_COST = 300;
 
 class RandomImage extends Module {
 	constructor() {
@@ -29,7 +28,7 @@ class RandomImage extends Module {
 			description: 'Shows a randomly selected picture from the image pool.',
 			callback: user => this.showRandomImage(user),
 			message: `${_.capitalize(COMMAND_NAME)} redeemed by $user for $pcost! One random drawing by Yecats coming up!`,
-			cost: COMMAND_COST,
+			cost: 300,
 		},
 	}
 }

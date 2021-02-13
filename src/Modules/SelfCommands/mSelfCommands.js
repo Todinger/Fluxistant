@@ -2,7 +2,7 @@
 
 const assert = require('assert').strict;
 const imageSize = require('image-size');
-const Module = require('../../module');
+const Module = requireMain('module');
 
 const MINIMUM_SIZE = 300;
 

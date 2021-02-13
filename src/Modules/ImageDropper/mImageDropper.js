@@ -1,6 +1,6 @@
 'use strict';
 
-const Module = require('../../module');
+const Module = requireMain('module');
 
 class ImageDropper extends Module {
 	constructor() {

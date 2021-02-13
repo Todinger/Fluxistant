@@ -1,6 +1,6 @@
 const path = require('path');
-const Utils = require('../../utils');
-const Module = require('../../module.js');
+const Utils = requireMain('utils');
+const Module = requireMain('module');
 
 const STYLES_DIR = 'Styles';
 
