@@ -1,13 +1,13 @@
-var Module = require('../../module.js');
+const Module = requireMain('module');
 
-const SECONDS = 1000;
+const SECONDS = 1;
 const MINUTES = 60 * SECONDS;
 const HOURS = 60 * MINUTES;
 
+const USER_SECONDS = 1000;
+
 
 class Countdown extends Module {
-	static get KEY_OFFSET_AMOUNT() { return 30 * MINUTES; }
-	
 	constructor() {
 		super({
 			name: 'Countdown',
@@ -15,7 +15,22 @@ class Countdown extends Module {
 			source: 'countdown.html',
 		});
 		
-		this.initialTime = 12 * HOURS;
+		this.initialTime = 0;
+		this.offsetValue = 0;
+	}
+	
+	defineModConfig(modConfig) {
+		modConfig.addNumber('initialTime', 12 * HOURS)
+			.setName('Initial Time (Seconds)')
+			.setDescription('The starting value of the countdown timer (will be displaying in hh:mm:ss format)');
+		modConfig.addNumber('offsetValue', 30 * MINUTES)
+			.setName('Offset on Key Presses')
+			.setDescription('Amount of seconds to add/subtract from the timer when pressing the shortcut keys');
+	}
+	
+	loadModConfig(conf) {
+		this.initialTime = conf.initialTime * USER_SECONDS;
+		this.offsetValue = conf.offsetValue * USER_SECONDS;
 	}
 	
 	load() {
@@ -28,7 +43,7 @@ class Countdown extends Module {
 				Module.Keycodes.VC_META_L,
 				Module.Keycodes.VC_KP_ADD
 			],
-			() => this.broadcastEvent('offsetTime', Countdown.KEY_OFFSET_AMOUNT)
+			() => this.broadcastEvent('offsetTime', this.offsetValue)
 		);
 		
 		this.registerShortcutKey(
@@ -38,7 +53,7 @@ class Countdown extends Module {
 				Module.Keycodes.VC_META_L,
 				Module.Keycodes.VC_KP_SUBTRACT
 			],
-			() => this.broadcastEvent('offsetTime', -Countdown.KEY_OFFSET_AMOUNT)
+			() => this.broadcastEvent('offsetTime', -this.offsetValue)
 		);
 		
 		this.registerShortcutKey(
@@ -87,7 +102,7 @@ class Countdown extends Module {
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: (user, time) => {
 				if (isNaN(time)) {
-					this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
+					this.log(`User ${user.name} used bad arguments: "subtracttime ${time}"`);
 					return;
 				}
 				
