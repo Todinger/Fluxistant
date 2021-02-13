@@ -134,6 +134,7 @@ class Module {
 		commandObjects = commandObjects || this.commandObjects;
 		if (commandObjects) {
 			Object.values(commandObjects).forEach(cmd => {
+				this.unregisterCommand(cmd.cmdname);
 				cmd.aliases.forEach(alias => this.unregisterCommand(alias));
 			});
 		}
@@ -372,16 +373,17 @@ class Module {
 			cmd.aliases = [];
 		}
 		
-		if (!cmd.aliases.includes(cmd.cmdname)) {
-			cmd.aliases.unshift(cmd.cmdname);
-		}
+		let allNames = [cmd.cmdname].concat(cmd.aliases);
+		let cmdname = cmd.cmdname;
 		
-		cmd.aliases.forEach(alias => {
+		allNames.forEach(alias => {
 			cmd.cmdname = alias;
 			TwitchManager.registerCommand(
 				this._getCommandId(alias),
 				cmd);
 		});
+		
+		cmd.cmdname = cmdname;
 	}
 	
 	// [For use by inheriting classes]
@@ -420,6 +422,7 @@ class Module {
 	// command is simple you can use registerCommand or forwardSimpleCommand
 	// for it; this is for more complex things, such as commands with dynamic
 	// names, e.g. self-commands).
+	// noinspection JSUnusedLocalSymbols
 	invokeCommand(user, command) {
 		return false;
 	}
