@@ -6,6 +6,7 @@ class UserFilter_IsSubEntity extends UserFilter_BaseEntity {
 	
 	constructor() {
 		super(UserFilter_IsSubEntity.TYPE, 'Subs Only');
+		this.setDescription('Allows only subs to invoke the command');
 	}
 }
 

@@ -1,8 +1,8 @@
 'use strict';
 
 const urljoin = require('url-join');
-const Module = require('../../module');
-const Utils = require('../../utils');
+const Module = requireMain('module');
+const Utils = requireMain('utils');
 
 // File structure:
 // 	{
@@ -23,9 +23,9 @@ const CANDY_DEFAULTS = {
 };
 
 const INFLATIONS = {
-	NONE:						(start, step) => start,
-	makeLinear:    (weight) =>	(start, step) => start + step * weight,
-	makeExponential: (base) =>	(start, step) => start * (base ** step),
+	none:			()		 =>	(start)       => start,
+	linear:			(weight) =>	(start, step) => start + step * weight,
+	exponential:	(base)   =>	(start, step) => start * (base ** step),
 }
 
 // Candy Game
@@ -34,7 +34,7 @@ const INFLATIONS = {
 // specific people or by anyone through a channel reward redemption.
 // During the game, people can use the candy drop command, !gimme, to have the
 // bot choose a random candy from the candy database and drop a shower of them
-// on its client webpage.
+// on its client web page.
 // Using the command costs a small amount of points, and each candy has its own
 // value of points it grants the player for getting it.
 // Most candy have the same fixed, positive value, with three exceptions:
@@ -68,12 +68,64 @@ class CandyGame extends Module {
 			tags: ['imgdrop', 'textdisp'], 
 		});
 		
+		this.candyDefaults = {};
+		
 		this.candyData = {};
 		this.ongoing = false;
 		this.imageDirURL = null;
 		
-		this.winningWeightInflation = INFLATIONS.makeLinear(5);
+		this.winningWeightInflation = INFLATIONS.linear(5);
 		this.candyCount = 0;
+	}
+	
+	
+	defineModConfig(modConfig) {
+		modConfig.add('candyInflation', 'CandyInflation')
+			.setName('Candy Inflation')
+			.setDescription('Optional inflation of win chances to control the length of the game');
+	
+/*		// TODO: Switch defaults to config system after implementing data system with image selection
+		let defs = modConfig.addObject('candyDefaults')
+			.setName('Candy Defaults')
+			.setDescription('Default values to use for candy - these are overridden by specific candy settings');
+		defs.addNumber('weight', 25)
+			.setName('Weight')
+			.setDescription('Higher relative to other weights = more likely to be picked');
+		defs.addInteger('reward', 50)
+			.setName('Reward')
+			.setDescription('Amount of StreamElements loyalty points given when found (enter a negative number for a penalty)');
+		defs.addInteger('imageWidth', 100)
+			.setName('Image Width')
+			.setDescription('Width in pixels');
+		defs.addInteger('imageHeight', 100)
+			.setName('Image Height')
+			.setDescription('Height in pixels');
+		defs.addInteger('userBonus')
+			.setName('User Bonus')
+			.setDescription('Reward for a user finding their own special candy');
+*/
+	}
+	
+	loadModConfig(conf) {
+		if (conf.candyInflation && conf.candyInflation.type) {
+			let inflationFuncMaker = INFLATIONS[conf.candyInflation.type];
+			let inflationValue = conf.candyInflation.argument;
+			this.winningWeightInflation = inflationFuncMaker(inflationValue);
+		}
+	
+/*      // TODO: Switch defaults to config system after implementing data system with image selection
+		this.candyDefaults = {
+			weight: conf.weight,
+			reward: conf.reward,
+			image: {
+				width: conf.imageWidth,
+				height: conf.imageHeight,
+			},
+			userBonus: {
+				amount: conf.userBonus,
+			},
+		};
+*/
 	}
 	
 	// Sends the given image parameters to the Image Display Module client for
@@ -118,6 +170,7 @@ class CandyGame extends Module {
 	
 	getCandyWeight(candy) {
 		if (candy.winning) {
+			// noinspection UnnecessaryLocalVariableJS
 			let weight = this.winningWeightInflation(
 				candy.weight,
 				this.candyCount);

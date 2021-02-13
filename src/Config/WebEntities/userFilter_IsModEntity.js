@@ -6,6 +6,7 @@ class UserFilter_IsModEntity extends UserFilter_BaseEntity {
 	
 	constructor() {
 		super(UserFilter_IsModEntity.TYPE, 'Mods Only');
+		this.setDescription('Allows only mods to invoke the command');
 	}
 }
 

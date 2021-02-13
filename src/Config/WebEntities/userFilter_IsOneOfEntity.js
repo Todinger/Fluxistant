@@ -8,9 +8,10 @@ class UserFilter_IsOneOfEntity extends UserFilter_BaseEntity {
 	
 	constructor() {
 		super(UserFilter_IsOneOfEntity.TYPE, 'Specific Users');
+		this.setDescription('Allows only a specific group of users to invoke the command');
 		this.addChild('argument', new DynamicArrayEntity('String'))
 			.setName('Usernames')
-			.setDescription('Only this user will be able to invoke the command.');
+			.setDescription('Only this user will be able to invoke the command');
 	}
 	
 	setData(data) {

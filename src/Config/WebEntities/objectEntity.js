@@ -1,6 +1,7 @@
 const assert = require('assert').strict;
 const _ = require('lodash');
 const ConfigEntity = require('./configEntity');
+const EntityFactory = require('../entityFactory');
 
 class ObjectEntity extends ConfigEntity {
 	static get TYPE()		{ return null;		}	// Avoid construction (abstract type)
@@ -31,9 +32,47 @@ class ObjectEntity extends ConfigEntity {
 		this.children[key] = value;
 		return this.children[key];
 	}
-	
 	hasChild(key) {
 		return key in this.children;
+	}
+	
+	// ------------- Child Manufacturing ------------- //
+	
+	add(key, type, ...params) {
+		let buildParams = params;
+		buildParams.unshift(type);
+		return this.addChild(key, EntityFactory.build.apply(EntityFactory, buildParams));
+	}
+	
+	addString(key, defaultValue) {
+		return this.add(key, 'String', defaultValue);
+	}
+	
+	addNumber(key, defaultValue) {
+		return this.add(key, 'Number', defaultValue);
+	}
+	
+	addInteger(key, defaultValue) {
+		return this.add(key, 'Integer', defaultValue);
+	}
+	
+	addBoolean(key, defaultValue) {
+		return this.add(key, 'Boolean', defaultValue);
+	}
+	
+	addDynamicArray(key, valueType, values) {
+		let array = this.add(key, 'DynamicArray', valueType);
+		if (values) {
+			values.forEach(value => {
+				array.addElement(EntityFactory.build(valueType, value));
+			});
+		}
+		
+		return array;
+	}
+	
+	addObject(key) {
+		return this.add(key, 'StaticObject');
 	}
 	
 	

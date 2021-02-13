@@ -31,8 +31,8 @@ class Configuration {
 	// 	argument	Filter-specific data (e.g. username for the isUser filter).
 	addCommand(data) {
 		if (!this.configRoot.hasChild('commands')) {
-			this.configRoot.addChild('commands', EntityFactory.build('FixedArray', 'Command'))
-				.setDescription('Commands associated with this module.');
+			this.configRoot.add('commands', 'FixedArray', 'Command')
+				.setDescription('Commands associated with this module');
 		}
 		
 		this.getChild('commands').addElement(
@@ -54,37 +54,33 @@ class Configuration {
 		});
 	}
 	
-	add(key, type, ...params) {
-		let buildParams = params;
-		buildParams.unshift(type);
-		return this.configRoot.addChild(key, EntityFactory.build.apply(EntityFactory, buildParams));
+	add(key, ...params) {
+		params.unshift(key);
+		return this.configRoot.add.apply(this.configRoot, params);
 	}
 	
 	addString(key, defaultValue) {
-		return this.add(key, 'String', defaultValue);
+		return this.configRoot.addString(key, defaultValue);
 	}
 	
 	addNumber(key, defaultValue) {
-		return this.add(key, 'Number', defaultValue);
+		return this.configRoot.addNumber(key, defaultValue);
 	}
 	
 	addInteger(key, defaultValue) {
-		return this.add(key, 'Integer', defaultValue);
+		return this.configRoot.addInteger(key, defaultValue);
 	}
 	
 	addBoolean(key, defaultValue) {
-		return this.add(key, 'Boolean', defaultValue);
+		return this.configRoot.addBoolean(key, defaultValue);
 	}
 	
 	addDynamicArray(key, valueType, values) {
-		let array = this.add(key, 'DynamicArray', valueType);
-		if (values) {
-			values.forEach(value => {
-				array.addElement(EntityFactory.build(valueType, value));
-			});
-		}
-		
-		return array;
+		return this.configRoot.addDynamicArray(key, valueType, values);
+	}
+	
+	addObject(key) {
+		return this.configRoot.addObject(key);
 	}
 	
 	toConf() {

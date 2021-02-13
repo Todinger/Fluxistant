@@ -298,7 +298,7 @@ class Module {
 	// This is so that when we reload configurations  during runtime we can
 	// alert the user about faulty values and still keep running smoothly
 	// without crashing.
-	loadModConfig(config) {
+	loadModConfig(conf) {
 		// Do nothing by default (for overriding where needed)
 	}
 	

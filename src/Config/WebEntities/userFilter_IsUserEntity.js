@@ -7,9 +7,10 @@ class UserFilter_IsUserEntity extends UserFilter_BaseEntity {
 	
 	constructor() {
 		super(UserFilter_IsUserEntity.TYPE, 'Specific User');
+		this.setDescription('Allows only a specific user to invoke the command');
 		this.addChild('argument', new StringEntity(''))
 			.setName('Username')
-			.setDescription('Only this user will be able to invoke the command.');
+			.setDescription('Only this user will be able to invoke the command');
 	}
 	
 	setData(data) {

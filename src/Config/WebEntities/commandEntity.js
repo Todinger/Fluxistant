@@ -17,20 +17,20 @@ class CommandEntity extends StaticObjectEntity {
 			.hide();
 		this.addChild('cmdname', new StringEntity(data && data.cmdname || ''))
 			.setName('Name')
-			.setDescription('The term that will invoke the command.');
+			.setDescription('The term that will invoke the command');
 		this.addChild('aliases', new DynamicArrayEntity('String'))
-			.setDescription('Optional additional names for the command.');
+			.setDescription('Optional additional names for the command');
 		this.addChild('cost', new IntegerEntity(data && data.cost || 0))
-			.setDescription('Cost in StreamElements loyalty points.');
+			.setDescription('Cost in StreamElements loyalty points');
 		this.addChild('message', new StringEntity(data && data.message))
-			.setDescription('A message the bot will send to the chat when the command is invoked.');
+			.setDescription('A message the bot will send to the chat when the command is invoked');
 		// this.addChild('silent', new ValueEntity(false))
 		// 	.setDescription('Whether or not to suppress the bot from announcing point usage for this command.');
 		this.addChild('cooldowns', new CooldownEntity())
-			.setDescription('How long it takes before the command can be used again.');
+			.setDescription('How long it takes before the command can be used again');
 		this.addChild('filters', new DynamicArrayEntity('UserFilter'))
 			.setName('User Filters')
-			.setDescription('Filters for which users may use the command.');
+			.setDescription('Filters for which users may use the command');
 		
 		if (data) {
 			if (data.name) {

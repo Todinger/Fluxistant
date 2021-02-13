@@ -6,6 +6,7 @@ class UserFilter_IsAtLeastModEntity extends UserFilter_BaseEntity {
 	
 	constructor() {
 		super(UserFilter_IsAtLeastModEntity.TYPE, 'Mods and Streamer Only');
+		this.setDescription('Allows only mods and the streamer to invoke the command');
 	}
 }
 
