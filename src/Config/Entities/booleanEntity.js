@@ -6,7 +6,7 @@ class BooleanEntity extends ValueEntity {
 	static get BUILDER()	{ return value => new BooleanEntity(value); 	}
 	
 	constructor(value) {
-		super(value, BooleanEntity.TYPE, 'boolean');
+		super(value, 'boolean');
 	}
 }
 

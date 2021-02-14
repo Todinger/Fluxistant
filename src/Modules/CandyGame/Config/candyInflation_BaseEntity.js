@@ -1,8 +1,8 @@
 const ChoiceValueEntity = requireConfig('choiceValueEntity');
 
 class CandyInflation_BaseEntity extends ChoiceValueEntity {
-	constructor(type, displayText) {
-		super(type, displayText);
+	constructor(displayText) {
+		super(displayText);
 	}
 	
 	// Used by some concrete entities

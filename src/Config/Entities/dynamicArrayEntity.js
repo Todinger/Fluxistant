@@ -9,7 +9,7 @@ class DynamicArrayEntity extends ArrayEntity {
 	static get BUILDER()	{ return elementType => new DynamicArrayEntity(elementType); 	}
 	
 	constructor(elementType) {
-		super(DynamicArrayEntity.TYPE, elementType);
+		super(elementType);
 		this.elementType = elementType || null;
 		this.elements = [];
 	}

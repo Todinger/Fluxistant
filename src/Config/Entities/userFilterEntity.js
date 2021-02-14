@@ -5,7 +5,7 @@ class UserFilterEntity extends ChoiceEntity {
 	static get BUILDER()	{ return () => new UserFilterEntity(); 	}
 	
 	constructor() {
-		super(UserFilterEntity.TYPE);
+		super();
 		this._addOptions({
 			["isMod"]:          'UserFilter_IsMod',
 			["isAtLeastMod"]:   'UserFilter_IsAtLeastMod',

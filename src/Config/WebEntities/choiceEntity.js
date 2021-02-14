@@ -6,8 +6,8 @@ class ChoiceEntity extends ConfigEntity {
 	static get TYPE()		{ return null;		}	// Avoid construction (abstract type)
 	static get GUITYPE()	{ return 'Choice'; 	}
 	
-	constructor(type) {
-		super(type);
+	constructor() {
+		super();
 		this.options = {};
 		this.selectedValue = null;
 		this.selectedOption = null;

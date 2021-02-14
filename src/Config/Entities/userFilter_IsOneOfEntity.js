@@ -7,7 +7,7 @@ class UserFilter_IsOneOfEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsOneOfEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsOneOfEntity.TYPE, 'Specific Users');
+		super('Specific Users');
 		this.setDescription('Allows only a specific group of users to invoke the command');
 		this.addChild('argument', new DynamicArrayEntity('String'))
 			.setName('Usernames')

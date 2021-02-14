@@ -5,8 +5,8 @@ const EntityFactory = require('../entityFactory');
 class ArrayEntity extends ConfigEntity {
 	static get TYPE() { return null; }	// Avoid construction (abstract type)
 	
-	constructor(type, elementType) {
-		super(type);
+	constructor(elementType) {
+		super();
 		this.elementType = elementType || null;
 		this.elements = [];
 	}

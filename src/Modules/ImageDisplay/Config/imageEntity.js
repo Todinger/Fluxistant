@@ -1,5 +1,4 @@
 const StaticObjectEntity = requireConfig('staticObjectEntity');
-const ValueEntity = requireConfig('valueEntity');
 const DynamicArrayEntity = requireConfig('dynamicArrayEntity');
 
 class ImageEntity extends StaticObjectEntity {
@@ -7,17 +6,22 @@ class ImageEntity extends StaticObjectEntity {
 	static get BUILDER()	{ return () => new ImageEntity(); 	}
 	
 	constructor() {
-		super(ImageEntity.TYPE);
-		this.addChild('filename', new ValueEntity())
-			.setDescription('The name of the image file that will be displayed.');
-		this.addChild('width', new ValueEntity())
-			.setDescription('Display width on screen.');
-		this.addChild('height', new ValueEntity())
-			.setDescription('Display height on screen.');
-		this.addChild('duration', new ValueEntity())
-			.setDescription('Display height on screen.');
+		super();
+		this.addString('filename')
+			.setName('File Name')
+			.setDescription('The name of the image file that will be displayed');
+		this.addInteger('width')
+			.setName('Width')
+			.setDescription('Display width on screen');
+		this.addInteger('height')
+			.setName('Height')
+			.setDescription('Display height on screen');
+		this.addNumber('duration')
+			.setName('Duration')
+			.setDescription('Duration in milliseconds that the image will be displayed');
 		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
-			.setDescription('Special effects to apply to the image.');
+			.setName('Effects')
+			.setDescription('Special effects to apply to the image');
 	}
 	
 	isSet() {

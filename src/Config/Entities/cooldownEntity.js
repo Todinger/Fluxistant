@@ -7,7 +7,7 @@ class CooldownEntity extends StaticObjectEntity {
 	static get BUILDER()	{ return () => new CooldownEntity(); 	}
 	
 	constructor() {
-		super(CooldownEntity.TYPE);
+		super();
 		this.addChild('user', new IntegerEntity())
 			.setDescription('Time in milliseconds before the same user can use the command.');
 		this.addChild('global', new IntegerEntity())

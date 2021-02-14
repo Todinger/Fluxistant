@@ -5,7 +5,7 @@ class IntegerEntity extends NumberEntity {
 	static get BUILDER()	{ return value => new IntegerEntity(value); 	}
 	
 	constructor(value) {
-		super(value, IntegerEntity.TYPE);
+		super(value);
 	}
 	
 	validate() {

@@ -18581,8 +18581,8 @@ const EntityFactory = require('../entityFactory');
 class ArrayEntity extends ConfigEntity {
 	static get TYPE() { return null; }	// Avoid construction (abstract type)
 	
-	constructor(type, elementType) {
-		super(type);
+	constructor(elementType) {
+		super();
 		this.elementType = elementType || null;
 		this.elements = [];
 	}
@@ -18695,7 +18695,7 @@ class BooleanEntity extends ValueEntity {
 	static get BUILDER()	{ return value => new BooleanEntity(value); 	}
 	
 	constructor(value) {
-		super(value, BooleanEntity.TYPE, 'boolean');
+		super(value, 'boolean');
 	}
 }
 
@@ -18709,7 +18709,7 @@ class CandyInflationEntity extends ChoiceEntity {
 	static get BUILDER()	{ return () => new CandyInflationEntity(); 	}
 	
 	constructor() {
-		super(CandyInflationEntity.TYPE);
+		super();
 		this._addOptions({
 			["none"]:           'CandyInflation_None',
 			["linear"]:         'CandyInflation_Linear',
@@ -18726,8 +18726,8 @@ module.exports = CandyInflationEntity;
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class CandyInflation_BaseEntity extends ChoiceValueEntity {
-	constructor(type, displayText) {
-		super(type, displayText);
+	constructor(displayText) {
+		super(displayText);
 	}
 	
 	// Used by some concrete entities
@@ -18746,7 +18746,7 @@ class CandyInflation_ExponentialEntity extends CandyInflation_BaseEntity {
 	static get BUILDER()	{ return () => new CandyInflation_ExponentialEntity();	}
 	
 	constructor() {
-		super(CandyInflation_ExponentialEntity.TYPE, 'Exponential');
+		super('Exponential');
 		this.setDescription('The winning image will have its selection odds multiplied every time');
 		this.addChild('argument', new NumberEntity(1))
 			.setName('Base')
@@ -18765,7 +18765,7 @@ class CandyInflation_LinearEntity extends CandyInflation_BaseEntity {
 	static get BUILDER()	{ return () => new CandyInflation_LinearEntity();	}
 	
 	constructor() {
-		super(CandyInflation_LinearEntity.TYPE, 'Linear');
+		super('Linear');
 		this.setDescription('The winning image will have its selection odds increased by a fixed amount every time');
 		this.addChild('argument', new NumberEntity(0))
 			.setName('Weight')
@@ -18783,7 +18783,7 @@ class CandyInflation_NoneEntity extends CandyInflation_BaseEntity {
 	static get BUILDER()	{ return () => new CandyInflation_NoneEntity();	}
 	
 	constructor() {
-		super(CandyInflation_NoneEntity.TYPE, 'None');
+		super('None');
 		this.setDescription('The winning image will have the same odds of being chosen every time');
 	}
 }
@@ -18799,8 +18799,8 @@ class ChoiceEntity extends ConfigEntity {
 	static get TYPE()		{ return null;		}	// Avoid construction (abstract type)
 	static get GUITYPE()	{ return 'Choice'; 	}
 	
-	constructor(type) {
-		super(type);
+	constructor() {
+		super();
 		this.options = {};
 		this.selectedValue = null;
 		this.selectedOption = null;
@@ -18916,8 +18916,8 @@ class ChoiceValueEntity extends StaticObjectEntity {
 	static get GUITYPE()	{ return 'RawObject';	}
 	
 	// constructor(type, optionName) {
-	constructor(type, displayText) {
-		super(type);
+	constructor(displayText) {
+		super();
 		// this.optionName = optionName;
 		this.displayText = displayText;
 	}
@@ -18956,10 +18956,11 @@ const UserFilter = require('./userFilterEntity');
 
 class CommandEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Command'; 				    	}
+	static get GUITYPE()	{ return 'Command'; 				    	}
 	static get BUILDER()	{ return data => new CommandEntity(data); 	}
 	
 	constructor(data) {
-		super(CommandEntity.TYPE, () => new CommandEntity());
+		super();
 		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')) // Identifies the command for functional purposes
 			.hide();
 		this.addChild('cmdname', new StringEntity(data && data.cmdname || ''))
@@ -19071,8 +19072,8 @@ class ConfigEntity {
 	static get TYPE()       { return null; }	// Avoid construction (abstract type)
 	static get GUITYPE()    { return null; }    // Specifies which GUI class to use to edit entities of this type
 	
-	constructor(type) {
-		this.type = type;
+	constructor() {
+		this.type = this.constructor.TYPE;
 		this.description = undefined;
 		this.name = undefined;
 		this.hidden = false;
@@ -19213,7 +19214,7 @@ class CooldownEntity extends StaticObjectEntity {
 	static get BUILDER()	{ return () => new CooldownEntity(); 	}
 	
 	constructor() {
-		super(CooldownEntity.TYPE);
+		super();
 		this.addChild('user', new IntegerEntity())
 			.setDescription('Time in milliseconds before the same user can use the command.');
 		this.addChild('global', new IntegerEntity())
@@ -19277,7 +19278,7 @@ class DynamicArrayEntity extends ArrayEntity {
 	static get BUILDER()	{ return elementType => new DynamicArrayEntity(elementType); 	}
 	
 	constructor(elementType) {
-		super(DynamicArrayEntity.TYPE, elementType);
+		super(elementType);
 		this.elementType = elementType || null;
 		this.elements = [];
 	}
@@ -19315,11 +19316,6 @@ class DynamicObjectEntity extends ObjectEntity {
 	static get GUITYPE()	{ return 'DynamicObject'; 		   			}
 	static get BUILDER()	{ return () => new DynamicObjectEntity(); 	}
 	
-	constructor(type) {
-		super(type || DynamicObjectEntity.TYPE);
-	}
-	
-	
 	// ---- Overrides ---- //
 	
 	importDesc(descriptor) {
@@ -19354,7 +19350,7 @@ class FixedArrayEntity extends ArrayEntity {
 	static get BUILDER()	{ return elementType => new FixedArrayEntity(elementType); 	}
 	
 	constructor(elementType) {
-		super(FixedArrayEntity.TYPE, elementType);
+		super(elementType);
 		this.elementType = elementType || null;
 		this.elements = [];
 	}
@@ -19395,11 +19391,13 @@ class ImageCommandEntity extends CommandEntity {
 	static get BUILDER()	{ return () => new ImageCommandEntity(); 	}
 	
 	constructor() {
-		super(ImageCommandEntity.TYPE, () => new CommandEntity());
+		super({ cmdname: 'newcommand' });
 		this.addChild('image', new ImageEntity())
-			.setDescription('Configures which image to display and how.');
+			.setName('Image')
+			.setDescription('Image display parameters');
 		this.addChild('sound', new SoundEntity())
-			.setDescription('Configures which sound to play and how.');
+			.setName('Sound')
+			.setDescription('Sound playing parameters');
 	}
 	
 	
@@ -19423,12 +19421,14 @@ class ImageEffectEntity extends ChoiceEntity {
 	static get BUILDER()	{ return () => new ImageEffectEntity(); 	}
 	
 	constructor() {
-		super(ImageEffectEntity.TYPE);
+		super();
 		this._addOptions({
 			["glow"]:       'ImageEffect_Glow',
 			["shadow"]:     'ImageEffect_Shadow',
 			["dundundun"]:  'ImageEffect_DunDunDun',
 		});
+		
+		this.select('glow');
 	}
 }
 
@@ -19436,32 +19436,32 @@ module.exports = ImageEffectEntity;
 
 },{"./choiceEntity":15}],25:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
-const IntegerEntity = require('./integerEntity');
 
 class ImageEffect_DunDunDunEntity extends ChoiceValueEntity {
 	static get TYPE()		{ return 'ImageEffect_DunDunDun'; 					}
 	static get BUILDER()	{ return () => new ImageEffect_DunDunDunEntity(); 	}
 	
 	constructor() {
-		super(ImageEffect_DunDunDunEntity.TYPE);
+		super('Dun Dun Dun!!!');
+		this.setDescription('Makes the image zoom in in three steps and then shake (dun dun duuuuuun!!!)');
 		
-		this.addChild('durationSmall', new IntegerEntity())
+		this.addInteger('durationSmall')
 			.setName('Small Size Duration')
 			.setDescription('The amount of time that the image will remain in its smallest size. Should match the pause between the first and second "dun"s of the sound effect.');
-		this.addChild('durationMedium', new IntegerEntity())
+		this.addInteger('durationMedium')
 			.setName('Medium Size Duration')
 			.setDescription('The amount of time that the image will remain in its middle size. Should match the pause between the second and third "dun"s of the sound effect.');
-		this.addChild('durationLarge', new IntegerEntity())
+		this.addInteger('durationLarge')
 			.setName('Large Size Duration')
 			.setDescription('The amount of time that the image will remain in its full size (shaking). Should match the length of the third "dun" in the sound effect.');
 		
-		this.addChild('sizeSmall', new IntegerEntity())
+		this.addInteger('sizeSmall')
 			.setName('Small Size (Width)')
 			.setDescription('The width the image should have in its small form. The height will scale to match.');
-		this.addChild('sizeSmall', new IntegerEntity())
+		this.addInteger('sizeMedium')
 			.setName('Medium Size (Width)')
 			.setDescription('The width the image should have in its middle form. The height will scale to match.');
-		this.addChild('sizeSmall', new IntegerEntity())
+		this.addInteger('sizeLarge')
 			.setName('Large Size (Width)')
 			.setDescription('The width the image should have in its final form. The height will scale to match.');
 	}
@@ -19469,43 +19469,46 @@ class ImageEffect_DunDunDunEntity extends ChoiceValueEntity {
 
 module.exports = ImageEffect_DunDunDunEntity;
 
-},{"./choiceValueEntity":16,"./integerEntity":29}],26:[function(require,module,exports){
+},{"./choiceValueEntity":16}],26:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
-const IntegerEntity = require('./integerEntity');
 
 class ImageEffect_GlowEntity extends ChoiceValueEntity {
 	static get TYPE()		{ return 'ImageEffect_Glow'; 					}
 	static get BUILDER()	{ return () => new ImageEffect_GlowEntity(); 	}
 	
 	constructor() {
-		super(ImageEffect_GlowEntity.TYPE);
-		this.addChild('size', new IntegerEntity())
-			.setDescription("Spread of the glow effect (warning: doesn't work that well).");
+		super('Glow');
+		this.setDescription('Adds an outer glow to the image');
+		
+		this.addInteger('size')
+			.setName('Size')
+			.setDescription("Spread of the glow effect (warning - doesn't work that well)");
 	}
 }
 
 module.exports = ImageEffect_GlowEntity;
 
-},{"./choiceValueEntity":16,"./integerEntity":29}],27:[function(require,module,exports){
+},{"./choiceValueEntity":16}],27:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
-const IntegerEntity = require('./integerEntity');
 
 class ImageEffect_ShadowEntity extends ChoiceValueEntity {
 	static get TYPE()		{ return 'ImageEffect_Shadow'; 					}
 	static get BUILDER()	{ return () => new ImageEffect_ShadowEntity(); 	}
 	
 	constructor() {
-		super(ImageEffect_ShadowEntity.TYPE);
-		this.addChild('size', new IntegerEntity())
-			.setDescription("Spread of the shadow effect (warning: doesn't work that well).");
+		super('Shadow');
+		this.setDescription('Adds an outer shadow to the image');
+		
+		this.addInteger('size')
+			.setName('Size')
+			.setDescription("Spread of the shadow effect (warning - doesn't work that well).");
 	}
 }
 
 module.exports = ImageEffect_ShadowEntity;
 
-},{"./choiceValueEntity":16,"./integerEntity":29}],28:[function(require,module,exports){
+},{"./choiceValueEntity":16}],28:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
-const ValueEntity = require('./valueEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
 class ImageEntity extends StaticObjectEntity {
@@ -19513,17 +19516,22 @@ class ImageEntity extends StaticObjectEntity {
 	static get BUILDER()	{ return () => new ImageEntity(); 	}
 	
 	constructor() {
-		super(ImageEntity.TYPE);
-		this.addChild('filename', new ValueEntity())
-			.setDescription('The name of the image file that will be displayed.');
-		this.addChild('width', new ValueEntity())
-			.setDescription('Display width on screen.');
-		this.addChild('height', new ValueEntity())
-			.setDescription('Display height on screen.');
-		this.addChild('duration', new ValueEntity())
-			.setDescription('Display height on screen.');
+		super();
+		this.addString('filename')
+			.setName('File Name')
+			.setDescription('The name of the image file that will be displayed');
+		this.addInteger('width')
+			.setName('Width')
+			.setDescription('Display width on screen');
+		this.addInteger('height')
+			.setName('Height')
+			.setDescription('Display height on screen');
+		this.addNumber('duration')
+			.setName('Duration')
+			.setDescription('Duration in milliseconds that the image will be displayed');
 		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
-			.setDescription('Special effects to apply to the image.');
+			.setName('Effects')
+			.setDescription('Special effects to apply to the image');
 	}
 	
 	isSet() {
@@ -19533,7 +19541,7 @@ class ImageEntity extends StaticObjectEntity {
 
 module.exports = ImageEntity;
 
-},{"./dynamicArrayEntity":20,"./staticObjectEntity":34,"./valueEntity":43}],29:[function(require,module,exports){
+},{"./dynamicArrayEntity":20,"./staticObjectEntity":34}],29:[function(require,module,exports){
 const NumberEntity = require('./numberEntity');
 
 class IntegerEntity extends NumberEntity {
@@ -19541,7 +19549,7 @@ class IntegerEntity extends NumberEntity {
 	static get BUILDER()	{ return value => new IntegerEntity(value); 	}
 	
 	constructor(value) {
-		super(value, IntegerEntity.TYPE);
+		super(value);
 	}
 	
 	validate() {
@@ -19560,8 +19568,8 @@ class NumberEntity extends ValueEntity {
 	static get GUITYPE()	{ return 'Number';   		        		}
 	static get BUILDER()	{ return value => new NumberEntity(value); 	}
 	
-	constructor(value, type) {
-		super(value, type || NumberEntity.TYPE, 'number');
+	constructor(value) {
+		super(value);
 	}
 }
 
@@ -19577,8 +19585,8 @@ class ObjectEntity extends ConfigEntity {
 	static get TYPE()		{ return null;		}	// Avoid construction (abstract type)
 	static get GUITYPE()	{ return 'Object';	}
 	
-	constructor(type) {
-		super(type || ObjectEntity.TYPE);
+	constructor() {
+		super();
 		this.children = {};
 		this.allowImportingNewChildren = false;
 	}
@@ -19600,10 +19608,19 @@ class ObjectEntity extends ConfigEntity {
 	addChild(key, value) {
 		assert(!(key in this.children), `Duplicate key added: ${key}.`);
 		this.children[key] = value;
+		this._fillChildName(key);
 		return this.children[key];
 	}
+	
 	hasChild(key) {
 		return key in this.children;
+	}
+	
+	_fillChildName(key) {
+		let child = this.children[key];
+		if (!child.getName() || child.getName() === '') {
+			child.setName(_.upperFirst(key));
+		}
 	}
 	
 	// ------------- Child Manufacturing ------------- //
@@ -19681,9 +19698,7 @@ class ObjectEntity extends ConfigEntity {
 				this.addChild(key, child);
 			}
 			
-			if (!child.hasName()) {
-				child.setName(_.upperFirst(key));
-			}
+			this._fillChildName(key);
 		});
 	}
 }
@@ -19699,7 +19714,7 @@ class SimpleObjectEntity extends DynamicObjectEntity {
 	static get BUILDER()	{ return () => new SimpleObjectEntity(); 	}
 	
 	constructor() {
-		super(SimpleObjectEntity.TYPE);
+		super();
 	}
 }
 
@@ -19707,17 +19722,18 @@ module.exports = SimpleObjectEntity;
 
 },{"./dynamicObjectEntity":21}],33:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
-const ValueEntity = require('./valueEntity');
 
 class SoundEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Sound'; 					}
 	static get BUILDER()	{ return () => new SoundEntity(); 	}
 	
 	constructor() {
-		super(SoundEntity.TYPE);
-		this.addChild('filename', new ValueEntity())
+		super();
+		this.addString('filename')
+			.setName('File Name')
 			.setDescription('The name of the sound file that will be displayed.');
-		this.addChild('volume', new ValueEntity())
+		this.addNumber('volume', 100)
+			.setName('Volume')
 			.setDescription('Volume at which to play the sound (not implemented yet).');
 	}
 	
@@ -19728,7 +19744,7 @@ class SoundEntity extends StaticObjectEntity {
 
 module.exports = SoundEntity;
 
-},{"./staticObjectEntity":34,"./valueEntity":43}],34:[function(require,module,exports){
+},{"./staticObjectEntity":34}],34:[function(require,module,exports){
 const assert = require('assert').strict;
 const ObjectEntity = require('./objectEntity');
 const EntityFactory = require('../entityFactory');
@@ -19736,11 +19752,6 @@ const EntityFactory = require('../entityFactory');
 class StaticObjectEntity extends ObjectEntity {
 	static get TYPE()		{ return 'StaticObject';	    			}
 	static get BUILDER()	{ return () => new StaticObjectEntity(); 	}
-	
-	constructor(type) {
-		super(type || StaticObjectEntity.TYPE);
-	}
-	
 	
 	// ---- Overrides ---- //
 	
@@ -19771,7 +19782,7 @@ class StringEntity extends ValueEntity {
 	static get BUILDER()	{ return value => new StringEntity(value); 	}
 	
 	constructor(value) {
-		super(value, StringEntity.TYPE, 'string');
+		super(value, 'string');
 	}
 }
 
@@ -19785,7 +19796,7 @@ class UserFilterEntity extends ChoiceEntity {
 	static get BUILDER()	{ return () => new UserFilterEntity(); 	}
 	
 	constructor() {
-		super(UserFilterEntity.TYPE);
+		super();
 		this._addOptions({
 			["isMod"]:          'UserFilter_IsMod',
 			["isAtLeastMod"]:   'UserFilter_IsAtLeastMod',
@@ -19804,8 +19815,8 @@ module.exports = UserFilterEntity;
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class UserFilter_BaseEntity extends ChoiceValueEntity {
-	constructor(type, displayText) {
-		super(type, displayText);
+	constructor(displayText) {
+		super(displayText);
 	}
 	
 	// Used by some concrete user filter entities
@@ -19823,7 +19834,7 @@ class UserFilter_IsAtLeastModEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsAtLeastModEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsAtLeastModEntity.TYPE, 'Mods and Streamer Only');
+		super('Mods and Streamer Only');
 		this.setDescription('Allows only mods and the streamer to invoke the command');
 	}
 }
@@ -19838,7 +19849,7 @@ class UserFilter_IsModEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsModEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsModEntity.TYPE, 'Mods Only');
+		super('Mods Only');
 		this.setDescription('Allows only mods to invoke the command');
 	}
 }
@@ -19855,7 +19866,7 @@ class UserFilter_IsOneOfEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsOneOfEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsOneOfEntity.TYPE, 'Specific Users');
+		super('Specific Users');
 		this.setDescription('Allows only a specific group of users to invoke the command');
 		this.addChild('argument', new DynamicArrayEntity('String'))
 			.setName('Usernames')
@@ -19882,7 +19893,7 @@ class UserFilter_IsSubEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsSubEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsSubEntity.TYPE, 'Subs Only');
+		super('Subs Only');
 		this.setDescription('Allows only subs to invoke the command');
 	}
 }
@@ -19898,7 +19909,7 @@ class UserFilter_IsUserEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsUserEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsUserEntity.TYPE, 'Specific User');
+		super('Specific User');
 		this.setDescription('Allows only a specific user to invoke the command');
 		this.addChild('argument', new StringEntity(''))
 			.setName('Username')
@@ -19928,8 +19939,8 @@ class ValueEntity extends ConfigEntity {
 	}
 	
 	// constructor(valueType) {
-	constructor(value, entityType, javascriptValueType) {
-		super(entityType || ValueEntity.TYPE);
+	constructor(value, javascriptValueType) {
+		super();
 		this.value = value;
 		this.javascriptValueType = javascriptValueType;
 	}

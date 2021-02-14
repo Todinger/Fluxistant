@@ -6,7 +6,7 @@ class UserFilter_IsUserEntity extends UserFilter_BaseEntity {
 	static get BUILDER()	{ return () => new UserFilter_IsUserEntity(); 	}
 	
 	constructor() {
-		super(UserFilter_IsUserEntity.TYPE, 'Specific User');
+		super('Specific User');
 		this.setDescription('Allows only a specific user to invoke the command');
 		this.addChild('argument', new StringEntity(''))
 			.setName('Username')

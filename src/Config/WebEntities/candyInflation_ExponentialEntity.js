@@ -6,7 +6,7 @@ class CandyInflation_ExponentialEntity extends CandyInflation_BaseEntity {
 	static get BUILDER()	{ return () => new CandyInflation_ExponentialEntity();	}
 	
 	constructor() {
-		super(CandyInflation_ExponentialEntity.TYPE, 'Exponential');
+		super('Exponential');
 		this.setDescription('The winning image will have its selection odds multiplied every time');
 		this.addChild('argument', new NumberEntity(1))
 			.setName('Base')

@@ -7,11 +7,6 @@ class DynamicObjectEntity extends ObjectEntity {
 	static get GUITYPE()	{ return 'DynamicObject'; 		   			}
 	static get BUILDER()	{ return () => new DynamicObjectEntity(); 	}
 	
-	constructor(type) {
-		super(type || DynamicObjectEntity.TYPE);
-	}
-	
-	
 	// ---- Overrides ---- //
 	
 	importDesc(descriptor) {

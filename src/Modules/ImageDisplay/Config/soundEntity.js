@@ -1,15 +1,16 @@
 const StaticObjectEntity = requireConfig('staticObjectEntity');
-const ValueEntity = requireConfig('valueEntity');
 
 class SoundEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Sound'; 					}
 	static get BUILDER()	{ return () => new SoundEntity(); 	}
 	
 	constructor() {
-		super(SoundEntity.TYPE);
-		this.addChild('filename', new ValueEntity())
+		super();
+		this.addString('filename')
+			.setName('File Name')
 			.setDescription('The name of the sound file that will be displayed.');
-		this.addChild('volume', new ValueEntity())
+		this.addNumber('volume', 100)
+			.setName('Volume')
 			.setDescription('Volume at which to play the sound (not implemented yet).');
 	}
 	

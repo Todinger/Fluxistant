@@ -9,10 +9,11 @@ const UserFilter = require('./userFilterEntity');
 
 class CommandEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Command'; 				    	}
+	static get GUITYPE()	{ return 'Command'; 				    	}
 	static get BUILDER()	{ return data => new CommandEntity(data); 	}
 	
 	constructor(data) {
-		super(CommandEntity.TYPE, () => new CommandEntity());
+		super();
 		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')) // Identifies the command for functional purposes
 			.hide();
 		this.addChild('cmdname', new StringEntity(data && data.cmdname || ''))

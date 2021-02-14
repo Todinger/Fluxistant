@@ -5,8 +5,8 @@ class NumberEntity extends ValueEntity {
 	static get GUITYPE()	{ return 'Number';   		        		}
 	static get BUILDER()	{ return value => new NumberEntity(value); 	}
 	
-	constructor(value, type) {
-		super(value, type || NumberEntity.TYPE, 'number');
+	constructor(value) {
+		super(value);
 	}
 }
 

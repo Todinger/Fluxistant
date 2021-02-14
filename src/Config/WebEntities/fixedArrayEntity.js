@@ -7,7 +7,7 @@ class FixedArrayEntity extends ArrayEntity {
 	static get BUILDER()	{ return elementType => new FixedArrayEntity(elementType); 	}
 	
 	constructor(elementType) {
-		super(FixedArrayEntity.TYPE, elementType);
+		super(elementType);
 		this.elementType = elementType || null;
 		this.elements = [];
 	}

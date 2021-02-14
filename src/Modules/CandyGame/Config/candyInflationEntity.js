@@ -5,7 +5,7 @@ class CandyInflationEntity extends ChoiceEntity {
 	static get BUILDER()	{ return () => new CandyInflationEntity(); 	}
 	
 	constructor() {
-		super(CandyInflationEntity.TYPE);
+		super();
 		this._addOptions({
 			["none"]:           'CandyInflation_None',
 			["linear"]:         'CandyInflation_Linear',

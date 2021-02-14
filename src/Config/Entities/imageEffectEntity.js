@@ -5,12 +5,14 @@ class ImageEffectEntity extends ChoiceEntity {
 	static get BUILDER()	{ return () => new ImageEffectEntity(); 	}
 	
 	constructor() {
-		super(ImageEffectEntity.TYPE);
+		super();
 		this._addOptions({
 			["glow"]:       'ImageEffect_Glow',
 			["shadow"]:     'ImageEffect_Shadow',
 			["dundundun"]:  'ImageEffect_DunDunDun',
 		});
+		
+		this.select('glow');
 	}
 }
 

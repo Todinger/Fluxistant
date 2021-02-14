@@ -5,7 +5,7 @@ class SimpleObjectEntity extends DynamicObjectEntity {
 	static get BUILDER()	{ return () => new SimpleObjectEntity(); 	}
 	
 	constructor() {
-		super(SimpleObjectEntity.TYPE);
+		super();
 	}
 }
 

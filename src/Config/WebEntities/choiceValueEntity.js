@@ -5,8 +5,8 @@ class ChoiceValueEntity extends StaticObjectEntity {
 	static get GUITYPE()	{ return 'RawObject';	}
 	
 	// constructor(type, optionName) {
-	constructor(type, displayText) {
-		super(type);
+	constructor(displayText) {
+		super();
 		// this.optionName = optionName;
 		this.displayText = displayText;
 	}

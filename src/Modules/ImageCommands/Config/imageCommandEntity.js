@@ -8,11 +8,13 @@ class ImageCommandEntity extends CommandEntity {
 	static get BUILDER()	{ return () => new ImageCommandEntity(); 	}
 	
 	constructor() {
-		super(ImageCommandEntity.TYPE, () => new CommandEntity());
+		super({ cmdname: 'newcommand' });
 		this.addChild('image', new ImageEntity())
-			.setDescription('Configures which image to display and how.');
+			.setName('Image')
+			.setDescription('Image display parameters');
 		this.addChild('sound', new SoundEntity())
-			.setDescription('Configures which sound to play and how.');
+			.setName('Sound')
+			.setDescription('Sound playing parameters');
 	}
 	
 	

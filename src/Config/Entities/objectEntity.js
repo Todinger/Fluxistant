@@ -7,8 +7,8 @@ class ObjectEntity extends ConfigEntity {
 	static get TYPE()		{ return null;		}	// Avoid construction (abstract type)
 	static get GUITYPE()	{ return 'Object';	}
 	
-	constructor(type) {
-		super(type || ObjectEntity.TYPE);
+	constructor() {
+		super();
 		this.children = {};
 		this.allowImportingNewChildren = false;
 	}
@@ -30,10 +30,19 @@ class ObjectEntity extends ConfigEntity {
 	addChild(key, value) {
 		assert(!(key in this.children), `Duplicate key added: ${key}.`);
 		this.children[key] = value;
+		this._fillChildName(key);
 		return this.children[key];
 	}
+	
 	hasChild(key) {
 		return key in this.children;
+	}
+	
+	_fillChildName(key) {
+		let child = this.children[key];
+		if (!child.getName() || child.getName() === '') {
+			child.setName(_.upperFirst(key));
+		}
 	}
 	
 	// ------------- Child Manufacturing ------------- //
@@ -111,9 +120,7 @@ class ObjectEntity extends ConfigEntity {
 				this.addChild(key, child);
 			}
 			
-			if (!child.hasName()) {
-				child.setName(_.upperFirst(key));
-			}
+			this._fillChildName(key);
 		});
 	}
 }

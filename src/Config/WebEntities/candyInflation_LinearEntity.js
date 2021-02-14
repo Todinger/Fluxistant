@@ -6,7 +6,7 @@ class CandyInflation_LinearEntity extends CandyInflation_BaseEntity {
 	static get BUILDER()	{ return () => new CandyInflation_LinearEntity();	}
 	
 	constructor() {
-		super(CandyInflation_LinearEntity.TYPE, 'Linear');
+		super('Linear');
 		this.setDescription('The winning image will have its selection odds increased by a fixed amount every time');
 		this.addChild('argument', new NumberEntity(0))
 			.setName('Weight')

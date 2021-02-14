@@ -11,8 +11,8 @@ class ValueEntity extends ConfigEntity {
 	}
 	
 	// constructor(valueType) {
-	constructor(value, entityType, javascriptValueType) {
-		super(entityType || ValueEntity.TYPE);
+	constructor(value, javascriptValueType) {
+		super();
 		this.value = value;
 		this.javascriptValueType = javascriptValueType;
 	}

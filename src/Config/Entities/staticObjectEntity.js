@@ -6,11 +6,6 @@ class StaticObjectEntity extends ObjectEntity {
 	static get TYPE()		{ return 'StaticObject';	    			}
 	static get BUILDER()	{ return () => new StaticObjectEntity(); 	}
 	
-	constructor(type) {
-		super(type || StaticObjectEntity.TYPE);
-	}
-	
-	
 	// ---- Overrides ---- //
 	
 	importDesc(descriptor) {

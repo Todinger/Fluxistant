@@ -6,8 +6,8 @@ class ConfigEntity {
 	static get TYPE()       { return null; }	// Avoid construction (abstract type)
 	static get GUITYPE()    { return null; }    // Specifies which GUI class to use to edit entities of this type
 	
-	constructor(type) {
-		this.type = type;
+	constructor() {
+		this.type = this.constructor.TYPE;
 		this.description = undefined;
 		this.name = undefined;
 		this.hidden = false;

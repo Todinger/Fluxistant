@@ -6,7 +6,7 @@ class StringEntity extends ValueEntity {
 	static get BUILDER()	{ return value => new StringEntity(value); 	}
 	
 	constructor(value) {
-		super(value, StringEntity.TYPE, 'string');
+		super(value, 'string');
 	}
 }
 
