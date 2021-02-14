@@ -3,7 +3,7 @@
   going to add a "commands" object to modules that will include all the
   information about the commands along with the callbacks for them. Then
   I'll link command registration to configuration loading.
-- UI for changing the configuration during runtime.
++ UI for changing the configuration during runtime.
 - Support for user data files for modules (for large data that shouldn't
   be in the configurations themselves).
 - User data editor: raw (use shell to open Notepad for data files).
