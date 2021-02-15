@@ -1,3 +1,4 @@
+const assert = require('assert').strict;
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class SoundEntity extends StaticObjectEntity {
@@ -14,8 +15,31 @@ class SoundEntity extends StaticObjectEntity {
 			.setDescription('Volume at which to play the sound (not implemented yet).');
 	}
 	
+	getFilename() {
+		return this.getChild('filename').getValue();
+	}
+	
+	getVolume() {
+		return this.getChild('volume').getValue();
+	}
+	
 	isSet() {
 		return this.getChild('filename').isSet();
+	}
+	
+	isVolumeSet() {
+		return this.getChild('volume').isSet();
+	}
+	
+	
+	// ---- Overrides ---- //
+	
+	validate() {
+		super.validate();
+		let volume = this.getVolume();
+		assert(
+			!this.isSet() || !this.isVolumeSet() || (0 <= volume && volume <= 100),
+			`Volume must be bet 0 and 100.`);
 	}
 }
 

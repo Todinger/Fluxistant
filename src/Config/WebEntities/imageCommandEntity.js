@@ -16,16 +16,6 @@ class ImageCommandEntity extends CommandEntity {
 			.setName('Sound')
 			.setDescription('Sound playing parameters');
 	}
-	
-	
-	// ---- Overrides ---- //
-	
-	validate() {
-		assert(
-			this.getChild('image').isSet() ||
-			this.getChild('sound').isSet(),
-			'An Image Command must have an image or a sound set.');
-	}
 }
 
 module.exports = ImageCommandEntity;

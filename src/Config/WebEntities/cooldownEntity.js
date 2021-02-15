@@ -1,6 +1,4 @@
-const assert = require('assert').strict;
 const StaticObjectEntity = require('./staticObjectEntity');
-const IntegerEntity = require('./integerEntity');
 
 class CooldownEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Cooldown'; 					}
@@ -8,9 +6,9 @@ class CooldownEntity extends StaticObjectEntity {
 	
 	constructor() {
 		super();
-		this.addChild('user', new IntegerEntity())
+		this.addNaturalNumber('user')
 			.setDescription('Time in milliseconds before the same user can use the command.');
-		this.addChild('global', new IntegerEntity())
+		this.addNaturalNumber('global')
 			.setDescription('Time in milliseconds before the command can be used again at all.');
 	}
 	
@@ -37,24 +35,6 @@ class CooldownEntity extends StaticObjectEntity {
 		
 		if (data.global) {
 			this.setGlobal(data.global);
-		}
-	}
-	
-	
-	// ---- Overrides ---- //
-	
-	validate() {
-		super.validate();
-		
-		let userCD = this.getUser();
-		let globalCD = this.getGlobal();
-		
-		if (userCD) {
-			assert(userCD >= 0);
-		}
-		
-		if (globalCD) {
-			assert(globalCD >= 0);
 		}
 	}
 }

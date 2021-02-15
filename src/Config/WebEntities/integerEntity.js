@@ -2,8 +2,9 @@ const assert = require('assert').strict;
 const NumberEntity = require('./numberEntity');
 
 class IntegerEntity extends NumberEntity {
-	static get TYPE()		{ return 'Integer'; 		        			}
-	static get BUILDER()	{ return value => new IntegerEntity(value); 	}
+	static get TYPE()		{ return 'Integer';							}
+	static get GUITYPE()	{ return 'Integer';							}
+	static get BUILDER()	{ return value => new IntegerEntity(value); }
 	
 	constructor(value) {
 		super(value);

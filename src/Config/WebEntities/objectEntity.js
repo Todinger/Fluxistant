@@ -65,6 +65,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'Integer', defaultValue);
 	}
 	
+	addNaturalNumber(key, defaultValue) {
+		return this.add(key, 'NaturalNumber', defaultValue);
+	}
+	
 	addBoolean(key, defaultValue) {
 		return this.add(key, 'Boolean', defaultValue);
 	}

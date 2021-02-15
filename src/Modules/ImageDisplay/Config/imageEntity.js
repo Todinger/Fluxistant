@@ -16,7 +16,7 @@ class ImageEntity extends StaticObjectEntity {
 		this.addInteger('height')
 			.setName('Height')
 			.setDescription('Display height on screen');
-		this.addNumber('duration')
+		this.addNaturalNumber('duration')
 			.setName('Duration')
 			.setDescription('Duration in milliseconds that the image will be displayed');
 		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))

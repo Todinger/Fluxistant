@@ -7,6 +7,11 @@
     <file url="file://$PROJECT_DIR$/src/ClientsCommon/configEntities.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/arrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/booleanEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyInflation_BaseEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyInflation_ExponentialEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyInflation_LinearEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyInflation_NoneEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyInflationEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/choiceEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/choiceValueEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/commandEntity.js" />
@@ -22,6 +27,7 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageEffectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/integerEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/naturalNumberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/numberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/objectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/simpleObjectEntity.js" />

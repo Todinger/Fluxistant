@@ -8,23 +8,23 @@ class ImageEffect_DunDunDunEntity extends ChoiceValueEntity {
 		super('Dun Dun Dun!!!');
 		this.setDescription('Makes the image zoom in in three steps and then shake (dun dun duuuuuun!!!)');
 		
-		this.addInteger('durationSmall')
+		this.addNaturalNumber('durationSmall')
 			.setName('Small Size Duration')
 			.setDescription('The amount of time that the image will remain in its smallest size. Should match the pause between the first and second "dun"s of the sound effect.');
-		this.addInteger('durationMedium')
+		this.addNaturalNumber('durationMedium')
 			.setName('Medium Size Duration')
 			.setDescription('The amount of time that the image will remain in its middle size. Should match the pause between the second and third "dun"s of the sound effect.');
-		this.addInteger('durationLarge')
+		this.addNaturalNumber('durationLarge')
 			.setName('Large Size Duration')
 			.setDescription('The amount of time that the image will remain in its full size (shaking). Should match the length of the third "dun" in the sound effect.');
 		
-		this.addInteger('sizeSmall')
+		this.addNaturalNumber('sizeSmall')
 			.setName('Small Size (Width)')
 			.setDescription('The width the image should have in its small form. The height will scale to match.');
-		this.addInteger('sizeMedium')
+		this.addNaturalNumber('sizeMedium')
 			.setName('Medium Size (Width)')
 			.setDescription('The width the image should have in its middle form. The height will scale to match.');
-		this.addInteger('sizeLarge')
+		this.addNaturalNumber('sizeLarge')
 			.setName('Large Size (Width)')
 			.setDescription('The width the image should have in its final form. The height will scale to match.');
 	}

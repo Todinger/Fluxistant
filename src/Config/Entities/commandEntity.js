@@ -93,9 +93,6 @@ class CommandEntity extends StaticObjectEntity {
 		super.validate();
 		
 		let cmdname = this.getCmdName();
-		// Errors.ensureNonEmptyString(
-		// 	this.getName(),
-		// 	`Command name must be a non-empty string.`);
 		Errors.ensureRegexString(
 			cmdname,
 			/[^\s]+/,
