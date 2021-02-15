@@ -1,3 +1,4 @@
+const express = require('express');
 const path = require('path');
 const Utils = require('./utils');
 
@@ -29,8 +30,7 @@ const KEYCODES = require('./enums').KEYCODES;
 class FluxBot {
 	constructor() {
 		// Basic server setup
-		this.express = require('express');
-		this.app = this.express();
+		this.app = express();
 		this.server = require('http').createServer(this.app);
 		this.io = require('socket.io')(this.server);
 	}
@@ -74,7 +74,7 @@ class FluxBot {
 	setupWebDirs() {
 		// The files here are needed by the HTML pages of the various modules
 		this.assets.registerDir(path.join(__dirname, 'ClientsCommon'), '/common');
-		this.app.use(GUI_DIR_WEB, this.express.static(GUI_DIR));
+		this.app.use(GUI_DIR_WEB, express.static(GUI_DIR));
 	}
 	
 	// Gets a collection of { username: imageurl } pairs for all the users who have
@@ -116,7 +116,7 @@ class FluxBot {
 			'/mod/',
 			'Modules',
 			this.app,
-			this.express,
+			express,
 			generationOutputDir);
 	}
 	
