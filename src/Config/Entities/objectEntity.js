@@ -61,6 +61,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'Number', defaultValue);
 	}
 	
+	addPositiveNumber(key, defaultValue) {
+		return this.add(key, 'PositiveNumber', defaultValue);
+	}
+	
 	addInteger(key, defaultValue) {
 		return this.add(key, 'Integer', defaultValue);
 	}

@@ -39,7 +39,10 @@ export default class ObjectGui extends EntityGui {
 			contents: childLabeledContainer,
 		});
 		
-		childGui.onChanged(() => childGui._updateStatusIndicators(childEntry.guiData.marker));
+		childGui.onChangedOrError(() => {
+			this._contentsChanged();
+			childGui._updateStatusIndicators(childEntry.guiData.marker);
+		});
 		
 		return childEntry;
 	}
@@ -69,8 +72,8 @@ export default class ObjectGui extends EntityGui {
 				childEntry = this._buildChildEntry(this.childrenGUIs[key], labeledContainer);
 				
 				this.childrenGUIs[key].onChangedOrError(() => {
-					childrenGUIs[key]._updateStatusIndicators(labeledContainer.guiData.label);
 					this._contentsChanged();
+					childrenGUIs[key]._updateStatusIndicators(labeledContainer.guiData.label);
 				});
 			}
 			

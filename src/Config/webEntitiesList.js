@@ -17,6 +17,7 @@ const entities = {
 	NaturalNumberEntity: require('./WebEntities/naturalNumberEntity.js'),
 	NumberEntity: require('./WebEntities/numberEntity.js'),
 	ObjectEntity: require('./WebEntities/objectEntity.js'),
+	PositiveNumberEntity: require('./WebEntities/positiveNumberEntity.js'),
 	SimpleObjectEntity: require('./WebEntities/simpleObjectEntity.js'),
 	StaticObjectEntity: require('./WebEntities/staticObjectEntity.js'),
 	StringEntity: require('./WebEntities/stringEntity.js'),

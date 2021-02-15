@@ -16,7 +16,7 @@ export default class ChoiceGui extends EntityGui {
 			this.optionGUIs[optionName] = GuiRegistry.buildGui(
 				optionEntity,
 				`${this.guiID}-option-${optionName}`);
-			this.optionGUIs[optionName].onChanged(() => this._changed());
+			this.optionGUIs[optionName].onChangedOrError(() => this._changed());
 		});
 		
 		return this.optionGUIs;
