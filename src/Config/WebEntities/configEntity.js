@@ -119,6 +119,19 @@ class ConfigEntity {
 		Errors.abstract();
 	}
 	
+	_performValidationStep(action, stepIdentifier) {
+		try {
+			action();
+		} catch (err) {
+			if (!err.path) {
+				err.path = [];
+			}
+			
+			err.path.unshift(stepIdentifier);
+			throw err;
+		}
+	}
+	
 	static buildEntity(entityObject) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);

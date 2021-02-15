@@ -90,6 +90,15 @@ class ChoiceEntity extends ConfigEntity {
 		return result;
 	}
 	
+	validate() {
+		super.validate();
+		Object.values(this.options).forEach(optionEntity => {
+			this._performValidationStep(
+				() => optionEntity.validate(),
+				`${optionEntity.displayText} option`);
+		});
+	}
+	
 	cloneImpl() {
 		let copy = EntityFactory.build(this.type);
 		Object.keys(this.options).forEach(

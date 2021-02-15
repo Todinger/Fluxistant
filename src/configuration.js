@@ -96,6 +96,15 @@ class Configuration {
 		}
 	}
 	
+	validateConfig(rootDescriptor) {
+		assert(
+			rootDescriptor.type === this.configRoot.type,
+			`Bad configuration: Expected root object to have the type '${this.configRoot.type}', instead got '${rootDescriptor.type}'.`);
+		let newConfig = this.configRoot.clone();
+		newConfig.import(rootDescriptor);
+		newConfig.validate();
+	}
+	
 	export() {
 		return this.configRoot.export();
 	}
@@ -106,6 +115,7 @@ class Configuration {
 	
 	// Saves the current configuration from the given config file.
 	load(filename) {
+		// TODO: Uncomment try-catch blocks
 		// try {
 			let rootDescriptor = Utils.tryReadJSON(filename);
 			if (rootDescriptor) {

@@ -18662,7 +18662,11 @@ class ArrayEntity extends ConfigEntity {
 	
 	validate() {
 		super.validate();
-		this.elements.forEach(element => element.validate());
+		for (let i = 0; i < this.elements.length; i++) {
+			this._performValidationStep(
+				() => this.elements[i].validate(),
+				`Element #${i + 1}`);
+		}
 	}
 	
 	cloneImpl() {
@@ -18882,6 +18886,15 @@ class ChoiceEntity extends ConfigEntity {
 		});
 		
 		return result;
+	}
+	
+	validate() {
+		super.validate();
+		Object.values(this.options).forEach(optionEntity => {
+			this._performValidationStep(
+				() => optionEntity.validate(),
+				`${optionEntity.displayText} option`);
+		});
 	}
 	
 	cloneImpl() {
@@ -19185,6 +19198,19 @@ class ConfigEntity {
 		Errors.abstract();
 	}
 	
+	_performValidationStep(action, stepIdentifier) {
+		try {
+			action();
+		} catch (err) {
+			if (!err.path) {
+				err.path = [];
+			}
+			
+			err.path.unshift(stepIdentifier);
+			throw err;
+		}
+	}
+	
 	static buildEntity(entityObject) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
@@ -19365,7 +19391,6 @@ class FixedArrayEntity extends ArrayEntity {
 module.exports = FixedArrayEntity;
 
 },{"./arrayEntity":8,"assert":1}],23:[function(require,module,exports){
-const assert = require('assert').strict;
 const CommandEntity = require('./commandEntity');
 const ImageEntity = require('./imageEntity');
 const SoundEntity = require('./soundEntity');
@@ -19387,7 +19412,7 @@ class ImageCommandEntity extends CommandEntity {
 
 module.exports = ImageCommandEntity;
 
-},{"./commandEntity":17,"./imageEntity":28,"./soundEntity":34,"assert":1}],24:[function(require,module,exports){
+},{"./commandEntity":17,"./imageEntity":28,"./soundEntity":34}],24:[function(require,module,exports){
 const ChoiceEntity = require('./choiceEntity');
 
 class ImageEffectEntity extends ChoiceEntity {
@@ -19692,7 +19717,11 @@ class ObjectEntity extends ConfigEntity {
 	
 	validate() {
 		super.validate();
-		Object.values(this.children).forEach(child => child.validate());
+		Object.values(this.children).forEach(child => {
+			this._performValidationStep(
+				() => child.validate(),
+				child.getName());
+		});
 	}
 	
 	buildFrom(descriptor) {

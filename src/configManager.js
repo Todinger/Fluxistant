@@ -152,6 +152,35 @@ class ConfigManager extends EventNotifier {
 		this.importModuleConfigs(config.modules);
 	}
 	
+	validateMainConfig(mainConfig) {
+		assert(mainConfig, 'Null main configuration received.');
+		try {
+			this.mainConfig.validateConfig(mainConfig);
+		} catch (err) {
+			err.path.unshift('Main');
+			throw err;
+		}
+	}
+	
+	validateModuleConfigs(moduleConfigs) {
+		assert(moduleConfigs, 'Null modules configuration received.');
+		Object.keys(moduleConfigs).forEach(moduleName => {
+			try {
+				this.moduleConfigs[moduleName].validateConfig(moduleConfigs[moduleName]);
+			} catch (err) {
+				err.path.unshift(moduleName);
+				err.path.unshift('Modules');
+				throw err;
+			}
+		});
+	}
+	
+	validateAll(config) {
+		assert(config, 'Null configuration received.');
+		this.validateMainConfig(config.main);
+		this.validateModuleConfigs(config.modules);
+	}
+	
 	onModConfigLoaded(callback) {
 		this.on('modConfigLoaded', callback);
 	}

@@ -181,6 +181,19 @@ class FluxBot {
 			
 			socket.on('saveConfig', config => {
 				this.cli.log('Received configuration for saving.');
+				try {
+					this.configManager.validateAll(config);
+				} catch (err) {
+					socket.emit(
+						'configSaveError',
+						{
+							message: err.message,
+							path: err.path,
+						});
+					
+					return;
+				}
+				
 				this.configManager.importAll(config);
 				this.configManager.saveAll();
 				socket.emit('configSaved');

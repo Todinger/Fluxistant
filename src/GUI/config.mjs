@@ -229,9 +229,16 @@ class Configurator {
 		});
 	}
 	
+	saveError(error) {
+		let errorMessage = error.path.join(' > ');
+		errorMessage = `${errorMessage}: ${error.message}`;
+		this.showError(errorMessage);
+	}
+	
 	start() {
 		this.socket.on('loadConfig', data => this.loadConfigs(data));
 		this.socket.on('configSaved', () => this.configsSaved());
+		this.socket.on('configSaveError', (error) => this.saveError(error));
 		this.socket.emit('configRequest');
 	}
 }

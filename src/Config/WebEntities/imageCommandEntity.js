@@ -1,4 +1,3 @@
-const assert = require('assert').strict;
 const CommandEntity = require('./commandEntity');
 const ImageEntity = require('./imageEntity');
 const SoundEntity = require('./soundEntity');

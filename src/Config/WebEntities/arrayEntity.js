@@ -86,7 +86,11 @@ class ArrayEntity extends ConfigEntity {
 	
 	validate() {
 		super.validate();
-		this.elements.forEach(element => element.validate());
+		for (let i = 0; i < this.elements.length; i++) {
+			this._performValidationStep(
+				() => this.elements[i].validate(),
+				`Element #${i + 1}`);
+		}
 	}
 	
 	cloneImpl() {

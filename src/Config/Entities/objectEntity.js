@@ -113,7 +113,11 @@ class ObjectEntity extends ConfigEntity {
 	
 	validate() {
 		super.validate();
-		Object.values(this.children).forEach(child => child.validate());
+		Object.values(this.children).forEach(child => {
+			this._performValidationStep(
+				() => child.validate(),
+				child.getName());
+		});
 	}
 	
 	buildFrom(descriptor) {
