@@ -10,12 +10,14 @@ export default class EntityGui extends EventNotifier {
 	constructor(entity, guiID) {
 		super();
 		this._addEvent('changed');
+		this._addEvent('error');
 		
 		this.entity = entity;
 		this.guiID = guiID;
 		this.gui = null;
-		this.jPrimaryElement = null;
-		this.changedEvent = new Event('changed');
+		
+		this.changed = false;
+		this.error = false;
 	}
 	
 	get isContainer() {
@@ -46,11 +48,29 @@ export default class EntityGui extends EventNotifier {
 	// Deriving classes should call this when the entities they're
 	// in charge of have their value changed.
 	_changed() {
-		this._notify('changed');
+		this.changed = true;
+		
+		try {
+			this.entity.validate();
+			this.error = false;
+			this._notify('changed');
+		} catch (err) {
+			this.error = true;
+			this._notify('error', err);
+		}
 	}
 	
 	onChanged(callback) {
 		this.on('changed', callback);
+	}
+	
+	onError(callback) {
+		this.on('error', callback);
+	}
+	
+	onChangedOrError(callback) {
+		this.onChanged(callback);
+		this.onError(callback);
 	}
 	
 	// Visually marks that this value has been changed
@@ -59,6 +79,24 @@ export default class EntityGui extends EventNotifier {
 	
 	// Clear the indication that this value has been changed
 	clearChangedIndicators() {
+		this.changed = false;
+	}
+	
+	_updateStatusIndicators(jElement) {
+		EntityGui.updateStatusIndicator(jElement, this.changed, this.error);
+	}
+	
+	static updateStatusIndicator(jElement, changed, error) {
+		if (error) {
+			EntityGui.addErrorIndicator(jElement);
+			EntityGui.clearChangeIndicator(jElement);
+		} else if (changed) {
+			EntityGui.addChangeIndicator(jElement);
+			EntityGui.clearErrorIndicator(jElement);
+		} else {
+			EntityGui.clearErrorIndicator(jElement);
+			EntityGui.clearChangeIndicator(jElement);
+		}
 	}
 	
 	// Utility functions for marking changes
@@ -69,5 +107,15 @@ export default class EntityGui extends EventNotifier {
 	// Utility functions for unmarking changes
 	static clearChangeIndicator(jElement) {
 		jElement.removeClass('uk-text-warning');
+	}
+	
+	// Utility functions for marking changes
+	static addErrorIndicator(jElement) {
+		jElement.addClass('uk-text-danger');
+	}
+	
+	// Utility functions for unmarking changes
+	static clearErrorIndicator(jElement) {
+		jElement.removeClass('uk-text-danger');
 	}
 }

@@ -85,6 +85,7 @@ class ArrayEntity extends ConfigEntity {
 	}
 	
 	validate() {
+		super.validate();
 		this.elements.forEach(element => element.validate());
 	}
 	

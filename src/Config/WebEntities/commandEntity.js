@@ -90,6 +90,8 @@ class CommandEntity extends StaticObjectEntity {
 	// ---- Overrides ---- //
 	
 	validate() {
+		super.validate();
+		
 		let cmdname = this.getCmdName();
 		// Errors.ensureNonEmptyString(
 		// 	this.getName(),

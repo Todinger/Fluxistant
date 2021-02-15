@@ -44,6 +44,8 @@ class CooldownEntity extends StaticObjectEntity {
 	// ---- Overrides ---- //
 	
 	validate() {
+		super.validate();
+		
 		let userCD = this.getUser();
 		let globalCD = this.getGlobal();
 		

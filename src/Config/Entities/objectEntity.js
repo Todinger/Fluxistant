@@ -108,6 +108,7 @@ class ObjectEntity extends ConfigEntity {
 	}
 	
 	validate() {
+		super.validate();
 		Object.values(this.children).forEach(child => child.validate());
 	}
 	

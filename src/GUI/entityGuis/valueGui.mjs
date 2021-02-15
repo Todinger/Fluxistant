@@ -16,6 +16,7 @@ export default class ValueGui extends EntityGui {
 	_guiValueChanged(newValue) {
 		this.entity.setValue(newValue);
 		this._changed();
+		this._updateStatusIndicators(this.jInput);
 	}
 	
 	_buildGUI() {

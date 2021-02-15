@@ -18661,6 +18661,7 @@ class ArrayEntity extends ConfigEntity {
 	}
 	
 	validate() {
+		super.validate();
 		this.elements.forEach(element => element.validate());
 	}
 	
@@ -19037,6 +19038,8 @@ class CommandEntity extends StaticObjectEntity {
 	// ---- Overrides ---- //
 	
 	validate() {
+		super.validate();
+		
 		let cmdname = this.getCmdName();
 		// Errors.ensureNonEmptyString(
 		// 	this.getName(),
@@ -19140,6 +19143,7 @@ class ConfigEntity {
 		this.hidden = !!entityInfo.hidden;
 	}
 	
+	// noinspection JSUnusedLocalSymbols
 	importDesc(descriptor) {
 		Errors.abstract();
 	}
@@ -19179,6 +19183,7 @@ class ConfigEntity {
 		Errors.abstract();
 	}
 	
+	// noinspection JSUnusedLocalSymbols
 	buildFrom(descriptor) {
 		Errors.abstract();
 	}
@@ -19251,6 +19256,8 @@ class CooldownEntity extends StaticObjectEntity {
 	// ---- Overrides ---- //
 	
 	validate() {
+		super.validate();
+		
 		let userCD = this.getUser();
 		let globalCD = this.getGlobal();
 		
@@ -19542,6 +19549,7 @@ class ImageEntity extends StaticObjectEntity {
 module.exports = ImageEntity;
 
 },{"./dynamicArrayEntity":20,"./staticObjectEntity":34}],29:[function(require,module,exports){
+const assert = require('assert').strict;
 const NumberEntity = require('./numberEntity');
 
 class IntegerEntity extends NumberEntity {
@@ -19553,14 +19561,16 @@ class IntegerEntity extends NumberEntity {
 	}
 	
 	validate() {
-		return  super.validate() &&
-				(!this.isSet() || this.getValue().isInteger());
+		super.validate();
+		assert(
+			!this.isSet() || Number.isInteger(this.getValue()),
+			`This value must be an integer (whole number).`);
 	}
 }
 
 module.exports = IntegerEntity;
 
-},{"./numberEntity":30}],30:[function(require,module,exports){
+},{"./numberEntity":30,"assert":1}],30:[function(require,module,exports){
 const ValueEntity = require('./valueEntity');
 
 class NumberEntity extends ValueEntity {
@@ -19686,6 +19696,7 @@ class ObjectEntity extends ConfigEntity {
 	}
 	
 	validate() {
+		super.validate();
 		Object.values(this.children).forEach(child => child.validate());
 	}
 	

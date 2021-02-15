@@ -1,3 +1,4 @@
+const assert = require('assert').strict;
 const NumberEntity = require('./numberEntity');
 
 class IntegerEntity extends NumberEntity {
@@ -9,8 +10,10 @@ class IntegerEntity extends NumberEntity {
 	}
 	
 	validate() {
-		return  super.validate() &&
-				(!this.isSet() || this.getValue().isInteger());
+		super.validate();
+		assert(
+			!this.isSet() || Number.isInteger(this.getValue()),
+			`This value must be an integer (whole number).`);
 	}
 }
 

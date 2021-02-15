@@ -52,7 +52,6 @@ export default class EventNotifier {
 	_notify(eventName, ...args) {
 		console.assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
 		
-		console.log(`Invoking event: ${eventName}`);
 		this._eventHandlers[eventName].forEach(
 			callback => callback.apply(null, args));
 	}

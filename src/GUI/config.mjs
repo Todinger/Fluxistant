@@ -19,6 +19,8 @@ class Configurator {
 			modules: null,
 			tabTitles: null,
 		}
+		
+		this.error = false;
 	}
 	
 	init() {
@@ -26,7 +28,7 @@ class Configurator {
 		$('#btn-revert').click(() => this.revertButtonClicked());
 		this.configViewSwitcher = $('#configViewSwitcher');
 		this.mainTabTitle = $('#mainTabTitle');
-		this.allModulesTabTitle = $('#allModulesTabTitle');
+		this.allModulesTabTitle = $('#modulesTabTitle');
 	}
 	
 	disableButton(btn) {
@@ -40,11 +42,31 @@ class Configurator {
 	}
 	
 	applyButtonClicked() {
-		this.saveConfigs();
+		let error = this.guis.main.error;
+		error = Object.values(this.guis.modules).reduce((soFar, modGui) => soFar || modGui.error, error);
+		if (error) {
+			this.showError('Please fix all errors before saving the configuration.');
+		} else {
+			this.saveConfigs();
+		}
 	}
 	
 	revertButtonClicked() {
 		this.buildPageFromActive();
+		this.updateStatusIndicators();
+	}
+	
+	updateStatusIndicators() {
+		this.guis.main._updateStatusIndicators(this.mainTabTitle);
+		let modsChanged = false;
+		let modsError = false;
+		Object.keys(this.guis.modules).forEach(modName => {
+			this.guis.modules[modName]._updateStatusIndicators(this.guis.tabTitles[modName]);
+			modsChanged = modsChanged || this.guis.modules[modName].changed;
+			modsError = modsError || this.guis.modules[modName].error;
+		});
+		
+		EntityGui.updateStatusIndicator(this.allModulesTabTitle, modsChanged, modsError);
 	}
 	
 	clearTabChangeIndicators() {
@@ -69,12 +91,24 @@ class Configurator {
 		UIkit.switcher(this.configViewSwitcher).show(0);
 	}
 	
+	showError(message) {
+		UIkit.notification({
+			message: `<span uk-icon=\'icon: close\'></span> ${message}`,
+			status: 'danger',
+			timeout: 5000,
+		});
+	}
+	
 	buildPage() {
 		let mainContainer = $('#main');
 		mainContainer.empty();
 		let mainGUI = GuiRegistry.buildGui(this.displayedConfig.main, 'main-contents', 'RawObject');
 		mainContainer.append(mainGUI.getGUI());
-		mainGUI.onChanged(() => EntityGui.addChangeIndicator(this.mainTabTitle));
+		mainGUI.onChanged(() => mainGUI._updateStatusIndicators(this.mainTabTitle));
+		mainGUI.onError((err) => {
+			mainGUI._updateStatusIndicators(this.mainTabTitle);
+			this.showError(err.message || err);
+		});
 		this.guis.main = mainGUI;
 		
 		this.guis.modules = {};
@@ -98,9 +132,10 @@ class Configurator {
 					moduleID,
 					'RawObject');
 				let moduleGUIContents = moduleGUI.getGUI();
-				moduleGUI.onChanged(() => {
-					EntityGui.addChangeIndicator(moduleTabTitle);
-					EntityGui.addChangeIndicator(this.allModulesTabTitle);
+				moduleGUI.onChanged(() => this.updateStatusIndicators());
+				moduleGUI.onError((err) => {
+					this.updateStatusIndicators();
+					this.showError(err.message);
 				});
 				this.guis.modules[modName] = moduleGUI;
 				this.guis.tabTitles[modName] = moduleTabTitle;

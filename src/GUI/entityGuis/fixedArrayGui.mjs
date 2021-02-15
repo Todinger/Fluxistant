@@ -18,13 +18,13 @@ export default class FixedArrayGui extends EntityGui {
 	}
 	
 	_changed() {
-		EntityGui.addChangeIndicator(this.mainGui.guiData.header);
 		super._changed();
+		this._updateStatusIndicators(this.mainGui.guiData.header);
 	}
 	
 	_onElementChanged(index) {
-		EntityGui.addChangeIndicator(this.elementRows[index].guiData.marker);
 		this._changed();
+		this.elementRows[index]._updateStatusIndicators(this.elementRows[index].guiData.marker);
 	}
 	
 	_buildElementGUIs() {
@@ -35,6 +35,7 @@ export default class FixedArrayGui extends EntityGui {
 					element,
 					`${this.guiID}-${i}`);
 				elementGui.onChanged(() => this._onElementChanged(i));
+				elementGui.onError(() => this._onElementChanged(i));
 				this.elementGUIs.push(elementGui);
 			}
 		}

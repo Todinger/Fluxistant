@@ -1,5 +1,5 @@
 const assert = require('assert').strict;
-const Errors = requireMain('errors');
+const Errors = requireMain('./errors');
 const EntityFactory = require('../entityFactory');
 
 class ConfigEntity {

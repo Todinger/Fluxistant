@@ -74,6 +74,7 @@ class ConfigEntity {
 		this.hidden = !!entityInfo.hidden;
 	}
 	
+	// noinspection JSUnusedLocalSymbols
 	importDesc(descriptor) {
 		Errors.abstract();
 	}
@@ -113,6 +114,7 @@ class ConfigEntity {
 		Errors.abstract();
 	}
 	
+	// noinspection JSUnusedLocalSymbols
 	buildFrom(descriptor) {
 		Errors.abstract();
 	}
