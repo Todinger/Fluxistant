@@ -79,7 +79,7 @@ class Catastrophe extends Effect {
 	keyPressedHandler() {
 		let file = Effect.Assets.getRandomLocalFile(
 			this.sfxdir,
-			file => sound.play(path.resolve(file)),
+			file => sound.play(path.resolve(file), 0.3),
 			() => this.error(`No sounds files found in "${this.sfxdir}".`)
 		);
 	}
