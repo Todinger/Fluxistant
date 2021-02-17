@@ -13,6 +13,14 @@ class RandomImage extends Module {
 		});
 	}
 	
+	defineModData(modData) {
+		modData.addUniformPool('images');
+	}
+	
+	defineModConfig(modConfig) {
+		// TODO: Add configuration for the image pool
+	}
+	
 	showRandomImage() {
 		Module.Assets.getRandomImageFromCache((name, url) => {
 			this.say(`Showing: ${name}`);

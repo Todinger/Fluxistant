@@ -38,6 +38,13 @@ class Errors {
 		assert(typeof str == 'string', message);
 		assert(regex.test(str), message);
 	}
+	
+	ensureKeysMatch(obj1, obj2, message) {
+		assert(Object.keys(obj1).length === Object.keys(obj2).length, message);
+		Object.keys(obj1).forEach(collectionID => {
+			assert(collectionID in obj2, message);
+		});
+	}
 }
 
 module.exports = new Errors();

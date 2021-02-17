@@ -1,4 +1,5 @@
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const path = require('path');
 const Utils = require('./utils');
 
@@ -6,6 +7,7 @@ const Utils = require('./utils');
 const APP_DATA_DIR = path.join(process.env.APPDATA, 'Fluxbot');
 const DATA_DIR_MAIN = APP_DATA_DIR;
 const DATA_DIR_MODULES = path.join(APP_DATA_DIR, 'Modules');
+const DATA_DIR_TEMP = path.join(APP_DATA_DIR, 'Temp');
 
 const CONFIG_DIR = './Config/';
 const WEB_ENTITIES_SUBDIR = 'WebEntities/';
@@ -39,6 +41,7 @@ class FluxBot {
 		Utils.ensureDirExists(APP_DATA_DIR);
 		Utils.ensureDirExists(DATA_DIR_MAIN);
 		Utils.ensureDirExists(DATA_DIR_MODULES);
+		Utils.ensureDirExists(DATA_DIR_TEMP);
 	}
 	
 	// Read configuration entities and generate web client files if prompted to
@@ -133,6 +136,13 @@ class FluxBot {
 		this.seManager.init();
 	}
 	
+	// Save the current data for the modules - this is to create default data files
+	// if they did not exist.
+	// Do this AFTER loading the modules.
+	saveData() {
+		this.dataManager.saveAll();
+	}
+	
 	// Save the current configuration (main and modules) - this is to create default
 	// configuration files if they did not exist.
 	// Do this AFTER loading the modules.
@@ -140,8 +150,83 @@ class FluxBot {
 		this.configManager.saveAll();
 	}
 	
-	exportConfig() {
-	
+	setupUserData() {
+		this.dataManager = require('./dataManager');
+		this.dataManager.init(APP_DATA_DIR);
+		
+		this.app.use(fileUpload({
+			useTempFiles: true,
+			tempFileDir: DATA_DIR_TEMP,
+		}));
+		
+		this.app.post('/upload/mod/:modName/:colID', (req, res) => {
+			if (!req.files || Object.keys(req.files).length === 0) {
+				return res.status(400).send('No files were uploaded.');
+			}
+			
+			let modName = req.params.modName;
+			let collectionID = req.params.colID;
+			
+			let processedFileCount = 0;
+			let encodedFiles = {};
+			let uploadFailed = false;
+			let files = req.files || {}; // The empty object here is to shut WebStorm's inspector up
+			Object.keys(files).forEach(fileKey => {
+				this.dataManager.upload(
+					modName,
+					collectionID,
+					files[fileKey],
+					(err, encodedData) => {
+						if (uploadFailed) {
+							// The error status is sent by the first failed file
+							// so there's no need to send a result here as well
+							return;
+						} else if (err) {
+							uploadFailed = true;
+							return res.status(500).send(err);
+						}
+						
+						processedFileCount++;
+						encodedFiles[fileKey] = encodedData;
+						if (processedFileCount === Object.keys(req.files).length) {
+							res.send(encodedFiles);
+						}
+					});
+			});
+			
+/*
+			file = req.files.dataFile;
+			
+			uploadPath = path.join(DATA_DIR_TEMP, file.name);
+			
+			const { Base64 } = require('js-base64');
+			//////// THIS IS GOOD FOR IMAGES //////////
+			// const fs = require('fs');
+			// fs.writeFile(uploadPath, Base64.encode(file.data), function(err) {
+			// 	if (err) {
+			// 		return res.status(500).send(err);
+			// 	}
+			//
+			// 	res.sendFile(uploadPath);
+			// });
+			///////////////////////////////////////////
+			
+			file.mv(uploadPath, function(err) {
+				if (err) {
+					return res.status(500).send(err);
+				}
+				
+				res.send(Base64.encode(file.data));
+				// This is to send the file with Base64 encoding after reading it from disk
+				// require('fs').readFile(uploadPath, (err, data) => {
+				// 	res.send(Base64.encode(data));
+				// });
+				
+				// res.sendFile(path.join(DATA_DIR_TEMP, 'img.png'));
+				// res.sendFile(uploadPath);
+			});
+*/
+		});
 	}
 	
 	// Register to handle general server events
@@ -213,6 +298,7 @@ class FluxBot {
 		this.prepareDirectories();
 		this.readConfigEntities();
 		this.loadConfig();
+		this.setupUserData();
 		this.setupCLI();
 		this.setupAssets();
 		this.setupWebDirs();
@@ -221,6 +307,7 @@ class FluxBot {
 		this.setupModules();
 		this.setupTwitch();
 		this.setupStreamElements();
+		this.saveData();
 		this.saveConfig();
 		this.registerServerEvents();
 		this.startServer();

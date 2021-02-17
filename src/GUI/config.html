@@ -50,131 +50,196 @@
 			</ul>
 			<ul id="configView" class="uk-switcher switcher-container uk-width-expand@m">
 				<li id="main" class="uk-child-width-expand" uk-grid>
-						<div>
-							<!-- Number --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Server port">
-								<h3 class="uk-width-1-6 uk-text-warning">Port</h3>
-								<div class="uk-width-expand">
-									<input id="main-number" class="uk-input uk-text-warning" type="number" placeholder="Value...">
-								</div>
-							</div>
-							<!-- Boolean --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
-								<h4 class="uk-width-1-6" uk-tooltip="Prevents the bot from printing lots of stuff to the console">Silent Mode</h4>
-								<div class="uk-width-expand">
-									<input id="main-boolean" class="uk-checkbox uk-height-1-1 uk-margin-auto-top" type="checkbox" uk-tooltip="Prevents the bot from printing lots of stuff to the console">
-								</div>
-							</div>
-							<!-- String --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Some name">
-								<h3 class="uk-width-1-6">Name</h3>
-								<div class="uk-width-expand">
-									<input id="main-string" class="uk-input" type="text" placeholder="Value...">
-								</div>
-							</div>
-							<!-- Object --> <div>
-								<ul uk-accordion class="uk-margin-small-top uk-border-rounded uk-box-shadow-large uk-padding-small">
-									<li>
-										<a class="uk-accordion-title" href="#">Main 2</a>
-										<div class="uk-accordion-content">
-											<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor reprehenderit.</p>
-										</div>
-									</li>
-									<li>
-										<a class="uk-accordion-title" href="#">Main 3</a>
-										<div class="uk-accordion-content">
-											<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat proident.</p>
-										</div>
-									</li>
-								</ul>
-							</div>
-							<!-- Static Array --> <!-- <div> Not really necessary, I think -->
-								<ul uk-accordion class="uk-margin-small-top uk-border-rounded uk-box-shadow-hover-large uk-padding-small">
-									<li>
-										<a class="uk-accordion-title uk-background-primary uk-border-rounded uk-padding-small" href="#">Static Array</a>
-										<div class="uk-accordion-content"> <div>
-											<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
-												<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-text-warning" uk-icon="icon: triangle-right"></span>
-												<div>
-													<input id="static-1" class="uk-input uk-width-expand" type="number" placeholder="Number...">
-												</div>
-											</div>
-											<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
-												<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
-												<span class="uk-width-auto"></span>
-												<input id="static-2" class="uk-input uk-width-expand" type="text" placeholder="Text...">
-											</div>
-											<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
-												<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
-												<span class="uk-width-auto"></span>
-												<div class="uk-child-width-expand@s uk-grid uk-margin-small-top uk-flex-nowrap">
-													<h4 class="uk-width-1-6@m" uk-tooltip="Prevents the bot from printing lots of stuff to the console">Silent Mode</h4>
-													<div class="uk-width-expand@m">
-														<input id="main-static-boolean" class="uk-checkbox uk-height-1-1 uk-margin-auto-top" type="checkbox" uk-tooltip="Prevents the bot from printing lots of stuff to the console">
-													</div>
-												</div>
-<!--												<input id="static-3" class="uk-checkbox uk-width-auto" type="checkbox" uk-tooltip="Prevents the bot from printing lots of stuff to the console">-->
-											</div>
-										</div> </div>
-									</li>
-								</ul>
-							<!-- </div> Not really necessary, I think -->
-							<!-- Dynamic Array --> <div>
-								<ul uk-accordion class="uk-margin-small-top">
-									<li>
-										<a class="uk-accordion-title" href="#">Dynamic Array</a>
-										<div class="uk-accordion-content"> <div>
-											<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
-												<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
-												<div>
-													<input id="dynamic-item-1" class="uk-input uk-width-expand" type="number" placeholder="Value...">
-												</div>
-												<span class="uk-width-auto"></span>
-												<button class="uk-button uk-button-default uk-width-auto uk-padding-remove">
-													<span uk-icon="icon: trash"></span>
-												</button>
-											</div>
-											<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
-												<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
-												<div>
-													<input id="dynamic-item-2" class="uk-input uk-width-expand" type="number" placeholder="Value...">
-												</div>
-												<span class="uk-width-auto"></span>
-												<button class="uk-button uk-button-default uk-width-auto uk-padding-remove">
-													<span uk-icon="icon: trash"></span>
-												</button>
-											</div>
-											<button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Add Element</button>
-										</div> </div>
-									</li>
-								</ul>
-							</div>
-							<!-- Choice --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
-							<h3 class="uk-width-1-6 uk-text-warning" uk-tooltip="User Filter">User Filter</h3>
+					<div>
+						<!-- Number --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Server port">
+							<h3 class="uk-width-1-6 uk-text-warning">Port</h3>
 							<div class="uk-width-expand">
-								<select class="uk-select" onchange="UIkit.switcher($('#hey')).show(Number(this.value));">
-									<option value="0">Mods Only</option>
-									<option value="1">Specific User</option>
-									<option value="2">Specific Users</option>
-								</select>
-								<ul id="hey" uk-switcher="toggle: > *" hidden>
-									<li></li>
-									<li></li>
-									<li></li>
-								</ul>
-								<ul id="bla" class="uk-switcher">
-									<li></li>
-									<li>
-										<!-- String --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Some name">
-										<h3 class="uk-width-1-6">Name</h3>
-										<div class="uk-width-expand">
-											<input class="uk-input" type="text" placeholder="Value...">
-										</div>
-									</div>
-									</li>
-									<li>Array here</li>
-								</ul>
+								<input id="main-number" class="uk-input uk-text-warning" type="number" placeholder="Value...">
 							</div>
+						</div>
+						<!-- Boolean --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+							<h4 class="uk-width-1-6" uk-tooltip="Prevents the bot from printing lots of stuff to the console">Silent Mode</h4>
+							<div class="uk-width-expand">
+								<input id="main-boolean" class="uk-checkbox uk-height-1-1 uk-margin-auto-top" type="checkbox" uk-tooltip="Prevents the bot from printing lots of stuff to the console">
+							</div>
+						</div>
+						<!-- String --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Some name">
+							<h3 class="uk-width-1-6">Name</h3>
+							<div class="uk-width-expand">
+								<input id="main-string" class="uk-input" type="text" placeholder="Value...">
+							</div>
+						</div>
+						<!-- Object --> <div>
+							<ul uk-accordion class="uk-margin-small-top uk-border-rounded uk-box-shadow-large uk-padding-small">
+								<li>
+									<a class="uk-accordion-title" href="#">Main 2</a>
+									<div class="uk-accordion-content">
+										<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor reprehenderit.</p>
+									</div>
+								</li>
+								<li>
+									<a class="uk-accordion-title" href="#">Main 3</a>
+									<div class="uk-accordion-content">
+										<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat proident.</p>
+									</div>
+								</li>
+							</ul>
+						</div>
+						<!-- Static Array --> <!-- <div> Not really necessary, I think -->
+							<ul uk-accordion class="uk-margin-small-top uk-border-rounded uk-box-shadow-hover-large uk-padding-small">
+								<li>
+									<a class="uk-accordion-title uk-background-primary uk-border-rounded uk-padding-small" href="#">Static Array</a>
+									<div class="uk-accordion-content"> <div>
+										<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+											<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-text-warning" uk-icon="icon: triangle-right"></span>
+											<div>
+												<input id="static-1" class="uk-input uk-width-expand" type="number" placeholder="Number...">
+											</div>
+										</div>
+										<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+											<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
+											<span class="uk-width-auto"></span>
+											<input id="static-2" class="uk-input uk-width-expand" type="text" placeholder="Text...">
+										</div>
+										<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+											<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
+											<span class="uk-width-auto"></span>
+											<div class="uk-child-width-expand@s uk-grid uk-margin-small-top uk-flex-nowrap">
+												<h4 class="uk-width-1-6@m" uk-tooltip="Prevents the bot from printing lots of stuff to the console">Silent Mode</h4>
+												<div class="uk-width-expand@m">
+													<input id="main-static-boolean" class="uk-checkbox uk-height-1-1 uk-margin-auto-top" type="checkbox" uk-tooltip="Prevents the bot from printing lots of stuff to the console">
+												</div>
+											</div>
+<!--												<input id="static-3" class="uk-checkbox uk-width-auto" type="checkbox" uk-tooltip="Prevents the bot from printing lots of stuff to the console">-->
+										</div>
+									</div> </div>
+								</li>
+							</ul>
+						<!-- </div> Not really necessary, I think -->
+						<!-- Dynamic Array --> <div>
+							<ul uk-accordion class="uk-margin-small-top">
+								<li>
+									<a class="uk-accordion-title" href="#">Dynamic Array</a>
+									<div class="uk-accordion-content"> <div>
+										<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+											<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
+											<div>
+												<input id="dynamic-item-1" class="uk-input uk-width-expand" type="number" placeholder="Value...">
+											</div>
+											<span class="uk-width-auto"></span>
+											<button class="uk-button uk-button-default uk-width-auto uk-padding-remove">
+												<span uk-icon="icon: trash"></span>
+											</button>
+										</div>
+										<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+											<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>
+											<div>
+												<input id="dynamic-item-2" class="uk-input uk-width-expand" type="number" placeholder="Value...">
+											</div>
+											<span class="uk-width-auto"></span>
+											<button class="uk-button uk-button-default uk-width-auto uk-padding-remove">
+												<span uk-icon="icon: trash"></span>
+											</button>
+										</div>
+										<button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Add Element</button>
+									</div> </div>
+								</li>
+							</ul>
+						</div>
+						<!-- Choice --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+						<h3 class="uk-width-1-6 uk-text-warning" uk-tooltip="User Filter">User Filter</h3>
+						<div class="uk-width-expand">
+							<select class="uk-select" onchange="UIkit.switcher($('#hey')).show(Number(this.value));">
+								<option value="0">Mods Only</option>
+								<option value="1">Specific User</option>
+								<option value="2">Specific Users</option>
+							</select>
+							<ul id="hey" uk-switcher="toggle: > *" hidden>
+								<li></li>
+								<li></li>
+								<li></li>
+							</ul>
+							<ul id="bla" class="uk-switcher">
+								<li></li>
+								<li>
+									<!-- String --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Some name">
+									<h3 class="uk-width-1-6">Name</h3>
+									<div class="uk-width-expand">
+										<input class="uk-input" type="text" placeholder="Value...">
+									</div>
+								</div>
+								</li>
+								<li>Array here</li>
+							</ul>
+						</div>
+					</div>
+						<!-- File Upload --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+							<!--form ref="uploadForm" id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+								<input type="file" name="sampleFile">
+								<input type="submit" value="Upload!">
+							</form-->
+								<div class="js-upload" uk-form-custom>
+									<input type="file" multiple>
+									<button class="uk-button uk-button-default" type="button">Select</button>
+<!--									<button class="uk-button uk-button-default" type="submit">Submit</button>-->
+								</div>
+						<div id="tests">
+							<img id="test" src="" alt="">
+							<audio id="ctl" controls="controls">
+								<source id="aud" src=""/>
+							</audio>
 						</div>
 
+<!--						<div>-->
+<!--							<div class="uk-container uk-margin-top uk-margin-bottom">-->
+<!--								<p class="uk-text-lead">Multiple file upload preview</p>-->
+<!--								<div class="uk-upload-box">-->
+<!--									<div id="error-alert-file-upload" class="uk-alert-danger uk-margin-top uk-hidden" uk-alert>-->
+<!--										<p id="error-messages-fileupload"></p>-->
+<!--									</div>-->
+
+<!--									<div class="js-upload uk-placeholder uk-text-center">-->
+<!--										<span uk-icon="icon: cloud-upload"></span>-->
+<!--										<span class="uk-text-middle uk-margin-small-left">Attach files by dropping them here or</span>-->
+<!--										<div uk-form-custom>-->
+<!--											<input name="documents[]" type="file" accept="image/png, image/jpeg" multiple>-->
+<!--											<span class="uk-link">selecting one</span>-->
+<!--										</div>-->
+
+<!--										<ul id="preview" class="uk-list uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .list-item; delay: 80"></ul>-->
+<!--									</div>-->
+<!--								</div>-->
+
+<!--								<hr>-->
+<!--								<p class="uk-text-lead">Single file upload preview</p>-->
+
+<!--								<div class="uk-upload-box">-->
+<!--									<div id="error-alert-file-upload" class="uk-alert-danger uk-margin-top uk-hidden" uk-alert>-->
+<!--										<p id="error-messages-fileupload"></p>-->
+<!--									</div>-->
+
+<!--									<div class="js-upload uk-placeholder uk-text-center">-->
+<!--										<span uk-icon="icon: cloud-upload"></span>-->
+<!--										<span class="uk-text-middle uk-margin-small-left">Attach files by dropping them here or</span>-->
+<!--										<div uk-form-custom>-->
+<!--											<input name="document" accept="image/png, image/jpeg" type="file">-->
+<!--											<span class="uk-link">selecting one</span>-->
+<!--										</div>-->
+
+<!--										<ul id="preview" class="uk-list uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .list-item; delay: 80"></ul>-->
+<!--									</div>-->
+<!--								</div>-->
+
+<!--								<progress id="js-progressbar" class="uk-progress" value="0" max="100">    </progress>-->
+<!--								<div class="uk-clearfix">-->
+<!--									<div class="uk-float-left"><span class="bar-value-loaded"></span></div>-->
+<!--									<div class="uk-float-right"><span class="bar-value-total"></span></div>-->
+<!--								</div>-->
+<!--							</div>-->
+<!--						</div>-->
+
 						</div>
+					</div>
 				</li>
 				<li id="modules" class="uk-child-width-1-2 uk-padding-small" uk-grid>
 					<ul id="modules-tabs" class="uk-width-auto@m uk-tab-left uk-width-auto" uk-tab uk-switcher="connect: #moduleSelection">
@@ -234,6 +299,290 @@
 		</div>
 	</div>
 </div>
+
+<script src="/common/base64js.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-base64@3.6.0/base64.min.js"></script>
+<script>
+	function arrayBufferToBase64(buffer) {
+		let binary = '';
+		let bytes = new Uint8Array(buffer);
+		let len = bytes.byteLength;
+		for (let i = 0; i < len; i++) {
+			binary += String.fromCharCode(bytes[i]);
+		}
+		return window.btoa(binary);
+	}
+
+	function b64EncodeUnicode(str) {
+		// first we use encodeURIComponent to get percent-encoded UTF-8,
+		// then we convert the percent encodings into raw bytes which
+		// can be fed into btoa.
+		return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+				function toSolidBytes(match, p1) {
+					return String.fromCharCode('0x' + p1);
+				}));
+	}
+
+	function encodeUnicode(str) {
+		// first we use encodeURIComponent to get percent-encoded UTF-8,
+		// then we convert the percent encodings into raw bytes which
+		// can be fed into btoa.
+		return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+				function toSolidBytes(match, p1) {
+					return String.fromCharCode('0x' + p1);
+				}));
+	}
+
+	function getBase64(file) {
+		var reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = function () {
+			console.log(reader.result);
+		};
+		reader.onerror = function (error) {
+			console.log('Error: ', error);
+		};
+	}
+
+	function src(b64) {
+		$('#test').attr('src', 'data:image/png;base64,' + b64);
+	}
+
+	UIkit.upload('.js-upload', {
+		url: '/upload/mod/Random Image/images',
+		name: 'dataFile',
+		multiple: true,
+
+		completeAll: function() {
+			alert('Done');
+		},
+
+		complete: function(req) {
+			//////////////// SOUNDS ////////////////
+			// window.req = req;
+			// window.res = req.response;
+			// let files = JSON.parse(req.response);
+			// $('#aud').attr('src', 'data:audio/wav;base64,' + files.dataFile);
+			// $('#ctl').get(0).load();
+
+			//////////////// IMAGES ////////////////
+
+			// // let image = $(`<img id="test"></img>`);
+			window.req = req;
+			window.res = req.response;
+			let files = JSON.parse(req.response);
+			src(files.dataFile);
+			
+			//////////////// PREVIOUS ATTEMPTS ////////////////
+			// // let source;
+			//
+			// // console.log(req);
+			// // let b64Response = btoa(req.response);
+			// // source = 'data:image/png;base64,'+req.response;
+			//
+			// // let b64Response = b64EncodeUnicode(req.response);
+			// // let b64Response = btoa(unescape(encodeURIComponent(req.response)));
+			// // source = 'data:image/png;base64,' + b64Response;
+			//
+			// // source = URL.createObjectURL(req.response);
+			//
+			// // source = req.response;
+			// //
+			// // image.attr('src', source);
+			// // $('#images').append(image);
+		},
+	});
+/*
+	function imgPreviewLi(readerResult, filename) {
+		const li = document.createElement("li");
+		const div = document.createElement("div");
+		const img = document.createElement("img");
+		const span = document.createElement("span");
+
+		li.className = "list-item uk-margin-medium-top";
+		div.className = "uk-cover-container";
+		img.className = "delete-img-preview";
+		img.setAttribute("id", "img-preview-responsive");
+		img.setAttribute("src", readerResult);
+		img.setAttribute("data-name", filename);
+		img.setAttribute("alt", "file-image-preview");
+		span.className = "uk-text-meta uk-text-break file-upload-name";
+		span.textContent = filename;
+
+		div.append(img);
+		li.append(div, span);
+		return li;
+	}
+
+	function previewMultipleFiles(files, fileInput, preview, alert, alertMessage) {
+		const acceptedDocMimes = ["application/pdf", "image/png", "image/jpeg"];
+		const docFiles = [...files]
+
+		docFiles.forEach(file => {
+			const size = file["size"];
+			const fileType = file["type"];
+
+			if (docFiles.length !== 0) {
+				while(preview.firstChild) {
+					preview.removeChild(preview.firstChild);
+				}
+			}
+
+			if (size > 2000000) {
+				alertMessage.textContent =
+						"Sorry, one or more of your files has exceeded the file size limit of 2MB.";
+				alertMessage.classList.add("uk-text-danger");
+				alert.classList.remove("uk-hidden");
+				preview.innerHTML = "";
+				fileInput.files = [];
+				return false;
+			}
+
+			if (acceptedDocMimes.includes(fileType)) {
+				alertMessage.textContent = "";
+				alert.classList.add("uk-hidden");
+				fileInput.files = files;
+
+				// console.log(fileInput.files)
+
+				const reader = new FileReader();
+				reader.onload = () => {
+					let filename = file["name"];
+					let imgPreview = imgPreviewLi(reader.result, filename);
+					preview.append(imgPreview);
+				};
+				reader.readAsDataURL(file);
+			} else {
+				alertMessage.textContent = "Sorry, your file type is not allowed.";
+				alertMessage.classList.add("uk-text-danger");
+				alert.classList.remove("uk-hidden");
+				preview.innerHTML = "";
+				fileInput.files = [];
+			}
+		});
+	}
+
+	function previewSingleFile(files, fileInput, preview, alert, alertMessage) {
+		const acceptedDocMimes = ["application/pdf", "image/png", "image/jpeg"];
+		const size = files[0]["size"];
+		const fileType = files[0]["type"];
+		let filename = files[0]["name"];
+
+		if (files[0].length !== 0) {
+			while(preview.firstChild) {
+				preview.removeChild(preview.firstChild);
+			}
+		}
+
+		if (size > 2000000) {
+			alertMessage.textContent =
+					"Sorry, your file has exceeded the file size limit of 2MB.";
+			alertMessage.classList.add("uk-text-danger");
+			alert.classList.remove("uk-hidden");
+			preview.innerHTML = "";
+			fileInput.files = [];
+			console.log(`${size} is more than 2 mb`);
+			return false;
+		}
+
+		if (acceptedDocMimes.includes(fileType)) {
+			alertMessage.textContent = "";
+			alert.classList.add("uk-hidden");
+
+			const reader = new FileReader();
+			reader.onload = () => {
+				let imgPreview = imgPreviewLi(reader.result, filename);
+				preview.append(imgPreview);
+			};
+			reader.readAsDataURL(files[0]);
+
+		} else {
+			alertMessage.textContent = "Sorry, your file type is not allowed.";
+			alertMessage.classList.add("uk-text-danger");
+			alert.classList.remove("uk-hidden");
+			preview.innerHTML = "";
+			fileInput.files = [];
+			console.log(`${fileType} is not allowed`);
+		}
+	}
+
+	let bar = document.getElementById("js-progressbar");
+
+	UIkit.upload(".js-upload", {
+		url: "/upload",
+		multiple: true,
+		name: 'dataFile',
+
+		beforeSend: function() {
+			// console.log('beforeSend', arguments);
+		},
+
+		beforeAll: function() {
+			const files = arguments[1];
+			const jsUploadEl = arguments[0].$el;
+			const fileInput = jsUploadEl.querySelector(".uk-form-custom>input");
+			const preview = jsUploadEl.querySelector("#preview");
+			const alert = jsUploadEl.parentElement.querySelector(
+					".uk-upload-box>#error-alert-file-upload"
+			);
+			const alertMessage = jsUploadEl.parentElement.querySelector(
+					".uk-upload-box>#error-alert-file-upload>p"
+			);
+			let multiple = false;
+
+			if (fileInput.hasAttribute("multiple")) {
+				multiple = true;
+				previewMultipleFiles(files, fileInput, preview, alert, alertMessage);
+			} else {
+				previewSingleFile(files, fileInput, preview, alert, alertMessage);
+			}
+		},
+
+		load: function() {
+			// console.log('load', arguments);
+		},
+
+		error: function() {
+			// console.log('error', arguments);
+		},
+
+		complete: function(response) {
+			console.log('complete', arguments);
+		},
+
+		loadStart: function(e) {
+			// console.log('loadStart', arguments);
+
+			bar.removeAttribute("hidden");
+			bar.max = e.total;
+			bar.value = e.loaded;
+		},
+
+		progress: function(e) {
+			// console.log('progress', arguments);
+
+			bar.max = e.total;
+			bar.value = e.loaded;
+		},
+
+		loadEnd: function(e) {
+			// console.log('loadEnd', arguments);
+			bar.max = e.total;
+			bar.value = e.loaded;
+		},
+
+		completeAll: function() {
+			// console.log('completeAll', arguments);
+
+			setTimeout(function() {
+				bar.setAttribute("hidden", "hidden");
+			}, 1000);
+
+			alert('Upload Completed');
+		}
+	});
+*/
+</script>
 
 <!--</form>-->
 </body>

@@ -7,6 +7,7 @@ const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
 const ConfigManager = require('./configManager');
 const EntityFileManager = require('./entityFileManager');
+const DataManager = require('./dataManager');
 const Utils = require('./utils');
 
 // Every Module needs to have a file by this name in its root directory
@@ -169,20 +170,24 @@ class ModuleManager {
 	// Calls all the modules' configuration definition methods, effectively
 	// creating their default configurations, ready to be filled with actual
 	// values during _loadConfigs().
-	_defineConfigAll() {
-		Object.values(this.modules).forEach(mod => this._defineConfig(mod));
+	_defineConfigAndDataAll() {
+		Object.values(this.modules).forEach(mod => this._defineConfigAndData(mod));
 	}
 	
-	// Calls the module's configuration definition method.
+	// Calls the module's configuration and data definition methods.
 	// This creates its ModuleConfig with all its fields, using default values
-	// for everything.
-	_defineConfig(mod) {
+	// for everything, and registers the module in DataManager.
+	_defineConfigAndData(mod) {
+		let modData = DataManager.addModule(mod.name);
+		mod.defineData(modData);
+		
 		mod.defineConfig(mod.modConfig);
 		ConfigManager.addModule(mod.name, mod.modConfig);
 	}
 	
-	// Loads all the modules' configurations from disk.
-	_loadConfigAll() {
+	// Loads all the modules' configurations and data from disk.
+	_loadConfigAndDataAll() {
+		DataManager.loadAll();
 		ConfigManager.loadModules();
 	}
 	
@@ -232,8 +237,8 @@ class ModuleManager {
 		this._readAll(webPrefix, modulesDir, app, express, generationDir);
 		if (generationDir) return;
 		
-		this._defineConfigAll();
-		this._loadConfigAll();
+		this._defineConfigAndDataAll();
+		this._loadConfigAndDataAll();
 		this._loadAll();
 		this._postloadAll();
 	}

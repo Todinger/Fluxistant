@@ -180,6 +180,27 @@ class Module {
 	}
 	
 	// [For external use (by ModuleManager), NOT for override by inheriting classes!]
+	// Invoked during initialization (before defineConfig).
+	// Lets the concrete module define the data files it's going to use.
+	defineData(modData) {
+		// At the moment there's nothing to do here other than delegate to the
+		// inheriting class, but I thought it was a good idea to add this step -
+		// both because it'll be much easier to add some common code later if
+		// necessary, and to keep with the naming and invocation convention of
+		// loadConfig / loadModConfig
+		this.defineModData(modData);
+	}
+	
+	// [For override by inheriting classes]
+	// This is where the concrete module defines its data.
+	// This can mean multiple collections or just a single file.
+	// In order for data files and collections to be configurable, they need to
+	// be added to the configuration as well in defineModConfig.
+	defineModData(modData) {
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	// [For external use (by ModuleManager), NOT for override by inheriting classes!]
 	// Invoked during initialization (before loadConfig).
 	// Lets the concrete module define its configuration and then adds some common
 	// things that all modules need.
