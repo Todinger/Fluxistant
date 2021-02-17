@@ -3,7 +3,7 @@
 const path = require('path');
 // const createRequireFromPath = relativePath => createRequire(path.resolve(relativePath));
 function createRequireFromPath(relativePath) {
-	return modulePath => require('./' + path.join(relativePath, modulePath));
+	return subPath => require('./' + path.join(relativePath, subPath));
 }
 
 const CONFIG_ENTITIES_PATH = './Config/Entities/';

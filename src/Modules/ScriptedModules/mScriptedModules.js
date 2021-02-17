@@ -8,7 +8,7 @@ class ScriptedModules extends Module {
 			source: 'ScriptedModules.html',
 		});
 		
-		this.scriptsToShow = [
+		this.modulesToShow = [
 			'Channel Party',
 			'Image Display',
 			'Image Dropper',
@@ -22,7 +22,7 @@ class ScriptedModules extends Module {
 	
 	postload() {
 		Object.keys(this.moduleManager.clientModules).forEach(moduleName => {
-			if (this.scriptsToShow.includes(moduleName)) {
+			if (this.modulesToShow.includes(moduleName)) {
 				this.scriptsData[moduleName] =
 					this.moduleManager.clientModules[moduleName];
 			}

@@ -74,7 +74,7 @@ class Countdown extends Module {
 			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
 			callback: (user, time) => {
 				if (isNaN(time)) {
-					this.log(`User ${user.name} used bad arguments: "addtime ${time}"`);
+					this.log(`User ${user.name} used bad arguments: "settime ${time}"`);
 					return;
 				}
 				

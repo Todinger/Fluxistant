@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require('assert').strict;
-const Module = require('../../module');
-const Utils = require('../../utils');
+const Module = requireMain('module');
+const Utils = requireMain('utils');
 
 // In the following, anywhere "botName" is mentioned, it can be either
 // "Me", which represents our own bot, or "SE", which represents the
@@ -200,7 +200,7 @@ class SEBot extends Bot {
 // Bot Fight
 // ---------
 // Prints scritped "arguments" between us and StreamElements to the chat
-// occationally.
+// occasionally.
 // 
 // The conversations are all defined in CONVERSATIONS_FILE.
 // See the comment for that constant for the structure of the file.

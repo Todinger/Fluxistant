@@ -111,6 +111,7 @@ class Adventure extends Module {
 		modConfig.addInteger('victoryReward', 500)
 			.setName('Victory Reward')
 			.setDescription('The amount of StreamElements points a user gets upon winning the adventure');
+		// noinspection PointlessArithmeticExpressionJS
 		modConfig.addNumber('recruitmentDuration', 1 * MINUTES)
 			.setName('Recruitment Duration')
 			.setDescription('The amount of time in seconds in which users can join the adventure');
@@ -120,7 +121,7 @@ class Adventure extends Module {
 		modConfig.addInteger('minimumParticipants', 2)
 			.setName('Minimum Participants')
 			.setDescription('Minimum amount of users required for the adventure to start (includes the user who started it)');
-		modConfig.addNumber('pauseLength', 30 * SECONDS)
+		modConfig.addNumber('pauseLength', 5 * SECONDS)
 			.setName('Adventure Message Interval')
 			.setDescription('How many seconds between messages on the adventure itself');
 	}
