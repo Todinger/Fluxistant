@@ -49,7 +49,7 @@ class WeightedPool extends FilePool {
 	}
 	
 	_delete(key) {
-		super._delete(key);
+		super._deleteFile(key);
 		delete this.weights[key];
 	}
 	

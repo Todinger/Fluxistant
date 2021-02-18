@@ -12,7 +12,7 @@ class FilePool extends UserData {
 	
 	upload(file, callback) {
 		if (this.hasKey(file.name)) {
-			this._delete(file.name);
+			this._deleteFile(file.name);
 		}
 		
 		this._save(file.name, file, callback);

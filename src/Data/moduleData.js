@@ -19,45 +19,50 @@ class ModuleData {
 		this.collections = {};
 	}
 	
-	_validateAbsence(collectionID) {
+	_verifyAbsence(collectionID) {
 		assert(
 			!(collectionID in this.collections),
 			`Duplicate collection ID: ${collectionID}`);
 	}
 	
-	_validatePresence(collectionID) {
+	_verifyPresence(collectionID) {
 		assert(
 			collectionID in this.collections,
 			`Unknown collection ID: ${collectionID}`);
 	}
 	
 	addSingleFile(collectionID) {
-		this._validateAbsence(collectionID);
+		this._verifyAbsence(collectionID);
 		this.collections[collectionID] = new SingleFile(
 			path.join(this.dataDirPath, collectionID));
 		return this;
 	}
 	
 	addUniformPool(collectionID) {
-		this._validateAbsence(collectionID);
+		this._verifyAbsence(collectionID);
 		this.collections[collectionID] = new UniformPool(
 			path.join(this.dataDirPath, collectionID));
 		return this;
 	}
 	
 	addWeightedPool(collectionID) {
-		this._validateAbsence(collectionID);
+		this._verifyAbsence(collectionID);
 		this.collections[collectionID] = new WeightedPool(
 			path.join(this.dataDirPath, collectionID));
 		return this;
 	}
 	
 	upload(collection, file, callback) {
-		this._validatePresence(collection);
+		this._verifyPresence(collection);
 		this.collections[collection].upload(file, (err, encodedData) => {
 			this.saveToDisk();
 			callback(err, encodedData);
 		});
+	}
+	
+	delete(collection, key, callback) {
+		this._verifyPresence(collection);
+		this.collections[collection].delete(key, callback);
 	}
 	
 	import(exportedData) {

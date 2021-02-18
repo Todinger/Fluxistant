@@ -12,7 +12,7 @@ class SingleFile extends UserData {
 	
 	upload(file, callback) {
 		if (this.hasKey(SingleFile.SINGLE_KEY)) {
-			this._delete(SingleFile.SINGLE_KEY);
+			this._deleteFile(SingleFile.SINGLE_KEY);
 		}
 		
 		this._save(SingleFile.SINGLE_KEY, file, callback);

@@ -16,6 +16,12 @@ class DataManager {
 		this.dataDirRoot = dataDirRoot;
 	}
 	
+	_verifyPresence(modName) {
+		assert(
+			modName in this.moduleData,
+			`Data request for unknown module: ${modName}`);
+	}
+	
 	addModule(modName) {
 		assert(
 			!(modName in this.moduleData),
@@ -32,12 +38,13 @@ class DataManager {
 	}
 	
 	upload(modName, collection, file, callback) {
-		assert(
-			modName in this.moduleData,
-			`Data upload to unknown module: ${modName}`);
-		let modData = this.moduleData[modName];
-		
-		modData.upload(collection, file, callback);
+		this._verifyPresence(modName);
+		this.moduleData[modName].upload(collection, file, callback);
+	}
+	
+	delete(modName, collection, key, callback) {
+		this._verifyPresence(modName);
+		this.moduleData[modName].delete(collection, key, callback);
 	}
 	
 	saveAll() {

@@ -173,6 +173,31 @@
 							</ul>
 						</div>
 					</div>
+						<!-- User Data --> <div>
+							<!-- Single Image --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+							<h3 class="uk-width-1-6"><span>Image File</span></h3>
+								<div>
+									<div class="uk-width-expand">
+										<button id="upload-toggler" class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden>Toggle</button>
+										<div class="uk-visible-toggle" tabindex="-1" hidden>
+											<img id="upload-image" alt="" src="" uk-img>
+											<span class="uk-invisible-hover uk-width-auto uk-padding-remove">
+												<button id="xbtn" class="uk-invisible-hover" type="button" uk-close></button>
+											</span>
+										</div>
+										<div class="js-upload uk-placeholder uk-text-center uk-margin-remove">
+											<span uk-icon="icon: upload"></span>
+											<span class="uk-text-middle">Upload image by dropping it here or</span>
+											<div id="uploader" uk-form-custom>
+												<input type="file" multiple>
+												<span class="uk-link">selecting one</span>.
+											</div>
+										</div>
+									</div>
+									<progress id="js-progressbar" class="uk-progress" value="0" max="100" hidden></progress>
+								</div>
+							</div>
+						</div>
 						<!-- File Upload --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
 							<!--form ref="uploadForm" id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
 								<input type="file" name="sampleFile">
@@ -300,9 +325,48 @@
 	</div>
 </div>
 
-<script src="/common/base64js.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/js-base64@3.6.0/base64.min.js"></script>
 <script>
+	let imageName;
+
+	function deleteImage() {
+		let xHttp = new XMLHttpRequest();
+		xHttp.open('DELETE', `/data/mod/Random Image/images/${imageName}`, true);
+		xHttp.send();
+	}
+
+	$('#xbtn').click(() => {
+		UIkit.toggle('#upload-toggler').toggle();
+		deleteImage();
+		$('#upload-image').attr('src', '');
+	});
+
+	window.up = UIkit.upload('#uploader', {
+		url: '/data/mod/Random Image/images',
+		name: 'dataFile',
+		multiple: true,
+
+		completeAll: function() {
+		},
+
+		complete: function(req) {
+			let img = $('#upload-image');
+			let files = JSON.parse(req.response);
+			imageName = files.dataFile.name;
+			img.attr('src', 'data:image/png;base64,' + files.dataFile.data);
+			UIkit.toggle('#upload-toggler').toggle();
+		},
+
+	});
+
+
+
+
+
+
+
+
+
+
 	function arrayBufferToBase64(buffer) {
 		let binary = '';
 		let bytes = new Uint8Array(buffer);
@@ -345,7 +409,7 @@
 	}
 
 	function src(b64) {
-		$('#test').attr('src', 'data:image/png;base64,' + b64);
+		$('#test').attr('data-src', 'data:image/png;base64,' + b64);
 	}
 
 	UIkit.upload('.js-upload', {
@@ -372,7 +436,7 @@
 			window.res = req.response;
 			let files = JSON.parse(req.response);
 			src(files.dataFile);
-			
+
 			//////////////// PREVIOUS ATTEMPTS ////////////////
 			// // let source;
 			//

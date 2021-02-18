@@ -159,7 +159,7 @@ class FluxBot {
 			tempFileDir: DATA_DIR_TEMP,
 		}));
 		
-		this.app.post('/upload/mod/:modName/:colID', (req, res) => {
+		this.app.post('/data/mod/:modName/:colID', (req, res) => {
 			if (!req.files || Object.keys(req.files).length === 0) {
 				return res.status(400).send('No files were uploaded.');
 			}
@@ -187,7 +187,10 @@ class FluxBot {
 						}
 						
 						processedFileCount++;
-						encodedFiles[fileKey] = encodedData;
+						encodedFiles[fileKey] = {
+							name: files[fileKey].name,
+							data: encodedData,
+						};
 						if (processedFileCount === Object.keys(req.files).length) {
 							res.send(encodedFiles);
 						}
@@ -224,6 +227,61 @@ class FluxBot {
 				
 				// res.sendFile(path.join(DATA_DIR_TEMP, 'img.png'));
 				// res.sendFile(uploadPath);
+			});
+*/
+		});
+		
+		this.app.delete('/data/mod/:modName/:colID/:filename', (req, res) => {
+			let modName = req.params.modName;
+			let collectionID = req.params.colID;
+			let fileKey = req.params.filename;
+			
+			this.dataManager.delete(
+				modName,
+				collectionID,
+				fileKey,
+				(err) => {
+					if (err) {
+						return res.status(500).send(err);
+					} else {
+						res.send(`File 'mod/${modName}/${collectionID}/${fileKey}' deleted.`);
+					}
+				});
+			
+/*
+			if (!req.files || Object.keys(req.files).length === 0) {
+				return res.status(400).send('No files were deleted.');
+			}
+			
+			let modName = req.params.modName;
+			let collectionID = req.params.colID;
+			
+			let processedFileCount = 0;
+			let deletedFiles = [];
+			let deleteFailed = false;
+			Object.keys(files).forEach(fileKey => {
+				this.dataManager.delete(
+					modName,
+					collectionID,
+					fileKey,
+					(err) => {
+						if (deleteFailed) {
+							// The error status is sent by the first failed file
+							// so there's no need to send a result here as well
+							return;
+						} else if (err) {
+							deleteFailed = true;
+							return res.status(500).send(err);
+						} else {
+							res.send(`File 'mod/${modName}/${collectionID}/${fileKey}' deleted.`);
+						}
+						
+						processedFileCount++;
+						deletedFiles.push(fileKey);
+						if (processedFileCount === Object.keys(req.files).length) {
+							res.send(deletedFiles);
+						}
+					});
 			});
 */
 		});

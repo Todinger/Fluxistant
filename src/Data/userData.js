@@ -43,15 +43,19 @@ class UserData {
 		});
 	}
 	
-	_delete(key) {
+	_deleteFile(key, callback) {
 		let filename = this.files[key].path;
 		fs.unlink(filename, (err) => {
 			if (err) {
 				cli.warn(`Failed to delete file '${filename}': ${err}`);
 			}
+			
+			if (callback) {
+				callback(err);
+			}
 		});
 		
-		delete this[key];
+		delete this.files[key];
 	}
 	
 	hasKey(key) {
@@ -61,6 +65,11 @@ class UserData {
 	// noinspection JSUnusedLocalSymbols
 	upload(file, callback) {
 		Errors.abstract();
+	}
+	
+	delete(key, callback) {
+		assert(key in this.files, `Cannot delete file: key '${key}' not found.`);
+		this._deleteFile(key, callback);
 	}
 	
 	getFileLocal(...params) {
@@ -79,6 +88,11 @@ class UserData {
 	}
 	
 	getFileWeb(callback, ...params) {
+		if (Object.keys(this.files).length === 0) {
+			callback('Cannot get file: data collection is empty.');
+			return;
+		}
+		
 		let key = this._getFileKey.apply(this, params);
 		this._getFileWebByKey(key, callback);
 	}
