@@ -16,6 +16,8 @@ const entities = {
 	ImageEffect_GlowEntity: require('./WebEntities/imageEffect_GlowEntity.js'),
 	ImageEffect_ShadowEntity: require('./WebEntities/imageEffect_ShadowEntity.js'),
 	IntegerEntity: require('./WebEntities/integerEntity.js'),
+	KeyShortcutEntity: require('./WebEntities/keyShortcutEntity.js'),
+	KeyShortcutsEntity: require('./WebEntities/keyShortcutsEntity.js'),
 	NaturalNumberEntity: require('./WebEntities/naturalNumberEntity.js'),
 	NumberEntity: require('./WebEntities/numberEntity.js'),
 	ObjectEntity: require('./WebEntities/objectEntity.js'),

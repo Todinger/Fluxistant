@@ -17,7 +17,9 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/commandEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/configEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/cooldownEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dataEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicArrayEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicDataArrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicObjectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/fixedArrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageCommandEntity.js" />
@@ -27,9 +29,12 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageEffectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/integerEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/keyShortcutEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/keyShortcutsEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/naturalNumberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/numberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/objectEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/positiveNumberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/simpleObjectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/soundEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/staticObjectEntity.js" />

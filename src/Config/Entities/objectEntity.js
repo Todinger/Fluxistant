@@ -108,6 +108,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'Data', configData);
 	}
 	
+	addKeyShortcuts(key) {
+		return this.add(key, 'KeyShortcuts');
+	}
+	
 	
 	// ---- Overrides ---- //
 	

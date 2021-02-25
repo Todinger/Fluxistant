@@ -42,7 +42,16 @@ class ArrayEntity extends ConfigEntity {
 		this.validateType(value);
 		this.elements.push(value);
 		this.extendID(this.elements.length - 1, value);
+		if (!value.hasName()) {
+			value.setName(`#${this.length}`);
+		}
 		return value;
+	}
+	
+	add(...params) {
+		let buildParams = params;
+		buildParams.unshift(this.elementType);
+		return this.addElement(EntityFactory.build.apply(EntityFactory, buildParams));
 	}
 	
 	addElements(values) {

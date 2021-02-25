@@ -55,6 +55,27 @@ class Configuration {
 		});
 	}
 	
+	// Supported fields in the data argument:
+	// 	name		Display name.
+	// 	description	Display tooltip.
+	// 	keys		Array of key sequences (each of which is an array of strings).
+	addShortcut(key, data) {
+		if (!this.configRoot.hasChild('shortcuts')) {
+			this.configRoot.addKeyShortcuts('shortcuts')
+				.setName('Keyboard Shortcuts')
+				.setDescription('Key-activated functions in this module');
+		}
+		
+		this.getChild('shortcuts').addShortcut(key, data);
+	}
+	
+	// Uses addCommand() to add all of the commands in the given object while assuming
+	// that the keys represent each command's cmdid.
+	addShortcuts(shortcutsMap) {
+		Object.keys(shortcutsMap).forEach(
+			key => this.addShortcut(key, shortcutsMap[key]));
+	}
+	
 	add(key, ...params) {
 		params.unshift(key);
 		return this.configRoot.add.apply(this.configRoot, params);
@@ -86,6 +107,10 @@ class Configuration {
 	
 	addData(key, configData) {
 		return this.configRoot.addData(key, configData);
+	}
+	
+	addKeyShortcuts(key) {
+		return this.configRoot.addKeyShortcuts(key);
 	}
 	
 	toConf() {

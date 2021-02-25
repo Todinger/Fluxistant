@@ -1,0 +1,14 @@
+{
+  "Phantom": [ "Freezing Temperatures", "EMF 5", "Ghost Orb" ],
+  "Banshee": [ "Freezing Temperatures", "EMF 5", "Fingerprints" ],
+  "Mare": [ "Freezing Temperatures", "Ghost Orb", "Spirit Box" ],
+  "Yurei": [ "Freezing Temperatures", "Ghost Orb", "Ghost Writing" ],
+  "Demon": [ "Freezing Temperatures", "Spirit Box", "Ghost Writing" ],
+  "Wraith": [ "Freezing Temperatures", "Spirit Box", "Fingerprints" ],
+  "Jinn": [ "EMF 5", "Ghost Orb", "Spirit Box" ],
+  "Shade": [ "EMF 5", "Ghost Orb", "Ghost Writing" ],
+  "Oni": [ "EMF 5", "Spirit Box", "Ghost Writing" ],
+  "Revenant": [ "EMF 5", "Ghost Writing", "Fingerprints" ],
+  "Poltergeist": [ "Ghost Orb", "Spirit Box", "Fingerprints" ],
+  "Spirit": [ "Spirit Box", "Ghost Writing", "Fingerprints" ]
+}

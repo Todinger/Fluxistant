@@ -1,3 +1,6 @@
+'use strict';
+
+const assert = require('assert').strict;
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -80,6 +83,12 @@ class Module {
 		// Configuration
 		this.config = {};
 		this.modConfig = new ModuleConfig(this.name);
+		
+		// This is just to get the IDE to stop whining about this.shortcuts not being
+		// defined (that's kind of the point here...)
+		if (!this.shortcuts) {
+			this.shortcuts = undefined;
+		}
 		
 		// Loads the module in debug mode, replacing chat messages with
 		// console log printouts
@@ -172,6 +181,56 @@ class Module {
 		}
 	}
 	
+	registerShortcuts(shortcuts) {
+		shortcuts = shortcuts || this.shortcuts;
+		if (shortcuts) {
+			Object.keys(shortcuts).forEach(shortcutID => {
+				for (let i = 0; i < shortcuts[shortcutID].keys.length; i++) {
+					let keys = shortcuts[shortcutID].keys[i];
+					let name = `${shortcutID}[${i}]`;
+					let shortcutKeycodes = keys.map(
+						key => {
+							let keyCode = 'VC_' + key.toUpperCase();
+							assert(
+								keyCode in Module.Keycodes,
+								`Unknown key: ${key}`);
+							
+							return Module.Keycodes[keyCode];
+						});
+					
+					this.registerShortcutKey(
+						name,
+						shortcutKeycodes,
+						shortcuts[shortcutID].callback
+					);
+				}
+			});
+		}
+	}
+	
+	unregisterShortcuts(shortcuts) {
+		shortcuts = shortcuts || this.shortcuts;
+		if (shortcuts) {
+			Object.keys(shortcuts).forEach(shortcutID => {
+				for (let i = 0; i < shortcuts[shortcutID].keys.length; i++) {
+					let name = `${shortcutID}[${i}]`;
+					this.unregisterShortcutKey(name);
+				}
+			});
+		}
+	}
+	
+	importShortcutInfo(newShortcutInfo, shortcuts) {
+		shortcuts = shortcuts || this.shortcuts;
+		if (shortcuts && newShortcutInfo) {
+			Object.keys(newShortcutInfo).forEach(shortcut => {
+				if (shortcut in shortcuts) {
+					shortcuts[shortcut].keys = newShortcutInfo[shortcut];
+				}
+			});
+		}
+	}
+	
 	// [For use by inheriting classes]
 	// Invokes the given handler when a client is attached to this Module.
 	// The handler should accept a (socket) argument with the attached client.
@@ -211,12 +270,18 @@ class Module {
 	defineConfig(modConfig) {
 		this._addCommonCommands();
 		this.defineModConfig(modConfig); // Common commands may be overridden here - that's fine
+		
 		if (this.commands) {
 			Object.keys(this.commands).forEach(
 				cmdid => this.commands[cmdid].cmdname = cmdid);
 			this.commandObjects = this.createCommandObjects(this.commands);
 			this.registerCommands();
 			modConfig.addCommands(this.commands);
+		}
+		
+		if (this.shortcuts) {
+			this.registerShortcuts();
+			modConfig.addShortcuts(this.shortcuts);
 		}
 		
 		this.config = modConfig.toConf();
@@ -241,17 +306,24 @@ class Module {
 		if (this.config.enabled && !conf.enabled) {
 			// Module deactivation
 			this.unregisterCommands();
+			this.unregisterShortcuts();
 		} else if (!this.config.enabled && conf.enabled) {
 			// Commands not updated, but module activated
 			this.registerCommands();
+			this.registerShortcuts();
 		} else if (conf.enabled && conf.commands && this.commandObjects) {
-			// Module is active, import the updated commands and
-			// re-register all of them
+			// Module is active, import the updated commands and shortcuts
+			//  and re-register all of them
 			this.unregisterCommands();
 			this.importCommandInfo(conf.commands);
+			
+			this.unregisterShortcuts();
+			this.importShortcutInfo(conf.shortcuts);
+			
 			if (conf.enabled) {
-				// Commands updated and module activated or remains active
+				// Commands and shortcuts updated and module activated or remains active
 				this.registerCommands();
+				this.registerShortcuts();
 			}
 		}
 		
