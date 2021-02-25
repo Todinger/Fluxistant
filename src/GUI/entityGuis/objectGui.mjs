@@ -3,11 +3,11 @@ import GuiRegistry from "./guiRegistry.mjs";
 import GuiElements from "./guiElements/guiElements.mjs";
 
 export default class ObjectGui extends EntityGui {
-	static get GUITYPE()    { return 'Object';                                          }
-	static get BUILDER()    { return (entity, guiID) => new ObjectGui(entity, guiID);   }
+	static get GUITYPE()    { return 'Object';                                                            }
+	static get BUILDER()    { return (entity, guiID, modName) => new ObjectGui(entity, guiID, modName);   }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 		this.childrenGUIs = {};
 		this.childrenEntries = {};
 		this.mainGui = null;
@@ -27,7 +27,8 @@ export default class ObjectGui extends EntityGui {
 			if (!value.isHidden) {
 				this.childrenGUIs[key] = GuiRegistry.buildGui(
 					value,
-					`${this.guiID}-${key}`);
+					`${this.guiID}-${key}`,
+					this.modName);
 			}
 		});
 		

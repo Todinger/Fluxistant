@@ -3,8 +3,8 @@ import EntityGui from "./entityGui.mjs";
 export default class ValueGui extends EntityGui {
 	static get GUITYPE()    { return null; }   // Abstract class, should not be instantiated
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 		this.jInput = null;
 	}
 	

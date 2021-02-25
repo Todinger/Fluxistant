@@ -2,7 +2,7 @@
   "name": "scripted_modules",
   "version": "1.0.0",
   "description": "Various modules I have for my Twitch streaming.",
-  "main": "fluxbot.js",
+  "main": "src/main.js",
   "directories": {
     "lib": "lib"
   },
@@ -20,6 +20,7 @@
     "iohook": "^0.6.6",
     "js-base64": "^3.6.0",
     "lodash": "^4.17.20",
+    "mime-types": "^2.1.29",
     "node-db-logger": "^1.2.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",

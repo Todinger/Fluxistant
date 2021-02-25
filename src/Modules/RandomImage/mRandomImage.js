@@ -13,13 +13,20 @@ class RandomImage extends Module {
 		});
 	}
 	
-	defineModData(modData) {
-		modData.addUniformPool('images');
-	}
-	
-	defineModConfig(modConfig) {
-		// TODO: Add configuration for the image pool
-	}
+	// defineModData(modData) {
+	// 	// TODO: User a uniform pool here, not a single data file
+	// 	// modData.addUniformPool('images');
+	// 	modData.addSingleFile('images');
+	// }
+	//
+	// defineModConfig(modConfig) {
+	// 	// TODO: Add configuration for the image pool
+	// 	modConfig.addData('imagePool', {
+	// 		colID: 'images',
+	// 		dataType: 'IMAGE',
+	// 	})  .setName('Images')
+	// 		.setDescription('The pool of images from which a random one will be chosen for display.');
+	// }
 	
 	showRandomImage() {
 		Module.Assets.getRandomImageFromCache((name, url) => {

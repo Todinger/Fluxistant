@@ -12,11 +12,11 @@ import GuiRegistry from "./guiRegistry.mjs";
 import EntityGui from "./entityGui.mjs";
 
 export default class RawObjectGui extends ObjectGui {
-	static get GUITYPE()    { return 'RawObject';                                         }
-	static get BUILDER()    { return (entity, guiID) => new RawObjectGui(entity, guiID);  }
+	static get GUITYPE()    { return 'RawObject';                                                           }
+	static get BUILDER()    { return (entity, guiID, modName) => new RawObjectGui(entity, guiID, modName);  }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 	}
 	
 	_contentsChanged() {

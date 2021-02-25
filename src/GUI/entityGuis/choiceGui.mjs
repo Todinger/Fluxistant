@@ -2,11 +2,11 @@ import EntityGui from "./entityGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 
 export default class ChoiceGui extends EntityGui {
-	static get GUITYPE()    { return 'Choice';                                        }
-	static get BUILDER()    { return (entity, guiID) => new ChoiceGui(entity, guiID); }
+	static get GUITYPE()    { return 'Choice';                                                          }
+	static get BUILDER()    { return (entity, guiID, modName) => new ChoiceGui(entity, guiID, modName); }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 		this.optionGUIs = {};
 		this.optionIndices = {};
 	}
@@ -15,7 +15,8 @@ export default class ChoiceGui extends EntityGui {
 		this.entity.forEach((optionName, optionEntity) => {
 			this.optionGUIs[optionName] = GuiRegistry.buildGui(
 				optionEntity,
-				`${this.guiID}-option-${optionName}`);
+				`${this.guiID}-option-${optionName}`,
+				this.modName);
 			this.optionGUIs[optionName].onChangedOrError(() => this._changed());
 		});
 		

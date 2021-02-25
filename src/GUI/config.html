@@ -9,6 +9,13 @@
 		https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
 	<link rel="shortcut icon" href="#" />
 
+	<style>
+		.file-upload-name {
+			background: #585858;
+			padding: 0.5rem;
+			color: white;
+		}
+	</style>
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -175,15 +182,20 @@
 					</div>
 						<!-- User Data --> <div>
 							<!-- Single Image --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
-							<h3 class="uk-width-1-6"><span>Image File</span></h3>
+								<h3 class="uk-width-1-6"><span>Image File</span></h3>
 								<div>
 									<div class="uk-width-expand">
-										<button id="upload-toggler" class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden>Toggle</button>
-										<div class="uk-visible-toggle" tabindex="-1" hidden>
-											<img id="upload-image" alt="" src="" uk-img>
-											<span class="uk-invisible-hover uk-width-auto uk-padding-remove">
-												<button id="xbtn" class="uk-invisible-hover" type="button" uk-close></button>
-											</span>
+										<button id="upload-toggler" class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden></button>
+										<div class="uk-visible-toggle uk-flex uk-flex-column uk-width-small uk-padding-remove" tabindex="-1" hidden>
+												<div class="uk-inline">
+													<img id="upload-image" class="uk-width-small" alt="" src="" uk-img>
+													<span class="uk-invisible-hover uk-position-absolute uk-transform-center uk-light" style="left: 90%; top: 10%">
+														<button id="xbtn" class="uk-invisible-hover" type="button" uk-close></button>
+													</span>
+												</div>
+												<span class="uk-text-meta uk-text-break uk-width-small file-upload-name">
+													<span id="imgNameTag" class="uk-flex uk-flex-center uk-text-truncate"></span>
+												</span>
 										</div>
 										<div class="js-upload uk-placeholder uk-text-center uk-margin-remove">
 											<span uk-icon="icon: upload"></span>
@@ -330,7 +342,7 @@
 
 	function deleteImage() {
 		let xHttp = new XMLHttpRequest();
-		xHttp.open('DELETE', `/data/mod/Random Image/images/${imageName}`, true);
+		xHttp.open('DELETE', `/data/mod/Random Image/images/dataFile`, true);
 		xHttp.send();
 	}
 
@@ -340,22 +352,50 @@
 		$('#upload-image').attr('src', '');
 	});
 
+	let bar = $('#js-progressbar')[0];
+
 	window.up = UIkit.upload('#uploader', {
 		url: '/data/mod/Random Image/images',
 		name: 'dataFile',
 		multiple: true,
 
 		completeAll: function() {
+			setTimeout(function () {
+				bar.setAttribute('hidden', 'hidden');
+			}, 1000);
 		},
 
 		complete: function(req) {
 			let img = $('#upload-image');
 			let files = JSON.parse(req.response);
 			imageName = files.dataFile.name;
-			img.attr('src', 'data:image/png;base64,' + files.dataFile.data);
+			$('#imgNameTag').text(imageName);
+			let contentType = req.getResponseHeader('content-type');
+			img.attr('src', `data:${contentType}; base64,${files.dataFile.data}`);
 			UIkit.toggle('#upload-toggler').toggle();
 		},
 
+		loadStart: function (e) {
+			console.log('loadStart', arguments);
+
+			bar.removeAttribute('hidden');
+			bar.max = e.total;
+			bar.value = e.loaded;
+		},
+
+		progress: function (e) {
+			console.log('progress', arguments);
+
+			bar.max = e.total;
+			bar.value = e.loaded;
+		},
+
+		loadEnd: function (e) {
+			console.log('loadEnd', arguments);
+
+			bar.max = e.total;
+			bar.value = e.loaded;
+		},
 	});
 
 

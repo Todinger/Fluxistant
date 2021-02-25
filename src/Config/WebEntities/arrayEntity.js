@@ -34,12 +34,14 @@ class ArrayEntity extends ConfigEntity {
 		this.validateIndex(index);
 		this.validateType(value);
 		this.elements[index] = value;
+		this.extendID(index, value);
 		return value;
 	}
 	
 	addElement(value) {
 		this.validateType(value);
 		this.elements.push(value);
+		this.extendID(this.elements.length - 1, value);
 		return value;
 	}
 	

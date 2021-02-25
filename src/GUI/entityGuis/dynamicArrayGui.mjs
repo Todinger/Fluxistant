@@ -3,11 +3,11 @@ import GuiRegistry from "./guiRegistry.mjs";
 import GuiElements from "./guiElements/guiElements.mjs";
 
 export default class DynamicArrayGui extends EntityGui {
-	static get GUITYPE()    { return 'DynamicArray';                                        }
-	static get BUILDER()    { return (entity, guiID) => new DynamicArrayGui(entity, guiID); }
+	static get GUITYPE()    { return 'DynamicArray';                                                          }
+	static get BUILDER()    { return (entity, guiID, modName) => new DynamicArrayGui(entity, guiID, modName); }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 		this.elementGUIs = [];
 		this.elementRows = [];
 		this.mainGui = null;
@@ -25,7 +25,8 @@ export default class DynamicArrayGui extends EntityGui {
 	_buildElementGUI(element, index) {
 		return GuiRegistry.buildGui(
 			element,
-			`${this.guiID}-${index}`);
+			`${this.guiID}-${index}`,
+			this.modName);
 	}
 	
 	_buildElementGUIs() {

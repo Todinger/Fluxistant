@@ -8,14 +8,15 @@ class DynamicArrayEntity extends ArrayEntity {
 	static get GUITYPE()	{ return 'DynamicArray'; 										}
 	static get BUILDER()	{ return elementType => new DynamicArrayEntity(elementType); 	}
 	
-	constructor(elementType) {
+	constructor(elementType, ...itemConstructionOptions) {
 		super(elementType);
 		this.elementType = elementType || null;
 		this.elements = [];
+		this.itemConstructionOptions = itemConstructionOptions;
 	}
 	
 	createAndAddElement() {
-		let newElement = EntityFactory.build(this.elementType);
+		let newElement = EntityFactory.build(this.elementType, ...this.itemConstructionOptions);
 		this.addElement(newElement);
 		return newElement;
 	}

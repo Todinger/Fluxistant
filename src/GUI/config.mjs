@@ -102,7 +102,7 @@ class Configurator {
 	buildPage() {
 		let mainContainer = $('#main');
 		mainContainer.empty();
-		let mainGUI = GuiRegistry.buildGui(this.displayedConfig.main, 'main-contents', 'RawObject');
+		let mainGUI = GuiRegistry.buildGui(this.displayedConfig.main, 'main-contents', null, 'RawObject');
 		mainContainer.append(mainGUI.getGUI());
 		mainGUI.onChanged(() => mainGUI._updateStatusIndicators(this.mainTabTitle));
 		mainGUI.onError((err) => {
@@ -130,6 +130,7 @@ class Configurator {
 				let moduleGUI = GuiRegistry.buildGui(
 					this.displayedConfig.modules[modName],
 					moduleID,
+					modName,
 					'RawObject');
 				let moduleGUIContents = moduleGUI.getGUI();
 				moduleGUI.onChanged(() => this.updateStatusIndicators());
@@ -170,14 +171,14 @@ class Configurator {
 		this.showMain();
 	}
 	
-	createFromData(exportedData) {
+	createFromData(exportedData, id) {
 		// let entity = EntityFactory.build('DynamicObject');
 		// entity.importDesc(exportedData.descriptor);
 		// // Entities.ConfigEntity.readEntity(exportedData);
 		// // entity.import(exportedData);
 		// return entity;
 		
-		let entity = Entities.ConfigEntity.buildEntity(exportedData);
+		let entity = Entities.ConfigEntity.buildEntity(exportedData, id);
 		entity.import(exportedData);
 		return entity;
 	}
@@ -197,7 +198,7 @@ class Configurator {
 	loadConfigs(data) {
 		if (data) {
 			if (data.main) {
-				this.activeConfigs.main = this.createFromData(data.main);
+				this.activeConfigs.main = this.createFromData(data.main, 'main');
 			}
 			
 			if (data.modules) {
@@ -207,7 +208,7 @@ class Configurator {
 				
 				this.activeConfigs.modules = {};
 				Object.keys(data.modules).forEach(modName => {
-					this.activeConfigs.modules[modName] = this.createFromData(data.modules[modName]);
+					this.activeConfigs.modules[modName] = this.createFromData(data.modules[modName], `mod/${modName}`);
 				});
 			}
 			
@@ -249,6 +250,9 @@ $(document).ready(function() {
 	cfg.init();
 	cfg.start();
 });
+
+// TODO: Remove
+window.cfg = cfg;
 
 /*
 Graph editing:

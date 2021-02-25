@@ -1,6 +1,7 @@
 'use strict';
 
 const Module = requireMain('module');
+// const Utils = requireMain('utils');
 
 // Command file structure:
 //	{
@@ -35,6 +36,8 @@ class ImageCommands extends Module {
 			name: 'Image Commands',
 			tags: ['imgdisp'],
 		});
+		
+		// this.imageCommands = {};
 	}
 	
 	_sendCommand(cmd) {
@@ -49,6 +52,69 @@ class ImageCommands extends Module {
 			.setName('Image Commands')
 			.setDescription('Commands for showing images and/or playing sounds');
 	}
+	
+	// _sendCommand(cmdObject) {
+	// 	let _this = this;
+	// 	let promises = [];
+	//
+	// 	let hasImage = this.data.Images.hasKey(cmdObject.image.file.key);
+	// 	let hasSound = this.data.Sounds.hasKey(cmdObject.sound.file.key);
+	//
+	// 	let imagePromise = hasImage ?
+	// 		promises.push(this.data.getFileWeb(cmdObject.image)) :
+	// 		Promise.resolve();
+	//
+	// 	let soundPromise = hasImage ?
+	// 		promises.push(this.data.getFileWeb(cmdObject.sound)) :
+	// 		Promise.resolve();
+	//
+	// 	if (hasImage || hasSound) {
+	// 		Promise.all([imagePromise, soundPromise])
+	// 		.then(function([imageDataURL, soundDataURL]) {
+	// 			let parameters = {};
+	// 			if (hasImage) {
+	// 				parameters.image = Utils.objectWith(cmdObject.image, { url: imageDataURL });
+	// 			}
+	//
+	// 			if (hasSound) {
+	// 				parameters.image = Utils.objectWith(cmdObject.sound, { url: soundDataURL });
+	// 			}
+	//
+	// 			_this.broadcastEvent('showImage', parameters);
+	// 		});
+	// 	}
+	// }
+	//
+	// defineModData(modData) {
+	// 	modData.addNamedCollection('Images');
+	// 	modData.addNamedCollection('Sounds');
+	// }
+	//
+	// defineModConfig(modConfig) {
+	// 	modConfig.add(
+	// 		'imageCommands',
+	// 		'DynamicArray',
+	// 		'ImageCommand',
+	// 		{
+	// 			images: 'Images',
+	// 			sounds: 'Sounds',
+	// 		})
+	// 	.setName('Image Commands')
+	// 	.setDescription('Commands for showing images and/or playing sounds');
+	// }
+	//
+	// loadModConfig(conf) {
+	// 	this.unregisterCommands(this.imageCommands);
+	// 	this.imageCommands = this.createCommandObjects(conf.imageCommands);
+	// 	conf.imageCommands.forEach(command => {
+	// 		let cmdObject = this.createCommandObject(command);
+	// 		cmdObject.callback = (co) => this._sendCommand(co);
+	// 		cmdObject.image = command.image;
+	// 		cmdObject.sound = command.sound;
+	// 	});
+	//
+	// 	this.registerCommands(this.imageCommands);
+	// }
 	
 	loadData() {
 		this.commandManager.loadFile(

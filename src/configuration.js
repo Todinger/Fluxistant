@@ -8,8 +8,9 @@ const StaticObjectEntity = requireConfig('staticObjectEntity');
 const EntityFactory = require('./Config/entityFactory');
 
 class Configuration {
-	constructor() {
-		this.configRoot = new StaticObjectEntity();
+	constructor(id) {
+		this.configRoot = new StaticObjectEntity()
+			.setID(id);
 	}
 	
 	addChild(key, type, param) {
@@ -81,6 +82,10 @@ class Configuration {
 	
 	addObject(key) {
 		return this.configRoot.addObject(key);
+	}
+	
+	addData(key, configData) {
+		return this.configRoot.addData(key, configData);
 	}
 	
 	toConf() {

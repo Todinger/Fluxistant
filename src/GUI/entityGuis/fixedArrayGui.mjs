@@ -3,11 +3,11 @@ import GuiRegistry from "./guiRegistry.mjs";
 import GuiElements from "./guiElements/guiElements.mjs";
 
 export default class FixedArrayGui extends EntityGui {
-	static get GUITYPE()    { return 'FixedArray';                                          }
-	static get BUILDER()    { return (entity, guiID) => new FixedArrayGui(entity, guiID);   }
+	static get GUITYPE()    { return 'FixedArray';                                                            }
+	static get BUILDER()    { return (entity, guiID, modName) => new FixedArrayGui(entity, guiID, modName);   }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 		this.elementGUIs = [];
 		this.elementRows = [];
 		this.mainGui = null;
@@ -33,7 +33,8 @@ export default class FixedArrayGui extends EntityGui {
 			if (!element.isHidden) {
 				let elementGui = GuiRegistry.buildGui(
 					element,
-					`${this.guiID}-${i}`);
+					`${this.guiID}-${i}`,
+					this.modName);
 				elementGui.onChanged(() => this._onElementChanged(i));
 				elementGui.onError(() => this._onElementChanged(i));
 				this.elementGUIs.push(elementGui);

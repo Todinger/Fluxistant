@@ -37,9 +37,9 @@ class DataManager {
 		return this.moduleData[modName];
 	}
 	
-	upload(modName, collection, file, callback) {
+	upload(modName, collection, fileKey, file, callback) {
 		this._verifyPresence(modName);
-		this.moduleData[modName].upload(collection, file, callback);
+		this.moduleData[modName].upload(collection, fileKey, file, callback);
 	}
 	
 	delete(modName, collection, key, callback) {

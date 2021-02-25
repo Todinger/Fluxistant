@@ -1,3 +1,46 @@
+// const assert = require('assert').strict;
+// const StaticObjectEntity = require('./staticObjectEntity');
+//
+// class SoundEntity extends StaticObjectEntity {
+// 	static get TYPE()		{ return 'Sound'; 					}
+// 	static get BUILDER()	{ return () => new SoundEntity(); 	}
+//
+// 	constructor(colID) {
+// 		super();
+// 		this.addData('file', { colID: colID, dataType: 'SOUND' })
+// 			.setName('Sound')
+// 			.setDescription('The sound that will be played');
+// 		this.addNumber('volume', 100)
+// 			.setName('Volume')
+// 			.setDescription('Volume at which to play the sound (not implemented yet)');
+// 	}
+//
+// 	getVolume() {
+// 		return this.getChild('volume').getValue();
+// 	}
+//
+// 	isSet() {
+// 		return this.getChild('filename').isSet();
+// 	}
+//
+// 	isVolumeSet() {
+// 		return this.getChild('volume').isSet();
+// 	}
+//
+//
+// 	// ---- Overrides ---- //
+//
+// 	validate() {
+// 		super.validate();
+// 		let volume = this.getVolume();
+// 		assert(
+// 			!this.isSet() || !this.isVolumeSet() || (0 <= volume && volume <= 100),
+// 			`Volume must be bet 0 and 100.`);
+// 	}
+// }
+//
+// module.exports = SoundEntity;
+
 const assert = require('assert').strict;
 const StaticObjectEntity = require('./staticObjectEntity');
 

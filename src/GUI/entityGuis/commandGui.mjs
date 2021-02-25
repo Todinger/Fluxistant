@@ -12,11 +12,11 @@ import GuiRegistry from "./guiRegistry.mjs";
 import GuiElements from "./guiElements/guiElements.mjs";
 
 export default class CommandGui extends ObjectGui {
-	static get GUITYPE()    { return 'Command';                                         }
-	static get BUILDER()    { return (entity, guiID) => new CommandGui(entity, guiID);  }
+	static get GUITYPE()    { return 'Command';                                                           }
+	static get BUILDER()    { return (entity, guiID, modName) => new CommandGui(entity, guiID, modName);  }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 	}
 	
 	_getName() {

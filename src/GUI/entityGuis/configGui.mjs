@@ -8,7 +8,7 @@
 import RawObjectGui from "./rawObjectGui.mjs";
 
 export default class ConfigGui extends RawObjectGui {
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 	}
 }

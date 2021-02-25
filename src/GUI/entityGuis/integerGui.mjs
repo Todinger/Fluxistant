@@ -9,11 +9,11 @@ import GuiRegistry from "./guiRegistry.mjs";
 // allow non-integer inputs, but for now I'll just let it show an error when
 // the user enters invalid data.
 export default class IntegerGui extends NumberGui {
-	static get GUITYPE()    { return 'Integer';                                         }
-	static get BUILDER()    { return (entity, guiID) => new IntegerGui(entity, guiID);  }
+	static get GUITYPE()    { return 'Integer';                                                           }
+	static get BUILDER()    { return (entity, guiID, modName) => new IntegerGui(entity, guiID, modName);  }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 	}
 	
 	_setupInput() {

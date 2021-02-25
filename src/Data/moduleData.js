@@ -9,6 +9,7 @@ const Errors = require('../errors');
 const SingleFile = require('./singleFile');
 const UniformPool = require('./uniformPool');
 const WeightedPool = require('./weightedPool');
+const NamedCollection = require('./namedCollection');
 
 const DATA_EXTENSION = '.data.json';
 
@@ -23,6 +24,9 @@ class ModuleData {
 		assert(
 			!(collectionID in this.collections),
 			`Duplicate collection ID: ${collectionID}`);
+		assert(
+			!(collectionID in this),
+			`Cannot use collection ID '${collectionID}' because it overrides a class member.`);
 	}
 	
 	_verifyPresence(collectionID) {
@@ -31,38 +35,59 @@ class ModuleData {
 			`Unknown collection ID: ${collectionID}`);
 	}
 	
+	_injectSave(callback) {
+		return (...args) => {
+			this.saveToDisk();
+			callback(...args);
+		};
+	}
+	
+	add(collectionID, collectionClass) {
+		let collection = new collectionClass(path.join(this.dataDirPath, collectionID));
+		this.collections[collectionID] = collection;
+		this[collectionID] = collection;
+	}
+	
 	addSingleFile(collectionID) {
 		this._verifyAbsence(collectionID);
-		this.collections[collectionID] = new SingleFile(
-			path.join(this.dataDirPath, collectionID));
+		this.add(collectionID, SingleFile);
 		return this;
 	}
 	
 	addUniformPool(collectionID) {
 		this._verifyAbsence(collectionID);
-		this.collections[collectionID] = new UniformPool(
-			path.join(this.dataDirPath, collectionID));
+		this.add(collectionID, UniformPool);
 		return this;
 	}
 	
 	addWeightedPool(collectionID) {
 		this._verifyAbsence(collectionID);
-		this.collections[collectionID] = new WeightedPool(
-			path.join(this.dataDirPath, collectionID));
+		this.add(collectionID, WeightedPool);
 		return this;
 	}
 	
-	upload(collection, file, callback) {
+	addNamedCollection(collectionID) {
+		this._verifyAbsence(collectionID);
+		this.add(collectionID, NamedCollection);
+		return this;
+	}
+	
+	upload(collection, fileKey, file, callback) {
 		this._verifyPresence(collection);
-		this.collections[collection].upload(file, (err, encodedData) => {
-			this.saveToDisk();
-			callback(err, encodedData);
-		});
+		this.collections[collection].upload(fileKey, file, this._injectSave(callback));
 	}
 	
 	delete(collection, key, callback) {
 		this._verifyPresence(collection);
-		this.collections[collection].delete(key, callback);
+		this.collections[collection].delete(key, this._injectSave(callback));
+	}
+	
+	getFileWeb(fileDescriptor) {
+		let collection = fileDescriptor.colID;
+		this._verifyPresence(collection);
+		
+		let fileKey = fileDescriptor.fileKey;
+		return this.collections[collection].getFileWeb(fileKey);
 	}
 	
 	import(exportedData) {

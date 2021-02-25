@@ -31,6 +31,7 @@ class ObjectEntity extends ConfigEntity {
 		assert(!(key in this.children), `Duplicate key added: ${key}.`);
 		this.children[key] = value;
 		this._fillChildName(key);
+		this.extendID(key, value);
 		return this.children[key];
 	}
 	
@@ -88,8 +89,23 @@ class ObjectEntity extends ConfigEntity {
 		return array;
 	}
 	
+	addDynamicDataArray(key, colID, dataType, values) {
+		let array = this.add(key, 'DynamicDataArray', colID, dataType);
+		if (values) {
+			values.forEach(value => {
+				array.addElement(EntityFactory.build('Data', { colID, dataType }, value));
+			});
+		}
+		
+		return array;
+	}
+	
 	addObject(key) {
 		return this.add(key, 'StaticObject');
+	}
+	
+	addData(key, configData) {
+		return this.add(key, 'Data', configData);
 	}
 	
 	

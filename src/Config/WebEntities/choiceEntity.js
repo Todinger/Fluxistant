@@ -21,6 +21,7 @@ class ChoiceEntity extends ConfigEntity {
 		assert(!(option in this.options), `Duplicate option type: ${option}`);
 		this.options[option] = EntityFactory.build(type);
 		this.options[option].optionName = option;
+		this.extendID(option, this.options[option]);
 	}
 	
 	_addOptions(options) {

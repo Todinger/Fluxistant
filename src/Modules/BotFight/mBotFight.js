@@ -583,7 +583,8 @@ class BotFight extends Module {
 	// [Inherited, called externally]
 	// Module activation.
 	enable() {
-		this.scheduleNextConversation();
+		// TODO: Remove total disabling
+		// this.scheduleNextConversation();
 	}
 	
 	disable() {

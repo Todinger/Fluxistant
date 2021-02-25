@@ -7,9 +7,9 @@ class CooldownEntity extends StaticObjectEntity {
 	constructor() {
 		super();
 		this.addNaturalNumber('user')
-			.setDescription('Time in milliseconds before the same user can use the command.');
+			.setDescription('Time in milliseconds before the same user can use the command');
 		this.addNaturalNumber('global')
-			.setDescription('Time in milliseconds before the command can be used again at all.');
+			.setDescription('Time in milliseconds before the command can be used again at all');
 	}
 	
 	getUser() {

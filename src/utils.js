@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert').strict;
+const _ = require('lodash');
 
 // A general-purpose "static" class with various paraphernalia functions useful
 // for all sorts of things.
@@ -334,6 +335,10 @@ class Utils {
 	
 	static baseName(filename) {
 		return filename.split('.').slice(0, -1).join('.');
+	}
+	
+	static objectWith(obj, extras) {
+		return _.assign(_.cloneDeep(obj), extras);
 	}
 	
 	

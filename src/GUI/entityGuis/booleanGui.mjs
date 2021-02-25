@@ -2,11 +2,11 @@ import ValueGui from "./valueGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 
 export default class BooleanGui extends ValueGui {
-	static get GUITYPE()    { return 'Boolean';                                              }
-	static get BUILDER()    { return (entity, guiID) => new BooleanGui(entity, guiID); }
+	static get GUITYPE()    { return 'Boolean';                                                          }
+	static get BUILDER()    { return (entity, guiID, modName) => new BooleanGui(entity, guiID, modName); }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 	}
 	
 	_setupInput() {

@@ -10,7 +10,7 @@ class FilePool extends UserData {
 		super(dataDirPath);
 	}
 	
-	upload(file, callback) {
+	upload(fileKey, file, callback) {
 		if (this.hasKey(file.name)) {
 			this._deleteFile(file.name);
 		}

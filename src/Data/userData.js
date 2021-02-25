@@ -2,8 +2,10 @@
 
 const assert = require('assert').strict;
 const fs = require('fs');
+const fsPromise = require('fs/promises');
 const path = require('path');
 const { Base64 } = require('js-base64');
+const mime = require('mime-types');
 const Errors = require('../errors');
 const cli = require('../cliManager');
 const Utils = require('../utils');
@@ -63,7 +65,7 @@ class UserData {
 	}
 	
 	// noinspection JSUnusedLocalSymbols
-	upload(file, callback) {
+	upload(fileKey, file, callback) {
 		Errors.abstract();
 	}
 	
@@ -77,14 +79,24 @@ class UserData {
 		return this.files[key].path;
 	}
 	
-	_getFileWebByKey(key, callback) {
-		fs.readFile(this.files[key].path, (err, data) => {
-			if (err) {
-				callback(err);
-			} else {
-				callback(err, Base64.encode(data));
-			}
+	_getFileWebByKey(key) {
+		return fsPromise.readFile(this.files[key].path)
+		.then((data) => {
+			let b64Data = Base64.encode(data);
+			let contentType = mime.contentType(this.files[key].path);
+			return `data:${contentType}; base64,${b64Data}`;
 		});
+		
+		// fs.readFile(this.files[key].path, (err, data) => {
+		// 	if (err) {
+		// 		callback(err);
+		// 	} else {
+		// 		let b64Data = Base64.encode(data);
+		// 		let contentType = mime.contentType(this.files[key].path);
+		// 		let sourceString = `data:${contentType}; base64,${b64Data}`;
+		// 		callback(err, sourceString);
+		// 	}
+		// });
 	}
 	
 	getFileWeb(callback, ...params) {
@@ -94,7 +106,7 @@ class UserData {
 		}
 		
 		let key = this._getFileKey.apply(this, params);
-		this._getFileWebByKey(key, callback);
+		return this._getFileWebByKey(key, callback);
 	}
 	
 	import(exportedData) {

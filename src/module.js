@@ -74,9 +74,12 @@ class Module {
 		this._clientDisconnectedHandlers = [];
 		this._connectedClients = {};
 		
+		// Data
+		this.data = null; // Filled during defineData
+		
 		// Configuration
 		this.config = {};
-		this.modConfig = new ModuleConfig();
+		this.modConfig = new ModuleConfig(this.name);
 		
 		// Loads the module in debug mode, replacing chat messages with
 		// console log printouts
@@ -140,11 +143,15 @@ class Module {
 		}
 	}
 	
+	createCommandObject(command) {
+		return new Command(this, command);
+	}
+	
 	createCommandObjects(commands) {
 		if (commands) {
 			let cmdObjects = {};
 			Object.keys(commands).forEach(cmdid => {
-				cmdObjects[cmdid] = new Command(this, commands[cmdid]);
+				cmdObjects[cmdid] = this.createCommandObject(commands[cmdid]);
 			});
 			return cmdObjects;
 		}
@@ -181,13 +188,10 @@ class Module {
 	
 	// [For external use (by ModuleManager), NOT for override by inheriting classes!]
 	// Invoked during initialization (before defineConfig).
-	// Lets the concrete module define the data files it's going to use.
+	// Lets the concrete module define the data files it's going to use and saves
+	// a reference to the module's data manager.
 	defineData(modData) {
-		// At the moment there's nothing to do here other than delegate to the
-		// inheriting class, but I thought it was a good idea to add this step -
-		// both because it'll be much easier to add some common code later if
-		// necessary, and to keep with the naming and invocation convention of
-		// loadConfig / loadModConfig
+		this.data = modData;
 		this.defineModData(modData);
 	}
 	

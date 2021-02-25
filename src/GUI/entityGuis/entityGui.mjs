@@ -7,13 +7,14 @@ export default class EntityGui extends EventNotifier {
 	// Concrete classes should have a BUILDER defined similar to this as well:
 	// static get BUILDER() { return new EntityGui(); }
 	
-	constructor(entity, guiID) {
+	constructor(entity, guiID, modName) {
 		super();
 		this._addEvent('changed');
 		this._addEvent('error');
 		
 		this.entity = entity;
 		this.guiID = guiID;
+		this.modName = modName;
 		this.gui = null;
 		
 		this.changed = false;

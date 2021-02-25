@@ -2,11 +2,11 @@ import ValueGui from "./valueGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 
 export default class NumberGui extends ValueGui {
-	static get GUITYPE()    { return 'Number';                                              }
-	static get BUILDER()    { return (entity, guiID) => new NumberGui(entity, guiID); }
+	static get GUITYPE()    { return 'Number';                                                          }
+	static get BUILDER()    { return (entity, guiID, modName) => new NumberGui(entity, guiID, modName); }
 	
-	constructor(entity, guiID) {
-		super(entity, guiID);
+	constructor(entity, guiID, modName) {
+		super(entity, guiID, modName);
 	}
 	
 	_setupInput() {

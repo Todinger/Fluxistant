@@ -97,7 +97,7 @@ class ImageDisplay extends ModuleClient {
 				blockingEvents.push('Sound');
 			}
 			
-			if (blockingEvents.length == 0) {
+			if (blockingEvents.length === 0) {
 				// Empty request, do nothing
 				return;
 			}

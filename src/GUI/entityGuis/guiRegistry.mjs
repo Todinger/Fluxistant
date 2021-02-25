@@ -15,13 +15,13 @@ class GuiRegistryClass {
 		this.guiBuilders[guiType] = guiClass.BUILDER;
 	}
 	
-	buildGui(entity, guiID, guiType) {
+	buildGui(entity, guiID, modName, guiType) {
 		guiType = guiType || (entity && entity.constructor && entity.constructor.GUITYPE);
 		console.assert(
 			guiType && guiType in this.guiBuilders,
 			`Unknown GUI type: ${guiType}.`);
 		
-		return this.guiBuilders[guiType](entity, guiID);
+		return this.guiBuilders[guiType](entity, guiID, modName);
 	}
 }
 

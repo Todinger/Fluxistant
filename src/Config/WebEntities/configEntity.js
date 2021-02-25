@@ -11,6 +11,7 @@ class ConfigEntity {
 		this.description = undefined;
 		this.name = undefined;
 		this.hidden = false;
+		this.id = null; // EVERY entity should have this, set from outside by its parent
 	}
 	
 	hasName() {
@@ -48,6 +49,23 @@ class ConfigEntity {
 	show() {
 		this.hidden = false;
 		return this;
+	}
+	
+	getID() {
+		return this.id;
+	}
+	
+	setID(id) {
+		this.id = id;
+		return this;
+	}
+	
+	_escapeID(value) {
+		return (''+value).replace('/', '\\/');
+	}
+	
+	extendID(addendum, childEntity) {
+		childEntity.setID(`${this.id}/${this._escapeID(addendum)}`);
 	}
 	
 	// Returns the contents of this entity as a module-ready configuration for
@@ -107,6 +125,7 @@ class ConfigEntity {
 		copy.setName(this.getName());
 		copy.setDescription(this.getDescription());
 		copy.hidden = this.hidden;
+		copy.id = this.id;
 		return copy;
 	}
 	
@@ -132,12 +151,13 @@ class ConfigEntity {
 		}
 	}
 	
-	static buildEntity(entityObject) {
+	static buildEntity(entityObject, id) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
 		instance.buildFrom(entityObject.descriptor);
 		instance.setName(entityObject.name);
 		instance.setDescription(entityObject.description);
+		instance.setID(id);
 		instance.validate();
 		return instance;
 	}

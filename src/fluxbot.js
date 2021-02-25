@@ -1,6 +1,7 @@
 const express = require('express');
-const fileUpload = require('express-fileupload');
 const path = require('path');
+const fileUpload = require('express-fileupload');
+const mime = require('mime-types');
 const Utils = require('./utils');
 
 // Directory locations
@@ -172,10 +173,12 @@ class FluxBot {
 			let uploadFailed = false;
 			let files = req.files || {}; // The empty object here is to shut WebStorm's inspector up
 			Object.keys(files).forEach(fileKey => {
+				let file = files[fileKey];
 				this.dataManager.upload(
 					modName,
 					collectionID,
-					files[fileKey],
+					fileKey,
+					file,
 					(err, encodedData) => {
 						if (uploadFailed) {
 							// The error status is sent by the first failed file
@@ -188,10 +191,11 @@ class FluxBot {
 						
 						processedFileCount++;
 						encodedFiles[fileKey] = {
-							name: files[fileKey].name,
+							name: file.name,
 							data: encodedData,
 						};
 						if (processedFileCount === Object.keys(req.files).length) {
+							res.set('Content-Type', mime.contentType(file.name));
 							res.send(encodedFiles);
 						}
 					});
