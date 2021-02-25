@@ -519,6 +519,31 @@ class Module {
 	}
 	
 	// [For use by inheriting classes]
+	// Registers a callback that will be invoked every time a key is held down
+	// (possibly repeating while the key is down, I'm not sure)
+	onKeyDown(handler) {
+		KeyboardManager.onKeyDown(handler);
+	}
+	
+	// [For use by inheriting classes]
+	// Removes a previously registered key-down handler
+	removeKeyDownHandler(handler) {
+		KeyboardManager.removeKeyDownHandler(handler);
+	}
+	
+	// [For use by inheriting classes]
+	// Registers a callback that will be invoked every time a key is released
+	onKeyUp(handler) {
+		KeyboardManager.onKeyUp(handler);
+	}
+	
+	// [For use by inheriting classes]
+	// Removes a previously registered key-up handler
+	removeKeyUpHandler(handler) {
+		KeyboardManager.removeKeyUpHandler(handler);
+	}
+	
+	// [For use by inheriting classes]
 	// Sends the given message to the Twitch channel (the bot will say it).
 	say(msg) {
 		TwitchManager.say(msg);

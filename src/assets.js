@@ -96,6 +96,12 @@ class AssetManager {
 		this.registerRelativeDir(SOUNDEFFECTS_DIR, SOUNDEFFECTS_URL);
 	}
 	
+	// TODO: Remove after transition to configurations of Catastrophe module
+	// Local path of the sound effects directory.
+	getSoundEffectsDir() {
+		return SOUNDEFFECTS_DIR;
+	}
+	
 	// Gets the URL of an image from its path.
 	// 
 	// Parameters:
@@ -267,6 +273,40 @@ class AssetManager {
 			onDone,
 			onNotFound,
 			`${username.toLowerCase()}*.*`);
+	}
+	
+	// Gets a random file from the given directory, using the given pattern or
+	// the "*.*" pattern if none is given.
+	// When done, the onDone function is called with the file's name.
+	// If no image was found, onNotFound() is called instead.
+	//
+	// Parameters:
+	// dir			Directory to search in
+	// onDone(name)	Function to call when a file is found and selected
+	// onNotFound()	Function to call when no image matching the pattern is found
+	// pattern		Optional custom search pattern to use
+	getRandomLocalFile(dir, onDone, onNotFound, pattern) {
+		if (!pattern) {
+			pattern = '*.*';
+		}
+		
+		glob(path.join(dir, pattern), {}, (err, files) => {
+			if (err) {
+				cli.error(`Filed to read dir ${dir}: ${err}`);
+				return;
+			}
+			
+			if (!files || files.length === 0) {
+				if (onNotFound) {
+					onNotFound();
+				}
+				
+				return;
+			}
+			
+			let index = Utils.randomInt(0, files.length);
+			onDone(files[index]);
+		});
 	}
 }
 
