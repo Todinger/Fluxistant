@@ -332,6 +332,10 @@ class Utils {
 			(soFar, element) => soFar && arr.includes(element), true);
 	}
 	
+	static arraysHaveSameValues(arr1, arr2) {
+		return _.isEqual([...arr1].sort(), [...arr2].sort());
+	}
+	
 	static ensureDirExists(path) {
 		try {
 			fs.mkdirSync(path);

@@ -1,7 +1,9 @@
 'use strict';
 const assert = require('assert').strict;
 const ioHook = require('iohook');
+const _ = require('lodash');
 const cli = require('./cliManager');
+const Utils = require('./utils');
 
 // Responsible for all keyboard interaction.
 // Currently only supports registration of keyboard shortcuts, but feel free to
@@ -116,4 +118,71 @@ class KeyboardManager {
 	}
 }
 
-module.exports = new KeyboardManager();
+// ioHook currently doesn't implement shortcuts that well: if you register
+// both 'Shift+1' and '1' as shortcuts and then press Shift+1, it fires
+// the callback for the '1' shortcut as well, which is really wrong and we
+// don't want that.
+// This class implements keyboard shortcuts on its own using the keydown
+// and keyup events. We'll be using this but keeping the original in case
+// we want the original behavior for some reason later on.
+class ManualShortcutsKeyboardManager extends KeyboardManager {
+	constructor() {
+		super();
+		
+		// This is where we keep all the keys that are currently pressed down
+		this.keysDown = [];
+	}
+	
+	_isShortcutActive(keys) {
+		return this.keysDown.length === keys.length &&
+			Utils.arraysHaveSameValues(this.keysDown, keys);
+	}
+	
+	_invokeAllActiveShortcuts() {
+		Object.values(this.shortcuts).forEach(shortcut => {
+			if (this._isShortcutActive(shortcut.keys)) {
+				shortcut.callback();
+			}
+		});
+	}
+	
+	registerShortcut(name, shortcut, callback) {
+		assert(!(name in this.shortcuts),
+			`Multiple shortcuts registered for the name '${name}'`);
+		
+		this.shortcuts[name] = {
+			keys: shortcut,
+			callback: callback,
+		};
+		
+		if (this._isShortcutActive(shortcut)) {
+			callback();
+		}
+		
+		return this;
+	}
+	
+	unregisterShortcut(name) {
+		assert(name in this.shortcuts,
+			`No shortcut registered by the name of '${name}`);
+		
+		delete this.shortcuts[name];
+		return this;
+	}
+	
+	_onKeyDown(event) {
+		super._onKeyDown(event);
+		if (!this.keysDown.includes(event.keycode)) {
+			this.keysDown.push(event.keycode);
+			this._invokeAllActiveShortcuts();
+		}
+	}
+	
+	_onKeyUp(event) {
+		super._onKeyUp(event);
+		_.pull(this.keysDown, event.keycode);
+	}
+}
+
+// module.exports = new KeyboardManager();
+module.exports = new ManualShortcutsKeyboardManager();

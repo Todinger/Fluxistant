@@ -43,14 +43,6 @@ class Phasmophobia extends Module {
 		return evidenceList.map(ev => this.evidenceNames[ev]);
 	}
 	
-	validateData(ghostData) {
-		Object.values(ghostData).forEach(evList => {
-			evList.forEach(ev => assert(
-				this.evidenceList.includes(ev),
-				`Unknown evidence in ghost data: ${ev}`));
-		});
-	}
-	
 	enable() {
 		this.game.startMonitoring();
 	}
@@ -83,17 +75,55 @@ class Phasmophobia extends Module {
 	loadModConfig(conf) {
 	}
 	
+	validateData(ghostData) {
+		Object.values(ghostData).forEach(evList => {
+			evList.forEach(ev => assert(
+				this.evidenceList.includes(ev),
+				`Unknown evidence in ghost data: ${ev}`));
+		});
+	}
+	
 	loadData() {
 		let ghostData = this.readJSON(GHOST_DATA_FILE);
 		this.validateData(ghostData);
 		this.ghostData = ghostData;
 	}
 	
+	buildEvidenceState() {
+		let evidenceState = {};
+		this.evidenceList.forEach(ev => {
+			if (this.levelData.flags[ev]) {
+				evidenceState[ev] = 'on';
+			} else if (this.levelData.impossibleEvidence.includes(ev)) {
+				evidenceState[ev] = 'invalid';
+			} else {
+				evidenceState[ev] = 'off';
+			}
+		});
+		
+		return evidenceState;
+	}
+	
+	makeClientState() {
+		return {
+			ghostName: this.levelData.ghostName,
+			evidence: this.buildEvidenceState(),
+			possibleGhosts: this.levelData.possibleGhosts,
+		};
+	}
+	
+	updateClient() {
+		let clientState = this.makeClientState();
+		this.broadcastEvent('state', clientState);
+	}
+	
 	gameStarted() {
 		this.clearEvidence();
+		this.broadcastEvent('show');
 	}
 	
 	gameEnded() {
+		this.broadcastEvent('hide');
 	}
 	
 	ifRunning(callback) {
@@ -132,6 +162,7 @@ class Phasmophobia extends Module {
 	
 	newLevel() {
 		this.clearEvidence();
+		this.updateClient();
 		this.say('New level, people!');
 	}
 	
@@ -171,14 +202,13 @@ class Phasmophobia extends Module {
 			union,
 			this.levelData.list);
 		
-		// List the piece(s) of evidence it *can't* be once two pieces of evidence are acquired
-		if (this.levelData.list.length === 2) {
-			this.levelData.impossibleEvidence = _.difference(
-				this.evidenceList,
-				_.union(this.levelData.list, this.levelData.possibleEvidenceLeft));
-			if (this.config.chat.evidenceLeft) {
-				this.say(`Possible evidence left: ${Utils.makeEnglishAndList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft))} (no ${Utils.makeEnglishOrList(this.toEvidenceNames(this.levelData.impossibleEvidence))}).`);
-			}
+		// List the piece(s) of evidence it *can't* be
+		this.levelData.impossibleEvidence = _.difference(
+			this.evidenceList,
+			_.union(this.levelData.list, this.levelData.possibleEvidenceLeft));
+		// Once two pieces of evidence are acquired we may want to announce this information
+		if (this.levelData.list.length === 2 && this.config.chat.evidenceLeft) {
+			this.say(`Possible evidence left: ${Utils.makeEnglishAndList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft))} (no ${Utils.makeEnglishOrList(this.toEvidenceNames(this.levelData.impossibleEvidence))}).`);
 		}
 		
 		let options = this.levelData.possibleGhosts;
@@ -187,6 +217,8 @@ class Phasmophobia extends Module {
 		} else if (options.length === 1 && this.config.chat.ghost) {
 			this.say(`We've got it! The ghost must be ${Utils.definiteSingularFor(options[0])}!`);
 		}
+		
+		this.updateClient();
 	}
 	
 	addEvidence(evidence) {
@@ -227,6 +259,14 @@ class Phasmophobia extends Module {
 	}
 	
 	load() {
+		this.imageDirURL = this.registerAssetDir('Images', 'images');
+		this.onClientAttached(socket => {
+			let clientState = this.makeClientState();
+			socket.emit('state', clientState);
+			if (this.game.isRunning()) {
+				socket.emit('show');
+			}
+		});
 	}
 	
 	commands = {
