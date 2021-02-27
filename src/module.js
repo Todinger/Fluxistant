@@ -187,24 +187,26 @@ class Module {
 		shortcuts = shortcuts || this.shortcuts;
 		if (shortcuts) {
 			Object.keys(shortcuts).forEach(shortcutID => {
-				for (let i = 0; i < shortcuts[shortcutID].keys.length; i++) {
-					let keys = shortcuts[shortcutID].keys[i];
-					let name = `${shortcutID}[${i}]`;
-					let shortcutKeycodes = keys.map(
-						key => {
-							let keyCode = 'VC_' + key.toUpperCase();
-							assert(
-								keyCode in Module.Keycodes,
-								`Unknown key: ${key}`);
-							
-							return Module.Keycodes[keyCode];
-						});
-					
-					this.registerShortcutKey(
-						name,
-						shortcutKeycodes,
-						shortcuts[shortcutID].callback
-					);
+				if (shortcuts[shortcutID].keys) {
+					for (let i = 0; i < shortcuts[shortcutID].keys.length; i++) {
+						let keys = shortcuts[shortcutID].keys[i];
+						let name = `${shortcutID}[${i}]`;
+						let shortcutKeycodes = keys.map(
+							key => {
+								let keyCode = 'VC_' + key.toUpperCase();
+								assert(
+									keyCode in Module.Keycodes,
+									`Unknown key: ${key}`);
+								
+								return Module.Keycodes[keyCode];
+							});
+						
+						this.registerShortcutKey(
+							name,
+							shortcutKeycodes,
+							shortcuts[shortcutID].callback
+						);
+					}
 				}
 			});
 		}
@@ -214,9 +216,11 @@ class Module {
 		shortcuts = shortcuts || this.shortcuts;
 		if (shortcuts) {
 			Object.keys(shortcuts).forEach(shortcutID => {
-				for (let i = 0; i < shortcuts[shortcutID].keys.length; i++) {
-					let name = `${shortcutID}[${i}]`;
-					this.unregisterShortcutKey(name);
+				if (shortcuts[shortcutID].keys) {
+					for (let i = 0; i < shortcuts[shortcutID].keys.length; i++) {
+						let name = `${shortcutID}[${i}]`;
+						this.unregisterShortcutKey(name);
+					}
 				}
 			});
 		}

@@ -92,6 +92,10 @@ class Utils {
 		return Utils.randomRange(base - variance, base + variance);
 	}
 	
+	static inRange(min, val, max) {
+		return min <= val && val <= max;
+	}
+	
 	// Returns a random key from an object, with each value having a differet
 	// chance of being selected based on weight.
 	// A weight can be any positive number. If one value has the weight of X and

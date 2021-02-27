@@ -154,7 +154,7 @@ class Phasmophobia extends Module {
 				temps:  false,
 			},
 			list: [],
-			possibleGhosts: [],
+			possibleGhosts: Object.keys(this.ghostData),
 			possibleEvidenceLeft: this.evidenceList,
 			impossibleEvidence: [],
 		}
@@ -184,6 +184,28 @@ class Phasmophobia extends Module {
 			this.say(`The ghost must be ${Utils.definiteSingularFor(options[0])}!`);
 		} else {
 			this.say(`The ghost type can be any of: ${Utils.makeEnglishOrList(options)}`);
+		}
+	}
+	
+	sayConciseState() {
+		let messageParts = [];
+		
+		if (this.levelData.ghostName) {
+			messageParts.push(`Name: ${this.levelData.ghostName}`);
+		}
+		
+		if (Utils.inRange(1, this.levelData.possibleEvidenceLeft.length, 3)) {
+			messageParts.push(`Possible Evidence: ${Utils.makeEnglishAndList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft))}`);
+		}
+		
+		if (this.levelData.possibleGhosts.length <= 3) {
+			messageParts.push(`Ghost Type: ${Utils.makeEnglishOrList(this.levelData.possibleGhosts)}`)
+		}
+		
+		if (messageParts.length > 0) {
+			this.tellStreamer(messageParts.join(' / '));
+		} else {
+			this.tellStreamer("There isn't enough information yet for the current level.");
 		}
 	}
 	
@@ -317,10 +339,16 @@ class Phasmophobia extends Module {
 		showInfo: {
 			name: 'Show Information',
 			description: 'Invokes the evidence message to the chat (same as using the !evidence command)',
+			callback: this.ifActive(() => this.sayState()),
+		},
+		
+		showConciseInfo: {
+			name: 'Show Concise Information',
+			description: 'Shows all the interesting information for the streamer in a single, concise message',
 			keys: [
 				['BACKQUOTE'],
 			],
-			callback: this.ifActive(() => this.sayState()),
+			callback: this.ifActive(() => this.sayConciseState()),
 		},
 		
 		// --------- Evidence --------- //
