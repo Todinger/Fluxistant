@@ -6,6 +6,7 @@ class ImageDisplay extends Module {
 			name: 'Image Display',
 			webname: 'imgdisp',
 			source: 'imgdisp.html',
+			webSounds: true,
 		});
 	}
 }

@@ -31,7 +31,7 @@ class CommandEntity extends StaticObjectEntity {
 			.setDescription('How long it takes before the command can be used again');
 		this.addChild('filters', new DynamicArrayEntity('UserFilter'))
 			.setName('User Filters')
-			.setDescription('Filters for which users may use the command');
+			.setDescription('Specifies which users may use the command');
 		
 		if (data) {
 			if (data.name) {

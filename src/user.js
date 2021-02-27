@@ -17,6 +17,9 @@ class User {
     	this.userstate		= userstate;
 	}
 	
+	get isAtLeastMod() {
+		return this.isMod || this.isBroadcaster;
+	}
 }
 
 // User Filters:
@@ -41,7 +44,7 @@ class Filters {
 	static isMod() { return (user) => user.isMod; }
 	
 	// Returns a filter that only accepts mods and the broadacster.
-	static isAtLeastMod() { return (user) => user.isMod || user.isBroadcaster; }
+	static isAtLeastMod() { return (user) => user.isAtLeastMod; }
 	
 	// Returns a filter that only accepts subscribers.
 	static isSub() { return (user) => user.isSub; }

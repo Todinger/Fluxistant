@@ -552,18 +552,19 @@ class TwitchManager extends EventNotifier {
 			// currently on cooldown (either for the user or globally)
 			Object.values(this._commandHandlers[command.cmdname]).forEach(
 				handler => {
-					// This reduction performs an "and" operation between the
+					// This reduction performs an "or" operation between the
 					// return values of all the filters and only proceeds if
-					// they all return true (or if there aren't any)
-					if (handler.filters.reduce(
-						(soFar, currentFilter) => soFar && currentFilter(user),
-						true)) {
-							// Make sure the user can use this command right now
-							// (this does initiate any cooldowns; it just checks
-							// to see that it's not currently on cooldown)
-							if (this._checkCooldowns(user, handler)) {
-								this._handleCommand(user, command, handler);
-							}
+					// any of them returns true (or if there aren't any)
+					if (handler.filters.length === 0 ||
+						handler.filters.reduce(
+							(soFar, currentFilter) => soFar || currentFilter(user),
+							false)) {
+								// Make sure the user can use this command right now
+								// (this does initiate any cooldowns; it just checks
+								// to see that it's not currently on cooldown)
+								if (this._checkCooldowns(user, handler)) {
+									this._handleCommand(user, command, handler);
+								}
 					}
 				});
 		}
@@ -604,6 +605,7 @@ class TwitchManager extends EventNotifier {
 			// object, to have a friendlier interface
 			let user = new User(userstate);
 			
+			// noinspection FallThroughInSwitchStatementJS
 			switch(userstate['message-type']) {
 				// This is what we get when someone types "/me <message>"
 				case 'action':

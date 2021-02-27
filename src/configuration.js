@@ -105,6 +105,10 @@ class Configuration {
 		return this.configRoot.addObject(key);
 	}
 	
+	addGroup(key) {
+		return this.configRoot.addGroup(key);
+	}
+	
 	addData(key, configData) {
 		return this.configRoot.addData(key, configData);
 	}

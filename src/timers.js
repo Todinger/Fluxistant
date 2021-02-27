@@ -14,19 +14,19 @@ class Timer {
 		}
 	}
 	
-	clearImpl() {
+	_clearImpl() {
 		Errors.abstract();
 	}
 	
 	// Stops the timer, preventing the callback from being invoked.
 	clear() {
 		if (this.handle) {
-			this.clearImpl();
+			this._clearImpl();
 			this.handle = null;
 		}
 	}
 	
-	setImpl(duration, callback) {
+	_setImpl(duration, callback) {
 		Errors.abstract();
 	}
 	
@@ -40,7 +40,7 @@ class Timer {
 		callback = callback || this.callback;
 		assert(callback, 'Timer activated without a callback.');
 		
-		this.handle = this.setImpl(duration, callback);
+		this.handle = this._setImpl(duration, callback);
 		this.callback = callback;
 	}
 	
@@ -62,11 +62,11 @@ class OneShotTimer extends Timer {
 		super(callback, duration);
 	}
 	
-	clearImpl() {
+	_clearImpl() {
 		clearTimeout(this.handle);
 	}
 	
-	setImpl(duration, callback) {
+	_setImpl(duration, callback) {
 		return setTimeout(
 			() => {
 				this.handle = null;
@@ -82,11 +82,11 @@ class RepeatingTimer extends Timer {
 		super(callback, duration);
 	}
 	
-	clearImpl() {
+	_clearImpl() {
 		clearInterval(this.handle);
 	}
 	
-	setImpl(duration, callback) {
+	_setImpl(duration, callback) {
 		return setInterval(callback, duration);
 	}
 }

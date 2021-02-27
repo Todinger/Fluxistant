@@ -81,11 +81,13 @@ class ConfigEntity {
 			`Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`);
 		this.importDesc(entityInfo.descriptor);
 		
-		if (entityInfo.name) {
+		// Don't import names and descriptions if we have them already - this is so that when
+		// these are changed in the code the saved configuration files don't override them
+		if (entityInfo.name && !this.name) {
 			this.setName(entityInfo.name);
 		}
 		
-		if (entityInfo.description) {
+		if (entityInfo.description && !this.description) {
 			this.setDescription(entityInfo.description);
 		}
 		

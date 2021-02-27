@@ -245,7 +245,7 @@ class Adventure extends Module {
 				// 'Cee, Tee and JDee' for ['Cee', 'Tee', 'JDee'].
 				result = result.replace(
 					PARTICIPANTS_PLACEHOLDER,
-					Utils.makeEnglishList(
+					Utils.makeEnglishAndList(
 						Object.values(this.activeAdventure.participants)
 						.map(user => user.displayName)));
 				
@@ -253,7 +253,7 @@ class Adventure extends Module {
 				if (this.activeAdventure.winner) {
 					result = result.replace(
 						LOSERS_PLACEHOLDER,
-						Utils.makeEnglishList(
+						Utils.makeEnglishAndList(
 							Object.values(this.activeAdventure.participants)
 							.filter(user =>
 								user.name !== this.activeAdventure.winner.name)

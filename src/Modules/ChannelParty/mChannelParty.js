@@ -7,6 +7,7 @@ class ChannelParty extends Module {
 			webname: 'party',
 			source: 'party.html',
 			zindex: 10,
+			webSounds: true,
 		});
 	}
 	

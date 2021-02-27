@@ -2,6 +2,8 @@
 
 const ffi = require('ffi-napi');
 const ref = require('ref-napi');
+const EventNotifier = require('./eventNotifier');
+const Timers = require('./timers');
 
 // Import Windows API functions
 const user32 = new ffi.Library('user32', {
@@ -10,10 +12,21 @@ const user32 = new ffi.Library('user32', {
 	'FindWindowA': ['int', ['string', 'string']],
 });
 
-class Process {
+class Process extends EventNotifier {
+	static get DEFAULT_RUN_TEST_INTERVAL() { return 5000; }
+	
 	constructor(windowTitle) {
+		super();
+		this._addEvent('started');
+		this._addEvent('exited');
+		
 		this.windowTitle = windowTitle;
 		this.nameBuffer = Buffer.alloc(windowTitle.length + 2);
+		
+		this.processRunning = false;
+		this.monitorTimer = Timers.repeating(
+			() => this._refreshRunning(),
+			Process.DEFAULT_RUN_TEST_INTERVAL);
 	}
 	
 	isRunning() {
@@ -28,6 +41,34 @@ class Process {
 			this.nameBuffer.length);
 		let activeWindowTitle = ref.readCString(this.nameBuffer, 0);
 		return activeWindowTitle === this.windowTitle;
+	}
+	
+	_refreshRunning() {
+		let running = this.isRunning();
+		if (running && !this.processRunning) {
+			this._notify('started');
+		} else if (!running && this.processRunning) {
+			this._notify('exited');
+		}
+		
+		this.processRunning = running;
+	}
+	
+	startMonitoring(interval) {
+		this.monitorTimer.set(interval || Process.DEFAULT_RUN_TEST_INTERVAL);
+	}
+	
+	stopMonitoring() {
+		this.monitorTimer.clear();
+		this.processRunning = false;
+	}
+	
+	onStarted(callback) {
+		this.on('started', callback);
+	}
+	
+	onExited(callback) {
+		this.on('exited', callback);
 	}
 }
 

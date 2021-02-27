@@ -16,6 +16,7 @@ const RewardsManager = require('./rewardsManager');
 const Log = require('./logger')
 const ModuleConfig = require('./Config/moduleConfig');
 const Command = require('./command');
+const MainConfig = require('./mainConfig');
 
 // This is the base class for all server-side Module-specific logic classes.
 // 
@@ -60,6 +61,7 @@ class Module {
 		this.source = description.source;
 		this.zindex = description.zindex;
 		this.tags = description.tags;
+		this.webSounds = description.webSounds;
 		
 		// Utility objects
 		this.moduleManager = null;
@@ -122,8 +124,8 @@ class Module {
 			this.commands = {};
 		}
 		
-		// The !fxvol command is only relevant to modules that have a web client part
-		if (this.webname) {
+		// The !fxvol command is only relevant to modules that have a web client part with audio
+		if (this.webname && this.webSounds) {
 			this.commands['fxvol'] = {
 				name: 'Set Volume',
 				description: 'Modifies the volume level of sounds produced by this module. Accepts a percentage number (0-100) for setting a specific volume, or differences with +/- (e.g. +20 would increase the volume by 20%, up to 100%).',
@@ -626,6 +628,13 @@ class Module {
 	// specified.
 	tell(user, msg) {
 		TwitchManager.tell(user, msg);
+	}
+	
+	// [For use by inheriting classes]
+	// Same as above, only addressed to the streamer using the name they
+	// configured in the main configuration.
+	tellStreamer(msg) {
+		TwitchManager.say(`@${MainConfig.getStreamerName()} ${msg}`);
 	}
 	
 	// [For use by inheriting classes]

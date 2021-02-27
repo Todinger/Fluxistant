@@ -255,23 +255,26 @@ class Utils {
 		}
 	}
 	
-	// Turns an array into a correct form of a list in English.
+	// Turns an array into a correct form of a list in English with the given
+	// transition word before the final item.
 	// Examples:
-	// 	makeEnglishList('a', 'b', 'c') === 'a, b and c'
-	// 	makeEnglishList('b', 'c') === 'b and c'
-	// 	makeEnglishList('c') === 'c'
-	// 	makeEnglishList('a', 'b', 'c', 5, 6) === 'a, b, c, 5 and 6'
-	static makeEnglishList(items) {
-		assert(Array.isArray(items) && items.length > 0,
-			'An array of at least one item is required to make an English list.');
+	// 	makeEnglishAndList(['a', 'b', 'c'], 'and') === 'a, b and c'
+	// 	makeEnglishAndList(['a', 'b', 'c'], 'or') === 'a, b or c'
+	// 	makeEnglishAndList(['a', 'b', 'c'], 'schnitzel') === 'a, b schnitzel c'
+	// 	makeEnglishAndList(['c'], 'and') === 'c'
+	static makeEnglishList(items, transitionWord) {
+		assert(Array.isArray(items),
+			'An array is required to make an English list.');
 		
-		// A list of one item is just that item itself
-		if (items.length === 1) {
+		if (items.length === 0) {
+			return '';
+		} else if (items.length === 1) {
+			// A list of one item is just that item itself
 			return items[0];
 		}
 		
 		// Here we have at least two items, so it's going to end with "X and Y"
-		let result = `${items[items.length - 2]} and ${items[items.length - 1]}`;
+		let result = `${items[items.length - 2]} ${transitionWord} ${items[items.length - 1]}`;
 		
 		// Now we add "item, " for each item, so we get something that
 		// looks like "A, B, C, X and Y"
@@ -282,13 +285,48 @@ class Utils {
 		return result;
 	}
 	
+	// Turns an array into a correct form of a list in English.
+	// Examples:
+	// 	makeEnglishAndList(['a', 'b', 'c']) === 'a, b and c'
+	// 	makeEnglishAndList(['b', 'c']) === 'b and c'
+	// 	makeEnglishAndList(['c']) === 'c'
+	// 	makeEnglishAndList(['a', 'b', 'c', 5, 6]) === 'a, b, c, 5 and 6'
+	static makeEnglishAndList(items) {
+		return Utils.makeEnglishList(items, 'and');
+	}
+	
+	// Turns an array into a correct form of a list in English.
+	// Examples:
+	// 	makeEnglishAndList(['a', 'b', 'c']) === 'a, b or c'
+	// 	makeEnglishAndList(['b', 'c']) === 'b or c'
+	// 	makeEnglishAndList(['c']) === 'c'
+	// 	makeEnglishAndList(['a', 'b', 'c', 5, 6]) === 'a, b, c, 5 or 6'
+	static makeEnglishOrList(items) {
+		return Utils.makeEnglishList(items, 'or');
+	}
+	
+	// Very simplistic function for adding a singular definitive article
+	// for a word. Uses the first letter only to decide, so no guarantees here...
+	// Examples:
+	//  definiteSingularFor('chair') === 'a chair'
+	//  definiteSingularFor('object') === 'an object'
+	//  definiteSingularFor('herb') === 'an herb'  <-- Note this!
+	//  definiteSingularFor('university') === 'an university' <-- Note this!
+	static definiteSingularFor(word) {
+		if (['a', 'e', 'i', 'o', 'u'].includes(word[0].toLowerCase())) {
+			return 'an ' + word;
+		} else {
+			return 'a ' + word;
+		}
+	}
+	
 	// Returns true iff every key in sub is also a key in obj
 	static isKeySubset(sub, obj) {
 		return Object.keys(sub).reduce(
 			(soFar, key) => soFar && (key in obj), true);
 	}
 	
-	// Returns true iff every key in sub is also a key in obj
+	// Returns true iff every element in sub is also an element in arr
 	static isArraySubset(sub, arr) {
 		return sub.reduce(
 			(soFar, element) => soFar && arr.includes(element), true);

@@ -11,6 +11,7 @@ class ParrotMate extends Module {
 			webname: 'parrot',
 			source: 'parrot.html',
 			tags: ['imgdisp'],
+			webSounds: true,
 		});
 		
 		this.whatWasThatCooldownActive = false;

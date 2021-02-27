@@ -104,6 +104,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'StaticObject');
 	}
 	
+	addGroup(key) {
+		return this.addObject(key);
+	}
+	
 	addData(key, configData) {
 		return this.add(key, 'Data', configData);
 	}
