@@ -77,16 +77,13 @@ class ModuleData {
 		this.collections[collection].upload(fileKey, file, this._injectSave(callback));
 	}
 	
-	delete(collection, key, callback) {
+	delete(collection, fileKey, callback) {
 		this._verifyPresence(collection);
-		this.collections[collection].delete(key, this._injectSave(callback));
+		this.collections[collection].delete(fileKey, this._injectSave(callback));
 	}
 	
-	getFileWeb(fileDescriptor) {
-		let collection = fileDescriptor.colID;
+	getFileWeb(collection, fileKey) {
 		this._verifyPresence(collection);
-		
-		let fileKey = fileDescriptor.fileKey;
 		return this.collections[collection].getFileWeb(fileKey);
 	}
 	

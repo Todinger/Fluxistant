@@ -43,6 +43,7 @@ export default class DynamicArrayGui extends EntityGui {
 	
 	_deleteItem(index) {
 		this.entity.removeElementAt(index);
+		// this.elementGUIs[index].getGUI().remove();
 		this.elementGUIs.splice(index, 1);
 		this.elementRows[index].remove();
 		this.elementRows.splice(index, 1);

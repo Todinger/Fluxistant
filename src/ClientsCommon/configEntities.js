@@ -18691,7 +18691,7 @@ class ArrayEntity extends ConfigEntity {
 	
 	cloneImpl() {
 		let copy = EntityFactory.build(this.type, this.elementType);
-		this.elements.forEach(element => copy.addElement(element.clone()));
+		this.elements.forEach(element => copy.elements.push(element.clone()));
 		return copy;
 	}
 	
@@ -19384,7 +19384,7 @@ class DataEntity extends StaticObjectEntity {
 			.hide();
 		this.addString('dataType', data && data.dataType || '')
 			.hide();
-		this.addString('key', data && data.fileKey || '')
+		this.addBoolean('isSet', false)
 			.hide();
 	}
 	
@@ -19401,7 +19401,15 @@ class DataEntity extends StaticObjectEntity {
 	}
 	
 	isSet() {
-		return true;
+		return this.getChild('isSet').getValue();
+	}
+	
+	set() {
+		this.getChild('isSet').setValue(true);
+	}
+	
+	clear() {
+		this.getChild('isSet').setValue(false);
 	}
 	
 	// ---- Overrides ---- //

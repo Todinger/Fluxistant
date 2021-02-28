@@ -115,7 +115,7 @@ class ArrayEntity extends ConfigEntity {
 	
 	cloneImpl() {
 		let copy = EntityFactory.build(this.type, this.elementType);
-		this.elements.forEach(element => copy.addElement(element.clone()));
+		this.elements.forEach(element => copy.elements.push(element.clone()));
 		return copy;
 	}
 	

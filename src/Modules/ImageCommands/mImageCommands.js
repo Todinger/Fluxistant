@@ -61,11 +61,11 @@ class ImageCommands extends Module {
 		let hasSound = this.data.Sounds.hasKey(cmdObject.sound.file.key);
 
 		let imagePromise = hasImage ?
-			promises.push(this.data.getFileWeb(cmdObject.image)) :
+			promises.push(this.data.getFileWeb(cmdObject.image.colID, cmdObject.image.fileKey)) :
 			Promise.resolve();
 
 		let soundPromise = hasImage ?
-			promises.push(this.data.getFileWeb(cmdObject.sound)) :
+			promises.push(this.data.getFileWeb(cmdObject.sound.colID, cmdObject.sound.fileKey)) :
 			Promise.resolve();
 
 		if (hasImage || hasSound) {

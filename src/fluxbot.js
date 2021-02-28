@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fileUpload = require('express-fileupload');
-const mime = require('mime-types');
 const Utils = require('./utils');
 
 // Directory locations
@@ -160,6 +159,23 @@ class FluxBot {
 			tempFileDir: DATA_DIR_TEMP,
 		}));
 		
+		this.app.get('/data/mod/:modName/:colID/:filename', async (req, res) => {
+			let modName = req.params.modName;
+			let collectionID = req.params.colID;
+			let fileKey = req.params.filename;
+			
+			try {
+				let file = await this.dataManager.getFileWeb(modName, collectionID, fileKey);
+				res.set('Content-Type', file.contentType);
+				res.send({
+					name: file.name,
+					data: file.data,
+				});
+			} catch (err) {
+				return res.status(500).send(err);
+			}
+		});
+		
 		this.app.post('/data/mod/:modName/:colID', (req, res) => {
 			if (!req.files || Object.keys(req.files).length === 0) {
 				return res.status(400).send('No files were uploaded.');
@@ -179,7 +195,7 @@ class FluxBot {
 					collectionID,
 					fileKey,
 					file,
-					(err, encodedData) => {
+					(err, savedFile) => {
 						if (uploadFailed) {
 							// The error status is sent by the first failed file
 							// so there's no need to send a result here as well
@@ -191,48 +207,15 @@ class FluxBot {
 						
 						processedFileCount++;
 						encodedFiles[fileKey] = {
-							name: file.name,
-							data: encodedData,
+							name: savedFile.name,
+							data: savedFile.data,
 						};
 						if (processedFileCount === Object.keys(req.files).length) {
-							res.set('Content-Type', mime.contentType(file.name));
+							// res.set('Content-Type', mime.contentType(file.name));
 							res.send(encodedFiles);
 						}
 					});
 			});
-			
-/*
-			file = req.files.dataFile;
-			
-			uploadPath = path.join(DATA_DIR_TEMP, file.name);
-			
-			const { Base64 } = require('js-base64');
-			//////// THIS IS GOOD FOR IMAGES //////////
-			// const fs = require('fs');
-			// fs.writeFile(uploadPath, Base64.encode(file.data), function(err) {
-			// 	if (err) {
-			// 		return res.status(500).send(err);
-			// 	}
-			//
-			// 	res.sendFile(uploadPath);
-			// });
-			///////////////////////////////////////////
-			
-			file.mv(uploadPath, function(err) {
-				if (err) {
-					return res.status(500).send(err);
-				}
-				
-				res.send(Base64.encode(file.data));
-				// This is to send the file with Base64 encoding after reading it from disk
-				// require('fs').readFile(uploadPath, (err, data) => {
-				// 	res.send(Base64.encode(data));
-				// });
-				
-				// res.sendFile(path.join(DATA_DIR_TEMP, 'img.png'));
-				// res.sendFile(uploadPath);
-			});
-*/
 		});
 		
 		this.app.delete('/data/mod/:modName/:colID/:filename', (req, res) => {
@@ -251,43 +234,6 @@ class FluxBot {
 						res.send(`File 'mod/${modName}/${collectionID}/${fileKey}' deleted.`);
 					}
 				});
-			
-/*
-			if (!req.files || Object.keys(req.files).length === 0) {
-				return res.status(400).send('No files were deleted.');
-			}
-			
-			let modName = req.params.modName;
-			let collectionID = req.params.colID;
-			
-			let processedFileCount = 0;
-			let deletedFiles = [];
-			let deleteFailed = false;
-			Object.keys(files).forEach(fileKey => {
-				this.dataManager.delete(
-					modName,
-					collectionID,
-					fileKey,
-					(err) => {
-						if (deleteFailed) {
-							// The error status is sent by the first failed file
-							// so there's no need to send a result here as well
-							return;
-						} else if (err) {
-							deleteFailed = true;
-							return res.status(500).send(err);
-						} else {
-							res.send(`File 'mod/${modName}/${collectionID}/${fileKey}' deleted.`);
-						}
-						
-						processedFileCount++;
-						deletedFiles.push(fileKey);
-						if (processedFileCount === Object.keys(req.files).length) {
-							res.send(deletedFiles);
-						}
-					});
-			});
-*/
 		});
 	}
 	

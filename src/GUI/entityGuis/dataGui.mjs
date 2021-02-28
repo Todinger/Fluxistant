@@ -5,17 +5,7 @@ export default class DataGui extends EntityGui {
 	
 	constructor(entity, guiID, modName) {
 		super(entity, guiID, modName);
-	}
-	
-	// This should create our this.jInput variable and set it up to detect and react to changes
-	_setupInput() {
-		throw 'Abstract method invoked.';
-	}
-	
-	_guiValueChanged(newValue) {
-		this.entity.setValue(newValue);
-		this._changed();
-		this._updateStatusIndicators(this.jInput);
+		this.showingItem = false;
 	}
 	
 	_getFileKey() {
@@ -37,10 +27,21 @@ export default class DataGui extends EntityGui {
 	}
 	
 	_deleteFile() {
-		this._toggleView();
+		this.entity.clear();
+		this._hideItem();
 		this._sendDeleteRequest();
-		this._clearItemPreview();
-		this._clearItemName();
+		this._clearItem();
+		// this._changed();
+	}
+	
+	_loadFileFromServer() {
+		$.get(
+			this._getFileURL(),
+			(res) => {
+				let file = JSON.parse(res);
+				this._showItem(file.data, file.name);
+			}
+		)
 	}
 	
 	_makeItemPreview() {
@@ -59,20 +60,41 @@ export default class DataGui extends EntityGui {
 		return outerSpan;
 	}
 	
-	_showItemPreview(contentType, data) {
+	_showItemPreview(data) {
 		this.itemPreview.attr('src', data);
-	}
-	
-	_clearItemPreview() {
-		this.itemPreview.attr('src', '');
 	}
 	
 	_showItemName(itemName) {
 		this.nameTag.text(itemName);
 	}
 	
+	_showItem(data, name) {
+		if (!this.showingItem) {
+			this._showItemPreview(data);
+			this._showItemName(name);
+			this._toggleView();
+			this.showingItem = true;
+		}
+	}
+	
+	_hideItem() {
+		if (this.showingItem) {
+			this._toggleView();
+			this.showingItem = false;
+		}
+	}
+	
+	_clearItemPreview() {
+		this.itemPreview.attr('src', '');
+	}
+	
 	_clearItemName() {
 		this.nameTag.text('');
+	}
+	
+	_clearItem() {
+		this._clearItemPreview();
+		this._clearItemName();
 	}
 	
 	_makeItemContainer() {
@@ -204,37 +226,31 @@ export default class DataGui extends EntityGui {
 					_this.progressBar.attr('hidden', 'hidden');
 				}, 1000);
 				
-				_this._toggleView();
+				// _this._toggleView();
+				// _this._changed();
 			},
 			
 			complete: function(req) {
 				let files = JSON.parse(req.response);
 				let file = files[_this._getFileKey()];
-				let contentType = req.getResponseHeader('content-type');
 				let fileName = file.name;
 				
-				_this._showItemPreview(contentType, file.data);
-				_this._showItemName(fileName);
+				_this.entity.set();
+				_this._showItem(file.data, fileName);
 			},
 			
 			loadStart: function (e) {
-				console.log('loadStart', arguments);
-				
 				_this.progressBar.removeAttr('hidden');
 				_this.progressBar.max = e.total;
 				_this.progressBar.value = e.loaded;
 			},
 			
 			progress: function (e) {
-				console.log('progress', arguments);
-				
 				_this.progressBar.max = e.total;
 				_this.progressBar.value = e.loaded;
 			},
 			
 			loadEnd: function (e) {
-				console.log('loadEnd', arguments);
-				
 				_this.progressBar.max = e.total;
 				_this.progressBar.value = e.loaded;
 			},
@@ -246,6 +262,12 @@ export default class DataGui extends EntityGui {
 		let contents = this._makeContents();
 		let progressBar = this._makeProgressBar();
 		fullResult.append(contents, progressBar);
+		
+		fullResult.on('remove', () => this._deleteFile());
+		
+		if (this.entity.isSet()) {
+			this._loadFileFromServer();
+		}
 		
 		return fullResult;
 	}

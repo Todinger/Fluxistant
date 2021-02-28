@@ -80,8 +80,9 @@ class UserData {
 	}
 	
 	delete(key, callback) {
-		assert(key in this.files, `Cannot delete file: key '${key}' not found.`);
-		this._deleteFile(key, callback);
+		if (key in this.files) {
+			this._deleteFile(key, callback);
+		}
 	}
 	
 	getFileLocal(...params) {
@@ -94,7 +95,11 @@ class UserData {
 		.then((data) => {
 			let b64Data = Base64.encode(data);
 			let contentType = mime.contentType(this.files[key].path);
-			return `data:${contentType}; base64,${b64Data}`;
+			return {
+				name: this.files[key].name,
+				contentType: contentType,
+				data: `data:${contentType}; base64,${b64Data}`,
+			};
 		});
 		
 		// fs.readFile(this.files[key].path, (err, data) => {
@@ -109,14 +114,13 @@ class UserData {
 		// });
 	}
 	
-	getFileWeb(callback, ...params) {
+	getFileWeb(...params) {
 		if (Object.keys(this.files).length === 0) {
-			callback('Cannot get file: data collection is empty.');
-			return;
+			throw 'Cannot get file: data collection is empty.';
 		}
 		
 		let key = this._getFileKey.apply(this, params);
-		return this._getFileWebByKey(key, callback);
+		return this._getFileWebByKey(key);
 	}
 	
 	import(exportedData) {

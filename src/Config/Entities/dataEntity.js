@@ -20,7 +20,7 @@ class DataEntity extends StaticObjectEntity {
 			.hide();
 		this.addString('dataType', data && data.dataType || '')
 			.hide();
-		this.addString('key', data && data.fileKey || '')
+		this.addBoolean('isSet', false)
 			.hide();
 	}
 	
@@ -37,7 +37,15 @@ class DataEntity extends StaticObjectEntity {
 	}
 	
 	isSet() {
-		return true;
+		return this.getChild('isSet').getValue();
+	}
+	
+	set() {
+		this.getChild('isSet').setValue(true);
+	}
+	
+	clear() {
+		this.getChild('isSet').setValue(false);
 	}
 	
 	// ---- Overrides ---- //

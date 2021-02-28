@@ -42,9 +42,14 @@ class DataManager {
 		this.moduleData[modName].upload(collection, fileKey, file, callback);
 	}
 	
-	delete(modName, collection, key, callback) {
+	delete(modName, collection, fileKey, callback) {
 		this._verifyPresence(modName);
-		this.moduleData[modName].delete(collection, key, callback);
+		this.moduleData[modName].delete(collection, fileKey, callback);
+	}
+	
+	getFileWeb(modName, collection, fileKey) {
+		this._verifyPresence(modName);
+		return this.moduleData[modName].getFileWeb(collection, fileKey);
 	}
 	
 	saveAll() {
