@@ -74,7 +74,7 @@ export default class KeyGui extends EntityGui {
 	}
 	
 	_buildGUI() {
-		let button = $(`<div class="uk-button uk-button-default""></div>`);
+		let button = $(`<div class="uk-button uk-button-default uk-width-medium"></div>`);
 		let switcher = $(`<ul uk-switcher="toggle: > *" hidden></ul>`);
 		for (let i = 0; i <= 2; i++) {
 			switcher.append($(`<li></li>`));

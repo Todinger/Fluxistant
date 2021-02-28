@@ -19778,7 +19778,7 @@ class KeyEntity extends ValueEntity {
 	
 	isValid() {
 		let key = this.getValue();
-		return key !== 'CHAR_UNDEFINED' && Enums.fromShortID(key);
+		return !key || (key !== 'CHAR_UNDEFINED' && Enums.fromShortID(key));
 	}
 	
 	validate() {
@@ -19798,11 +19798,6 @@ class KeyEntity extends ValueEntity {
 	}
 	
 	setKey(htmlCode) {
-		// if (keyCode in Enums.KEYCODES_BY_VALUE) {
-		// 	this.setValue(Enums.KEYCODES[Enums.KEYCODES_BY_VALUE[keyCode]].shortID);
-		// } else {
-		// 	this.setValue('CHAR_UNDEFINED');
-		// }
 		this.setValue(Enums.htmlCodeToShortID(htmlCode));
 	}
 	
