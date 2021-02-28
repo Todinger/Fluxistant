@@ -14,6 +14,7 @@ class Phasmophobia extends Module {
 			name: 'Phasmophobia',
 			webname: 'phasmophobia',
 			source: 'phasmophobia.html',
+			tags: ['textdisp'],
 		});
 		
 		this.ghostData = {};
@@ -166,6 +167,20 @@ class Phasmophobia extends Module {
 		this.say('New level, people!');
 	}
 	
+	ghostFound() {
+		let ghost = this.levelData.possibleGhosts[0];
+		this.broadcastEvent('showText', {
+			text: `It's ${Utils.definiteSingularFor(ghost)}!`,
+			style: 'Creepy',
+			color: '#FFFFFF',
+			duration: 5000,
+		});
+		
+		if (this.config.chat.ghost) {
+			this.say(`We've got it! The ghost must be ${Utils.definiteSingularFor(ghost)}!`);
+		}
+	}
+	
 	sayState() {
 		if (this.levelData.list.length === 0) {
 			this.say("We currently have no evidence yet. But we'll get there!");
@@ -236,8 +251,8 @@ class Phasmophobia extends Module {
 		let options = this.levelData.possibleGhosts;
 		if (options.length === 0 && this.config.chat.badEvidence) {
 			this.tellStreamer("Hey, something's wrong here! No ghost matches the evidence! Are you sure you got it right?");
-		} else if (options.length === 1 && this.config.chat.ghost) {
-			this.say(`We've got it! The ghost must be ${Utils.definiteSingularFor(options[0])}!`);
+		} else if (options.length === 1) {
+			this.ghostFound();
 		}
 		
 		this.updateClient();
