@@ -98,6 +98,11 @@ export default class ObjectGui extends EntityGui {
 		return this.mainGui;
 	}
 	
+	// Add an indication that this value has been changed (note: not its children)
+	activateChangedIndicators() {
+		EntityGui.addChangeIndicator(this.mainGui.guiData.header);
+	}
+	
 	// Clear the indication that this value has been changed
 	clearChangedIndicators() {
 		Object.keys(this.childrenGUIs).forEach(key => {

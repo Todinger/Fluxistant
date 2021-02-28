@@ -68,7 +68,8 @@ export default class DynamicArrayGui extends EntityGui {
 			newElementRow);
 		
 		this._changed();
-		newElementGui._updateStatusIndicators(newElementRow.guiData.marker);
+		this._updateStatusIndicators(newElementRow.guiData.marker);
+		newElementGui.activateChangedIndicators();
 	}
 	
 	_buildElementRow(elementGui) {

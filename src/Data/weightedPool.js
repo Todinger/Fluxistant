@@ -56,7 +56,7 @@ class WeightedPool extends FilePool {
 	import(exportedData) {
 		// Validate weights (each file should have one and nothing else)
 		Errors.ensureKeysMatch(
-			exportedData.filenames,
+			exportedData.files,
 			exportedData.weights,
 			"Weights data doesn't match files data.");
 		

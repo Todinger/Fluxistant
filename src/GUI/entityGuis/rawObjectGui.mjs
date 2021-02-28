@@ -32,6 +32,11 @@ export default class RawObjectGui extends ObjectGui {
 		return this._buildChildrenContainer();
 	}
 	
+	// Add an indication that this value has been changed (note: not its children)
+	activateChangedIndicators() {
+		// We have no main GUI ourselves, so we do nothing here
+	}
+	
 	// Clear the indication that this value has been changed
 	clearChangedIndicators() {
 		Object.keys(this.childrenGUIs).forEach(key => {

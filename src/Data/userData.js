@@ -29,8 +29,13 @@ class UserData {
 		return path.join(this.dataDirPath, filename);
 	}
 	
+	_pathForKey(key, name) {
+		name = name || this.files[key].name;
+		return path.join(this.dataDirPath, key + path.extname(name));
+	}
+	
 	_save(key, file, callback) {
-		let filePath = this._pathFor(file.name);
+		let filePath = this._pathForKey(key, file.name);
 		file.mv(filePath, async (err) => {
 			if (err) {
 				callback(err);
@@ -116,26 +121,32 @@ class UserData {
 	
 	import(exportedData) {
 		assert(
-			exportedData && exportedData.filenames,
+			exportedData && exportedData.files,
 			`Invalid exported file data given for import: ${exportedData}`);
 		
-		let filenames = exportedData.filenames;
+		// Added the '|| {}' part to shut the IDE up about it might being
+		// null or undefined (despite our test above to make sure it isn't...)
+		let files = exportedData.files || {};
 		this.files = {};
-		Object.keys(filenames).forEach(key => {
+		Object.keys(files).forEach(key => {
 			this.files[key] = {
-				name: filenames[key],
-				path: this._pathFor(filenames[key]),
+				name: files[key],
+				path: this._pathForKey(key, files[key]),
 			};
 		});
 	}
 	
 	export() {
-		let filenames = {};
-		Object.keys(this.files).forEach(key => {
-			filenames[key] = this.files[key].name;
-		});
-		
-		return { filenames };
+		// let filenames = {};
+		// Object.keys(this.files).forEach(key => {
+		// 	filenames[key] = {
+		// 		name: this.files[key].name,
+		// 		path:
+		// 	};
+		// });
+		//
+		// return { filenames };
+		return { files: this.files };
 	}
 }
 

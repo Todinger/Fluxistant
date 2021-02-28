@@ -10,3 +10,5 @@
 - User data editor: built-in, data-specific interface that allows visual
   editing of the data (each module will need to define these editors for
   itself).
+- OBS Websocket module
+- Voice activation mechanism (in addition to commands and shortcut keys)
