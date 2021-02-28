@@ -1,4 +1,5 @@
 import EntityGui from "./entityGui.mjs";
+import DataContentRegistry from "./dataContents/dataContentFactory.mjs";
 
 export default class DataGui extends EntityGui {
 	static get GUITYPE()    { return null; }   // Abstract class, should not be instantiated
@@ -6,6 +7,7 @@ export default class DataGui extends EntityGui {
 	constructor(entity, guiID, modName) {
 		super(entity, guiID, modName);
 		this.showingItem = false;
+		this.dataContent = null;
 	}
 	
 	_getFileKey() {
@@ -31,7 +33,7 @@ export default class DataGui extends EntityGui {
 		this._hideItem();
 		this._sendDeleteRequest();
 		this._clearItem();
-		// this._changed();
+		this._changed();
 	}
 	
 	_loadFileFromServer() {
@@ -46,12 +48,14 @@ export default class DataGui extends EntityGui {
 	
 	_makeItemPreview() {
 		// TODO: Move to image-specific object
-		this.itemPreview =  $('<img alt="" src="" uk-img>');
-		return this.itemPreview;
+		// this.dataContent =  $('<img alt="" src="" uk-img>');
+		// this.dataContent = PREVIEW_BUILDERS[this.entity.getDataType()](container);
+		this.dataContent = DataContentRegistry.build(this.entity.getDataType());
+		return this.dataContent.build();
 	}
 	
 	_makeNameTag() {
-		let outerSpan = $('<span class="uk-text-meta uk-text-break uk-width-small file-upload-name"></span>');
+		let outerSpan = $('<span class="uk-text-meta uk-text-break uk-width-auto file-upload-name"></span>');
 		let innerSpan = $('<span class="uk-flex uk-flex-center uk-text-truncate"></span>');
 		outerSpan.append(innerSpan);
 		
@@ -61,7 +65,7 @@ export default class DataGui extends EntityGui {
 	}
 	
 	_showItemPreview(data) {
-		this.itemPreview.attr('src', data);
+		this.dataContent.fill(data);
 	}
 	
 	_showItemName(itemName) {
@@ -85,7 +89,7 @@ export default class DataGui extends EntityGui {
 	}
 	
 	_clearItemPreview() {
-		this.itemPreview.attr('src', '');
+		this.dataContent.clear();
 	}
 	
 	_clearItemName() {
@@ -98,7 +102,7 @@ export default class DataGui extends EntityGui {
 	}
 	
 	_makeItemContainer() {
-		let container = $('<div class="uk-inline"></div>');
+		let container = $('<div class="uk-inline uk-flex uk-flex-center"></div>');
 		let preview = this._makeItemPreview();
 		
 		let deleteButtonContainer = $('<span class="uk-invisible-hover uk-position-absolute uk-transform-center" style="left: 90%; top: 10%">');
@@ -111,7 +115,7 @@ export default class DataGui extends EntityGui {
 	}
 	
 	_makePreview() {
-		let previewContainer = $('<div class="uk-visible-toggle uk-flex uk-flex-column uk-width-small uk-padding-remove" tabindex="-1" hidden></div>');
+		let previewContainer = $('<div class="uk-visible-toggle uk-flex uk-flex-column uk-width-auto uk-padding-remove" tabindex="-1" hidden></div>');
 		
 		let previewItemContainer = this._makeItemContainer();
 		let nameTag = this._makeNameTag();
@@ -227,7 +231,7 @@ export default class DataGui extends EntityGui {
 				}, 1000);
 				
 				// _this._toggleView();
-				// _this._changed();
+				_this._changed();
 			},
 			
 			complete: function(req) {

@@ -7,7 +7,7 @@ class GuiRegistryClass {
 		if (!guiClass) throw 'Invalid definer class registered.';
 		
 		let guiType = guiClass.GUITYPE;
-		console.assert(guiType, `GUI builder registration missing a GUITYPE value.`)
+		console.assert(guiType, `GUI builder registration missing a GUITYPE value.`);
 		
 		if (!guiType) throw 'Abstract or invalid definer class registered.';
 		if (guiType in this.guiBuilders) throw `Duplicate registration for GUI type '${guiType}'.`
