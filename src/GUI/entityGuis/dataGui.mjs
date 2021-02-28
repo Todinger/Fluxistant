@@ -22,6 +22,27 @@ export default class DataGui extends EntityGui {
 		return this.entity.getID();
 	}
 	
+	_getCollectionURL() {
+		return `/data/mod/${this.modName}/${this.entity.getCollectionID()}`;
+	}
+	
+	_getFileURL() {
+		return `${this._getCollectionURL()}/${this._getFileKey()}`;
+	}
+	
+	_sendDeleteRequest() {
+		let xHttp = new XMLHttpRequest();
+		xHttp.open('DELETE', this._getFileURL(), true);
+		xHttp.send();
+	}
+	
+	_deleteFile() {
+		this._toggleView();
+		this._sendDeleteRequest();
+		this._clearItemPreview();
+		this._clearItemName();
+	}
+	
 	_makeItemPreview() {
 		// TODO: Move to image-specific object
 		this.itemPreview =  $('<img alt="" src="" uk-img>');
@@ -39,11 +60,19 @@ export default class DataGui extends EntityGui {
 	}
 	
 	_showItemPreview(contentType, data) {
-		this.itemPreview.attr('src', `data:${contentType}; base64,${data}`);
+		this.itemPreview.attr('src', data);
+	}
+	
+	_clearItemPreview() {
+		this.itemPreview.attr('src', '');
 	}
 	
 	_showItemName(itemName) {
 		this.nameTag.text(itemName);
+	}
+	
+	_clearItemName() {
+		this.nameTag.text('');
 	}
 	
 	_makeItemContainer() {
@@ -52,6 +81,7 @@ export default class DataGui extends EntityGui {
 		
 		let deleteButtonContainer = $('<span class="uk-invisible-hover uk-position-absolute uk-transform-center" style="left: 90%; top: 10%">');
 		let deleteButton = $('<button class="uk-invisible-hover" type="button" uk-close></button>');
+		deleteButton.click(() => this._deleteFile());
 		deleteButtonContainer.append(deleteButton);
 		
 		container.append(preview, deleteButtonContainer);
@@ -91,7 +121,7 @@ export default class DataGui extends EntityGui {
 	_makeUploadArea() {
 		let areaContainer = $('<div class="js-upload uk-placeholder uk-text-center uk-margin-remove"></div>');
 		let icon = $('<span uk-icon="icon: upload"></span>');
-		let text = $('<span class="uk-text-middle">Upload image by dropping it here or</span>');
+		let text = $('<span class="uk-text-middle">Upload image by dropping it here or </span>');
 		
 		let uploadForm = $('<div id="uploader" uk-form-custom></div>');
 		let uploadInput = this._makeUploadInput();
@@ -111,6 +141,7 @@ export default class DataGui extends EntityGui {
 		contents.append(toggleButton, preview, uploadArea);
 		
 		this.toggler = toggleButton;
+		return contents;
 /*
 		<div class="uk-width-expand">
 			<button id="upload-toggler" class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden></button>
@@ -164,13 +195,13 @@ export default class DataGui extends EntityGui {
 	_createUploader(uploadForm) {
 		let _this = this;
 		window.up = UIkit.upload(uploadForm, {
-			url: `/data/mod/${this.modName}/${this.entity.getCollectionID()}`,
+			url: _this._getCollectionURL(),
 			name: this._getFileKey(),
 			multiple: true,
 			
 			completeAll: function() {
 				setTimeout(function () {
-					_this.progressBar.setAttribute('hidden', 'hidden');
+					_this.progressBar.attr('hidden', 'hidden');
 				}, 1000);
 				
 				_this._toggleView();
@@ -178,17 +209,18 @@ export default class DataGui extends EntityGui {
 			
 			complete: function(req) {
 				let files = JSON.parse(req.response);
+				let file = files[_this._getFileKey()];
 				let contentType = req.getResponseHeader('content-type');
-				let fileName = files.dataFile.name;
+				let fileName = file.name;
 				
-				_this._showItemPreview(contentType, files.dataFile.data);
+				_this._showItemPreview(contentType, file.data);
 				_this._showItemName(fileName);
 			},
 			
 			loadStart: function (e) {
 				console.log('loadStart', arguments);
 				
-				_this.progressBar.removeAttribute('hidden');
+				_this.progressBar.removeAttr('hidden');
 				_this.progressBar.max = e.total;
 				_this.progressBar.value = e.loaded;
 			},

@@ -54,6 +54,12 @@ class ChoiceEntity extends ConfigEntity {
 	
 	// ---- Overrides ---- //
 	
+	setID(id) {
+		super.setID(id);
+		this.forEach((option, value) => this.extendID(option, value));
+		return this;
+	}
+	
 	toConf() {
 		if (this.hasSelection()) {
 			return this.getSelection().toConf();

@@ -208,7 +208,7 @@ class Configurator {
 				
 				this.activeConfigs.modules = {};
 				Object.keys(data.modules).forEach(modName => {
-					this.activeConfigs.modules[modName] = this.createFromData(data.modules[modName], `mod/${modName}`);
+					this.activeConfigs.modules[modName] = this.createFromData(data.modules[modName], `mod.${modName}`);
 				});
 			}
 			

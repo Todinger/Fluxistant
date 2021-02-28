@@ -59,16 +59,16 @@ class Phasmophobia extends Module {
 		chatMessages.addBoolean('evidence', false)
 			.setName('Evidence')
 			.setDescription('Makes the bot send information to the chat every time a piece of evidence is found');
-		chatMessages.addBoolean('ghost', true)
+		chatMessages.addBoolean('ghost', false)
 			.setName('Final Ghost')
 			.setDescription('Makes the bot send a message to the chat when the ghost is found saying what it is');
 		chatMessages.addBoolean('newLevel', false)
 			.setName('New Level')
 			.setDescription('Makes the bot send a message to the chat when a new level is started');
-		chatMessages.addBoolean('evidenceLeft', true)
+		chatMessages.addBoolean('evidenceLeft', false)
 			.setName('Evidence Left')
 			.setDescription('Makes the bot say which types of evidence are still possible once two pieces have been acquired');
-		chatMessages.addBoolean('badEvidence', true)
+		chatMessages.addBoolean('badEvidence', false)
 			.setName('Bad Evidence Warning')
 			.setDescription('Makes the bot tag the streamer in a message if the evidence is faulty (i.e. if there are no possible ghosts for it)');
 	}

@@ -119,6 +119,12 @@ class ObjectEntity extends ConfigEntity {
 	
 	// ---- Overrides ---- //
 	
+	setID(id) {
+		super.setID(id);
+		this.forEach((key, child) => this.extendID(key, child));
+		return this;
+	}
+	
 	toConf() {
 		let conf = {};
 		Object.keys(this.children).map(key => {

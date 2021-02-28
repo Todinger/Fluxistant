@@ -1,3 +1,36 @@
+const StaticObjectEntity = require('./staticObjectEntity');
+const DynamicArrayEntity = require('./dynamicArrayEntity');
+
+class ImageEntity extends StaticObjectEntity {
+	static get TYPE()		{ return 'Image'; 					}
+	static get BUILDER()	{ return () => new ImageEntity(); 	}
+
+	constructor() {
+		super();
+		this.addData('file', { colID: 'Images', dataType: 'IMAGE' })
+			.setName('Image')
+			.setDescription('The image that will be displayed on the screen');
+		this.addInteger('width')
+			.setName('Width')
+			.setDescription('Display width on screen');
+		this.addInteger('height')
+			.setName('Height')
+			.setDescription('Display height on screen');
+		this.addNaturalNumber('duration')
+			.setName('Duration')
+			.setDescription('Duration in milliseconds that the image will be displayed');
+		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
+			.setName('Effects')
+			.setDescription('Special effects to apply to the image');
+	}
+
+	isSet() {
+		return this.getChild('file').isSet();
+	}
+}
+
+module.exports = ImageEntity;
+
 // const StaticObjectEntity = require('./staticObjectEntity');
 // const DynamicArrayEntity = require('./dynamicArrayEntity');
 //
@@ -5,11 +38,11 @@
 // 	static get TYPE()		{ return 'Image'; 					}
 // 	static get BUILDER()	{ return () => new ImageEntity(); 	}
 //
-// 	constructor(colID) {
+// 	constructor() {
 // 		super();
-// 		this.addData('file', { colID: colID, dataType: 'IMAGE' })
-// 			.setName('Image')
-// 			.setDescription('The image that will be displayed on the screen');
+// 		this.addString('filename')
+// 			.setName('File Name')
+// 			.setDescription('The name of the image file that will be displayed');
 // 		this.addInteger('width')
 // 			.setName('Width')
 // 			.setDescription('Display width on screen');
@@ -25,41 +58,8 @@
 // 	}
 //
 // 	isSet() {
-// 		return this.getChild('fileKey').isSet();
+// 		return this.getChild('filename').isSet();
 // 	}
 // }
 //
 // module.exports = ImageEntity;
-
-const StaticObjectEntity = require('./staticObjectEntity');
-const DynamicArrayEntity = require('./dynamicArrayEntity');
-
-class ImageEntity extends StaticObjectEntity {
-	static get TYPE()		{ return 'Image'; 					}
-	static get BUILDER()	{ return () => new ImageEntity(); 	}
-	
-	constructor() {
-		super();
-		this.addString('filename')
-			.setName('File Name')
-			.setDescription('The name of the image file that will be displayed');
-		this.addInteger('width')
-			.setName('Width')
-			.setDescription('Display width on screen');
-		this.addInteger('height')
-			.setName('Height')
-			.setDescription('Display height on screen');
-		this.addNaturalNumber('duration')
-			.setName('Duration')
-			.setDescription('Duration in milliseconds that the image will be displayed');
-		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
-			.setName('Effects')
-			.setDescription('Special effects to apply to the image');
-	}
-	
-	isSet() {
-		return this.getChild('filename').isSet();
-	}
-}
-
-module.exports = ImageEntity;

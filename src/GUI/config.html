@@ -390,7 +390,7 @@
 	let bar = $('#js-progressbar')[0];
 
 	window.up = UIkit.upload('#uploader', {
-		url: '/data/mod/Random Image/images',
+		url: '/data/mod/Image Commands/Images',
 		name: 'dataFile',
 		multiple: true,
 
@@ -406,7 +406,7 @@
 			imageName = files.dataFile.name;
 			$('#imgNameTag').text(imageName);
 			let contentType = req.getResponseHeader('content-type');
-			img.attr('src', `data:${contentType}; base64,${files.dataFile.data}`);
+			img.attr('src', files.dataFile.data);
 			UIkit.toggle('#upload-toggler').toggle();
 		},
 

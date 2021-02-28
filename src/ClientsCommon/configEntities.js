@@ -18657,6 +18657,15 @@ class ArrayEntity extends ConfigEntity {
 	
 	// ---- Overrides ---- //
 	
+	setID(id) {
+		super.setID(id);
+		for (let i = 0; i < this.elements.length; i++) {
+			this.extendID(i, this.elements[i]);
+		}
+		
+		return this;
+	}
+	
 	toConf() {
 		return this.elements.map(element => element.toConf());
 	}
@@ -18894,6 +18903,12 @@ class ChoiceEntity extends ConfigEntity {
 	
 	
 	// ---- Overrides ---- //
+	
+	setID(id) {
+		super.setID(id);
+		this.forEach((option, value) => this.extendID(option, value));
+		return this;
+	}
 	
 	toConf() {
 		if (this.hasSelection()) {
@@ -19184,11 +19199,11 @@ class ConfigEntity {
 	}
 	
 	_escapeID(value) {
-		return (''+value).replace('/', '\\/');
+		return (''+value).replace('.', '\\.');
 	}
 	
 	extendID(addendum, childEntity) {
-		childEntity.setID(`${this.id}/${this._escapeID(addendum)}`);
+		childEntity.setID(`${this.id}.${this._escapeID(addendum)}`);
 	}
 	
 	// Returns the contents of this entity as a module-ready configuration for
@@ -19280,9 +19295,9 @@ class ConfigEntity {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
 		instance.buildFrom(entityObject.descriptor);
+		instance.setID(id);
 		instance.setName(entityObject.name);
 		instance.setDescription(entityObject.description);
-		instance.setID(id);
 		instance.validate();
 		return instance;
 	}
@@ -19379,6 +19394,10 @@ class DataEntity extends StaticObjectEntity {
 	
 	getFileKey() {
 		return this.getChild('fileKey').getValue();
+	}
+	
+	isSet() {
+		return true;
 	}
 	
 	// ---- Overrides ---- //
@@ -19673,6 +19692,39 @@ class ImageEffect_ShadowEntity extends ChoiceValueEntity {
 module.exports = ImageEffect_ShadowEntity;
 
 },{"./choiceValueEntity":16}],30:[function(require,module,exports){
+const StaticObjectEntity = require('./staticObjectEntity');
+const DynamicArrayEntity = require('./dynamicArrayEntity');
+
+class ImageEntity extends StaticObjectEntity {
+	static get TYPE()		{ return 'Image'; 					}
+	static get BUILDER()	{ return () => new ImageEntity(); 	}
+
+	constructor() {
+		super();
+		this.addData('file', { colID: 'Images', dataType: 'IMAGE' })
+			.setName('Image')
+			.setDescription('The image that will be displayed on the screen');
+		this.addInteger('width')
+			.setName('Width')
+			.setDescription('Display width on screen');
+		this.addInteger('height')
+			.setName('Height')
+			.setDescription('Display height on screen');
+		this.addNaturalNumber('duration')
+			.setName('Duration')
+			.setDescription('Duration in milliseconds that the image will be displayed');
+		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
+			.setName('Effects')
+			.setDescription('Special effects to apply to the image');
+	}
+
+	isSet() {
+		return this.getChild('file').isSet();
+	}
+}
+
+module.exports = ImageEntity;
+
 // const StaticObjectEntity = require('./staticObjectEntity');
 // const DynamicArrayEntity = require('./dynamicArrayEntity');
 //
@@ -19680,11 +19732,11 @@ module.exports = ImageEffect_ShadowEntity;
 // 	static get TYPE()		{ return 'Image'; 					}
 // 	static get BUILDER()	{ return () => new ImageEntity(); 	}
 //
-// 	constructor(colID) {
+// 	constructor() {
 // 		super();
-// 		this.addData('file', { colID: colID, dataType: 'IMAGE' })
-// 			.setName('Image')
-// 			.setDescription('The image that will be displayed on the screen');
+// 		this.addString('filename')
+// 			.setName('File Name')
+// 			.setDescription('The name of the image file that will be displayed');
 // 		this.addInteger('width')
 // 			.setName('Width')
 // 			.setDescription('Display width on screen');
@@ -19700,44 +19752,11 @@ module.exports = ImageEffect_ShadowEntity;
 // 	}
 //
 // 	isSet() {
-// 		return this.getChild('fileKey').isSet();
+// 		return this.getChild('filename').isSet();
 // 	}
 // }
 //
 // module.exports = ImageEntity;
-
-const StaticObjectEntity = require('./staticObjectEntity');
-const DynamicArrayEntity = require('./dynamicArrayEntity');
-
-class ImageEntity extends StaticObjectEntity {
-	static get TYPE()		{ return 'Image'; 					}
-	static get BUILDER()	{ return () => new ImageEntity(); 	}
-	
-	constructor() {
-		super();
-		this.addString('filename')
-			.setName('File Name')
-			.setDescription('The name of the image file that will be displayed');
-		this.addInteger('width')
-			.setName('Width')
-			.setDescription('Display width on screen');
-		this.addInteger('height')
-			.setName('Height')
-			.setDescription('Display height on screen');
-		this.addNaturalNumber('duration')
-			.setName('Duration')
-			.setDescription('Duration in milliseconds that the image will be displayed');
-		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
-			.setName('Effects')
-			.setDescription('Special effects to apply to the image');
-	}
-	
-	isSet() {
-		return this.getChild('filename').isSet();
-	}
-}
-
-module.exports = ImageEntity;
 
 },{"./dynamicArrayEntity":21,"./staticObjectEntity":41}],31:[function(require,module,exports){
 const assert = require('assert').strict;
@@ -20056,6 +20075,12 @@ class ObjectEntity extends ConfigEntity {
 	
 	// ---- Overrides ---- //
 	
+	setID(id) {
+		super.setID(id);
+		this.forEach((key, child) => this.extendID(key, child));
+		return this;
+	}
+	
 	toConf() {
 		let conf = {};
 		Object.keys(this.children).map(key => {
@@ -20140,6 +20165,49 @@ class SimpleObjectEntity extends DynamicObjectEntity {
 module.exports = SimpleObjectEntity;
 
 },{"./dynamicObjectEntity":23}],40:[function(require,module,exports){
+const assert = require('assert').strict;
+const StaticObjectEntity = require('./staticObjectEntity');
+
+class SoundEntity extends StaticObjectEntity {
+	static get TYPE()		{ return 'Sound'; 					}
+	static get BUILDER()	{ return () => new SoundEntity(); 	}
+
+	constructor() {
+		super();
+		this.addData('file', { colID: 'Sounds', dataType: 'SOUND' })
+			.setName('Sound')
+			.setDescription('The sound that will be played');
+		this.addNumber('volume', 100)
+			.setName('Volume')
+			.setDescription('Volume at which to play the sound (not implemented yet)');
+	}
+
+	getVolume() {
+		return this.getChild('volume').getValue();
+	}
+
+	isSet() {
+		return this.getChild('file').isSet();
+	}
+
+	isVolumeSet() {
+		return this.getChild('volume').isSet();
+	}
+
+
+	// ---- Overrides ---- //
+
+	validate() {
+		super.validate();
+		let volume = this.getVolume();
+		assert(
+			!this.isSet() || !this.isVolumeSet() || (0 <= volume && volume <= 100),
+			`Volume must be bet 0 and 100.`);
+	}
+}
+
+module.exports = SoundEntity;
+
 // const assert = require('assert').strict;
 // const StaticObjectEntity = require('./staticObjectEntity');
 //
@@ -20147,14 +20215,18 @@ module.exports = SimpleObjectEntity;
 // 	static get TYPE()		{ return 'Sound'; 					}
 // 	static get BUILDER()	{ return () => new SoundEntity(); 	}
 //
-// 	constructor(colID) {
+// 	constructor() {
 // 		super();
-// 		this.addData('file', { colID: colID, dataType: 'SOUND' })
-// 			.setName('Sound')
-// 			.setDescription('The sound that will be played');
+// 		this.addString('filename')
+// 			.setName('File Name')
+// 			.setDescription('The name of the sound file that will be displayed.');
 // 		this.addNumber('volume', 100)
 // 			.setName('Volume')
-// 			.setDescription('Volume at which to play the sound (not implemented yet)');
+// 			.setDescription('Volume at which to play the sound (not implemented yet).');
+// 	}
+//
+// 	getFilename() {
+// 		return this.getChild('filename').getValue();
 // 	}
 //
 // 	getVolume() {
@@ -20182,53 +20254,6 @@ module.exports = SimpleObjectEntity;
 // }
 //
 // module.exports = SoundEntity;
-
-const assert = require('assert').strict;
-const StaticObjectEntity = require('./staticObjectEntity');
-
-class SoundEntity extends StaticObjectEntity {
-	static get TYPE()		{ return 'Sound'; 					}
-	static get BUILDER()	{ return () => new SoundEntity(); 	}
-	
-	constructor() {
-		super();
-		this.addString('filename')
-			.setName('File Name')
-			.setDescription('The name of the sound file that will be displayed.');
-		this.addNumber('volume', 100)
-			.setName('Volume')
-			.setDescription('Volume at which to play the sound (not implemented yet).');
-	}
-	
-	getFilename() {
-		return this.getChild('filename').getValue();
-	}
-	
-	getVolume() {
-		return this.getChild('volume').getValue();
-	}
-	
-	isSet() {
-		return this.getChild('filename').isSet();
-	}
-	
-	isVolumeSet() {
-		return this.getChild('volume').isSet();
-	}
-	
-	
-	// ---- Overrides ---- //
-	
-	validate() {
-		super.validate();
-		let volume = this.getVolume();
-		assert(
-			!this.isSet() || !this.isVolumeSet() || (0 <= volume && volume <= 100),
-			`Volume must be bet 0 and 100.`);
-	}
-}
-
-module.exports = SoundEntity;
 
 },{"./staticObjectEntity":41,"assert":1}],41:[function(require,module,exports){
 const assert = require('assert').strict;

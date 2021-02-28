@@ -61,11 +61,11 @@ class ConfigEntity {
 	}
 	
 	_escapeID(value) {
-		return (''+value).replace('/', '\\/');
+		return (''+value).replace('.', '\\.');
 	}
 	
 	extendID(addendum, childEntity) {
-		childEntity.setID(`${this.id}/${this._escapeID(addendum)}`);
+		childEntity.setID(`${this.id}.${this._escapeID(addendum)}`);
 	}
 	
 	// Returns the contents of this entity as a module-ready configuration for
@@ -157,9 +157,9 @@ class ConfigEntity {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
 		instance.buildFrom(entityObject.descriptor);
+		instance.setID(id);
 		instance.setName(entityObject.name);
 		instance.setDescription(entityObject.description);
-		instance.setID(id);
 		instance.validate();
 		return instance;
 	}

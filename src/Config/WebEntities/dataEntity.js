@@ -36,6 +36,10 @@ class DataEntity extends StaticObjectEntity {
 		return this.getChild('fileKey').getValue();
 	}
 	
+	isSet() {
+		return true;
+	}
+	
 	// ---- Overrides ---- //
 	
 	validate() {

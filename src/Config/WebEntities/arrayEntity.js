@@ -81,6 +81,15 @@ class ArrayEntity extends ConfigEntity {
 	
 	// ---- Overrides ---- //
 	
+	setID(id) {
+		super.setID(id);
+		for (let i = 0; i < this.elements.length; i++) {
+			this.extendID(i, this.elements[i]);
+		}
+		
+		return this;
+	}
+	
 	toConf() {
 		return this.elements.map(element => element.toConf());
 	}

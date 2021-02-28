@@ -31,7 +31,7 @@ class UserData {
 	
 	_save(key, file, callback) {
 		let filePath = this._pathFor(file.name);
-		file.mv(filePath, (err) => {
+		file.mv(filePath, async (err) => {
 			if (err) {
 				callback(err);
 			} else {
@@ -40,7 +40,12 @@ class UserData {
 					path: filePath,
 				};
 				
-				this._getFileWebByKey(key, callback);
+				try {
+					let fileData = await this._getFileWebByKey(key);
+					callback(undefined, fileData);
+				} catch (err) {
+					callback(err);
+				}
 			}
 		});
 	}
