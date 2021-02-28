@@ -99,9 +99,13 @@ class CommandEntity extends StaticObjectEntity {
 			`Command name must be a non-empty single-word string. Got: ${cmdname}`);
 		
 		this.getAliases().forEach(
-			alias => Errors.ensureNonEmptyString(
-				alias,
-				'Command aliases must be non-empty strings.'));
+			alias => {
+				if (alias) {
+					Errors.ensureNonEmptyString(
+						alias,
+						'Command aliases must be non-empty strings.');
+				}
+			});
 		
 		assert(
 			this.getCost() >= 0,

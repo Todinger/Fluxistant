@@ -480,7 +480,7 @@ class Module {
 			cmd.aliases = [];
 		}
 		
-		let allNames = [cmd.cmdname].concat(cmd.aliases);
+		let allNames = [cmd.cmdname].concat(cmd.aliases).filter((alias) => alias && alias.length > 0);
 		let cmdname = cmd.cmdname;
 		
 		allNames.forEach(alias => {
