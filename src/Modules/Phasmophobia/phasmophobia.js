@@ -60,11 +60,26 @@ class PhasmophobiaClient extends ModuleClient {
 		this.images[ev].back.attr('src', this.stateImages[state]);
 	}
 	
+	showName(name) {
+		$('#ghostName').text(name);
+		$('#ghostNameContainer').css('opacity', 1);
+	}
+	
+	hideName() {
+		$('#ghostNameContainer').css('opacity', 0);
+	}
+	
 	start() {
 		this.server.on('hide', () => this.hide());
 		this.server.on('show', () => this.show());
 		
 		this.server.on('state', state => {
+			if (state.ghostName) {
+				this.showName(state.ghostName);
+			} else {
+				this.hideName();
+			}
+			
 			Object.keys(state.evidence).forEach(ev => {
 				this.setState(ev, state.evidence[ev]);
 			});

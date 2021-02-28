@@ -273,6 +273,7 @@ class Phasmophobia extends Module {
 		} else if (user.isAtLeastMod) {
 			this.levelData.ghostName = name.join(' ');
 			this.say(`Ghost's name set to ${this.levelData.ghostName}.`);
+			this.updateClient();
 		}
 	}
 	
