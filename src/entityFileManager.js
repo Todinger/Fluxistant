@@ -75,6 +75,7 @@ ${classes.join('\n')}
 };
 
 const factory = require('./entityFactory');
+const enums = require('../enums');
 
 function registerAll() {
 	Object.values(entities).forEach(entity => {
@@ -86,6 +87,7 @@ module.exports = {
 	Entities: entities,
 	Factory: factory,
 	RegisterAll: registerAll,
+	Enums: enums,
 }`;
 		
 		fs.writeFileSync(outputFilePath, fileText, 'utf8');

@@ -30,9 +30,25 @@
 	<!--suppress HtmlUnknownTarget -->
 	<script src="/common/configEntities.js"></script>
 	<script type="module" src="./entityGuis/entityGuis.mjs"></script>
+	<script type="text/javascript">
+		let listening = false;
+
+		function bodyKeyPress(e) {
+			if (listening) {
+				$('#keyText').text(e.keyCode);
+				UIkit.switcher($('#keyview')).show(2);
+				listening = false;
+			}
+		}
+
+		function listenForKey() {
+			UIkit.switcher($('#keyview')).show(1);
+			listening = true;
+		}
+	</script>
 <!--	<script type="module" src="./config.mjs"></script>-->
 </head>
-<body>
+<body onkeypress="bodyKeyPress(event)">
 <!--<form class="uk-form-horizontal">-->
 
 <div class="uk-light uk-background-secondary uk-padding-small uk-height-viewport">
@@ -74,6 +90,25 @@
 							<h3 class="uk-width-1-6">Name</h3>
 							<div class="uk-width-expand">
 								<input id="main-string" class="uk-input" type="text" placeholder="Value...">
+							</div>
+						</div>
+						<!-- Key --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Key">
+							<h3 class="uk-width-1-6 uk-text-warning">Key</h3>
+							<div class="uk-width-expand">
+<!--								<input id="main-key" class="uk-input uk-button" type="button">-->
+								<div class="uk-button uk-button-default" onclick="listenForKey();">
+									<ul id="keyview" uk-switcher="toggle: > *" hidden>
+										<li></li>
+										<li></li>
+										<li></li>
+									</ul>
+									<ul id="keyview-vals" class="uk-switcher" uk-switcher="toggle: > *">
+										<li>Click to Set Key</li>
+										<li>Waiting for keypress...</li>
+										<li id="keyText" class="uk-label uk-label-warning">F1</li>
+									</ul>
+<!--									<span class="uk-label">F1</span>-->
+								</div>
 							</div>
 						</div>
 						<!-- Object --> <div>

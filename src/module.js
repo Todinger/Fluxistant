@@ -193,6 +193,10 @@ class Module {
 						let name = `${shortcutID}[${i}]`;
 						let shortcutKeycodes = keys.map(
 							key => {
+								assert(
+									key !== 'CHAR_UNDEFINED',
+									'Undefined key given for shortcut.');
+								
 								let keyCode = 'VC_' + key.toUpperCase();
 								assert(
 									keyCode in Module.Keycodes,

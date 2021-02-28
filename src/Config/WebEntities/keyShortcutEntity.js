@@ -7,7 +7,7 @@ class KeyShortcutEntity extends DynamicArrayEntity {
 	static get BUILDER()	{ return (...p) => new KeyShortcutEntity(...p);	}
 	
 	constructor(defaultKeys) {
-		super('String');
+		super('Key');
 		// TODO: Switch to keyboard shortcut entity
 		if (defaultKeys) {
 			this.setKeys(defaultKeys);

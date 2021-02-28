@@ -16,6 +16,7 @@ const entities = {
 	ImageEffect_GlowEntity: require('./WebEntities/imageEffect_GlowEntity.js'),
 	ImageEffect_ShadowEntity: require('./WebEntities/imageEffect_ShadowEntity.js'),
 	IntegerEntity: require('./WebEntities/integerEntity.js'),
+	KeyEntity: require('./WebEntities/keyEntity.js'),
 	KeyShortcutEntity: require('./WebEntities/keyShortcutEntity.js'),
 	KeyShortcutsEntity: require('./WebEntities/keyShortcutsEntity.js'),
 	NaturalNumberEntity: require('./WebEntities/naturalNumberEntity.js'),
@@ -44,6 +45,7 @@ const entities = {
 };
 
 const factory = require('./entityFactory');
+const enums = require('../enums');
 
 function registerAll() {
 	Object.values(entities).forEach(entity => {
@@ -55,4 +57,5 @@ module.exports = {
 	Entities: entities,
 	Factory: factory,
 	RegisterAll: registerAll,
+	Enums: enums,
 }

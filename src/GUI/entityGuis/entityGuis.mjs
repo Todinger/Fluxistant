@@ -13,7 +13,8 @@ import ChoiceGui		from "./choiceGui.mjs";
 import RawObjectGui		from "./rawObjectGui.mjs";
 import ConfigGui		from "./configGui.mjs";
 import CommandGui		from "./commandGui.mjs";
-import DataGui		from "./dataGui.mjs";
+import DataGui			from "./dataGui.mjs";
+import KeyGui			from "./keyGui.mjs";
 
 export default {
 	GuiRegistry,
@@ -32,5 +33,6 @@ export default {
 	ConfigGui,
 	CommandGui,
 	UploadGui: DataGui,
+	KeyGui,
 };
 

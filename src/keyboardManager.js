@@ -43,7 +43,7 @@ class KeyboardManager {
 			`Multiple shortcuts registered for the name '${name}'`);
 		
 		// We basically just delegate this to the ioHook library
-		let id = ioHook.registerShortcut(shortcut, callback);
+		let id = ioHook.registerShortcut(shortcut.map(sc => sc.value), callback);
 		
 		// We need to store the result of the registration if we want to later
 		// unregister it, which is the reason for this collection
@@ -151,7 +151,7 @@ class ManualShortcutsKeyboardManager extends KeyboardManager {
 			`Multiple shortcuts registered for the name '${name}'`);
 		
 		this.shortcuts[name] = {
-			keys: shortcut,
+			keys: shortcut.map(sc => sc.value),
 			callback: callback,
 		};
 		
