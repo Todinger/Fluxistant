@@ -130,14 +130,14 @@ class UserData {
 		
 		// Added the '|| {}' part to shut the IDE up about it might being
 		// null or undefined (despite our test above to make sure it isn't...)
-		let files = exportedData.files || {};
-		this.files = {};
-		Object.keys(files).forEach(key => {
-			this.files[key] = {
-				name: files[key],
-				path: this._pathForKey(key, files[key]),
-			};
-		});
+		// let files = exportedData.files || {};
+		this.files = exportedData.files || {};
+		// Object.keys(files).forEach(key => {
+		// 	this.files[key] = {
+		// 		name: files[key].name,
+		// 		path: this._pathForKey(key, files[key]),
+		// 	};
+		// });
 	}
 	
 	export() {

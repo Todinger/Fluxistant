@@ -46,6 +46,10 @@ console.assert	= function(cond, text, dontThrow){
 // In charge of loading sounds, playing them, controlling volume, fade-ins,
 // fade-outs, etc.
 class SoundManager {
+	static getNextTempName() {
+		return `Temp: ${SoundManager.tempSoundNum++}`;
+	}
+	
 	constructor(soundHolderID) {
 		this._soundHolderID = soundHolderID;
 		this._sounds = {};
@@ -184,7 +188,8 @@ class SoundManager {
 	// 	location	URL of the actual sound file.
 	// 	[loop]		Set to true if the sound should loop when playing.
 	// 	[onLoaded]	Function to call once the file finishes loading.
-	loadSound(name, location, loop, onLoaded) {
+	// 	[onError]	Function to call if an error occurs while loading.
+	loadSound(name, location, loop, onLoaded, onError) {
 		console.assert(!(name in this._sounds),
 			`Duplicate loading of the sound ${name}`);
 		
@@ -194,6 +199,10 @@ class SoundManager {
 			if (onLoaded) {
 				onLoaded(name);
 			}
+		})
+		.on('error', () => {
+			this.unloadSound(name);
+			onError();
 		})
 		.prop('loop', loop)
 		.appendTo(`#${this._soundHolderID}`);
@@ -262,32 +271,30 @@ class SoundManager {
 	// 
 	playOneShot(url, onDone, onError, name) {
 		if (!name) {
-			name = url;
+			name = SoundManager.getNextTempName();
 		}
 		
-		this.loadSound(name, url, false, () => {
-			let endFunc = () => {
-				this.unloadSound(name);
-				if (onDone) {
-					onDone();
-				}
-			};
-			
-			this.play(
-				name,
-				() => {
-					this.unloadSound(name);
-					if (onDone) {
-						onDone();
-					}
-				},
-				() => {
-					this.unloadSound(name);
-					if (onError) {
-						onError();
-					}
-				});
-		});
+		this.loadSound(
+			name,
+			url,
+			false,
+			() => {
+				this.play(
+					name,
+					() => {
+						this.unloadSound(name);
+						if (onDone) {
+							onDone();
+						}
+					},
+					() => {
+						this.unloadSound(name);
+						if (onError) {
+							onError();
+						}
+					});
+			},
+			onError);
 	}
 	
 	// Invokes the given function on all the sounds we have and forwards the
@@ -475,6 +482,9 @@ class SoundManager {
 		this.fadeIn(duration, name, onDone);
 	}
 }
+
+// Used to assign names to one-shot audio files, increased for each
+SoundManager.tempSoundNum = 0;
 
 // General event notification class.
 // Lets you use on(...) and invokes registered callbacks upon _notify(...).

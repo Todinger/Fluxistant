@@ -2,8 +2,8 @@ const FADE_DURATION = 250;
 const DEFAULT_SHOW_DURATION = 5000;
 
 // A jQuery value holding the image element we use for displaying images
-var jImageHolder = $('#imageholder');
-var jImage = $('#actualimg');
+const jImageHolder = $('#imageholder');
+const jImage = $('#actualimg');
 
 class ImageDisplay extends ModuleClient {
 	constructor() {
@@ -54,12 +54,12 @@ class ImageDisplay extends ModuleClient {
 		}
 	}
 	
-	playSound(url) {
+	playSound(soundParameters) {
 		// let sound = new Audio(url);
 		// $(sound).on('ended', () => this.soundDone());
 		// sound.play().catch(() => this.soundDone());
 		let markDone = () => this.soundDone();
-		this.sounds.playOneShot(url, markDone, markDone);
+		this.sounds.playOneShot(soundParameters.url, markDone, markDone);
 	}
 	
 	imageDone(imageParameters) {

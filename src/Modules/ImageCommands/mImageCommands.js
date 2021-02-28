@@ -1,34 +1,7 @@
 'use strict';
 
+const _ = require('lodash');
 const Module = requireMain('module');
-// const Utils = requireMain('utils');
-
-// Command file structure:
-//	{
-//		cmdname1: {...},
-//		cmdname2: {...},
-//	}
-// 
-// Command details:
-// cmdname: {
-// 	aliases: [ "list", "of", "aliases" ],	// Completely optional
-// 	filters: [								// Completely optional
-// 		{
-// 			name: "filterName",		// E.g. "isUser"
-// 			argument: "Some value",	// E.g. "Fluxistence", omit if unnecessary
-// 		},
-// 		// More filters if so desired
-// 	],
-// 	image: {						// Optional, can be sound only
-// 		url: "/url/of/image.png",
-// 		width: widthInPixels,		// Optional, defaults to 300
-// 		height: heightInPixels,		// Optional, defaults to 300
-// 		duration: timeInMS,			// Optional, defaults to 300
-// 	},
-// 	sound: "/url/of/sound.mp3",		// Optional, can be image only
-// 	// Both image and sound are optional, but at least one must be present
-// }
-const COMMANDS_FILENAME = 'commands.json';
 
 class ImageCommands extends Module {
 	constructor() {
@@ -40,46 +13,39 @@ class ImageCommands extends Module {
 		this.imageCommands = {};
 	}
 	
-	// _sendCommand(cmd) {
-	// 	this.broadcastEvent('showImage', {
-	// 		image: cmd.image,
-	// 		sound: cmd.sound,
-	// 	});
-	// }
-	
-	// defineConfig(modConfig) {
-	// 	modConfig.addChild('imageCommands', 'DynamicArray', 'ImageCommand')
-	// 		.setName('Image Commands')
-	// 		.setDescription('Commands for showing images and/or playing sounds');
-	// }
+	_makeDisplayData(displayObject, file) {
+		let dd = _.omit(displayObject, 'file');
+		dd.url = file.data;
+		return dd;
+	}
 	
 	_sendCommand(cmdObject) {
 		let _this = this;
-		let promises = [];
 		
-		let hasImage = this.data.Images.hasKey(cmdObject.image.file.key);
-		let hasSound = this.data.Sounds.hasKey(cmdObject.sound.file.key);
-
+		let hasImage = this.data.Images.hasKey(cmdObject.image.file.fileKey);
+		let hasSound = this.data.Sounds.hasKey(cmdObject.sound.file.fileKey);
+		
 		let imagePromise = hasImage ?
-			promises.push(this.data.getFileWeb(cmdObject.image.colID, cmdObject.image.fileKey)) :
+			this.data.getFileWeb(cmdObject.image.file.colID, cmdObject.image.file.fileKey) :
 			Promise.resolve();
-
-		let soundPromise = hasImage ?
-			promises.push(this.data.getFileWeb(cmdObject.sound.colID, cmdObject.sound.fileKey)) :
+		
+		let soundPromise = hasSound ?
+			this.data.getFileWeb(cmdObject.sound.file.colID, cmdObject.sound.file.fileKey) :
 			Promise.resolve();
-
+		
 		if (hasImage || hasSound) {
 			Promise.all([imagePromise, soundPromise])
-			.then(function([imageDataURL, soundDataURL]) {
+			.then(function([imageFile, soundFile]) {
 				let parameters = {};
 				if (hasImage) {
-					parameters.image = Utils.objectWith(cmdObject.image, { url: imageDataURL });
+					parameters.image = _this._makeDisplayData(cmdObject.image, imageFile); //Utils.objectWith(cmdObject.image, { url: imageFile.data });
 				}
-
+				
 				if (hasSound) {
-					parameters.image = Utils.objectWith(cmdObject.sound, { url: soundDataURL });
+					// parameters.sound = Utils.objectWith(cmdObject.sound, { url: soundFile.data });
+					parameters.sound = _this._makeDisplayData(cmdObject.sound, soundFile);
 				}
-
+				
 				_this.broadcastEvent('showImage', parameters);
 			});
 		}
@@ -89,7 +55,7 @@ class ImageCommands extends Module {
 		modData.addNamedCollection('Images');
 		modData.addNamedCollection('Sounds');
 	}
-
+	
 	defineModConfig(modConfig) {
 		modConfig.add(
 			'imageCommands',
@@ -98,25 +64,29 @@ class ImageCommands extends Module {
 		.setName('Image Commands')
 		.setDescription('Commands for showing images and/or playing sounds');
 	}
-
+	
 	loadModConfig(conf) {
 		this.unregisterCommands(this.imageCommands);
-		this.imageCommands = this.createCommandObjects(conf.imageCommands);
-		conf.imageCommands.forEach(command => {
-			let cmdObject = this.createCommandObject(command);
-			cmdObject.callback = (co) => this._sendCommand(co);
-			cmdObject.image = command.image;
-			cmdObject.sound = command.sound;
-		});
-
+		this.imageCommands = {};
+		if (conf.imageCommands) {
+			for (let i = 0; i < conf.imageCommands.length; i++) {
+				let cmd = conf.imageCommands[i];
+				let cmdObject = this.createCommandObject(cmd);
+				
+				if (!cmdObject.cmdid) {
+					cmdObject.cmdid = `ImageCommand[${i}]`;
+				}
+				
+				cmdObject.image = cmd.image;
+				cmdObject.sound = cmd.sound;
+				cmdObject.callback = () => {
+					this._sendCommand(cmdObject);
+				};
+				this.imageCommands[cmdObject.cmdid] = cmdObject;
+			}
+		}
+		
 		this.registerCommands(this.imageCommands);
-	}
-	
-	loadData() {
-		this.commandManager.loadFile(
-			COMMANDS_FILENAME,
-			(cmd) => this._sendCommand(cmd)
-		);
 	}
 }
 

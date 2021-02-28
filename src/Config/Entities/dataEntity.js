@@ -33,7 +33,7 @@ class DataEntity extends StaticObjectEntity {
 	}
 	
 	getFileKey() {
-		return this.getChild('fileKey').getValue();
+		return this.getID();
 	}
 	
 	isSet() {
@@ -49,6 +49,12 @@ class DataEntity extends StaticObjectEntity {
 	}
 	
 	// ---- Overrides ---- //
+	
+	toConf() {
+		let conf = super.toConf();
+		conf.fileKey = this.getFileKey();
+		return conf;
+	}
 	
 	validate() {
 		super.validate();

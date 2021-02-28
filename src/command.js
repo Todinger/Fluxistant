@@ -21,7 +21,6 @@ class Command {
 		// this.silent = data.silent;
 		this.cooldowns = data.cooldowns;
 		this.filters = this.compileFilters(data.filters);
-		this.extras = {};
 	}
 	
 	compileFilters(filterData) {
