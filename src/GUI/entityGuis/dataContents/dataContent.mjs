@@ -26,4 +26,8 @@ export default class DataContent {
 	clear() {
 		this.components.source.attr('src', '');
 	}
+	
+	get allowedMimeTypes() {
+		throw 'Abstract function called.';
+	}
 }

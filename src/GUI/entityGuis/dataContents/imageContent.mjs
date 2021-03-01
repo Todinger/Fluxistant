@@ -12,6 +12,10 @@ export default class ImageContent extends DataContent {
 			source: img,
 		}
 	}
+	
+	get allowedMimeTypes() {
+		return "image/*";
+	}
 }
 
 DataContentFactory.register(ImageContent);

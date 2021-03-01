@@ -143,7 +143,7 @@ export default class DataGui extends EntityGui {
 	
 	_makeUploadInput() {
 		// TODO: Move to concrete subclasses for single/multiple uploads
-		return $('<input type="file" multiple>');
+		return $(`<input type="file" multiple accept="${this.dataContent.allowedMimeTypes}">`);
 	}
 	
 	_makeUploadArea() {
@@ -151,11 +151,11 @@ export default class DataGui extends EntityGui {
 		let icon = $('<span uk-icon="icon: upload"></span>');
 		let text = $('<span class="uk-text-middle">Upload image by dropping it here or </span>');
 		
-		let uploadForm = $('<div id="uploader" uk-form-custom></div>');
+		let uploadForm = $('<div uk-form-custom></div>');
 		let uploadInput = this._makeUploadInput();
 		let uploadLink = $('<span class="uk-link">selecting one</span>');
 		uploadForm.append(uploadInput, uploadLink, '.'); // Include end-of-sentence period
-		this._createUploader(uploadForm);
+		this._createUploader(areaContainer);
 		
 		areaContainer.append(icon, text, uploadForm);
 		return areaContainer;
@@ -226,6 +226,9 @@ export default class DataGui extends EntityGui {
 			url: _this._getCollectionURL(),
 			name: this._getFileKey(),
 			multiple: true,
+			// allow: _this.dataContent.allowedTypes,
+			// ["cls-dragover"]: _this.dataContent.allowedTypes,
+			mime: _this.dataContent.allowedMimeTypes,
 			
 			completeAll: function() {
 				setTimeout(function () {

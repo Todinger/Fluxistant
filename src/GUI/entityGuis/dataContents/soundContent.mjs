@@ -19,6 +19,10 @@ export default class SoundContent extends DataContent {
 		super.fill(source);
 		this.components.main.get(0).load();
 	}
+	
+	get allowedMimeTypes() {
+		return "audio/*";
+	}
 }
 
 DataContentFactory.register(SoundContent);
