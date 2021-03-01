@@ -11,10 +11,6 @@ export default class DataGui extends EntityGui {
 		this.dataContent = null;
 	}
 	
-	_getFileKey() {
-		return this.entity.getID();
-	}
-	
 	_getCollectionURL() {
 		return `/data/mod/${this.modName}/${this.entity.getCollectionID()}`;
 	}

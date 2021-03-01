@@ -16,7 +16,7 @@ export default class SingleDataGui extends DataGui {
 		this.entity.clearKey();
 		this._hideItem();
 		this._clearItem();
-		super._sendDeleteRequest(savedFile);
+		super._deleteFile(savedFile, notifyChange);
 	}
 	
 	_loadFilesFromServer() {
@@ -55,7 +55,7 @@ export default class SingleDataGui extends DataGui {
 	_makeContents() {
 		let contents = $('<div class="uk-width-expand"></div>');
 		let toggleButton = $('<button class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden></button>');
-		this.preview = this._makePreview(() => this._deleteFile(this.entity.getFileKey()));
+		this.preview = this._makePreview(() => this._deleteFile(this.entity.getFileKey(), true));
 		let uploadArea = this._makeUploadArea();
 		contents.append(toggleButton, this.preview.main, uploadArea);
 		
