@@ -45,7 +45,9 @@ class SelfCommands extends Module {
 			
 			if (userFiles.sound) {
 				hasFiles = true;
-				requestData.sound = userFiles.sound;
+				requestData.sound = {
+					url: userFiles.sound,
+				};
 			}
 			
 			if (hasFiles) {
