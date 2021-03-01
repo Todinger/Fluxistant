@@ -42,7 +42,6 @@ export default class ObjectGui extends EntityGui {
 		});
 		
 		childGui.onChangedOrError(() => {
-			this._contentsChanged();
 			childGui._updateStatusIndicators(childEntry.guiData.marker);
 		});
 		

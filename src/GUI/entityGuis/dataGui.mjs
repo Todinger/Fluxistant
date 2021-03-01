@@ -28,12 +28,14 @@ export default class DataGui extends EntityGui {
 		xHttp.send();
 	}
 	
-	_deleteFile() {
+	_deleteFile(notifyChange) {
 		this.entity.clear();
 		this._hideItem();
 		this._sendDeleteRequest();
 		this._clearItem();
-		this._changed();
+		if (notifyChange) {
+			this._changed();
+		}
 	}
 	
 	_loadFileFromServer() {
@@ -107,7 +109,7 @@ export default class DataGui extends EntityGui {
 		
 		let deleteButtonContainer = $('<span class="uk-invisible-hover uk-position-absolute uk-transform-center" style="left: 90%; top: 10%">');
 		let deleteButton = $('<button class="uk-invisible-hover" type="button" uk-close></button>');
-		deleteButton.click(() => this._deleteFile());
+		deleteButton.click(() => this._deleteFile(true));
 		deleteButtonContainer.append(deleteButton);
 		
 		container.append(preview, deleteButtonContainer);
@@ -267,7 +269,7 @@ export default class DataGui extends EntityGui {
 		let progressBar = this._makeProgressBar();
 		fullResult.append(contents, progressBar);
 		
-		fullResult.on('remove', () => this._deleteFile());
+		fullResult.on('remove', () => this._deleteFile(false));
 		
 		if (this.entity.isSet()) {
 			this._loadFileFromServer();

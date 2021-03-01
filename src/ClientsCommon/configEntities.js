@@ -19124,10 +19124,11 @@ class CommandEntity extends StaticObjectEntity {
 		super.validate();
 		
 		let cmdname = this.getCmdName();
+		let cmdnameText = typeof cmdname === 'string' ? `"${cmdname}"` : `${cmdname}`;
 		Errors.ensureRegexString(
 			cmdname,
 			/[^\s]+/,
-			`Command name must be a non-empty single-word string. Got: ${cmdname}`);
+			`Command name must be a non-empty single-word string. Got: ${cmdnameText}`);
 		
 		this.getAliases().forEach(
 			alias => {

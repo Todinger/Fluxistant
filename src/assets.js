@@ -29,7 +29,7 @@ const SOUNDEFFECTS_DIR = SOUND_ASSETS_DIR;
 const SOUNDEFFECTS_URL = '/assets/sfx/';
 
 // Used for displaying random images (the RandomImage module)
-const RANDOMIMAGECACHE_DIR = IMAGE_ASSETS_DIR + 'Images/Random Image Cache';
+const RANDOMIMAGECACHE_DIR = IMAGE_ASSETS_DIR + 'Random Image Cache';
 const RANDOMIMAGECACHE_URL = '/assets/random-image-cache/';
 
 // Random image cache and user-specific images for the F Shower module
