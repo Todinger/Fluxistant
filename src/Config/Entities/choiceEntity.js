@@ -73,13 +73,17 @@ class ChoiceEntity extends ConfigEntity {
 		// choiceValueEntity, which inherently has an .option property in its
 		// own descriptor, so we just use that instead of saving the type of
 		// the selection ourselves (it'd be redundant data)
-		assert(
-			descriptor.selectedOption in this.options,
-			`Unknown selected type for ${this.type}: ${descriptor.selectedOption}`);
-		this.selectedOption = descriptor.selectedOption;
 		Object.keys(descriptor.options).forEach(option => {
-			this.options[option].import(descriptor.options[option]);
+			if (option in this.options) {
+				this.options[option].import(descriptor.options[option]);
+			}
 		});
+		
+		if (descriptor.selectedOption in this.options) {
+			this.selectedOption = descriptor.selectedOption;
+		} else {
+			this.selectedOption = Object.keys(this.options)[0];
+		}
 	}
 	
 	exportDesc() {

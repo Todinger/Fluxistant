@@ -14,7 +14,7 @@ class ObjectEntity extends ConfigEntity {
 	}
 	
 	getChild(key) {
-		assert(key in this.children, `Key not found: ${key}.`);
+		assert(this.hasChild(key), `Key not found: ${key}.`);
 		return this.children[key];
 	}
 	
@@ -28,7 +28,7 @@ class ObjectEntity extends ConfigEntity {
 	}
 	
 	addChild(key, value) {
-		assert(!(key in this.children), `Duplicate key added: ${key}.`);
+		assert(!(this.hasChild(key)), `Duplicate key added: ${key}.`);
 		this.children[key] = value;
 		this._fillChildName(key);
 		this.extendID(key, value);
@@ -37,6 +37,11 @@ class ObjectEntity extends ConfigEntity {
 	
 	hasChild(key) {
 		return key in this.children;
+	}
+	
+	removeChild(key) {
+		assert(this.hasChild(key), `Key not found: ${key}.`);
+		delete this.children[key];
 	}
 	
 	_fillChildName(key) {

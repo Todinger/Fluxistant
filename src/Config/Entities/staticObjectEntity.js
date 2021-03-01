@@ -1,4 +1,3 @@
-const assert = require('assert').strict;
 const ObjectEntity = require('./objectEntity');
 const EntityFactory = require('../entityFactory');
 
@@ -10,8 +9,10 @@ class StaticObjectEntity extends ObjectEntity {
 	
 	importDesc(descriptor) {
 		Object.keys(descriptor).forEach(key => {
-			assert(this.hasChild(key), `Unknown key imported to static object: ${key}`);
-			this.getChild(key).import(descriptor[key]);
+			// Only import children we know
+			if (this.hasChild(key)) {
+				this.getChild(key).import(descriptor[key]);
+			}
 		});
 	}
 	

@@ -10,6 +10,8 @@ class DynamicObjectEntity extends ObjectEntity {
 	// ---- Overrides ---- //
 	
 	importDesc(descriptor) {
+		let selfExtraKeys = Object.keys(this.children).filter(key => !(key in descriptor));
+		
 		Object.keys(descriptor).forEach(key => {
 			let child = ConfigEntity.readEntity(descriptor[key]);
 			if (this.hasChild(key)) {
@@ -17,6 +19,10 @@ class DynamicObjectEntity extends ObjectEntity {
 			} else {
 				this.addChild(key, child);
 			}
+		});
+		
+		selfExtraKeys.forEach(key => {
+			this.removeChild(key);
 		});
 	}
 	
