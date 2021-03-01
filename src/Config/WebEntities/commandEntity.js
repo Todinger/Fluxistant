@@ -112,10 +112,6 @@ class CommandEntity extends StaticObjectEntity {
 			this.getCost() >= 0,
 			`Cost must be a non-negative integer (got: ${this.getCost()}).`);
 	}
-	
-	importDesc(descriptor) {
-		super.importDesc(descriptor);
-	}
 }
 
 module.exports = CommandEntity;

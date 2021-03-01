@@ -254,6 +254,15 @@ $(document).ready(function() {
 // TODO: Remove
 window.cfg = cfg;
 
+function showError(...params) {
+	return cfg.showError(...params);
+}
+
+export {
+	showError,
+};
+
+
 /*
 Graph editing:
 - https://github.com/d3/d3/wiki

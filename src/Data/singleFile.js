@@ -11,15 +11,15 @@ class SingleFile extends UserData {
 		super(dataDirPath);
 	}
 	
-	upload(fileKey, file, callback) {
+	upload(params, callback) {
 		if (this.hasKey(SingleFile.SINGLE_KEY)) {
 			this._deleteFile(SingleFile.SINGLE_KEY);
 		}
 		
-		this._save(SingleFile.SINGLE_KEY, file, callback);
+		this._addFile(SingleFile.SINGLE_KEY, params.file, callback);
 	}
 	
-	delete(key, callback) {
+	delete(params, callback) {
 		assert(SingleFile.SINGLE_KEY in this.files, 'No file to delete.');
 		this._deleteFile(SingleFile.SINGLE_KEY, callback);
 	}

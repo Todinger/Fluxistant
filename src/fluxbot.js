@@ -150,6 +150,10 @@ class FluxBot {
 		this.configManager.saveAll();
 	}
 	
+	emptyDataTempDir() {
+		Utils.emptyDirPromise(DATA_DIR_TEMP).then();
+	}
+	
 	setupUserData() {
 		this.dataManager = require('./dataManager');
 		this.dataManager.init(APP_DATA_DIR);
@@ -159,13 +163,18 @@ class FluxBot {
 			tempFileDir: DATA_DIR_TEMP,
 		}));
 		
-		this.app.get('/data/mod/:modName/:colID/:filename', async (req, res) => {
+		this.app.get('/data/mod/:modName/:colID', async (req, res) => {
 			let modName = req.params.modName;
-			let collectionID = req.params.colID;
-			let fileKey = req.params.filename;
+			let collection = req.params.colID;
+			let fileKey = req.query.fileKey;
 			
 			try {
-				let file = await this.dataManager.getFileWeb(modName, collectionID, fileKey);
+				let file = await this.dataManager.getFileWeb({
+					modName,
+					collection,
+					fileKey
+				});
+				
 				res.set('Content-Type', file.contentType);
 				res.send({
 					name: file.name,
@@ -182,58 +191,60 @@ class FluxBot {
 			}
 			
 			let modName = req.params.modName;
-			let collectionID = req.params.colID;
+			let collection = req.params.colID;
 			
-			let processedFileCount = 0;
 			let encodedFiles = {};
-			let uploadFailed = false;
 			let files = req.files || {}; // The empty object here is to shut WebStorm's inspector up
-			Object.keys(files).forEach(fileKey => {
-				let file = files[fileKey];
-				this.dataManager.upload(
+			
+			let uploadPromises = [];
+			Object.keys(files).forEach(uploadKey => {
+				let file = files[uploadKey];
+				let promise = this.dataManager.upload({
 					modName,
-					collectionID,
-					fileKey,
+					collection,
 					file,
-					(err, savedFile) => {
-						if (uploadFailed) {
-							// The error status is sent by the first failed file
-							// so there's no need to send a result here as well
-							return;
-						} else if (err) {
-							uploadFailed = true;
-							return res.status(500).send(err);
-						}
-						
-						processedFileCount++;
-						encodedFiles[fileKey] = {
-							name: savedFile.name,
-							data: savedFile.data,
-						};
-						if (processedFileCount === Object.keys(req.files).length) {
-							// res.set('Content-Type', mime.contentType(file.name));
-							res.send(encodedFiles);
-						}
-					});
+				}).then(savedFile => {
+					encodedFiles[uploadKey] = {
+						success: true,
+						fileKey: savedFile.fileKey,
+						name: savedFile.name,
+						data: savedFile.data,
+					};
+				}).catch(err => {
+					encodedFiles[uploadKey] = {
+						success: false,
+						err: `Error saving file: ${err}`,
+					};
+				});
+				
+				uploadPromises.push(promise);
+			});
+			
+			Promise.all(uploadPromises).then(() => {
+				res.send(encodedFiles);
 			});
 		});
 		
-		this.app.delete('/data/mod/:modName/:colID/:filename', (req, res) => {
+		this.app.delete('/data/mod/:modName/:colID', (req, res) => {
 			let modName = req.params.modName;
-			let collectionID = req.params.colID;
-			let fileKey = req.params.filename;
+			let collection = req.params.colID;
+			let fileKey = req.query.fileKey;
 			
-			this.dataManager.delete(
-				modName,
-				collectionID,
-				fileKey,
-				(err) => {
-					if (err) {
-						return res.status(500).send(err);
-					} else {
-						res.send(`File 'mod/${modName}/${collectionID}/${fileKey}' deleted.`);
-					}
+			try {
+				this.dataManager.delete({
+					modName,
+					collection,
+					fileKey,
+				}).then(() => {
+					res.send(`File 'mod/${modName}/${collection}/${fileKey}' deleted.`);
 				});
+			} catch (err) {
+				return res.status(500).send(err);
+			}
+		});
+		
+		this.io.on('dropDataChanges', () => {
+			this.dataManager.dropChanges().then(() => this.emptyDataTempDir());
 		});
 	}
 	
@@ -289,7 +300,17 @@ class FluxBot {
 				
 				this.configManager.importAll(config);
 				this.configManager.saveAll();
-				socket.emit('configSaved');
+				this.dataManager.commitChanges()
+					.then(() => {
+						socket.emit('configSaved');
+					})
+					.catch(err => {
+						socket.emit(
+							'configSaveError',
+							{
+								message: `${err}`,
+							});
+					});
 			});
 		});
 	}
@@ -306,6 +327,7 @@ class FluxBot {
 		this.prepareDirectories();
 		this.readConfigEntities();
 		this.loadConfig();
+		this.emptyDataTempDir();
 		this.setupUserData();
 		this.setupCLI();
 		this.setupAssets();

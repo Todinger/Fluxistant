@@ -16,16 +16,16 @@ class DataEntity extends StaticObjectEntity {
 	
 	constructor(data) {
 		super();
-		this.addString('colID', data && data.colID || '') // Identifies the collection for functional purposes
+		this.addString('collection', data && data.collection || '') // Identifies the collection for functional purposes
 			.hide();
 		this.addString('dataType', data && data.dataType || '')
 			.hide();
-		this.addBoolean('isSet', false)
+		this.addString('fileKey', data && data.fileKey || undefined)
 			.hide();
 	}
 	
 	getCollectionID() {
-		return this.getChild('colID').getValue();
+		return this.getChild('collection').getValue();
 	}
 	
 	getDataType() {
@@ -33,19 +33,19 @@ class DataEntity extends StaticObjectEntity {
 	}
 	
 	getFileKey() {
-		return this.getID();
+		return this.getChild('fileKey').getValue();
+	}
+	
+	setFileKey(fileKey) {
+		return this.getChild('fileKey').setValue(fileKey);
 	}
 	
 	isSet() {
-		return this.getChild('isSet').getValue();
+		return !!this.getFileKey();
 	}
 	
-	set() {
-		this.getChild('isSet').setValue(true);
-	}
-	
-	clear() {
-		this.getChild('isSet').setValue(false);
+	clearKey() {
+		this.getChild('fileKey').setValue(undefined);
 	}
 	
 	// ---- Overrides ---- //
@@ -59,10 +59,10 @@ class DataEntity extends StaticObjectEntity {
 	validate() {
 		super.validate();
 		
-		let colID = this.getCollectionID();
+		let collection = this.getCollectionID();
 		Errors.ensureNonEmptyString(
-			colID,
-			`colID must be a non-empty string. Got: ${colID}`);
+			collection,
+			`collection must be a non-empty string. Got: ${collection}`);
 		
 		let dataType = this.getDataType();
 		assert(

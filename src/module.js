@@ -148,8 +148,8 @@ class Module {
 		commandObjects = commandObjects || this.commandObjects;
 		if (commandObjects) {
 			Object.values(commandObjects).forEach(cmd => {
-				this.unregisterCommand(cmd.cmdname);
-				cmd.aliases.forEach(alias => this.unregisterCommand(alias));
+				this.unregisterCommand(cmd.cmdname, cmd.cmdid);
+				cmd.aliases.forEach(alias => this.unregisterCommand(alias, cmd.cmdid));
 			});
 		}
 	}
@@ -454,8 +454,13 @@ class Module {
 	
 	// Creates a unique ID per Module and per cmdname that is unique to that
 	// Module.
-	_getCommandId(cmdname) {
-		return `<${this.name}> ${cmdname}`;
+	_getCommandId(cmdname, cmdid) {
+		let prefix = '';
+		if (cmdid) {
+			prefix = `${cmdid}: `;
+		}
+		
+		return `<${this.name}> ${prefix}${cmdname}`;
 	}
 	
 	// [For use by inheriting classes]
@@ -486,7 +491,7 @@ class Module {
 		allNames.forEach(alias => {
 			cmd.cmdname = alias;
 			TwitchManager.registerCommand(
-				this._getCommandId(alias),
+				this._getCommandId(alias, cmd.cmdid),
 				cmd);
 		});
 		
@@ -496,8 +501,8 @@ class Module {
 	// [For use by inheriting classes]
 	// Unregister a previously registered command. Only the identifying cmdname
 	// is needed here.
-	unregisterCommand(cmdname) {
-		TwitchManager.unregisterCommand(this._getCommandId(cmdname));
+	unregisterCommand(cmdname, cmdid) {
+		TwitchManager.unregisterCommand(this._getCommandId(cmdname, cmdid));
 	}
 	
 	// [For external use (by ModuleManager)]

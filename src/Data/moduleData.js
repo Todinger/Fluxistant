@@ -72,19 +72,28 @@ class ModuleData {
 		return this;
 	}
 	
-	upload(collection, fileKey, file, callback) {
-		this._verifyPresence(collection);
-		this.collections[collection].upload(fileKey, file, this._injectSave(callback));
+	upload(params) {
+		this._verifyPresence(params.collection);
+		return this.collections[params.collection].upload(params);
 	}
 	
-	delete(collection, fileKey, callback) {
-		this._verifyPresence(collection);
-		this.collections[collection].delete(fileKey, this._injectSave(callback));
+	delete(params) {
+		this._verifyPresence(params.collection);
+		return this.collections[params.collection].delete(params);
 	}
 	
-	getFileWeb(collection, fileKey) {
-		this._verifyPresence(collection);
-		return this.collections[collection].getFileWeb(fileKey);
+	commitChanges() {
+		return Promise.all(Object.values(this.collections).map(col => col.commitChanges()))
+			.then(() => this.saveToDisk());
+	}
+	
+	dropChanges() {
+		return Promise.all(Object.values(this.collections).map(col => col.dropChanges()));
+	}
+	
+	getFileWeb(params) {
+		this._verifyPresence(params.collection);
+		return this.collections[params.collection].getFileWeb(params);
 	}
 	
 	import(exportedData) {

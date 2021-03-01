@@ -1,5 +1,6 @@
 import EntityGui from "./entityGui.mjs";
 import DataContentRegistry from "./dataContents/dataContentFactory.mjs";
+import { showError } from "../config.mjs";
 
 export default class DataGui extends EntityGui {
 	static get GUITYPE()    { return null; }   // Abstract class, should not be instantiated
@@ -18,42 +19,27 @@ export default class DataGui extends EntityGui {
 		return `/data/mod/${this.modName}/${this.entity.getCollectionID()}`;
 	}
 	
-	_getFileURL() {
-		return `${this._getCollectionURL()}/${this._getFileKey()}`;
+	_getFileURL(fileKey) {
+		return `${this._getCollectionURL()}?fileKey=${fileKey}`;
 	}
 	
-	_sendDeleteRequest() {
+	_sendDeleteRequest(fileKey) {
 		let xHttp = new XMLHttpRequest();
-		xHttp.open('DELETE', this._getFileURL(), true);
+		xHttp.open('DELETE', this._getFileURL(fileKey), true);
 		xHttp.send();
 	}
 	
-	_deleteFile(notifyChange) {
-		this.entity.clear();
-		this._hideItem();
-		this._sendDeleteRequest();
-		this._clearItem();
-		if (notifyChange) {
-			this._changed();
+	_deleteFile(fileKey, notifyChange) {
+		if (fileKey) {
+			this._sendDeleteRequest(fileKey);
+			if (notifyChange) {
+				this._changed();
+			}
 		}
 	}
 	
-	_loadFileFromServer() {
-		$.get(
-			this._getFileURL(),
-			(res) => {
-				let file = JSON.parse(res);
-				this._showItem(file.data, file.name);
-			}
-		)
-	}
-	
-	_makeItemPreview() {
-		// TODO: Move to image-specific object
-		// this.dataContent =  $('<img alt="" src="" uk-img>');
-		// this.dataContent = PREVIEW_BUILDERS[this.entity.getDataType()](container);
-		this.dataContent = DataContentRegistry.build(this.entity.getDataType());
-		return this.dataContent.build();
+	_loadFilesFromServer() {
+		throw 'Abstract method invoked.';
 	}
 	
 	_makeNameTag() {
@@ -61,69 +47,42 @@ export default class DataGui extends EntityGui {
 		let innerSpan = $('<span class="uk-flex uk-flex-center uk-text-truncate"></span>');
 		outerSpan.append(innerSpan);
 		
-		this.nameTag = innerSpan;
-		
-		return outerSpan;
+		return {
+			main: outerSpan,
+			nameTag: innerSpan,
+		};
 	}
 	
-	_showItemPreview(data) {
-		this.dataContent.fill(data);
-	}
-	
-	_showItemName(itemName) {
-		this.nameTag.text(itemName);
-	}
-	
-	_showItem(data, name) {
-		if (!this.showingItem) {
-			this._showItemPreview(data);
-			this._showItemName(name);
-			this._toggleView();
-			this.showingItem = true;
-		}
-	}
-	
-	_hideItem() {
-		if (this.showingItem) {
-			this._toggleView();
-			this.showingItem = false;
-		}
-	}
-	
-	_clearItemPreview() {
-		this.dataContent.clear();
-	}
-	
-	_clearItemName() {
-		this.nameTag.text('');
-	}
-	
-	_clearItem() {
-		this._clearItemPreview();
-		this._clearItemName();
-	}
-	
-	_makeItemContainer() {
+	_makeItemContainer(onDelete) {
 		let container = $('<div class="uk-inline uk-flex uk-flex-center"></div>');
-		let preview = this._makeItemPreview();
+		let dataContent = DataContentRegistry.build(this.entity.getDataType());
+		let preview = dataContent.build();
 		
 		let deleteButtonContainer = $('<span class="uk-invisible-hover uk-position-absolute uk-transform-center" style="left: 90%; top: 10%">');
 		let deleteButton = $('<button class="uk-invisible-hover" type="button" uk-close></button>');
-		deleteButton.click(() => this._deleteFile(true));
+		// deleteButton.click(() => this._deleteFile(true));
+		deleteButton.click(onDelete);
 		deleteButtonContainer.append(deleteButton);
 		
 		container.append(preview, deleteButtonContainer);
-		return container;
+		return {
+			main: container,
+			dataContent: dataContent,
+		};
 	}
 	
-	_makePreview() {
+	_makePreview(onDeleteButtonClicked) {
 		let previewContainer = $('<div class="uk-visible-toggle uk-flex uk-flex-column uk-width-auto uk-padding-remove" tabindex="-1" hidden></div>');
 		
-		let previewItemContainer = this._makeItemContainer();
-		let nameTag = this._makeNameTag();
-		previewContainer.append(previewItemContainer, nameTag);
+		let previewItemContainer = this._makeItemContainer(onDeleteButtonClicked);
+		let nameTagContainer = this._makeNameTag();
+		previewContainer.append(previewItemContainer.main, nameTagContainer.main);
 		
-		return previewContainer;
+		return {
+			main: previewContainer,
+			nameTag: nameTagContainer.nameTag,
+			dataContent: previewItemContainer.dataContent,
+		};
 	}
 	/*
 			<div class="uk-visible-toggle" tabindex="-1" hidden>
@@ -143,7 +102,7 @@ export default class DataGui extends EntityGui {
 	
 	_makeUploadInput() {
 		// TODO: Move to concrete subclasses for single/multiple uploads
-		return $(`<input type="file" multiple accept="${this.dataContent.allowedMimeTypes}">`);
+		return $(`<input type="file" multiple accept="${DataContentRegistry.getMimeType(this.entity.getDataType())}">`);
 	}
 	
 	_makeUploadArea() {
@@ -162,14 +121,7 @@ export default class DataGui extends EntityGui {
 	}
 	
 	_makeContents() {
-		let contents = $('<div class="uk-width-expand"></div>');
-		let toggleButton = $('<button class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden></button>');
-		let preview = this._makePreview();
-		let uploadArea = this._makeUploadArea();
-		contents.append(toggleButton, preview, uploadArea);
-		
-		this.toggler = toggleButton;
-		return contents;
+		throw 'Abstract function called.';
 /*
 		<div class="uk-width-expand">
 			<button id="upload-toggler" class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden></button>
@@ -216,19 +168,19 @@ export default class DataGui extends EntityGui {
 		return this.progressBar;
 	}
 	
-	_toggleView() {
-		UIkit.toggle(this.toggler).toggle();
+	_fileUploaded(savedFile) {
+		throw 'Abstract method invoked.';
 	}
 	
 	_createUploader(uploadForm) {
 		let _this = this;
 		window.up = UIkit.upload(uploadForm, {
 			url: _this._getCollectionURL(),
-			name: this._getFileKey(),
+			name: 'fileUpload',
 			multiple: true,
 			// allow: _this.dataContent.allowedTypes,
 			// ["cls-dragover"]: _this.dataContent.allowedTypes,
-			mime: _this.dataContent.allowedMimeTypes,
+			mime: DataContentRegistry.getMimeType(this.entity.getDataType()),
 			
 			completeAll: function() {
 				setTimeout(function () {
@@ -241,11 +193,13 @@ export default class DataGui extends EntityGui {
 			
 			complete: function(req) {
 				let files = JSON.parse(req.response);
-				let file = files[_this._getFileKey()];
-				let fileName = file.name;
-				
-				_this.entity.set();
-				_this._showItem(file.data, fileName);
+				// let file = files[_this._getFileKey()];
+				let file = files['fileUpload'];
+				if (file.success) {
+					_this._fileUploaded(file);
+				} else {
+					showError(file.err);
+				}
 			},
 			
 			loadStart: function (e) {
@@ -266,17 +220,19 @@ export default class DataGui extends EntityGui {
 		});
 	}
 	
+	_selfRemoved() {
+		throw 'Abstract method invoked.';
+	}
+	
 	_buildGUI() {
 		let fullResult = $(`<div id="${this.guiID}"></div>`);
 		let contents = this._makeContents();
 		let progressBar = this._makeProgressBar();
 		fullResult.append(contents, progressBar);
 		
-		fullResult.on('remove', () => this._deleteFile(false));
+		fullResult.on('remove', () => this._selfRemoved());
 		
-		if (this.entity.isSet()) {
-			this._loadFileFromServer();
-		}
+		this._loadFilesFromServer();
 		
 		return fullResult;
 	}

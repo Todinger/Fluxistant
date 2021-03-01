@@ -38,19 +38,19 @@ class WeightedPool extends FilePool {
 	
 	
 	_getFileKey() {
-		return Utils.weightedRandomKey(this.files);
+		return Utils.weightedRandomKey(this.savedFiles);
 	}
 	
-	_save(key, file, callback) {
-		super._save(key, file, callback);
+	_addFile(key, file, callback) {
+		super._addFile(key, file, callback);
 		
 		// Assign the default weight upon saving
 		this.weights[key] = 1;
 	}
 	
 	_delete(key) {
-		super._deleteFile(key);
 		delete this.weights[key];
+		return super._deleteFile(key);
 	}
 	
 	import(exportedData) {

@@ -9,16 +9,16 @@ class NamedCollection extends UserData {
 		super(dataDirPath);
 	}
 	
-	upload(fileKey, file, callback) {
-		if (this.hasKey(fileKey)) {
-			this._deleteFile(fileKey);
-		}
-		
-		this._save(fileKey, file, callback);
-	}
+	// upload(params) {
+	// 	if (this.hasKey(params.fileKey)) {
+	// 		this._deleteFile(params.fileKey);
+	// 	}
+	//
+	// 	this._addFile(params.fileKey, params.file, callback);
+	// }
 	
-	_getFileKey(key) {
-		return key;
+	_getFileKey(params) {
+		return params.fileKey;
 	}
 }
 

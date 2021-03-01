@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fsPromise = require('fs/promises');
 const path = require('path');
 const assert = require('assert').strict;
 const _ = require('lodash');
@@ -257,6 +258,17 @@ class Utils {
 		} catch (err) {
 			return null;
 		}
+	}
+	
+	static emptyDirPromise(directory) {
+		return fsPromise.readdir(directory).then(files => {
+			let deletePromises = [];
+			for (const file of files) {
+				deletePromises.push(fsPromise.unlink(path.join(directory, file)));
+			}
+			
+			return Promise.all(deletePromises);
+		});
 	}
 	
 	// Turns an array into a correct form of a list in English with the given

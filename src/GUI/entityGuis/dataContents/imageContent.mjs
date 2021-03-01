@@ -4,6 +4,7 @@ import DataContentFactory from "./dataContentFactory.mjs";
 export default class ImageContent extends DataContent {
 	static get CONTENT_TYPE()   { return 'IMAGE';                   }
 	static get BUILDER()        { return () => new ImageContent();  }
+	static get MIME_TYPE()      { return "image/*";                 }
 	
 	_buildAll() {
 		let img = $('<img alt="Error Loading Image" src="" uk-img>');
@@ -11,10 +12,6 @@ export default class ImageContent extends DataContent {
 			main: img,
 			source: img,
 		}
-	}
-	
-	get allowedMimeTypes() {
-		return "image/*";
 	}
 }
 

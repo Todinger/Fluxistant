@@ -37,19 +37,27 @@ class DataManager {
 		return this.moduleData[modName];
 	}
 	
-	upload(modName, collection, fileKey, file, callback) {
-		this._verifyPresence(modName);
-		this.moduleData[modName].upload(collection, fileKey, file, callback);
+	upload(params) {
+		this._verifyPresence(params.modName);
+		return this.moduleData[params.modName].upload(params);
 	}
 	
-	delete(modName, collection, fileKey, callback) {
-		this._verifyPresence(modName);
-		this.moduleData[modName].delete(collection, fileKey, callback);
+	delete(params) {
+		this._verifyPresence(params.modName);
+		return this.moduleData[params.modName].delete(params);
 	}
 	
-	getFileWeb(modName, collection, fileKey) {
-		this._verifyPresence(modName);
-		return this.moduleData[modName].getFileWeb(collection, fileKey);
+	commitChanges() {
+		return Promise.all(Object.values(this.moduleData).map(col => col.commitChanges()));
+	}
+	
+	dropChanges() {
+		return Promise.all(Object.values(this.moduleData).map(col => col.dropChanges()));
+	}
+	
+	getFileWeb(params) {
+		this._verifyPresence(params.modName);
+		return this.moduleData[params.modName].getFileWeb(params);
 	}
 	
 	saveAll() {

@@ -7,7 +7,7 @@ class SoundEntity extends StaticObjectEntity {
 
 	constructor() {
 		super();
-		this.addData('file', { colID: 'Sounds', dataType: 'SOUND' })
+		this.addData('file', { collection: 'Sounds', dataType: 'SOUND' })
 			.setName('Sound')
 			.setDescription('The sound that will be played');
 		this.addNumber('volume', 100)

@@ -94,11 +94,11 @@ class ObjectEntity extends ConfigEntity {
 		return array;
 	}
 	
-	addDynamicDataArray(key, colID, dataType, values) {
-		let array = this.add(key, 'DynamicDataArray', colID, dataType);
+	addDynamicDataArray(key, collection, dataType, values) {
+		let array = this.add(key, 'DynamicDataArray', collection, dataType);
 		if (values) {
 			values.forEach(value => {
-				array.addElement(EntityFactory.build('Data', { colID, dataType }, value));
+				array.addElement(EntityFactory.build('Data', { collection, dataType }, value));
 			});
 		}
 		

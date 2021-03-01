@@ -18647,6 +18647,9 @@ class ArrayEntity extends ConfigEntity {
 	
 	removeElementAt(index) {
 		this.elements.splice(index, 1);
+		for (; index < this.length; index++) {
+			this.extendID(index, this.elements[index]);
+		}
 	}
 	
 	forEach(func) {
@@ -18934,13 +18937,17 @@ class ChoiceEntity extends ConfigEntity {
 		// choiceValueEntity, which inherently has an .option property in its
 		// own descriptor, so we just use that instead of saving the type of
 		// the selection ourselves (it'd be redundant data)
-		assert(
-			descriptor.selectedOption in this.options,
-			`Unknown selected type for ${this.type}: ${descriptor.selectedOption}`);
-		this.selectedOption = descriptor.selectedOption;
 		Object.keys(descriptor.options).forEach(option => {
-			this.options[option].import(descriptor.options[option]);
+			if (option in this.options) {
+				this.options[option].import(descriptor.options[option]);
+			}
 		});
+		
+		if (descriptor.selectedOption in this.options) {
+			this.selectedOption = descriptor.selectedOption;
+		} else {
+			this.selectedOption = Object.keys(this.options)[0];
+		}
 	}
 	
 	exportDesc() {
@@ -19142,10 +19149,6 @@ class CommandEntity extends StaticObjectEntity {
 		assert(
 			this.getCost() >= 0,
 			`Cost must be a non-negative integer (got: ${this.getCost()}).`);
-	}
-	
-	importDesc(descriptor) {
-		super.importDesc(descriptor);
 	}
 }
 
@@ -19407,16 +19410,16 @@ class DataEntity extends StaticObjectEntity {
 	
 	constructor(data) {
 		super();
-		this.addString('colID', data && data.colID || '') // Identifies the collection for functional purposes
+		this.addString('collection', data && data.collection || '') // Identifies the collection for functional purposes
 			.hide();
 		this.addString('dataType', data && data.dataType || '')
 			.hide();
-		this.addBoolean('isSet', false)
+		this.addString('fileKey', data && data.fileKey || undefined)
 			.hide();
 	}
 	
 	getCollectionID() {
-		return this.getChild('colID').getValue();
+		return this.getChild('collection').getValue();
 	}
 	
 	getDataType() {
@@ -19424,19 +19427,19 @@ class DataEntity extends StaticObjectEntity {
 	}
 	
 	getFileKey() {
-		return this.getID();
+		return this.getChild('fileKey').getValue();
+	}
+	
+	setFileKey(fileKey) {
+		return this.getChild('fileKey').setValue(fileKey);
 	}
 	
 	isSet() {
-		return this.getChild('isSet').getValue();
+		return !!this.getFileKey();
 	}
 	
-	set() {
-		this.getChild('isSet').setValue(true);
-	}
-	
-	clear() {
-		this.getChild('isSet').setValue(false);
+	clearKey() {
+		this.getChild('fileKey').setValue(undefined);
 	}
 	
 	// ---- Overrides ---- //
@@ -19450,10 +19453,10 @@ class DataEntity extends StaticObjectEntity {
 	validate() {
 		super.validate();
 		
-		let colID = this.getCollectionID();
+		let collection = this.getCollectionID();
 		Errors.ensureNonEmptyString(
-			colID,
-			`colID must be a non-empty string. Got: ${colID}`);
+			collection,
+			`collection must be a non-empty string. Got: ${collection}`);
 		
 		let dataType = this.getDataType();
 		assert(
@@ -19512,8 +19515,8 @@ class DynamicDataArrayEntity extends DynamicArrayEntity {
 	static get TYPE()		{ return 'DynamicDataArray'; 							}
 	static get BUILDER()	{ return value => new DynamicDataArrayEntity(value);	}
 	
-	constructor(colID, dataType) {
-		super('Data', { colID, dataType });
+	constructor(collection, dataType) {
+		super('Data', { collection, dataType });
 	}
 }
 
@@ -19532,6 +19535,8 @@ class DynamicObjectEntity extends ObjectEntity {
 	// ---- Overrides ---- //
 	
 	importDesc(descriptor) {
+		let selfExtraKeys = Object.keys(this.children).filter(key => !(key in descriptor));
+		
 		Object.keys(descriptor).forEach(key => {
 			let child = ConfigEntity.readEntity(descriptor[key]);
 			if (this.hasChild(key)) {
@@ -19539,6 +19544,10 @@ class DynamicObjectEntity extends ObjectEntity {
 			} else {
 				this.addChild(key, child);
 			}
+		});
+		
+		selfExtraKeys.forEach(key => {
+			this.removeChild(key);
 		});
 	}
 	
@@ -19594,33 +19603,6 @@ class FixedArrayEntity extends ArrayEntity {
 module.exports = FixedArrayEntity;
 
 },{"./arrayEntity":8,"assert":1}],25:[function(require,module,exports){
-// const CommandEntity = require('./commandEntity');
-// const ImageEntity = require('./imageEntity');
-// const SoundEntity = require('./soundEntity');
-//
-// class ImageCommandEntity extends CommandEntity {
-// 	static get TYPE()		{ return 'ImageCommand'; 					}
-// 	static get BUILDER()	{ return () => new ImageCommandEntity(); 	}
-//
-// 	constructor(collectionIDs) {
-// 		super({ cmdname: 'newcommand' });
-// 		this.addChild('image', new ImageEntity(collectionIDs.images))
-// 			.setName('Image')
-// 			.setDescription('Image display parameters');
-// 		this.addChild('sound', new SoundEntity(collectionIDs.sounds))
-// 			.setName('Sound')
-// 			.setDescription('Sound playing parameters');
-// 	}
-//
-// 	toConf() {
-// 		let conf = super.toConf();
-// 		conf.hasImage = this.getChild('image').isSet();
-// 		conf.hasSound = this.getChild('sound').isSet();
-// 	}
-// }
-//
-// module.exports = ImageCommandEntity;
-
 const CommandEntity = require('./commandEntity');
 const ImageEntity = require('./imageEntity');
 const SoundEntity = require('./soundEntity');
@@ -19746,7 +19728,7 @@ class ImageEntity extends StaticObjectEntity {
 
 	constructor() {
 		super();
-		this.addData('file', { colID: 'Images', dataType: 'IMAGE' })
+		this.addData('file', { collection: 'Images', dataType: 'IMAGE' })
 			.setName('Image')
 			.setDescription('The image that will be displayed on the screen');
 		this.addInteger('width')
@@ -20015,7 +19997,7 @@ class ObjectEntity extends ConfigEntity {
 	}
 	
 	getChild(key) {
-		assert(key in this.children, `Key not found: ${key}.`);
+		assert(this.hasChild(key), `Key not found: ${key}.`);
 		return this.children[key];
 	}
 	
@@ -20029,7 +20011,7 @@ class ObjectEntity extends ConfigEntity {
 	}
 	
 	addChild(key, value) {
-		assert(!(key in this.children), `Duplicate key added: ${key}.`);
+		assert(!(this.hasChild(key)), `Duplicate key added: ${key}.`);
 		this.children[key] = value;
 		this._fillChildName(key);
 		this.extendID(key, value);
@@ -20038,6 +20020,11 @@ class ObjectEntity extends ConfigEntity {
 	
 	hasChild(key) {
 		return key in this.children;
+	}
+	
+	removeChild(key) {
+		assert(this.hasChild(key), `Key not found: ${key}.`);
+		delete this.children[key];
 	}
 	
 	_fillChildName(key) {
@@ -20090,11 +20077,11 @@ class ObjectEntity extends ConfigEntity {
 		return array;
 	}
 	
-	addDynamicDataArray(key, colID, dataType, values) {
-		let array = this.add(key, 'DynamicDataArray', colID, dataType);
+	addDynamicDataArray(key, collection, dataType, values) {
+		let array = this.add(key, 'DynamicDataArray', collection, dataType);
 		if (values) {
 			values.forEach(value => {
-				array.addElement(EntityFactory.build('Data', { colID, dataType }, value));
+				array.addElement(EntityFactory.build('Data', { collection, dataType }, value));
 			});
 		}
 		
@@ -20219,7 +20206,7 @@ class SoundEntity extends StaticObjectEntity {
 
 	constructor() {
 		super();
-		this.addData('file', { colID: 'Sounds', dataType: 'SOUND' })
+		this.addData('file', { collection: 'Sounds', dataType: 'SOUND' })
 			.setName('Sound')
 			.setDescription('The sound that will be played');
 		this.addNumber('volume', 100)
@@ -20301,7 +20288,6 @@ module.exports = SoundEntity;
 // module.exports = SoundEntity;
 
 },{"./staticObjectEntity":41,"assert":1}],41:[function(require,module,exports){
-const assert = require('assert').strict;
 const ObjectEntity = require('./objectEntity');
 const EntityFactory = require('../entityFactory');
 
@@ -20313,8 +20299,10 @@ class StaticObjectEntity extends ObjectEntity {
 	
 	importDesc(descriptor) {
 		Object.keys(descriptor).forEach(key => {
-			assert(this.hasChild(key), `Unknown key imported to static object: ${key}`);
-			this.getChild(key).import(descriptor[key]);
+			// Only import children we know
+			if (this.hasChild(key)) {
+				this.getChild(key).import(descriptor[key]);
+			}
 		});
 	}
 	
@@ -20329,7 +20317,7 @@ class StaticObjectEntity extends ObjectEntity {
 
 module.exports = StaticObjectEntity;
 
-},{"../entityFactory":51,"./objectEntity":37,"assert":1}],42:[function(require,module,exports){
+},{"../entityFactory":51,"./objectEntity":37}],42:[function(require,module,exports){
 const ValueEntity = require('./valueEntity');
 
 class StringEntity extends ValueEntity {

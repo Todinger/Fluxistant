@@ -1,6 +1,6 @@
 class DataContentFactory {
 	constructor() {
-		this.builders = {};
+		this.classes = {};
 	}
 	
 	register(contentClass) {
@@ -10,17 +10,25 @@ class DataContentFactory {
 		console.assert(contentType, `Data content builder registration missing a CONTENT_TYPE value.`);
 		
 		if (!contentType) throw 'Abstract or invalid data content class registered.';
-		if (contentType in this.builders) throw `Duplicate registration for data content type '${contentType}'.`
+		if (contentType in this.classes) throw `Duplicate registration for data content type '${contentType}'.`
 		
-		this.builders[contentType] = contentClass.BUILDER;
+		this.classes[contentType] = contentClass;
 	}
 	
 	build(contentType) {
 		console.assert(
-			contentType && contentType in this.builders,
-			`Unknown content type type: ${contentType}.`);
+			contentType && contentType in this.classes,
+			`Unknown content type: ${contentType}.`);
 		
-		return this.builders[contentType]();
+		return this.classes[contentType].BUILDER();
+	}
+	
+	getMimeType(contentType) {
+		console.assert(
+			contentType && contentType in this.classes,
+			`Unknown content type: ${contentType}.`);
+		
+		return this.classes[contentType].MIME_TYPE;
 	}
 }
 

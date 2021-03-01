@@ -71,6 +71,9 @@ class ArrayEntity extends ConfigEntity {
 	
 	removeElementAt(index) {
 		this.elements.splice(index, 1);
+		for (; index < this.length; index++) {
+			this.extendID(index, this.elements[index]);
+		}
 	}
 	
 	forEach(func) {

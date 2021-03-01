@@ -1,13 +1,13 @@
 'use strict';
 
 const assert = require('assert').strict;
-const fs = require('fs');
 const fsPromise = require('fs/promises');
 const path = require('path');
 const { Base64 } = require('js-base64');
 const mime = require('mime-types');
+const { v4: uuidv4 } = require('uuid');
+const _ = require('lodash');
 const Errors = require('../errors');
-const cli = require('../cliManager');
 const Utils = require('../utils');
 
 // Base class for user data files
@@ -16,12 +16,14 @@ class UserData {
 		this.dataDirPath = dataDirPath;
 		Utils.ensureDirExists(dataDirPath);
 		
-		this.files = {};
+		this.savedFiles = {};       // Current state
+		this.filesToAdd = {};       // Uncommitted new files
+		this.filesToDelete = [];    // Uncommitted deletions
 	}
 	
 	// Selects a file from the stored data, according to the concrete class's own selection rules
 	// noinspection JSUnusedLocalSymbols
-	_getFileKey(...params) {
+	_getFileKey(params) {
 		Errors.abstract();
 	}
 	
@@ -30,96 +32,186 @@ class UserData {
 	}
 	
 	_pathForKey(key, name) {
-		name = name || this.files[key].name;
+		name = name || this.savedFiles[key].name;
 		return path.join(this.dataDirPath, key + path.extname(name));
 	}
 	
-	_save(key, file, callback) {
-		let filePath = this._pathForKey(key, file.name);
-		file.mv(filePath, async (err) => {
-			if (err) {
-				callback(err);
-			} else {
-				this.files[key] = {
-					name: file.name,
-					path: filePath,
-				};
-				
-				try {
-					let fileData = await this._getFileWebByKey(key);
-					callback(undefined, fileData);
-				} catch (err) {
-					callback(err);
-				}
-			}
-		});
+	_addFile(file) {
+		let fileKey = uuidv4();
+		let readPromise = this._readFile(file.tempFilePath, file.name)
+			.then(savedFile => {
+				savedFile.fileKey = fileKey;
+				return savedFile;
+			});
+		this.filesToAdd[fileKey] = {
+			file,
+			readPromise,
+		};
+		
+		return readPromise;
+		
+		// let filePath = this._pathForKey(key, file.name);
+		// file.mv(filePath, async (err) => {
+		// 	if (err) {
+		// 		callback(err);
+		// 	} else {
+		// 		this.savedFiles[key] = {
+		// 			name: file.name,
+		// 			path: filePath,
+		// 		};
+		//
+		// 		try {
+		// 			let fileData = await this._getFileWebByKey(key);
+		// 			callback(undefined, fileData);
+		// 		} catch (err) {
+		// 			callback(err);
+		// 		}
+		// 	}
+		// });
 	}
 	
-	_deleteFile(key, callback) {
-		let filename = this.files[key].path;
-		fs.unlink(filename, (err) => {
-			if (err) {
-				cli.warn(`Failed to delete file '${filename}': ${err}`);
-			}
-			
-			if (callback) {
-				callback(err);
-			}
-		});
+	_unAddFile(fileKey) {
+		return this.filesToAdd[fileKey].readPromise
+			.then(() => {
+				let file = this.filesToAdd[fileKey].file;
+				delete this.filesToAdd[fileKey];
+				return fsPromise.unlink(file.tempFilePath);
+			});
+	}
+	
+	_deleteFile(key) {
+		let filename = this.savedFiles[key].path;
+		return fsPromise.unlink(filename)
+			.then(() => {
+				delete this.savedFiles[key];
+				return key;
+			});
 		
-		delete this.files[key];
+		// let filename = this.savedFiles[key].path;
+		// fs.unlink(filename, (err) => {
+		// 	if (err) {
+		// 		cli.warn(`Failed to delete file '${filename}': ${err}`);
+		// 	}
+		//
+		// 	if (callback) {
+		// 		callback(err);
+		// 	}
+		// });
+		//
+		// delete this.savedFiles[key];
 	}
 	
 	hasKey(key) {
-		return key in this.files;
+		return key in this.savedFiles;
 	}
 	
-	// noinspection JSUnusedLocalSymbols
-	upload(fileKey, file, callback) {
-		Errors.abstract();
+	upload(params) {
+		return this._addFile(params.file);
 	}
 	
-	delete(key, callback) {
-		if (key in this.files) {
-			this._deleteFile(key, callback);
+	delete(params) {
+		if (params.fileKey in this.filesToAdd) {
+			return this._unAddFile(params.fileKey);
+		} else if ((params.fileKey in this.savedFiles) &&
+			!this.filesToDelete.includes(params.fileKey)) {
+				this.filesToDelete.push(params.fileKey);
 		}
+		
+		return Promise.resolve();
+		// if (params.fileKey in this.savedFiles) {
+		// 	return this._deleteFile(params.fileKey);
+		// }
+	}
+	
+	commitChanges() {
+		// First remove everything marked for removal
+		let deletePromises = this.filesToDelete.map(
+			fileKey => this._deleteFile(fileKey));
+		
+		// Then add everything marked for addition (this is so that
+		// if we remove and add something with the same name - i.e.
+		// replace it - then it'll work properly
+		return Promise.all(deletePromises).then(deletedKeys => {
+			_.pullAll(this.filesToDelete, deletedKeys);
+			let movePromises = [];
+			Object.keys(this.filesToAdd).forEach(fileKey => {
+				let file = this.filesToAdd[fileKey].file;
+				let filePath = this._pathForKey(fileKey, file.name);
+				let promise = file.mv(filePath)
+					.then(() => {
+						this.savedFiles[fileKey] = {
+							name: file.name,
+							path: filePath,
+						};
+						delete this.filesToAdd[fileKey];
+					});
+				movePromises.push(promise);
+			});
+			
+			return Promise.all(movePromises);
+		});
+	}
+	
+	dropChanges() {
+		this.filesToDelete = [];
+		
+		let promises = [];
+		Object.keys(this.filesToAdd).forEach(fileKey => {
+			promises.push(this._unAddFile(fileKey));
+		});
+		
+		return Promise.all(promises);
 	}
 	
 	getFileLocal(...params) {
 		let key = this._getFileKey.apply(this, params);
-		return this.files[key].path;
+		return this.savedFiles[key].path;
+	}
+	
+	_readFile(filePath, filename) {
+		return fsPromise.readFile(filePath)
+			.then((data) => {
+				let b64Data = Base64.encode(data);
+				let contentType = mime.contentType(filename);
+				return {
+					name: filename,
+					contentType: contentType,
+					data: `data:${contentType}; base64,${b64Data}`,
+				};
+			});
 	}
 	
 	_getFileWebByKey(key) {
-		return fsPromise.readFile(this.files[key].path)
-		.then((data) => {
-			let b64Data = Base64.encode(data);
-			let contentType = mime.contentType(this.files[key].path);
-			return {
-				name: this.files[key].name,
-				contentType: contentType,
-				data: `data:${contentType}; base64,${b64Data}`,
-			};
-		});
+		return this._readFile(this.savedFiles[key].path, this.savedFiles[key].name);
+		// return fsPromise.readFile(this.savedFiles[key].path)
+		// .then((data) => {
+		// 	let b64Data = Base64.encode(data);
+		// 	let contentType = mime.contentType(this.savedFiles[key].path);
+		// 	return {
+		// 		name: this.savedFiles[key].name,
+		// 		contentType: contentType,
+		// 		data: `data:${contentType}; base64,${b64Data}`,
+		// 	};
+		// });
 		
-		// fs.readFile(this.files[key].path, (err, data) => {
+		// fs.readFile(this.savedFiles[key].path, (err, data) => {
 		// 	if (err) {
 		// 		callback(err);
 		// 	} else {
 		// 		let b64Data = Base64.encode(data);
-		// 		let contentType = mime.contentType(this.files[key].path);
+		// 		let contentType = mime.contentType(this.savedFiles[key].path);
 		// 		let sourceString = `data:${contentType}; base64,${b64Data}`;
 		// 		callback(err, sourceString);
 		// 	}
 		// });
 	}
 	
-	getFileWeb(...params) {
-		if (Object.keys(this.files).length === 0) {
+	getFileWeb(params) {
+		if (Object.keys(this.savedFiles).length === 0) {
 			throw 'Cannot get file: data collection is empty.';
 		}
 		
-		let key = this._getFileKey.apply(this, params);
+		let key = this._getFileKey(params);
 		return this._getFileWebByKey(key);
 	}
 	
@@ -131,9 +223,9 @@ class UserData {
 		// Added the '|| {}' part to shut the IDE up about it might being
 		// null or undefined (despite our test above to make sure it isn't...)
 		// let files = exportedData.files || {};
-		this.files = exportedData.files || {};
+		this.savedFiles = exportedData.files || {};
 		// Object.keys(files).forEach(key => {
-		// 	this.files[key] = {
+		// 	this.savedFiles[key] = {
 		// 		name: files[key].name,
 		// 		path: this._pathForKey(key, files[key]),
 		// 	};
@@ -142,15 +234,15 @@ class UserData {
 	
 	export() {
 		// let filenames = {};
-		// Object.keys(this.files).forEach(key => {
+		// Object.keys(this.savedFiles).forEach(key => {
 		// 	filenames[key] = {
-		// 		name: this.files[key].name,
+		// 		name: this.savedFiles[key].name,
 		// 		path:
 		// 	};
 		// });
 		//
 		// return { filenames };
-		return { files: this.files };
+		return { files: this.savedFiles };
 	}
 }
 
