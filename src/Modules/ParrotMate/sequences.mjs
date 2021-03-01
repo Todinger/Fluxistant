@@ -1,7 +1,9 @@
+import { Event, Image, Sound, Text, Sequence, ClearText } from "./engine.mjs";
+import { parrotMate } from "./parrot.mjs";
 
 const NO_AUTOPLAY = true;
 
-const SEQUENCES = {
+const Sequences = {
 	hey: Sequence([
 		Event(0, [ Sound('hey') ]),
 		Event(0, [ Text('Hey! Look! Listen!\nHey! Look! Listen!') ]),
@@ -171,4 +173,4 @@ const SEQUENCES = {
 	]),
 };
 
-parrotMate.loadAll(SEQUENCES);
+parrotMate.loadAll(Sequences);

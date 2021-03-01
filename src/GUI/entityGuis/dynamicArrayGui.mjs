@@ -124,7 +124,7 @@ export default class DynamicArrayGui extends EntityGui {
 		
 		// Lastly, put all of this into a neat folder that can open all pretty like
 		this.mainGui = GuiElements.folder({
-			header: this.entity.getName(),
+			header: this.entity.getDisplayName(),
 			contents: this.childrenContainer,
 			tooltip: this.entity.getDescription(),
 		});

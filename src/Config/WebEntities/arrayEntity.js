@@ -42,9 +42,20 @@ class ArrayEntity extends ConfigEntity {
 		this.validateType(value);
 		this.elements.push(value);
 		this.extendID(this.elements.length - 1, value);
-		if (!value.hasName()) {
-			value.setName(`#${this.length}`);
-		}
+		
+		value.setDisplayName(`#${this.length}`);
+		
+		// let index = this.length;
+		// let originalGetName = value.getName;
+		// value.getName = () => {
+		// 	let name = originalGetName.apply(value, []);
+		// 	if (name && name !== '') {
+		// 		return name;
+		// 	} else {
+		// 		return `#${index}`;
+		// 	}
+		// };
+		
 		return value;
 	}
 	

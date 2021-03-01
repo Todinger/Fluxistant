@@ -1,5 +1,7 @@
+import { ModuleClient } from '/common/moduleClient.mjs';
+
 // A jQuery value holding the image element we use for displaying images
-var jImageHolder = $('#imageholder');
+const jImageHolder = $('#imageholder');
 
 class Censor extends ModuleClient {
 	constructor() {
@@ -10,13 +12,13 @@ class Censor extends ModuleClient {
 	addCensor(id, image) {
 		console.assert(!(id in this.censors), `Censor '${id}' already exists.`);
 		
-		let jImage = $(`<img class="cimage" src="${image.url}">`);
+		let jImage = $(`<img class="cimage" src="${image.url}" alt="">`);
 		jImage.css({
 			top: `${image.top}px`,
 			left: `${image.left}px`
 		})
 		.hide()
-		.appendTo("#imageholder");
+		.appendTo(jImageHolder);
 		
 		jImage.censorVisible = false;
 		
@@ -65,5 +67,5 @@ class Censor extends ModuleClient {
 	}
 }
 
-var censor = new Censor();
+const censor = new Censor();
 censor.start();

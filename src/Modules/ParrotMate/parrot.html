@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
 	<meta charset="UTF-8">
 	<title>Parrot Mate</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -10,10 +11,11 @@
 	<link rel="shortcut icon" href="#">
 	<link id='style' rel="stylesheet" type="text/css" href="">
 	<script type="text/javascript">
+		let style = $("#style");
 		if (window.location.search.search(/[?&]flipped(?:$|&)/) === -1) {
-			$('#style').attr('href', 'parrot.css');
+			style.attr('href', 'parrot.css');
 		} else {
-			$('#style').attr('href', 'parrot-flipped.css');
+			style.attr('href', 'parrot-flipped.css');
 		}
 	</script>
 </head>
@@ -21,7 +23,7 @@
 	<div id="soundholder"></div>
 	
 	<div id="imageholder" class="imgbox">
-		<img id="parrot" class="center-fit parrot" src="">
+		<img id="parrot" class="center-fit parrot" src="" alt="">
 		<div id="bubble" class="bubble-holder hide-on-startup">
 			<div id="bubbleText" class="bubble bubble-bottom-left bubble-text"></div>
 		</div>
@@ -32,19 +34,18 @@
 		 but not on OBS, so more drastic measures were necessary.
 	 -->
 	<script type="text/javascript">
-		$('#bubble').hide();
-		$('#bubble').css('visibility', 'visible');
+		let bubble = $("#bubble");
+		bubble.hide();
+		bubble.css('visibility', 'visible');
 	</script>
 	
 	<script src="/socket.io/socket.io.js"></script>
-	<script src="/common/clientUtils.js"></script>
-	<script src="/common/moduleClient.js"></script>
-	<script src="files.js"></script>
-	<script src="parrot.js"></script>
-	<script src="engine.js"></script>
-	<script src="sequences.js"></script>
-	<script type="text/javascript">
-		parrotMate.start();
-	</script>
+	<script type="module" src="/common/clientUtils.mjs"></script>
+	<script type="module" src="/common/moduleClient.mjs"></script>
+	<script type="module" src="files.mjs"></script>
+	<script type="module" src="parrot.mjs"></script>
+	<script type="module" src="engine.mjs"></script>
+	<script type="module" src="sequences.mjs"></script>
+	<script type="module" src="start.mjs"></script>
 </body>
 </html>

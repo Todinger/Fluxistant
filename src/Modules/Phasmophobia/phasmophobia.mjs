@@ -1,7 +1,4 @@
-
-const OFF_IMAGE_NAME = 'Off.png';
-const ON_IMAGE_NAME = 'Off.png';
-const INVALID_IMAGE_NAME = 'Invalid.png';
+import { ModuleClient } from "/common/moduleClient.mjs";
 
 class PhasmophobiaClient extends ModuleClient {
 	constructor() {

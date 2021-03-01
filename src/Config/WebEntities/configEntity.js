@@ -12,6 +12,8 @@ class ConfigEntity {
 		this.name = undefined;
 		this.hidden = false;
 		this.id = null; // EVERY entity should have this, set from outside by its parent
+		
+		this.displayName = null;
 	}
 	
 	hasName() {
@@ -58,6 +60,19 @@ class ConfigEntity {
 	setID(id) {
 		this.id = id;
 		return this;
+	}
+	
+	getDisplayName() {
+		let res = this.getName();
+		if ((!res || res === '') && this.displayName) {
+			res = this.displayName;
+		}
+		
+		return res;
+	}
+	
+	setDisplayName(displayName) {
+		this.displayName = displayName;
 	}
 	
 	_escapeID(value) {

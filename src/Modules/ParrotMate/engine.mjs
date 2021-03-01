@@ -1,3 +1,7 @@
+import { randomValue, randomRange } from "/common/clientUtils.mjs";
+import { IMAGE_LOCATIONS, BASE_IMAGE_NAME } from './files.mjs';
+import { parrotMate } from "./parrot.mjs";
+
 function showImage(name) {
 	$('#parrot').attr("src", IMAGE_LOCATIONS[name]);
 }
@@ -191,24 +195,6 @@ function Sequence(events, noAutoplay) {
 }
 
 
-
-function randomRange(min, max) {
-	return min + Math.random() * (max - min);
-}
-
-function randomInt(min, max) {
-	return min + Math.floor(Math.random() * (max - min));
-}
-
-function randomKey(obj) {
-	let keys = Object.keys(obj);
-	return keys[randomInt(0, keys.length)];
-}
-
-function randomValue(obj) {
-	return obj[randomKey(obj)];
-}
-
 class SequencePlayer {
 	constructor(baseImageName) {
 		this.baseImageName = baseImageName;
@@ -284,3 +270,19 @@ class LoopingSequencePlayer extends SequencePlayer {
 		setTimeout(() => this._playNext(), nextSequenceTime);
 	}
 }
+
+export {
+	showImage,
+	clearImage,
+	showText,
+	clearText,
+	clearAll,
+	Image,
+	Sound,
+	Text,
+	ClearText,
+	Event,
+	Sequence,
+	RandomSequencePlayer,
+	LoopingSequencePlayer,
+};

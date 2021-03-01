@@ -1,3 +1,4 @@
+import { ModuleClient } from "/common/moduleClient.mjs";
 
 // Gets a list of all the keys that are in obj1 and not in obj2
 function getSubKeys(obj1, obj2) {
@@ -79,5 +80,5 @@ class ScriptedModules extends ModuleClient {
 	}
 }
 
-var se = new ScriptedModules();
+const se = new ScriptedModules();
 se.start();

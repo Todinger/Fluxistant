@@ -1,3 +1,5 @@
+import { ModuleClient } from "/common/moduleClient.mjs";
+import { applyDefaults } from "/common/clientUtils.mjs";
 
 const DEFAULTS = {
 	color: 'black',
@@ -22,5 +24,5 @@ class CreepyText extends ModuleClient {
 	}
 }
 
-var ct = new CreepyText();
+const ct = new CreepyText();
 ct.start();

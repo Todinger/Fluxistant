@@ -1,3 +1,4 @@
+import { isNonEmptyString } from "./clientUtils.mjs";
 
 /**
  * Returns a number whose value is limited to the given range.
@@ -16,10 +17,6 @@
 Number.prototype.clamp = function(min, max) {
   return Math.min(Math.max(this, min), max);
 };
-
-function isNonEmptyString(obj) {
-	return (typeof obj == 'string') && (obj.length > 0);
-}
 
 /**
  * [Forked from https://gist.github.com/2651899]
@@ -1048,3 +1045,8 @@ class ModuleClient extends EventNotifier {
 		console.assert(test, this._printForm(message));
 	}
 }
+
+export {
+	ModuleClient,
+	EventNotifier,
+};

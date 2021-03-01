@@ -1,3 +1,6 @@
+import { ModuleClient } from '/common/moduleClient.mjs';
+import { SOUNDS } from './files.mjs';
+import { RandomSequencePlayer, showImage, clearText } from "./engine.mjs";
 
 const SECONDS = 1000;
 const MINUTES = 60 * SECONDS;
@@ -49,7 +52,7 @@ class ParrotMate extends ModuleClient {
 		
 		this.player = new RandomSequencePlayer(
 			'regular', 
-			Object.filter(sequences, seq => seq.autoPlay), // See ../clientUtils.js
+			Object.filter(sequences, seq => seq.autoPlay), // See ../clientUtils.mjs
 			this.baseDelay - this.delayVariance,
 			this.baseDelay + this.delayVariance);
 	}
@@ -91,9 +94,16 @@ class ParrotMate extends ModuleClient {
 	}
 }
 
-var parrotMate = new ParrotMate();
-var pm = parrotMate;
+const parrotMate = new ParrotMate();
+const pm = parrotMate;
 
 function play(sequenceName) {
 	pm.playSequence(sequenceName);
 }
+
+window.play = play;
+
+export {
+	parrotMate,
+	play,
+};

@@ -1,3 +1,5 @@
+import { ModuleClient } from "/common/moduleClient.mjs";
+import { randomInt, applyDefaults } from "/common/clientUtils.mjs";
 
 const DEFAULTS = {
 	minDuration: 500,
@@ -7,7 +9,7 @@ const DEFAULTS = {
 	count: 30,
 };
 
-class FShower extends ModuleClient {
+class ImageDropper extends ModuleClient {
 	constructor() {
 		super('Image Dropper');
 	}
@@ -16,7 +18,7 @@ class FShower extends ModuleClient {
 		// We use double this duration along with double the distance
 		// to avoid the slowing at the end of the default easing
 		let duration = randomInt(image.minDuration, image.maxDuration);
-		let jImage = $(`<img class="faller" src="${image.url}">`);
+		let jImage = $(`<img class="faller" src="${image.url}" alt="">`);
 		jImage
 		.width(image.width).height(image.height)
 		.css({ 
@@ -63,5 +65,5 @@ class FShower extends ModuleClient {
 	}
 }
 
-var fs = new FShower();
+const fs = new ImageDropper();
 fs.start();

@@ -1,26 +1,11 @@
+import { ModuleClient } from '/common/moduleClient.mjs';
+import { randomInt, randomSign } from "/common/clientUtils.mjs";
+
 const FETCH_USERS_URL = 'https://tmi.twitch.tv/group/user/fluxistence/chatters';
 const GLOW_SIZE = 15;
 const GLOW_COLOR = '#ffffcc';
 
-var showAllImages = false;
-
-// Assumes Math.floor(max) >= Math.ceil(min)
-function randomInt(min, max) {
-	return min + Math.floor(Math.random() * (max - min + 1));
-}
-
-// Returns +/- 1 randomly (no zeros though)
-function randomSign() {
-	return randomInt(0, 1) * 2 - 1;
-}
-
-// Gets a list of all the keys that are in obj1 and not in obj2
-function getSubKeys(obj1, obj2) {
-	var k1 = Object.keys(obj1);
-	return k1.filter(function(x) {
-		return obj2[x] === undefined;
-	});
-}
+let showAllImages = false;
 
 
 class HypeLevel {
@@ -66,7 +51,7 @@ class ImageHypeLevel extends HypeLevel {
 	constructor(source, sound) {
 		super(source, sound);
 		this.background = 
-			$(`<img src="${source}" class="fullscreen"></img>`)
+			$(`<img src="${source}" class="fullscreen" alt="">`)
 			.hide()
 			.appendTo(`#${ImageHypeLevel.CONTAINER_NAME}`);
 	}
@@ -129,7 +114,7 @@ class HypeManager {
 		
 		let prevLevel = this.currentLevel;
 		
-		if (prevLevel == level) {
+		if (prevLevel === level) {
 			console.warn('Asked to activate already active level, ignoring request');
 			return;
 		}
@@ -146,10 +131,10 @@ class HypeManager {
 			this._levelActivated(level);
 		}
 		
-		if (prevLevel == 0) {
+		if (prevLevel === 0) {
 			// Currently at 0, now rising
 			this._hypeStart();
-		} else if (level == 0) {
+		} else if (level === 0) {
 			// Currently above 0, now dropping to 0
 			// No need to activate any level then
 			this._hypeEnd();
@@ -166,7 +151,7 @@ class HypeManager {
 	}
 	
 	decrement() {
-		if (this.currentLevel == 0) {
+		if (this.currentLevel === 0) {
 			console.warn('Already at min hype level (i.e. 0)');
 			return;
 		}
@@ -179,7 +164,7 @@ class HypeManager {
 	}
 	
 	stop(onFullyStoppedCallback) {
-		if (this.currentLevel == 0) {
+		if (this.currentLevel === 0) {
 			if (onFullyStoppedCallback) {
 				onFullyStoppedCallback();
 			}
@@ -227,7 +212,7 @@ class LoopingAnimatedParticle extends Phaser.GameObjects.Particles.Particle {
 	
 	update(delta, step, processors)
 	{
-		var result = super.update(delta, step, processors);
+		let result = super.update(delta, step, processors);
 		
 		this.t += delta;
 		
@@ -262,7 +247,7 @@ class SingleAnimatedParticle extends Phaser.GameObjects.Particles.Particle {
 	
 	update(delta, step, processors)
 	{
-		var result = super.update(delta, step, processors);
+		let result = super.update(delta, step, processors);
 		
 		if (this.finished) {
 			return result;
@@ -335,7 +320,7 @@ class ChannelParty extends ModuleClient {
 		
 		let container = $('#gameContainer');
 		
-		var config = {
+		let config = {
 			type: Phaser.AUTO,
 			transparent: true,
 			physics: {
@@ -374,7 +359,7 @@ class ChannelParty extends ModuleClient {
 	preload(scene) {
 		this.scene = scene;
 		
-		scene.load.on('filecomplete', (key, type, data) => this.markAsLoaded(key));
+		scene.load.on('filecomplete', (key) => this.markAsLoaded(key));
 		scene.load.on('loaderror', this.errorLoading);
 		scene.load.atlas(
 			'flares',
@@ -482,7 +467,7 @@ class ChannelParty extends ModuleClient {
 				image.emitter.anim = lp.anim;
 			}
 			
-			if (lp.data.type == 'explode') {
+			if (lp.data.type === 'explode') {
 				image.emitter.explode();
 				image.emitter.explosionTimer = this.scene.time.addEvent({
 					delay: ChannelParty.PARTICLE_EXPLODE_INTERVAL,
@@ -599,11 +584,11 @@ class ChannelParty extends ModuleClient {
 		return username in this.existingUserFiles;
 	}
 	
-	hypeLevelVeolicty(level, image, axis) {
+	hypeLevelVelocity(level, image, axis) {
 		// The images should move at base speed when hype is off,
 		// so 0 should be treated the same as 1 for the purposes
-		// of valocity calculations
-		if (level == 0) {
+		// of velocity calculations
+		if (level === 0) {
 			level = 1;
 		}
 		
@@ -611,12 +596,11 @@ class ChannelParty extends ModuleClient {
 		let absoluteBaseSpeed = Math.abs(image.baseVelocity[axis]);
 		let speed = absoluteBaseSpeed + 
 			ChannelParty.HYPE_VELOCITY_INCREMENT * (level - 1);
-		let finalVelocity = sign * speed;
 		
-		return finalVelocity;
+		return sign * speed;
 	}
 	
-	hypeLevelDeactivated(level) {
+	hypeLevelDeactivated() {
 		// Remove emitters as necessary
 		Object.keys(this.currentUserImages).forEach(username => {
 			this.removeEmitter(username);
@@ -631,8 +615,8 @@ class ChannelParty extends ModuleClient {
 		
 		Object.values(this.currentUserImages).forEach(image => {
 			image.body.velocity.setTo(
-				this.hypeLevelVeolicty(level, image, 'x'),
-				this.hypeLevelVeolicty(level, image, 'y'));
+				this.hypeLevelVelocity(level, image, 'x'),
+				this.hypeLevelVelocity(level, image, 'y'));
 		});
 	}
 
@@ -646,9 +630,10 @@ class ChannelParty extends ModuleClient {
 		
 		let image = this.scene.physics.add.image(xpos, ypos, username);
 		image.displayWidth = ChannelParty.IMAGE_SIZE;
+		// noinspection JSSuspiciousNameCombination
 		image.scaleY = image.scaleX;
 		
-		if (image.texture.key == "__MISSING") {
+		if (image.texture.key === "__MISSING") {
 			console.log(`Image missing for ${username}`);
 		}
 		
@@ -664,8 +649,8 @@ class ChannelParty extends ModuleClient {
 		image.alpha = 0;
 		
 		image.body.velocity.setTo(
-			this.hypeLevelVeolicty(this.hypeManager.currentLevel, image, 'x'),
-			this.hypeLevelVeolicty(this.hypeManager.currentLevel, image, 'y'));
+			this.hypeLevelVelocity(this.hypeManager.currentLevel, image, 'x'),
+			this.hypeLevelVelocity(this.hypeManager.currentLevel, image, 'y'));
 		
 		
 		if (this.useParticles) {
@@ -735,8 +720,9 @@ class ChannelParty extends ModuleClient {
 	}
 	
 	resetFinalVideo() {
-		$('#finalVideo').fadeOut(ChannelParty.FADE_DURATION);
-		let videoElement = $('#finalVideo').get(0);
+		let finalVideo = $('#finalVideo');
+		finalVideo.fadeOut(ChannelParty.FADE_DURATION);
+		let videoElement = finalVideo.get(0);
 		videoElement.pause();
 		videoElement.currentTime = 0;
 	}
@@ -897,9 +883,11 @@ const HYPE_DATA = {
 
 const FINAL_VIDEO = 'assets/FinishVideo/FinishVideo.mp4';
 
-var cp = new ChannelParty(SOUNDS, HYPE_DATA, FINAL_VIDEO);
+const cp = new ChannelParty(SOUNDS, HYPE_DATA, FINAL_VIDEO);
 cp.start();
 
 function showAll() {
 	cp.addAllExistingUserImages();
 }
+
+window.showAll = showAll;

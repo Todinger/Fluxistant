@@ -1,3 +1,5 @@
+import { ModuleClient } from '/common/moduleClient.mjs';
+
 const FADE_DURATION = 250;
 const DEFAULT_SHOW_DURATION = 5000;
 
@@ -111,5 +113,5 @@ class ImageDisplay extends ModuleClient {
 	}
 }
 
-var id = new ImageDisplay();
+const id = new ImageDisplay();
 id.start();

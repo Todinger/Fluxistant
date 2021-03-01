@@ -20,6 +20,7 @@ export default class ObjectGui extends EntityGui {
 	_contentsChanged() {
 		super._changed();
 		this._updateStatusIndicators(this.mainGui.guiData.header);
+		this.updateName();
 	}
 	
 	_buildChildrenGUIs() {
@@ -53,7 +54,6 @@ export default class ObjectGui extends EntityGui {
 		let childrenGUIs = this._buildChildrenGUIs();
 		Object.keys(childrenGUIs).forEach(key => {
 			let childEntity = this.entity.getChild(key);
-			let childName = childEntity.getName();
 			let childDescription = childEntity.getDescription();
 			
 			let childEntry;
@@ -65,7 +65,7 @@ export default class ObjectGui extends EntityGui {
 				});
 			} else {
 				let labeledContainer = GuiElements.labeledContainer({
-					label: childName,
+					label: childEntity.getDisplayName(),
 					contents: childrenGUIs[key].getGUI(),
 					tooltip: childDescription,
 				});
@@ -73,6 +73,7 @@ export default class ObjectGui extends EntityGui {
 				childEntry = this._buildChildEntry(this.childrenGUIs[key], labeledContainer);
 				
 				this.childrenGUIs[key].onChangedOrError(() => {
+					labeledContainer.guiData.label.text(childEntity.getDisplayName());
 					this._contentsChanged();
 					childrenGUIs[key]._updateStatusIndicators(labeledContainer.guiData.label);
 				});
@@ -90,7 +91,7 @@ export default class ObjectGui extends EntityGui {
 		let childrenContainer = this._buildChildrenContainer();
 		
 		this.mainGui = GuiElements.folder({
-			header: this.entity.getName(),
+			header: this.entity.getDisplayName(),
 			contents: childrenContainer,
 			tooltip: this.entity.getDescription(),
 		});
@@ -115,6 +116,10 @@ export default class ObjectGui extends EntityGui {
 		});
 		
 		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);
+	}
+	
+	updateName() {
+		this.mainGui.guiData.header.text(this.entity.getDisplayName());
 	}
 }
 

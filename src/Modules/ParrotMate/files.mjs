@@ -24,3 +24,9 @@ const SOUNDS = {
 };
 
 const BASE_IMAGE_NAME = 'regular';
+
+export {
+	IMAGE_LOCATIONS,
+	SOUNDS,
+	BASE_IMAGE_NAME
+};

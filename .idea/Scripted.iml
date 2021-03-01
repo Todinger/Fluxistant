@@ -12,5 +12,7 @@
     <orderEntry type="library" name="fomantic-ui" level="application" />
     <orderEntry type="library" name="uikit" level="application" />
     <orderEntry type="library" name="jquery-ui" level="application" />
+    <orderEntry type="library" name="normalize" level="application" />
+    <orderEntry type="library" name="phaser" level="application" />
   </component>
 </module>

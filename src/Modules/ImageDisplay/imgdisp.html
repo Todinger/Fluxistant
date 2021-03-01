@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
 	<meta charset="UTF-8">
 	<title>Show Image</title>
 	<!-- This is to stop a weird "favicon" error.
@@ -8,6 +9,7 @@
 		https://stackoverflow.com/questions/31075893/im-getting-favicon-ico-error -->
 	<link rel="shortcut icon" href="#" />
 	<style>
+		/*noinspection CssUnusedSymbol*/
 		.bg {
 			position: absolute;
 			top: 50%;
@@ -15,6 +17,8 @@
 			transform: translate(-50%, -50%);
 			z-index: 1;
 		}
+
+		/*noinspection CssUnusedSymbol*/
 		.inbetween {
 			position: absolute;
 			top: 50%;
@@ -48,7 +52,7 @@
 		at the center of the page.
 	-->
 	<div class='inner'>
-		<img id='actualimg' class='shadowfilter' src=""/>
+		<img id='actualimg' class='shadowfilter' src="" alt="">
 	</div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -58,15 +62,16 @@
 	 but not on OBS, so more drastic measures were necessary.
  -->
 <script type="text/javascript">
-	$('#imageholder').hide();
-	$('#imageholder').css('visibility', 'visible');
+	let imageHolder = $('#imageholder');
+	imageHolder.hide();
+	imageHolder.css('visibility', 'visible');
 </script>
 
 
 <script src="/common/jQueryRotate.js"></script>
 <script src="/common/imageEffects.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/common/moduleClient.js"></script>
-<script src="imgdisp.js"></script>
+<script type="module" src="/common/moduleClient.mjs"></script>
+<script type="module" src="imgdisp.mjs"></script>
 </body>
 </html>

@@ -1,11 +1,5 @@
-
-// Gets a list of all the keys that are in obj1 and not in obj2
-function getSubKeys(obj1, obj2) {
-	var k1 = Object.keys(obj1);
-	return k1.filter(function(x) {
-		return obj2[x] === undefined;
-	});
-}
+import { ModuleClient } from "/common/moduleClient.mjs";
+import { applyDefaults } from "/common/clientUtils.mjs";
 
 const subtractArrays = (arr1, arr2) => arr1.filter(el => !arr2.includes(el));
 
@@ -16,7 +10,7 @@ class DisplayEffects {
 	
 	static get appear() {
 		return {
-			show: function(jTarget, displayEffectData) {
+			show: function(jTarget) {
 				jTarget.show();
 			},
 			hide: function(jTarget, displayEffectData, onDone) {
@@ -25,7 +19,7 @@ class DisplayEffects {
 					onDone();
 				}
 			},
-			duration: function(displayEffectData) {
+			duration: function() {
 				return 0;
 			},
 		}
@@ -47,6 +41,7 @@ class DisplayEffects {
 				});
 			},
 			duration(displayEffectData) {
+				// noinspection UnnecessaryLocalVariableJS
 				let res =
 					displayEffectData.duration ||
 					DisplayEffects.fade.DEFAULTS.duration;
@@ -183,5 +178,5 @@ class TextDisplay extends ModuleClient {
 	}
 }
 
-var td = new TextDisplay();
+const td = new TextDisplay();
 td.start();

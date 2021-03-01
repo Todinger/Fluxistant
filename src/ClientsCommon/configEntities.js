@@ -18618,9 +18618,20 @@ class ArrayEntity extends ConfigEntity {
 		this.validateType(value);
 		this.elements.push(value);
 		this.extendID(this.elements.length - 1, value);
-		if (!value.hasName()) {
-			value.setName(`#${this.length}`);
-		}
+		
+		value.setDisplayName(`#${this.length}`);
+		
+		// let index = this.length;
+		// let originalGetName = value.getName;
+		// value.getName = () => {
+		// 	let name = originalGetName.apply(value, []);
+		// 	if (name && name !== '') {
+		// 		return name;
+		// 	} else {
+		// 		return `#${index}`;
+		// 	}
+		// };
+		
 		return value;
 	}
 	
@@ -19154,6 +19165,8 @@ class ConfigEntity {
 		this.name = undefined;
 		this.hidden = false;
 		this.id = null; // EVERY entity should have this, set from outside by its parent
+		
+		this.displayName = null;
 	}
 	
 	hasName() {
@@ -19200,6 +19213,19 @@ class ConfigEntity {
 	setID(id) {
 		this.id = id;
 		return this;
+	}
+	
+	getDisplayName() {
+		let res = this.getName();
+		if ((!res || res === '') && this.displayName) {
+			res = this.displayName;
+		}
+		
+		return res;
+	}
+	
+	setDisplayName(displayName) {
+		this.displayName = displayName;
 	}
 	
 	_escapeID(value) {
@@ -19397,7 +19423,7 @@ class DataEntity extends StaticObjectEntity {
 	}
 	
 	getFileKey() {
-		return this.getChild('fileKey').getValue();
+		return this.getID();
 	}
 	
 	isSet() {
@@ -19413,6 +19439,12 @@ class DataEntity extends StaticObjectEntity {
 	}
 	
 	// ---- Overrides ---- //
+	
+	toConf() {
+		let conf = super.toConf();
+		conf.fileKey = this.getFileKey();
+		return conf;
+	}
 	
 	validate() {
 		super.validate();

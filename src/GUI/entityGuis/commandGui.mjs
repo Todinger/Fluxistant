@@ -10,6 +10,7 @@
 import ObjectGui from "./objectGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 import GuiElements from "./guiElements/guiElements.mjs";
+import { isNonEmptyString } from "/common/clientUtils.mjs";
 
 export default class CommandGui extends ObjectGui {
 	static get GUITYPE()    { return 'Command';                                                           }
@@ -20,12 +21,8 @@ export default class CommandGui extends ObjectGui {
 	}
 	
 	_getName() {
-		let name = this.entity.getName();
-		if (!name || name === '') {
-			name = this.entity.getCmdName();
-		}
-		
-		return name;
+		let options = [this.entity.getName(), this.entity.getCmdName(), this.entity.getDisplayName()];
+		return options.reduce((prev, current) => isNonEmptyString(prev) ? prev : current);
 	}
 	
 	_buildGUI() {

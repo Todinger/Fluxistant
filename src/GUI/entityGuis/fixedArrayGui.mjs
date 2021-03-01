@@ -53,7 +53,7 @@ export default class FixedArrayGui extends EntityGui {
 		});
 		
 		this.mainGui = GuiElements.folder({
-			header: this.entity.getName(),
+			header: this.entity.getDisplayName(),
 			contents: childrenContainer,
 			tooltip: this.entity.getDescription(),
 		});

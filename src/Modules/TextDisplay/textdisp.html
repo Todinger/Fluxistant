@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
 	<meta charset="UTF-8">
 	<title>Text Display</title>
 	<!-- This is to stop a weird "favicon" error.
@@ -28,7 +29,8 @@
 			margin: 0;
 			padding: 0;
 		}
-		
+
+		/*noinspection CssUnusedSymbol*/
 		.framediv {
 			display: block;
 			position: absolute;
@@ -45,9 +47,9 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/common/clientUtils.js"></script>
-<script src="/common/moduleClient.js"></script>
-<script src="textdisp.js"></script>
+<script type="module" src="/common/clientUtils.mjs"></script>
+<script type="module" src="/common/moduleClient.mjs"></script>
+<script type="module" src="textdisp.mjs"></script>
 
 </body>
 </html>

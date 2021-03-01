@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
 	<meta charset="UTF-8">
 	<title>Image Dropper</title>
 	<!-- This is to stop a weird "favicon" error.
@@ -11,7 +12,8 @@
 		body {
 			overflow: hidden; /* Hide scrollbars */
 		}
-		
+
+		/*noinspection CssUnusedSymbol*/
 		.faller {
 			position: absolute;
 			top: 0;
@@ -29,10 +31,9 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/common/clientUtils.js"></script>
+<script type="module" src="/common/clientUtils.mjs"></script>
+<script type="module" src="/common/moduleClient.mjs"></script>
 <script src="/common/imageEffects.js"></script>
-<script src="/common/clientUtils.js"></script>
-<script src="/common/moduleClient.js"></script>
-<script src="imgdrop.js"></script>
+<script type="module" src="imgdrop.mjs"></script>
 </body>
 </html>

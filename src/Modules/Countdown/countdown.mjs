@@ -1,14 +1,9 @@
+import { ModuleClient } from '/common/moduleClient.mjs';
+import { now } from '/common/clientUtils.mjs';
+
 const SECONDS = 1000;
 const MINUTES = 60 * SECONDS;
 const HOURS = 60 * MINUTES;
-
-function now() {
-	return new Date().getTime();
-}
-
-function addMinutes(date, amount) {
-    return new Date(date.getTime() + amount * MINUTES);
-}
 
 function pad(number) {
 	return String(number).padStart(2, '0');
@@ -26,8 +21,9 @@ class Countdown extends ModuleClient {
 		let hours = Math.floor(distance / HOURS);
 		let minutes = Math.floor((distance % HOURS) / MINUTES);
 		let seconds = Math.floor((distance % MINUTES) / SECONDS);
-		$('#clock').html(`\u00A0Time left for stream: ${hours}:${pad(minutes)}:${pad(seconds)}`);
-		$('#clock').fitText(1.25);
+		let clock = $('#clock');
+		clock.html(`\u00A0Time left for stream: ${hours}:${pad(minutes)}:${pad(seconds)}`);
+		clock.fitText(1.25);
 	}
 	
 	updateTime() {
@@ -50,11 +46,12 @@ class Countdown extends ModuleClient {
 			this.updateTime();
 		});
 		
+		// noinspection PointlessArithmeticExpressionJS
 		setInterval(() => this.updateTime(), 1 * SECONDS);
 		
 		this.server.attach();
 	}
 }
 
-var cd = new Countdown();
+const cd = new Countdown();
 cd.start();

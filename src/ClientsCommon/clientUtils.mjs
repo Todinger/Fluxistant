@@ -13,6 +13,10 @@ function randomInt(min, max) {
 	return min + Math.floor(Math.random() * (max - min));
 }
 
+// Returns +/- 1 randomly (no zeros though)
+function randomSign() {
+	return randomInt(0, 1) * 2 - 1;
+}
 // Returns a random key in the given object.
 function randomKey(obj) {
 	let keys = Object.keys(obj);
@@ -45,3 +49,19 @@ function applyDefaults(obj, defs) {
 function upperFirst(str) {
 	return str[0].toUpperCase() + str.substr(1);
 }
+
+function isNonEmptyString(obj) {
+	return (typeof obj == 'string') && (obj.length > 0);
+}
+
+export {
+	now,
+	randomRange,
+	randomInt,
+	randomSign,
+	randomKey,
+	randomValue,
+	applyDefaults,
+	upperFirst,
+	isNonEmptyString,
+};

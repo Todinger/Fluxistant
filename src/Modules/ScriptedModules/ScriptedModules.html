@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
 	<meta charset="UTF-8">
 	<title>Scripted Modules</title>
 	<!-- This is to stop a weird "favicon" error.
@@ -28,7 +29,8 @@
 			margin: 0;
 			padding: 0;
 		}
-		
+
+		/*noinspection CssUnusedSymbol*/
 		.framediv {
 			display: block;
 			position: absolute;
@@ -72,12 +74,13 @@
 	 but not on OBS, so more drastic measures were necessary.
  -->
 <script type="text/javascript">
-	$('#errorScreen').hide();
-	$('#errorScreen').css('visibility', 'visible');
+	let errorScreen = $('#errorScreen');
+	errorScreen.hide();
+	errorScreen.css('visibility', 'visible');
 </script>
 
-<script src="/common/moduleClient.js"></script>
-<script src="ScriptedModules.js"></script>
+<script type="module" src="/common/moduleClient.mjs"></script>
+<script type="module" src="ScriptedModules.mjs"></script>
 
 </body>
 </html>

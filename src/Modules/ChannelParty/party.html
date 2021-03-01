@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
 	<meta charset="UTF-8">
 	<title>Channel Party</title>
     <!-- This is to stop a weird "favicon" error.
@@ -58,12 +59,12 @@
 	<div id="imageHypeContainer" class="fullscreen"></div>
 </div>
 <div id="finalVideoHolder" class="fullscreen front">
-	<video id="finalVideo" class="blackbg" src="assets/FinishVideo/FinishVideo.mp4">
+	<video id="finalVideo" class="blackbg" src="assets/FinishVideo/FinishVideo.mp4"></video>
 </div>
 <script>$('#finalVideo').hide();</script>
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.16.1/dist/phaser-arcade-physics.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/common/moduleClient.js"></script>
-<script src="party_phaser.js"></script>
+<script type="module" src="/common/moduleClient.mjs"></script>
+<script type="module" src="party_phaser.mjs"></script>
 </body>
 </html>
