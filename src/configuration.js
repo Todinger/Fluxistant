@@ -109,8 +109,8 @@ class Configuration {
 		return this.configRoot.addGroup(key);
 	}
 	
-	addData(key, configData) {
-		return this.configRoot.addData(key, configData);
+	addSingleData(key, configData) {
+		return this.configRoot.addSingleData(key, configData);
 	}
 	
 	addKeyShortcuts(key) {

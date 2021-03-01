@@ -4,10 +4,10 @@ const StaticObjectEntity = requireConfig('staticObjectEntity');
 class SoundEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Sound'; 					}
 	static get BUILDER()	{ return () => new SoundEntity(); 	}
-
+	
 	constructor() {
 		super();
-		this.addData('file', { collection: 'Sounds', dataType: 'SOUND' })
+		this.addSingleData('file', { collection: 'Sounds', dataType: 'SOUND' })
 			.setName('Sound')
 			.setDescription('The sound that will be played');
 		this.addNumber('volume', 100)
