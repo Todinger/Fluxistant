@@ -206,15 +206,15 @@ class Phasmophobia extends Module {
 		let messageParts = [];
 		
 		if (this.levelData.ghostName) {
-			messageParts.push(`Name: ${this.levelData.ghostName}`);
+			messageParts.push(this.levelData.ghostName);
 		}
 		
 		if (Utils.inRange(1, this.levelData.possibleEvidenceLeft.length, 3)) {
-			messageParts.push(`Possible Evidence: ${Utils.makeEnglishAndList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft))}`);
+			messageParts.push(Utils.makeEnglishOrList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft)));
 		}
 		
 		if (this.levelData.possibleGhosts.length <= 3) {
-			messageParts.push(`Ghost Type: ${Utils.makeEnglishOrList(this.levelData.possibleGhosts)}`)
+			messageParts.push(Utils.makeEnglishOrList(this.levelData.possibleGhosts));
 		}
 		
 		if (messageParts.length > 0) {
