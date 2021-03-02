@@ -29,7 +29,7 @@
 
 	<!--suppress HtmlUnknownTarget -->
 	<script src="/common/configEntities.js"></script>
-	<script type="module" src="./entityGuis/entityGuis.mjs"></script>
+<!--	<script type="module" src="./entityGuis/entityGuis.mjs"></script>-->
 	<script type="text/javascript">
 		let listening = false;
 
@@ -50,6 +50,7 @@
 </head>
 <body onkeypress="bodyKeyPress(event)">
 <!--<form class="uk-form-horizontal">-->
+
 
 <div class="uk-light uk-background-secondary uk-padding-small uk-height-viewport">
 	<h1 class="uk-heading-line uk-text-center uk-margin-remove-bottom">
@@ -127,8 +128,7 @@
 								</li>
 							</ul>
 						</div>
-						<!-- Static Array --> <!-- <div> Not really necessary, I think -->
-							<ul uk-accordion class="uk-margin-small-top uk-border-rounded uk-box-shadow-hover-large uk-padding-small">
+						<!-- Static Array --><ul uk-accordion class="uk-margin-small-top uk-border-rounded uk-box-shadow-hover-large uk-padding-small">
 								<li>
 									<a class="uk-accordion-title uk-background-primary uk-border-rounded uk-padding-small" href="#">Static Array</a>
 									<div class="uk-accordion-content"> <div>
@@ -157,7 +157,6 @@
 									</div> </div>
 								</li>
 							</ul>
-						<!-- </div> Not really necessary, I think -->
 						<!-- Dynamic Array --> <div>
 							<ul uk-accordion class="uk-margin-small-top">
 								<li>
@@ -232,10 +231,10 @@
 													<span id="imgNameTag" class="uk-flex uk-flex-center uk-text-truncate"></span>
 												</span>
 										</div>
-										<div class="js-upload uk-placeholder uk-text-center uk-margin-remove">
+										<div id="uploader" class="js-upload uk-placeholder uk-text-center uk-margin-remove">
 											<span uk-icon="icon: upload"></span>
 											<span class="uk-text-middle">Upload image by dropping it here or</span>
-											<div id="uploader" uk-form-custom>
+											<div uk-form-custom>
 												<input type="file" multiple>
 												<span class="uk-link">selecting one</span>.
 											</div>
@@ -244,8 +243,144 @@
 									<progress id="js-progressbar" class="uk-progress" value="0" max="100" hidden></progress>
 								</div>
 							</div>
+							<!-- Multi Image --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+								<h3 class="uk-width-1-6"><span>Multi Files</span></h3>
+								<div>
+									<div class="uk-width-expand">
+<!--										<button id="m-upload-toggler" class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden></button>-->
+<!--										<div class="uk-visible-toggle uk-flex uk-flex-column uk-width-small uk-padding-remove" tabindex="-1" hidden>-->
+<!--										</div>-->
+										<div id="m-uploader" class="js-upload uk-placeholder uk-text-center uk-margin-remove">
+											<span uk-icon="icon: upload"></span>
+											<span class="uk-text-middle">Upload image by dropping it here or</span>
+											<div uk-form-custom>
+												<input type="file" multiple>
+												<span class="uk-link">selecting one</span>.
+											</div>
+											<div id="multi-preview" class="uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .list-item; delay: 80">
+												<!-- Suggested 0 -->
+<!--												<div class="uk-card uk-card-secondary uk-margin">-->
+<!--													<div class="uk-card-media-top">-->
+<!--														<img alt="..." src="https://i.stack.imgur.com/1yMhJ.png?s=32" uk-img style="width: 100%">-->
+<!--													</div>-->
+<!--													<div class="uk-card-body uk-margin-remove-first-child">-->
+<!--														<h3 class="uk-card-title uk-margin-top uk-margin-remove-bottom">Test</h3>-->
+<!--													</div>-->
+<!--												</div>-->
+												<!-- 1 --><div>
+													<div class="uk-card uk-card-secondary uk-card-hover uk-flex uk-flex-column uk-flex-stretch">
+														<div class="uk-card-body">
+															<img style="width: 100%" src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope">
+														</div>
+														<span class="uk-text-meta uk-text-break uk-card-footer file-upload-name">Bloop</span>
+													</div>
+												</div>
+												<!-- 2 --><div>
+													<div class="uk-card uk-card-secondary uk-card-hover">
+														<img class="uk-card-body" src="https://gogocdn.net/cover/made-in-abyss-movie-3-fukaki-tamashii-no-reimei.png" alt="Nope">
+														<span class="uk-text-meta uk-text-break uk-card-footer file-upload-name">Bloop</span>
+													</div>
+												</div>
+												<!-- 3 (THIS ONE!) --><div>
+													<a class="uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle" tabindex="0" href="#my-modal" uk-toggle>
+														<img src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+														<span class="uk-position-absolute uk-transform-center uk-light uk-invisible-hover" style="left: 90%; top: 5%">
+																<button id="axbtn" class="" type="button" uk-close></button>
+															</span>
+														<span class="uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">Bloop</span>
+													</a>
+												<!-- Modal --> <div id="my-modal" class="" uk-modal>
+												<div class="uk-modal-dialog uk-modal-body uk-light uk-background-secondary">
+													<button class="uk-modal-close-default" type="button" uk-close></button>
+													<div>Contents here!</div>
+												</div>
+											</div>
+												</div>
+
+												<!-- GOOD SINGLE: CENTER -->
+<!--												<div>-->
+<!--													<div class="uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle" tabindex="0">-->
+<!--														<img src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">-->
+<!--														<span class="uk-position-absolute uk-transform-center uk-light uk-invisible-hover" style="left: 90%; top: 5%">-->
+<!--																<button id="axbtn" class="" type="button" uk-close></button>-->
+<!--															</span>-->
+<!--														<span class="uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">Bloop</span>-->
+<!--													</div>-->
+<!--												</div>-->
+
+												<!-- GOOD SINGLE: STRETCH -->
+<!--												<div>-->
+<!--													<div class="uk-card uk-card-secondary uk-card-hover uk-flex uk-flex-column uk-flex-center uk-visible-toggle uk-transition-toggle" tabindex="0">-->
+<!--														<img src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope">-->
+<!--														<span class="uk-position-absolute uk-transform-center uk-light uk-invisible-hover" style="left: 90%; top: 5%">-->
+<!--															<button id="axbtn" class="" type="button" uk-close></button>-->
+<!--														</span>-->
+<!--														<span class="uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">Bloop</span>-->
+<!--													</div>-->
+<!--												</div>-->
+
+												<!-- 4 --><div>
+<!--													<div class="uk-card uk-card-secondary uk-card-hover uk-grid uk-child-width-1-1" uk-grid>-->
+<!--														<div class="uk-card-body">-->
+<!--															<img src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope">-->
+<!--														</div>-->
+<!--														<div class="uk-card-footer uk-text-meta uk-text-break file-upload-name">Bloop</div>-->
+<!--													</div>-->
+													<div class="uk-card uk-card-secondary uk-card-hover uk-flex uk-flex-column uk-flex-stretch">
+<!--														<div class="uk-card-header"></div>-->
+<!--														<span class="uk-invisible-hover uk-position-absolute uk-transform-center uk-light" style="left: 90%; top: 10%">-->
+<!--															<button id="m-xbtn" class="uk-invisible-hover" type="button" uk-close></button>-->
+<!--														</span>-->
+														<div class="uk-card-body uk-padding-remove uk-margin-auto-top uk-margin-auto-bottom">
+<!--																<img style="object-fit: contain; width: 100%; height: 100%" src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope">-->
+																<img style="object-fit: contain" src="https://gogocdn.net/cover/made-in-abyss-movie-3-fukaki-tamashii-no-reimei.png" alt="Nope">
+																<span class="uk-position-absolute uk-transform-center uk-light" style="left: 90%; top: 10%">
+																	<button id="axbtn" class="" type="button" uk-close></button>
+																</span>
+														</div>
+														<div class="uk-text-meta uk-text-break uk-card-footer file-upload-name uk-width-expand" style="position: absolute; bottom: 0;">Bloop</div>
+													</div>
+												</div>
+											</div>
+
+<!--											<ul id="multi-preview" class="uk-list uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .list-item; delay: 80">-->
+<!--												<li class="list-item uk-margin-medium-top uk-flex uk-flex-center uk-height-1-1">-->
+<!--													<div class="uk-cover-container">-->
+<!--														<div class="uk-width-expand uk-height-1-1">-->
+<!--															<img src="https://gogocdn.net/cover/made-in-abyss-movie-3-fukaki-tamashii-no-reimei.png" alt="Nope">-->
+<!--														</div>-->
+<!--													</div>-->
+<!--													<span class="uk-text-meta uk-text-break file-upload-name">Bloop</span>-->
+<!--												</li>-->
+<!--												<li class="list-item uk-margin-medium-top uk-grid-match">-->
+<!--													<div class="uk-cover-container">-->
+<!--														<div class="uk-width-expand uk-height-1-1">-->
+<!--															<img src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope">-->
+<!--														</div>-->
+<!--													</div>-->
+<!--													<span class="uk-text-meta uk-text-break file-upload-name">Bloop</span>-->
+<!--												</li>-->
+<!--											</ul>-->
+
+
+<!--											<div>-->
+<!--												<div class="uk-inline">-->
+<!--													<img id="m-upload-image" class="uk-width-small" alt="" src="https://i.stack.imgur.com/1yMhJ.png?s=32" uk-img>-->
+<!--													<span class="uk-invisible-hover uk-position-absolute uk-transform-center uk-light" style="left: 90%; top: 10%">-->
+<!--														<button id="m-xbtn" class="uk-invisible-hover" type="button" uk-close></button>-->
+<!--													</span>-->
+<!--												</div>-->
+<!--												<span class="uk-text-meta uk-text-break uk-width-small file-upload-name">-->
+<!--													<span id="m-imgNameTag" class="uk-flex uk-flex-center uk-text-truncate">Image</span>-->
+<!--												</span>-->
+<!--											</div>-->
+										</div>
+									</div>
+									<progress id="m-js-progressbar" class="uk-progress" value="0" max="100" hidden></progress>
+								</div>
+							</div>
 						</div>
-						<!-- File Upload --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+						<!-- Single File Upload --> <div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
 							<!--form ref="uploadForm" id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
 								<input type="file" name="sampleFile">
 								<input type="submit" value="Upload!">
@@ -261,7 +396,7 @@
 								<source id="aud" src=""/>
 							</audio>
 						</div>
-
+						<!-- Commented-out Code --> <div>
 <!--						<div>-->
 <!--							<div class="uk-container uk-margin-top uk-margin-bottom">-->
 <!--								<p class="uk-text-lead">Multiple file upload preview</p>-->
@@ -309,7 +444,57 @@
 <!--								</div>-->
 <!--							</div>-->
 <!--						</div>-->
+							</div>
+						</div>
+						<!-- Commented-out Code --> <div>
+<!--						<div>-->
+<!--							<div class="uk-container uk-margin-top uk-margin-bottom">-->
+<!--								<p class="uk-text-lead">Multiple file upload preview</p>-->
+<!--								<div class="uk-upload-box">-->
+<!--									<div id="error-alert-file-upload" class="uk-alert-danger uk-margin-top uk-hidden" uk-alert>-->
+<!--										<p id="error-messages-fileupload"></p>-->
+<!--									</div>-->
 
+<!--									<div class="js-upload uk-placeholder uk-text-center">-->
+<!--										<span uk-icon="icon: cloud-upload"></span>-->
+<!--										<span class="uk-text-middle uk-margin-small-left">Attach files by dropping them here or</span>-->
+<!--										<div uk-form-custom>-->
+<!--											<input name="documents[]" type="file" accept="image/png, image/jpeg" multiple>-->
+<!--											<span class="uk-link">selecting one</span>-->
+<!--										</div>-->
+
+<!--										<ul id="preview" class="uk-list uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .list-item; delay: 80"></ul>-->
+<!--									</div>-->
+<!--								</div>-->
+
+<!--								<hr>-->
+<!--								<p class="uk-text-lead">Single file upload preview</p>-->
+
+<!--								<div class="uk-upload-box">-->
+<!--									<div id="error-alert-file-upload" class="uk-alert-danger uk-margin-top uk-hidden" uk-alert>-->
+<!--										<p id="error-messages-fileupload"></p>-->
+<!--									</div>-->
+
+<!--									<div class="js-upload uk-placeholder uk-text-center">-->
+<!--										<span uk-icon="icon: cloud-upload"></span>-->
+<!--										<span class="uk-text-middle uk-margin-small-left">Attach files by dropping them here or</span>-->
+<!--										<div uk-form-custom>-->
+<!--											<input name="document" accept="image/png, image/jpeg" type="file">-->
+<!--											<span class="uk-link">selecting one</span>-->
+<!--										</div>-->
+
+<!--										<ul id="preview" class="uk-list uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .list-item; delay: 80"></ul>-->
+<!--									</div>-->
+<!--								</div>-->
+
+<!--								<progress id="js-progressbar" class="uk-progress" value="0" max="100">    </progress>-->
+<!--								<div class="uk-clearfix">-->
+<!--									<div class="uk-float-left"><span class="bar-value-loaded"></span></div>-->
+<!--									<div class="uk-float-right"><span class="bar-value-total"></span></div>-->
+<!--								</div>-->
+<!--							</div>-->
+<!--						</div>-->
+							</div>
 						</div>
 					</div>
 				</li>
@@ -373,6 +558,69 @@
 </div>
 
 <script>
+
+	let mbar = $('#m-js-progressbar')[0];
+
+	window.up = UIkit.upload('#uploader', {
+		url: '/data/mod/Image Commands/Images',
+		name: 'dataFile',
+		multiple: true,
+
+		completeAll: function() {
+			setTimeout(function () {
+				mbar.setAttribute('hidden', 'hidden');
+			}, 1000);
+		},
+
+		complete: function(req) {
+			let img = $('#upload-image');
+			let files = JSON.parse(req.response);
+			imageName = files.dataFile.name;
+			$('#imgNameTag').text(imageName);
+			let contentType = req.getResponseHeader('content-type');
+			img.attr('src', files.dataFile.data);
+			UIkit.toggle('#upload-toggler').toggle();
+		},
+
+		loadStart: function (e) {
+			console.log('loadStart', arguments);
+
+			mbar.removeAttribute('hidden');
+			mbar.max = e.total;
+			mbar.value = e.loaded;
+		},
+
+		progress: function (e) {
+			console.log('progress', arguments);
+
+			mbar.max = e.total;
+			mbar.value = e.loaded;
+		},
+
+		loadEnd: function (e) {
+			console.log('loadEnd', arguments);
+
+			mbar.max = e.total;
+			mbar.value = e.loaded;
+		},
+	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	let imageName;
 
 	function deleteImage() {
@@ -442,7 +690,7 @@
 
 
 
-	function arrayBufferToBase64(buffer) {
+/*	function arrayBufferToBase64(buffer) {
 		let binary = '';
 		let bytes = new Uint8Array(buffer);
 		let len = bytes.byteLength;
@@ -531,6 +779,7 @@
 			// // $('#images').append(image);
 		},
 	});
+*/
 /*
 	function imgPreviewLi(readerResult, filename) {
 		const li = document.createElement("li");
