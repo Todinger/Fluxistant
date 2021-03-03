@@ -21,10 +21,10 @@ class ImageDisplay extends ModuleClient {
 	}
 	
 	applyImageEffects(imageEffects) {
-		Object.keys(imageEffects).forEach(effectName => {
-			let name = effectName.trim().toLowerCase();
+		imageEffects.forEach(effectData => {
+			let name = effectData.type.trim().toLowerCase();
 			if (name in ImageEffects) {
-				ImageEffects[name].apply(jImage, imageEffects[effectName]);
+				ImageEffects[name].apply(jImage, effectData);
 			}
 		});
 	}

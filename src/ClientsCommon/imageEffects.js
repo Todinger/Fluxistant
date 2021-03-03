@@ -102,7 +102,7 @@ class ImageEffects {
 			DEFAULTS: {
 				DURATION_SMALL: 584,
 				DURATION_MEDIUM: 438,
-				DURATION_LARGE: DEFAULT_SHOW_DURATION,
+				DURATION_LARGE: 5000,
 				
 				SIZE_SMALL: 300,
 				SIZE_MEDIUM: 400,
@@ -184,7 +184,7 @@ $.fn.extend({
 			name in ImageEffects,
 			`Unknown effect name: ${name}`);
 		
-		ImageEffects[name].apply($(this));
+		ImageEffects[name].apply($(this), effectData);
 		return $(this);
 	},
 	clearEffect: function(name) {
