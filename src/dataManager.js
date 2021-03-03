@@ -55,9 +55,9 @@ class DataManager {
 		return Promise.all(Object.values(this.moduleData).map(col => col.dropChanges()));
 	}
 	
-	getFileWeb(params) {
+	getFilesWeb(params) {
 		this._verifyPresence(params.modName);
-		return this.moduleData[params.modName].getFileWeb(params);
+		return this.moduleData[params.modName].getFilesWeb(params);
 	}
 	
 	saveAll() {

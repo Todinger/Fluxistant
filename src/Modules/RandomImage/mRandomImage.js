@@ -29,12 +29,37 @@ class RandomImage extends Module {
 	// }
 	
 	showRandomImage() {
-		Module.Assets.getRandomImageFromCache((name, url) => {
-			this.say(`Showing: ${name}`);
-			this.broadcastEvent('showImage', {
-				image: { url: url },
+		this.data.Images.selectFile()
+			.then(file => {
+				this.say(`Showing: ${file.name}`);
+				this.broadcastEvent('showImage', {
+					image: { url: file.data },
+				});
 			});
-		});
+		
+		// Module.Assets.getRandomImageFromCache((name, url) => {
+		// 	this.say(`Showing: ${name}`);
+		// 	this.broadcastEvent('showImage', {
+		// 		image: { url: url },
+		// 	});
+		// });
+	}
+	
+	defineModData(modData) {
+		modData.addUniformPool('Images');
+	}
+	
+	defineModConfig(modConfig) {
+		modConfig.add(
+			'images',
+			'MultiData',
+			{
+				collection: 'Images',
+				dataType: 'IMAGE',
+				elementValueType: 'DataFile',
+			})
+		.setName('Images')
+		.setDescription('The collection of images that can show up');
 	}
 	
 	commands = {

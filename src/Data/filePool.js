@@ -10,13 +10,12 @@ class FilePool extends UserData {
 		super(dataDirPath);
 	}
 	
-	upload(params, callback) {
-		// let fileID = `${params.fileKey}`
-		if (this.hasKey(params.file.name)) {
-			this._deleteFile(params.file.name);
+	_getFileKeys(params) {
+		if (params.fileKey) {
+			return [ params.fileKey ];
+		} else {
+			return Object.keys(this.savedFiles);
 		}
-		
-		this._addFile(params.file.name, params.file, callback);
 	}
 }
 

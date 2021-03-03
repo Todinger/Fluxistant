@@ -16,7 +16,12 @@ export default class DataGui extends EntityGui {
 	}
 	
 	_getFileURL(fileKey) {
-		return `${this._getCollectionURL()}?fileKey=${fileKey}`;
+		let url = this._getCollectionURL();
+		if (fileKey) {
+			url += `?fileKey=${fileKey}`;
+		}
+		
+		return url;
 	}
 	
 	_sendDeleteRequest(fileKey) {
@@ -37,64 +42,6 @@ export default class DataGui extends EntityGui {
 	_loadFilesFromServer() {
 		throw 'Abstract method invoked.';
 	}
-	
-	_makeNameTag() {
-		let outerSpan = $('<span class="uk-text-meta uk-text-break uk-width-auto file-upload-name"></span>');
-		let innerSpan = $('<span class="uk-flex uk-flex-center uk-text-truncate"></span>');
-		outerSpan.append(innerSpan);
-		
-		return {
-			main: outerSpan,
-			nameTag: innerSpan,
-		};
-	}
-	
-	_makeItemContainer(onDelete) {
-		let container = $('<div class="uk-inline uk-flex uk-flex-center"></div>');
-		let dataContent = DataContentRegistry.build(this.entity.getDataType());
-		let preview = dataContent.build();
-		
-		let deleteButtonContainer = $('<span class="uk-invisible-hover uk-position-absolute uk-transform-center" style="left: 90%; top: 10%">');
-		let deleteButton = $('<button class="uk-invisible-hover" type="button" uk-close></button>');
-		// deleteButton.click(() => this._deleteFile(true));
-		deleteButton.click(onDelete);
-		deleteButtonContainer.append(deleteButton);
-		
-		container.append(preview, deleteButtonContainer);
-		return {
-			main: container,
-			dataContent: dataContent,
-		};
-	}
-	
-	_makePreview(onDeleteButtonClicked) {
-		let previewContainer = $('<div class="uk-visible-toggle uk-flex uk-flex-column uk-width-auto uk-padding-remove" tabindex="-1" hidden></div>');
-		
-		let previewItemContainer = this._makeItemContainer(onDeleteButtonClicked);
-		let nameTagContainer = this._makeNameTag();
-		previewContainer.append(previewItemContainer.main, nameTagContainer.main);
-		
-		return {
-			main: previewContainer,
-			nameTag: nameTagContainer.nameTag,
-			dataContent: previewItemContainer.dataContent,
-		};
-	}
-	/*
-			<div class="uk-visible-toggle" tabindex="-1" hidden>
-				<div class="uk-flex uk-flex-column uk-width-small uk-padding-remove">
-					<div class="uk-inline">
-						<img id="upload-image" class="uk-width-small" alt="" src="" uk-img>
-						<span class="uk-invisible-hover uk-position-absolute uk-transform-center" style="left: 90%; top: 10%">
-							<button id="xbtn" class="uk-invisible-hover" type="button" uk-close></button>
-						</span>
-					</div>
-					<span class="uk-text-meta uk-text-break uk-width-small file-upload-name">
-						<span id="imgNameTag" class="uk-flex uk-flex-center uk-text-truncate"></span>
-					</span>
-				</div>
-			</div>
-	 */
 	
 	_makeUploadInput() {
 		// TODO: Move to concrete subclasses for single/multiple uploads
@@ -118,45 +65,6 @@ export default class DataGui extends EntityGui {
 	
 	_makeContents() {
 		throw 'Abstract function called.';
-/*
-		<div class="uk-width-expand">
-			<button id="upload-toggler" class="uk-button uk-button-default" type="button" uk-toggle="target: ~ *" hidden></button>
-			
-			<div class="uk-visible-toggle" tabindex="-1" hidden>
-				<div>
-					<img id="upload-image" alt="" src="" uk-img>
-					<span class="uk-invisible-hover uk-width-auto uk-padding-remove">
-						<button id="xbtn" class="uk-invisible-hover" type="button" uk-close></button>
-					</span>
-				</div>
-				<span id="imgNameTag" class="uk-text-meta uk-text-break file-upload-name"></span>
-			</div>
-			
-			<div class="uk-visible-toggle" tabindex="-1" hidden>
-				<div class="uk-flex uk-flex-column uk-width-small uk-padding-remove">
-					<div class="uk-inline">
-						<img id="upload-image" class="uk-width-small" alt="" src="" uk-img>
-						<span class="uk-invisible-hover uk-position-absolute uk-transform-center uk-light" style="left: 90%; top: 10%">
-							<button id="xbtn" class="uk-invisible-hover" type="button" uk-close></button>
-						</span>
-					</div>
-					<span class="uk-text-meta uk-text-break uk-width-small file-upload-name">
-						<span id="imgNameTag" class="uk-flex uk-flex-center uk-text-truncate"></span>
-					</span>
-				</div>
-			</div>
-			
-			
-			<div class="js-upload uk-placeholder uk-text-center uk-margin-remove">
-				<span uk-icon="icon: upload"></span>
-				<span class="uk-text-middle">Upload image by dropping it here or</span>
-				<div id="uploader" uk-form-custom>
-					<input type="file" multiple>
-					<span class="uk-link">selecting one</span>.
-				</div>
-			</div>
-		</div>
- */
 	}
 	
 	_makeProgressBar() {
@@ -230,6 +138,7 @@ export default class DataGui extends EntityGui {
 		
 		this._loadFilesFromServer();
 		
+		fullResult.attr('id', this.guiID);
 		return fullResult;
 	}
 	

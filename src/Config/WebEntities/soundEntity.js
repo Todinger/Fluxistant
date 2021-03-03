@@ -4,7 +4,7 @@ const StaticObjectEntity = require('./staticObjectEntity');
 class SoundEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Sound'; 					}
 	static get BUILDER()	{ return () => new SoundEntity(); 	}
-
+	
 	constructor() {
 		super();
 		this.addSingleData('file', { collection: 'Sounds', dataType: 'SOUND' })

@@ -129,6 +129,8 @@ export default class DynamicArrayGui extends EntityGui {
 			tooltip: this.entity.getDescription(),
 		});
 		
+		this.mainGui.attr('id', this.guiID);
+		
 		return this.mainGui;
 	}
 	

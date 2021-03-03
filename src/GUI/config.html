@@ -15,6 +15,16 @@
 			padding: 0.5rem;
 			color: white;
 		}
+
+		/*noinspection CssUnusedSymbol*/
+		.status-changed {
+			border: 2px solid #faa05a;
+			border-radius: 7px;
+		}
+		.status-error {
+			border: 2px solid #d54567;
+			border-radius: 7px;
+		}
 	</style>
 
 	<meta charset="utf-8">
@@ -282,7 +292,7 @@
 													</div>
 												</div>
 												<!-- 3 (THIS ONE!) --><div>
-													<a class="uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle" tabindex="0" href="#my-modal" uk-toggle>
+													<a class="uk-height-medium uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle status-error" tabindex="0" href="#my-modal" uk-toggle>
 														<img src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
 														<span class="uk-position-absolute uk-transform-center uk-light uk-invisible-hover" style="left: 90%; top: 5%">
 																<button id="axbtn" class="" type="button" uk-close></button>
@@ -495,7 +505,6 @@
 <!--							</div>-->
 <!--						</div>-->
 							</div>
-						</div>
 					</div>
 				</li>
 				<li id="modules" class="uk-child-width-1-2 uk-padding-small" uk-grid>
@@ -577,7 +586,7 @@
 			let files = JSON.parse(req.response);
 			imageName = files.dataFile.name;
 			$('#imgNameTag').text(imageName);
-			let contentType = req.getResponseHeader('content-type');
+			// let contentType = req.getResponseHeader('content-type');
 			img.attr('src', files.dataFile.data);
 			UIkit.toggle('#upload-toggler').toggle();
 		},
@@ -653,7 +662,7 @@
 			let files = JSON.parse(req.response);
 			imageName = files.dataFile.name;
 			$('#imgNameTag').text(imageName);
-			let contentType = req.getResponseHeader('content-type');
+			// let contentType = req.getResponseHeader('content-type');
 			img.attr('src', files.dataFile.data);
 			UIkit.toggle('#upload-toggler').toggle();
 		},

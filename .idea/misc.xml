@@ -18,6 +18,7 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/configEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/cooldownEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dataEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dataFileEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicArrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicDataArrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicObjectEntity.js" />
@@ -32,6 +33,7 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/keyEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/keyShortcutEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/keyShortcutsEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/multiDataEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/naturalNumberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/numberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/objectEntity.js" />

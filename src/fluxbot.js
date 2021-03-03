@@ -163,35 +163,44 @@ class FluxBot {
 			tempFileDir: DATA_DIR_TEMP,
 		}));
 		
-		this.app.get('/data/mod/:modName/:colID', async (req, res) => {
+		this.app.get('/data/mod/:modName/:collection', async (req, res) => {
 			let modName = req.params.modName;
-			let collection = req.params.colID;
+			let collection = req.params.collection;
 			let fileKey = req.query.fileKey;
 			
 			try {
-				let file = await this.dataManager.getFileWeb({
+				let files = await this.dataManager.getFilesWeb({
 					modName,
 					collection,
 					fileKey
 				});
 				
-				res.set('Content-Type', file.contentType);
-				res.send({
-					name: file.name,
-					data: file.data,
+				let filesToSend = files.map(file => {
+					return {
+						name: file.name,
+						data: file.data,
+						fileKey: file.fileKey,
+					};
 				});
+				
+				if (files.length > 0) {
+					res.set('Content-Type', files[0].contentType);
+				}
+				
+				let sentObject = { files: filesToSend };
+				res.send(JSON.stringify(sentObject));
 			} catch (err) {
 				return res.status(500).send(err);
 			}
 		});
 		
-		this.app.post('/data/mod/:modName/:colID', (req, res) => {
+		this.app.post('/data/mod/:modName/:collection', (req, res) => {
 			if (!req.files || Object.keys(req.files).length === 0) {
 				return res.status(400).send('No files were uploaded.');
 			}
 			
 			let modName = req.params.modName;
-			let collection = req.params.colID;
+			let collection = req.params.collection;
 			
 			let encodedFiles = {};
 			let files = req.files || {}; // The empty object here is to shut WebStorm's inspector up
@@ -225,9 +234,9 @@ class FluxBot {
 			});
 		});
 		
-		this.app.delete('/data/mod/:modName/:colID', (req, res) => {
+		this.app.delete('/data/mod/:modName/:collection', (req, res) => {
 			let modName = req.params.modName;
-			let collection = req.params.colID;
+			let collection = req.params.collection;
 			let fileKey = req.query.fileKey;
 			
 			try {

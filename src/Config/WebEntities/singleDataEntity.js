@@ -1,5 +1,3 @@
-const assert = require('assert').strict;
-const Errors = require('../../errors');
 const DataEntity = require('./dataEntity');
 
 class SingleDataEntity extends DataEntity {

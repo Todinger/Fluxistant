@@ -91,9 +91,23 @@ class ModuleData {
 		return Promise.all(Object.values(this.collections).map(col => col.dropChanges()));
 	}
 	
+	getFilesWeb(params) {
+		this._verifyPresence(params.collection);
+		return this.collections[params.collection].getFilesWeb(params);
+	}
+	
 	getFileWeb(params) {
 		this._verifyPresence(params.collection);
-		return this.collections[params.collection].getFileWeb(params);
+		return this.collections[params.collection].getFilesWeb(params)
+			.then(files => {
+				if (files.length === 0) {
+					throw 'File not found';
+				} else if (files.length > 1) {
+					throw 'Got multiple files, expected one.';
+				}
+				
+				return files[0];
+			});
 	}
 	
 	import(exportedData) {
@@ -147,7 +161,7 @@ class ModuleData {
 			let exportedData = JSON.parse(exportedDataString);
 			this.import(exportedData);
 		} catch (err) {
-			cli.error(`Failed to load data of '${this.modName}' module from disk: ${err}`);
+			cli.warn(`Failed to load data of '${this.modName}' module from disk: ${err}`);
 		}
 	}
 }

@@ -23,7 +23,7 @@ class UserData {
 	
 	// Selects a file from the stored data, according to the concrete class's own selection rules
 	// noinspection JSUnusedLocalSymbols
-	_getFileKey(params) {
+	_getFileKeys(params) {
 		Errors.abstract();
 	}
 	
@@ -118,9 +118,6 @@ class UserData {
 		}
 		
 		return Promise.resolve();
-		// if (params.fileKey in this.savedFiles) {
-		// 	return this._deleteFile(params.fileKey);
-		// }
 	}
 	
 	commitChanges() {
@@ -182,7 +179,11 @@ class UserData {
 	}
 	
 	_getFileWebByKey(key) {
-		return this._readFile(this.savedFiles[key].path, this.savedFiles[key].name);
+		return this._readFile(this.savedFiles[key].path, this.savedFiles[key].name)
+			.then(file => {
+				file.fileKey = key;
+				return file;
+			});
 		// return fsPromise.readFile(this.savedFiles[key].path)
 		// .then((data) => {
 		// 	let b64Data = Base64.encode(data);
@@ -206,12 +207,31 @@ class UserData {
 		// });
 	}
 	
-	getFileWeb(params) {
-		if (Object.keys(this.savedFiles).length === 0) {
-			throw 'Cannot get file: data collection is empty.';
-		}
+	getFilesWeb(params) {
+		let keys = this._getFileKeys(params);
+		let promises = keys.map(key => (this._getFileWebByKey(key)));
+		// for (let i = 0; i < keys.length; i++) {
+		// 	promises.push(this._getFileWebByKey(keys[i]));
+		// }
 		
-		let key = this._getFileKey(params);
+		return Promise.all(promises);
+			// .then(filesArray => {
+			// 	let files = {};
+			// 	for (let i = 0; i < keys.length; i++) {
+			// 		files[keys[i]] = filesArray[i];
+			// 	}
+			//
+			// 	return files;
+			// });
+	}
+	
+	// noinspection JSUnusedLocalSymbols
+	_selectFileKey(params) {
+		Errors.abstract();
+	}
+	
+	selectFile(...params) {
+		let key = this._selectFileKey(...params);
 		return this._getFileWebByKey(key);
 	}
 	

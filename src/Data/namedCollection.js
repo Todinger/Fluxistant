@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert').strict;
 const UserData = require('./userData');
 
 // Represents data that contains multiple files, where we choose a file
@@ -9,16 +10,20 @@ class NamedCollection extends UserData {
 		super(dataDirPath);
 	}
 	
-	// upload(params) {
-	// 	if (this.hasKey(params.fileKey)) {
-	// 		this._deleteFile(params.fileKey);
-	// 	}
-	//
-	// 	this._addFile(params.fileKey, params.file, callback);
-	// }
+	_ensurePresence(fileKey) {
+		assert(
+			fileKey,
+			`Invalid key: "${fileKey}"`);
+	}
 	
-	_getFileKey(params) {
-		return params.fileKey;
+	_getFileKeys(params) {
+		this._ensurePresence(params.fileKey);
+		return [ params.fileKey ];
+	}
+	
+	_selectFileKey(fileKey) {
+		this._ensurePresence(fileKey);
+		return fileKey;
 	}
 }
 

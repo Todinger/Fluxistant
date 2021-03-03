@@ -15,6 +15,7 @@ import ConfigGui		from "./configGui.mjs";
 import CommandGui		from "./commandGui.mjs";
 import DataGui			from "./dataGui.mjs";
 import SingleDataGui	from "./singleDataGui.mjs";
+import MultiDataGui		from "./multiDataGui.mjs";
 import KeyGui			from "./keyGui.mjs";
 
 export default {
@@ -35,6 +36,7 @@ export default {
 	CommandGui,
 	UploadGui: DataGui,
 	SingleDataGui,
+	MultiDataGui,
 	KeyGui,
 };
 

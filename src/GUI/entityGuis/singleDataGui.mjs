@@ -1,5 +1,7 @@
 import DataGui from "./dataGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
+import DataContentFactory from "./dataContents/dataContentFactory.mjs";
+import { showError } from "../config.mjs";
 
 export default class SingleDataGui extends DataGui {
 	static get GUITYPE()    { return 'SingleData';                                                          }
@@ -22,13 +24,62 @@ export default class SingleDataGui extends DataGui {
 	_loadFilesFromServer() {
 		if (this.entity.isSet()) {
 			$.get(
-				this._getFileURL(this.entity.getFileKey()),
+				this._getFileURL([ this.entity.getFileKey() ]),
 				(res) => {
-					let file = JSON.parse(res);
+					let files = JSON.parse(res).files || []; // Added the [] to shut the IDE up
+					if (!files || files.length === 0) {
+						showError('No file received from server.');
+						return;
+					}
+					
+					let file = files[0];
 					this._showItem(file.data, file.name);
 				}
 			)
 		}
+	}
+	
+	_makeNameTag() {
+		let outerSpan = $('<span class="uk-text-meta uk-text-break uk-width-auto file-upload-name"></span>');
+		let innerSpan = $('<span class="uk-flex uk-flex-center uk-text-truncate"></span>');
+		outerSpan.append(innerSpan);
+		
+		return {
+			main: outerSpan,
+			nameTag: innerSpan,
+		};
+	}
+	
+	_makeItemContainer(onDelete) {
+		let container = $('<div class="uk-inline uk-flex uk-flex-center"></div>');
+		let dataContent = DataContentFactory.build(this.entity.getDataType());
+		let preview = dataContent.build();
+		
+		let deleteButtonContainer = $('<span class="uk-invisible-hover uk-position-absolute uk-transform-center" style="left: 90%; top: 10%">');
+		let deleteButton = $('<button class="uk-invisible-hover" type="button" uk-close></button>');
+		// deleteButton.click(() => this._deleteFile(true));
+		deleteButton.click(onDelete);
+		deleteButtonContainer.append(deleteButton);
+		
+		container.append(preview, deleteButtonContainer);
+		return {
+			main: container,
+			dataContent: dataContent,
+		};
+	}
+	
+	_makePreview(onDeleteButtonClicked) {
+		let previewContainer = $('<div class="uk-visible-toggle uk-flex uk-flex-column uk-width-auto uk-padding-remove" tabindex="-1" hidden></div>');
+		
+		let previewItemContainer = this._makeItemContainer(onDeleteButtonClicked);
+		let nameTagContainer = this._makeNameTag();
+		previewContainer.append(previewItemContainer.main, nameTagContainer.main);
+		
+		return {
+			main: previewContainer,
+			nameTag: nameTagContainer.nameTag,
+			dataContent: previewItemContainer.dataContent,
+		};
 	}
 	
 	_showItemPreview(data) {
