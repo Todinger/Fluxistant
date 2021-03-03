@@ -29,6 +29,7 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageEffect_ShadowEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageEffectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/imageFileEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/integerEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/keyEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/keyShortcutEntity.js" />

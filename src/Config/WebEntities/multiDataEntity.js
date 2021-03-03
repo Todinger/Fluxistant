@@ -42,6 +42,18 @@ class MultiDataEntity extends DataEntity {
 	}
 	
 	// ---- Overrides ---- //
+	
+	toConf() {
+		let conf = super.toConf();
+		let keyedFiles = {};
+		conf.files.forEach(file => {
+			keyedFiles[file.fileKey] = file;
+		});
+		
+		delete conf.files;
+		conf.files = keyedFiles;
+		return conf;
+	}
 }
 
 module.exports = MultiDataEntity;

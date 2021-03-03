@@ -61,6 +61,43 @@
 <body onkeypress="bodyKeyPress(event)">
 <!--<form class="uk-form-horizontal">-->
 
+<!--&lt;!&ndash; Modal &ndash;&gt; <div id="my-modal" class="" uk-modal>-->
+<!--	<div class="uk-modal-dialog uk-modal-body uk-light uk-background-secondary">-->
+<!--		<button class="uk-modal-close-default" type="button" uk-close></button>-->
+<!--		<div>-->
+<!--			<ul uk-accordion class="uk-margin-small-top">-->
+<!--				<li>-->
+<!--					<a class="uk-accordion-title" href="#">Dynamic Array</a>-->
+<!--					<div class="uk-accordion-content"> <div>-->
+<!--						<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">-->
+<!--							<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>-->
+<!--							<div>-->
+<!--								<input id="m-dynamic-item-1" class="uk-input uk-width-expand" type="number" placeholder="Value...">-->
+<!--							</div>-->
+<!--							<span class="uk-width-auto"></span>-->
+<!--							<button class="uk-button uk-button-default uk-width-auto uk-padding-remove">-->
+<!--								<span uk-icon="icon: trash"></span>-->
+<!--							</button>-->
+<!--						</div>-->
+<!--						<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">-->
+<!--							<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>-->
+<!--							<div>-->
+<!--								<input id="m-dynamic-item-2" class="uk-input uk-width-expand" type="number" placeholder="Value...">-->
+<!--							</div>-->
+<!--							<span class="uk-width-auto"></span>-->
+<!--							<button class="uk-button uk-button-default uk-width-auto uk-padding-remove">-->
+<!--								<span uk-icon="icon: trash"></span>-->
+<!--							</button>-->
+<!--						</div>-->
+<!--						<button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Add Element</button>-->
+<!--					</div> </div>-->
+<!--				</li>-->
+<!--			</ul>-->
+<!--		</div>-->
+<!--	</div>-->
+<!--</div>-->
+
+
 
 <div class="uk-light uk-background-secondary uk-padding-small uk-height-viewport">
 	<h1 class="uk-heading-line uk-text-center uk-margin-remove-bottom">
@@ -292,20 +329,103 @@
 													</div>
 												</div>
 												<!-- 3 (THIS ONE!) --><div>
-													<a class="uk-height-medium uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle status-error" tabindex="0" href="#my-modal" uk-toggle>
+													<a class="uk-height-medium uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle status-error" tabindex="0" onclick="UIkit.modal($('#my-modal')).show()">
 														<img src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
 														<span class="uk-position-absolute uk-transform-center uk-light uk-invisible-hover" style="left: 90%; top: 5%">
-																<button id="axbtn" class="" type="button" uk-close></button>
+																<button id="axbtn1" class="" type="button" uk-close></button>
 															</span>
 														<span class="uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">Bloop</span>
 													</a>
-												<!-- Modal --> <div id="my-modal" class="" uk-modal>
-												<div class="uk-modal-dialog uk-modal-body uk-light uk-background-secondary">
-													<button class="uk-modal-close-default" type="button" uk-close></button>
-													<div>Contents here!</div>
+
+<!--												<div id="my-modal" uk-modal="" class="uk-modal"><button class="uk-modal-close-default uk-icon uk-close" type="button" uk-close=""><svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><line fill="none" stroke="#000" stroke-width="1.1" x1="1" y1="1" x2="13" y2="13"></line><line fill="none" stroke="#000" stroke-width="1.1" x1="13" y1="1" x2="1" y2="13"></line></svg></button><ul uk-accordion="" class="uk-margin-small-top uk-box-shadow-large uk-padding-small uk-accordion" id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c"><li><a class="uk-accordion-title" href="#">#3</a><div class="uk-accordion-content" hidden=""><div><div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap"><span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-icon" uk-icon="icon: triangle-right"><svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><polygon points="8 5 13 10 8 15"></polygon></svg></span><div><div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap"><h4 class="uk-width-1-6" uk-tooltip="Display width on screen" title="" aria-expanded="false" tabindex="0">Width</h4><div class="uk-width-expand"><input id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c-width" class="uk-input" type="number" value="" placeholder="Value..." uk-tooltip="Display width on screen" step="1" title="" aria-expanded="false"></div></div></div></div><div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap"><span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-icon" uk-icon="icon: triangle-right"><svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><polygon points="8 5 13 10 8 15"></polygon></svg></span><div><div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap"><h4 class="uk-width-1-6" uk-tooltip="Display height on screen" title="" aria-expanded="false" tabindex="0">Height</h4><div class="uk-width-expand"><input id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c-height" class="uk-input" type="number" value="" placeholder="Value..." uk-tooltip="Display height on screen" step="1" title="" aria-expanded="false"></div></div></div></div><div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap"><span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-icon" uk-icon="icon: triangle-right"><svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><polygon points="8 5 13 10 8 15"></polygon></svg></span><div><div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap"><h4 class="uk-width-1-6" uk-tooltip="Duration in milliseconds that the image will be displayed" title="" aria-expanded="false" tabindex="0">Duration</h4><div class="uk-width-expand"><input id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c-duration" class="uk-input" type="number" value="" placeholder="Value..." uk-tooltip="Duration in milliseconds that the image will be displayed" step="1" min="0" title="" aria-expanded="false"></div></div></div></div><div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap"><span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-icon" uk-icon="icon: triangle-right"><svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><polygon points="8 5 13 10 8 15"></polygon></svg></span><div><ul uk-accordion="" class="uk-margin-small-top uk-box-shadow-large uk-padding-small uk-accordion" id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c-effects"><li><a class="uk-accordion-title" href="#" uk-tooltip="Special effects to apply to the image" title="" aria-expanded="false">Effects</a><div class="uk-accordion-content" hidden=""><div><button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Add Element</button></div></div></li></ul></div></div></div></div></li></ul></div>-->
+
+
+													<div id="my-modal" uk-modal="" class="uk-modal">
+														<div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical uk-light uk-background-secondary">
+														<button class="uk-modal-close-default uk-icon uk-close" type="button" uk-close="">
+															<svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+																<line fill="none" stroke="#000" stroke-width="1.1" x1="1" y1="1" x2="13" y2="13"></line>
+																<line fill="none" stroke="#000" stroke-width="1.1" x1="13" y1="1" x2="1" y2="13"></line>
+															</svg>
+														</button>
+														<ul uk-accordion="" class="uk-margin-small-top uk-box-shadow-large uk-padding-small uk-accordion" id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c">
+															<li>
+																<a class="uk-accordion-title" href="#">#3</a>
+																<div class="uk-accordion-content" hidden="">
+																	<div>
+																		<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+																		<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-icon" uk-icon="icon: triangle-right">
+																			<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+																				<polygon points="8 5 13 10 8 15"></polygon>
+																			</svg>
+																		</span>
+																			<div>
+																				<div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+																					<h4 class="uk-width-1-6" uk-tooltip="Display width on screen" title="" aria-expanded="false" tabindex="0">Width</h4>
+																					<div class="uk-width-expand"><input id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c-width" class="uk-input" type="number" value="" placeholder="Value..." uk-tooltip="Display width on screen" step="1" title="" aria-expanded="false"></div>
+																				</div>
+																			</div>
+																		</div>
+																		<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+																		<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-icon" uk-icon="icon: triangle-right">
+																			<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+																				<polygon points="8 5 13 10 8 15"></polygon>
+																			</svg>
+																		</span>
+																			<div>
+																				<div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+																					<h4 class="uk-width-1-6" uk-tooltip="Display height on screen" title="" aria-expanded="false" tabindex="0">Height</h4>
+																					<div class="uk-width-expand"><input id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c-height" class="uk-input" type="number" value="" placeholder="Value..." uk-tooltip="Display height on screen" step="1" title="" aria-expanded="false"></div>
+																				</div>
+																			</div>
+																		</div>
+																		<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+																		<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-icon" uk-icon="icon: triangle-right">
+																			<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+																				<polygon points="8 5 13 10 8 15"></polygon>
+																			</svg>
+																		</span>
+																			<div>
+																				<div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap">
+																					<h4 class="uk-width-1-6" uk-tooltip="Duration in milliseconds that the image will be displayed" title="" aria-expanded="false" tabindex="0">Duration</h4>
+																					<div class="uk-width-expand"><input id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c-duration" class="uk-input" type="number" value="" placeholder="Value..." uk-tooltip="Duration in milliseconds that the image will be displayed" step="1" min="0" title="" aria-expanded="false"></div>
+																				</div>
+																			</div>
+																		</div>
+																		<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap">
+																		<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right uk-icon" uk-icon="icon: triangle-right">
+																			<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+																				<polygon points="8 5 13 10 8 15"></polygon>
+																			</svg>
+																		</span>
+																			<div>
+																				<ul uk-accordion="" class="uk-margin-small-top uk-box-shadow-large uk-padding-small uk-accordion" id="mod-Random Image-images-13956b12-2249-4cfa-8187-e9f18d96fe9c-effects">
+																					<li>
+																						<a class="uk-accordion-title" href="#" uk-tooltip="Special effects to apply to the image" title="" aria-expanded="false">Effects</a>
+																						<div class="uk-accordion-content" hidden="">
+																							<div><button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Add Element</button></div>
+																						</div>
+																					</li>
+																				</ul>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</li>
+														</ul>
+													</div>
+
+
+
+<!--													&lt;!&ndash; Modal &ndash;&gt; <div id="my-modal" class="" uk-modal>-->
+<!--														<div class="uk-modal-dialog uk-modal-body uk-light uk-background-secondary">-->
+<!--															<button class="uk-modal-close-default" type="button" uk-close></button>-->
+<!--															<div>Contents here!</div>-->
+<!--														</div>-->
+<!--													</div>-->
+													</div>
 												</div>
-											</div>
-												</div>
+
 
 												<!-- GOOD SINGLE: CENTER -->
 <!--												<div>-->

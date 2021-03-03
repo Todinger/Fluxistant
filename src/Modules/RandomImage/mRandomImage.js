@@ -1,7 +1,9 @@
 'use strict';
 
+const assert = require('assert').strict;
 const _ = require('lodash');
 const Module = requireMain('module');
+const ImageFileEntity = requireModConfig('ImageDisplay', 'imageFileEntity');
 
 const COMMAND_NAME = 'pixelate';
 
@@ -13,27 +15,19 @@ class RandomImage extends Module {
 		});
 	}
 	
-	// defineModData(modData) {
-	// 	// TODO: User a uniform pool here, not a single data file
-	// 	// modData.addUniformPool('images');
-	// 	modData.addSingleFile('images');
-	// }
-	//
-	// defineModConfig(modConfig) {
-	// 	// TODO: Add configuration for the image pool
-	// 	modConfig.addData('imagePool', {
-	// 		colID: 'images',
-	// 		dataType: 'IMAGE',
-	// 	})  .setName('Images')
-	// 		.setDescription('The pool of images from which a random one will be chosen for display.');
-	// }
-	
 	showRandomImage() {
 		this.data.Images.selectFile()
 			.then(file => {
+				assert(
+					!this.config.images.files || !(this.fileKey in this.config.images.files),
+					'File missing from random image pool.');
+				
+				let files = this.config.images.files || {};
+				let imageConf = files[file.fileKey];
+				let displayData = ImageFileEntity.makeDisplayData(imageConf, file);
 				this.say(`Showing: ${file.name}`);
 				this.broadcastEvent('showImage', {
-					image: { url: file.data },
+					image: displayData,
 				});
 			});
 		
@@ -56,7 +50,7 @@ class RandomImage extends Module {
 			{
 				collection: 'Images',
 				dataType: 'IMAGE',
-				elementValueType: 'DataFile',
+				elementValueType: 'ImageFile',
 			})
 		.setName('Images')
 		.setDescription('The collection of images that can show up');

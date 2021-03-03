@@ -58,7 +58,7 @@ export default class MultiDataGui extends DataGui {
 	_makeItemCard(data, name, itemEntity, itemModal) {
 		let fileKey = itemEntity.getFileKey();
 		let card;
-		let cardAttributes = `class="uk-height-medium uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle" tabindex="0" href="#" uk-toggle`;
+		let cardAttributes = `class="uk-height-medium uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle" tabindex="0"`;
 		if (itemModal) {
 			card = $(`<a ${cardAttributes}></a>`);
 			card.click(() => {
@@ -80,6 +80,7 @@ export default class MultiDataGui extends DataGui {
 	
 	_makeItemModal(itemEntity) {
 		let modal = $(`<div uk-modal></div>`);
+		let modalDialog = $(`<div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical uk-light uk-background-secondary"></div>`);
 		let closeButton = $(`<button class="uk-modal-close-default" type="button" uk-close></button>`);
 		
 		let fileKey = itemEntity.getFileKey();
@@ -92,7 +93,8 @@ export default class MultiDataGui extends DataGui {
 			this._updateItemStatusIndicators(fileKey);
 		});
 		
-		modal.append(closeButton, entityGui);
+		modalDialog.append(closeButton, entityGui.getGUI());
+		modal.append(modalDialog);
 		this.fileGuiComponents[fileKey].entityGui = entityGui;
 		return modal;
 	}

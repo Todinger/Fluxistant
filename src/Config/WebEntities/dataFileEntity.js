@@ -2,6 +2,7 @@ const StaticObjectEntity = require('./staticObjectEntity');
 
 class DataFileEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'DataFile';						}
+	static get GUITYPE()	{ return 'RawObject';						}
 	static get BUILDER()	{ return data => new DataFileEntity(data);	}
 	
 	constructor(fileKey) {
