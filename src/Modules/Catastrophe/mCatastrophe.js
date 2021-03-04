@@ -76,12 +76,55 @@ class Catastrophe extends Module {
 		this.removeKeyUpHandler(doKeyPress);
 	}
 	
+	normalizeVolume(volume) {
+		if (volume === undefined) {
+			volume = 100;
+		}
+		
+		return volume / 100;
+	}
+	
+	calculateFinalVolume(volume) {
+		return this.normalizeVolume(this.config.masterVolume) *
+			this.normalizeVolume(volume);
+	}
+	
 	keyPressedHandler() {
-		Module.Assets.getRandomLocalFile(
-			this.sfxdir,
-			file => sound.play(path.resolve(file), 0.3),
-			() => this.error(`No sounds files found in "${this.sfxdir}".`)
-		);
+		let soundFile = this.data.Sounds.selectFileLocal();
+		if (soundFile) {
+			let files = this.config.sounds.files || {};
+			let soundConf = files[soundFile.fileKey];
+			
+			sound.play(
+				path.resolve(soundFile.path),
+				this.calculateFinalVolume(soundConf.volume));
+		}
+		// Module.Assets.getRandomLocalFile(
+		// 	this.sfxdir,
+		// 	file => sound.play(path.resolve(file), 0.3),
+		// 	() => this.error(`No sounds files found in "${this.sfxdir}".`)
+		// );
+	}
+	
+	defineModData(modData) {
+		modData.addUniformPool('Sounds');
+	}
+	
+	defineModConfig(modConfig) {
+		modConfig.addNaturalNumber('masterVolume', 100)
+			.setName('Master Volume')
+			.setDescription('Global volume modifier for all sounds');
+		
+		modConfig.add(
+			'sounds',
+			'MultiData',
+			{
+				collection: 'Sounds',
+				dataType: 'SOUND',
+				elementValueType: 'SoundFile',
+			})
+			.setName('Sounds')
+			.setDescription('The collection of cat sounds that can be played');
 	}
 	
 	load() {

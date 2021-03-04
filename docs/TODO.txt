@@ -11,6 +11,8 @@
 	- Command (with filters)
 	- Keywords (+ filters, regex)
 	- Key shortcut
+	- Key down/up
+	- Controller buttons
 	- Voice command
 	- Channel Reward
 - Also add function responses.
@@ -27,3 +29,63 @@
   itself).
 - OBS Websocket module
 - Voice activation mechanism (in addition to commands and shortcut keys)
+
+
+
+Functions module setup example:
+	functions = {
+		adventure: {
+			name: 'Start Adventure',
+			description: 'Starts the adventure by the user',
+			callback: user => this.startRecruiting(user),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'adventure',
+					aliases: ['adv'],
+					filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+				}),
+				this.trigger.keywords({
+					keywords: ['hello', 'there', /abc/],
+					filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+				}),
+				this,trigger.shorctut({
+					keys: [
+						['BACKSPACE'], // The backspace key on the keyboard
+					],
+					filters: [this.filterDesc('windowActive', ['Phasmophobia', 'Spelunky 2'])],
+				}),
+				this.trigger.voice({
+					// ???,
+					filters: [this.filterDesc('windowActive', ['Phasmophobia', 'Spelunky 2'])],
+				}),
+				this.trigger.channelReward({
+					name: 'Catastrophe',
+					filters: [this.filterDesc('isMod')],
+				}),
+			],
+			responses: [
+				this.response.chat({
+					message: 'Hello $user, nice to see you!',
+				}),
+				this.response.whisper({
+					usernames: ['yecatsmailbox', '$user'],
+					message: 'I saw you say that!',
+				}),
+				this.response.se({
+					message: "Hi, I'm StreamElements!",
+				}),
+				this.response.tts({
+					message: "Don't do that, $user!",
+					voice: 'Brian',
+				}),
+				this.log({
+					// Location? Category?
+					message: '$user did that thing.',
+				}),
+				this.file({
+					message: 'Yay $user!',
+					append: false,  // True by default
+				})
+			],
+		},
+	}

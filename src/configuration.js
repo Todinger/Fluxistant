@@ -93,6 +93,14 @@ class Configuration {
 		return this.configRoot.addInteger(key, defaultValue);
 	}
 	
+	addPositiveNumber(key, defaultValue) {
+		return this.configRoot.addPositiveNumber(key, defaultValue);
+	}
+	
+	addNaturalNumber(key, defaultValue) {
+		return this.configRoot.addNaturalNumber(key, defaultValue);
+	}
+	
 	addBoolean(key, defaultValue) {
 		return this.configRoot.addBoolean(key, defaultValue);
 	}

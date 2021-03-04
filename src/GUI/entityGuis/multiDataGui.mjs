@@ -2,6 +2,7 @@ import EntityGui from "./entityGui.mjs";
 import DataGui from "./dataGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 import { showError } from "../config.mjs";
+import DataContentFactory from "./dataContents/dataContentFactory.mjs";
 
 export default class MultiDataGui extends DataGui {
 	static get GUITYPE()    { return 'MultiData';                                                          }
@@ -52,6 +53,7 @@ export default class MultiDataGui extends DataGui {
 	
 	_clearItemStatusIndicators(fileKey) {
 		let guiComponents = this.fileGuiComponents[fileKey];
+		guiComponents.entityGui.clearChangedIndicators();
 		EntityGui.clearChangeIndicator(guiComponents.nameTag);
 		this._updateItemStatusIndicatorsFor(guiComponents.card, false, false);
 	}
@@ -80,13 +82,24 @@ export default class MultiDataGui extends DataGui {
 			card = $(`<div ${cardAttributes}></div>`);
 		}
 		
-		let image = $(`<img src="${data}" alt="Error Displaying Image" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">`);
+		let dataContent = DataContentFactory.build(this.entity.getDataType());
+		let content = dataContent.build();
+		dataContent.fill(data);
+		content.css({
+			"position": "absolute",
+			"top": "50%",
+			"left": "50%",
+			"transform": "translate(-50%, -50%)",
+			"max-width": "100%",
+		});
+		
+		// let acontent = $(`<img src="${data}" alt="Error Displaying Image" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)" uk-img>`);
 		let closeButton = this._makeCardCloseButton(fileKey);
 		let nameTag = $(`<span class="uk-margin uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">${name}</span>`);
 		
 		this.fileGuiComponents[fileKey].nameTag = nameTag;
 		
-		card.append(image, closeButton, nameTag);
+		card.append(content, closeButton, nameTag);
 		return card;
 	}
 	

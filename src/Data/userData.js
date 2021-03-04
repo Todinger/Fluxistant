@@ -160,9 +160,13 @@ class UserData {
 		return Promise.all(promises);
 	}
 	
-	getFileLocal(...params) {
-		let key = this._getFileKey.apply(this, params);
-		return this.savedFiles[key].path;
+	selectFileLocal(...params) {
+		let key = this._selectFileKey(...params);
+		return {
+			name: this.savedFiles[key].name,
+			path: this.savedFiles[key].path,
+			fileKey: key,
+		};
 	}
 	
 	_readFile(filePath, filename) {
