@@ -33,7 +33,7 @@ export default class MultiDataGui extends DataGui {
 	}
 	
 	_makeContents() {
-		this.fileGrid = $(`<div class="uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .uk-card; delay: 80"></div>`);
+		this.fileGrid = $(`<div class="uk-margin-small-top uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .uk-card; delay: 80"></div>`);
 		let uploadArea = this._makeUploadArea();
 		uploadArea.append(this.fileGrid);
 		
@@ -49,10 +49,10 @@ export default class MultiDataGui extends DataGui {
 		return span;
 	}
 	
-	_updateItemStatusIndicators(fileKey) {
+	_itemChanged(fileKey) {
 		let guiComponents = this.fileGuiComponents[fileKey];
-		guiComponents.entityGui._updateItemStatusIndicators(guiComponents.nameTag);
-		MultiDataGui.updateCardStatusIndicator(guiComponents.main);
+		guiComponents.entityGui._updateStatusIndicators(guiComponents.nameTag);
+		this._updateItemStatusIndicators(guiComponents.card);
 	}
 	
 	_makeItemCard(data, name, itemEntity, itemModal) {
@@ -70,9 +70,9 @@ export default class MultiDataGui extends DataGui {
 		
 		let image = $(`<img src="${data}" alt="Error Displaying Image" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">`);
 		let closeButton = this._makeCardCloseButton(fileKey);
-		let nameTag = $(`<span class="uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">${name}</span>`);
+		let nameTag = $(`<span class="uk-margin uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">${name}</span>`);
 		
-		this.fileGuiComponents[fileKey] = nameTag;
+		this.fileGuiComponents[fileKey].nameTag = nameTag;
 		
 		card.append(image, closeButton, nameTag);
 		return card;
@@ -90,7 +90,7 @@ export default class MultiDataGui extends DataGui {
 			this.modName);
 		entityGui.onChangedOrError(() => {
 			this._changed();
-			this._updateItemStatusIndicators(fileKey);
+			this._itemChanged(fileKey);
 		});
 		
 		modalDialog.append(closeButton, entityGui.getGUI());
@@ -114,6 +114,7 @@ export default class MultiDataGui extends DataGui {
 			container.append(itemModal);
 		}
 		
+		this.fileGuiComponents[itemEntity.getFileKey()].card = itemCard;
 		return container;
 	}
 	
@@ -146,11 +147,11 @@ export default class MultiDataGui extends DataGui {
 	}
 	
 	
-	static updateCardStatusIndicator(jElement, changed, error) {
-		if (error) {
+	_updateItemStatusIndicators(jElement) {
+		if (this.error) {
 			MultiDataGui.addCardErrorIndicator(jElement);
 			MultiDataGui.clearCardChangeIndicator(jElement);
-		} else if (changed) {
+		} else if (this.changed) {
 			MultiDataGui.addCardChangeIndicator(jElement);
 			MultiDataGui.clearCardErrorIndicator(jElement);
 		} else {
