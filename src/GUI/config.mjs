@@ -231,8 +231,14 @@ class Configurator {
 	}
 	
 	saveError(error) {
-		let errorMessage = error.path.join(' > ');
-		errorMessage = `${errorMessage}: ${error.message}`;
+		let errorMessage;
+		if (error.path) {
+			errorMessage = error.path.join(' > ');
+			errorMessage = `${errorMessage}: ${error.message}`;
+		} else {
+			errorMessage = error.message;
+		}
+		
 		this.showError(errorMessage);
 	}
 	

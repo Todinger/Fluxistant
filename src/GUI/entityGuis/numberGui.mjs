@@ -17,10 +17,13 @@ export default class NumberGui extends ValueGui {
 		}
 		
 		this.jInput.change(() => {
-			let newValue = this.jInput.val();
-			if (newValue && newValue !== '') {
-				this._guiValueChanged(Number(newValue));
+			let newValueString = this.jInput.val();
+			let newValue = undefined;
+			if (newValueString !== '') {
+				newValue = Number(newValueString);
 			}
+			
+			this._guiValueChanged(newValue);
 		});
 	}
 }

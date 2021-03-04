@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const DataFileEntity = require('./dataFileEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
@@ -13,7 +14,7 @@ class ImageFileEntity extends DataFileEntity {
 	
 	constructor(fileKey) {
 		super(fileKey);
-		this.addInteger('width')
+		this.addNaturalNumber('width')
 			.setName('Width')
 			.setDescription('Display width on screen');
 		this.addInteger('height')

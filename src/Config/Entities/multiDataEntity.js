@@ -31,6 +31,12 @@ class MultiDataEntity extends DataEntity {
 		this.getFiles().getElement(index).setFileKey(fileKey);
 	}
 	
+	getFileElementByKey(fileKey) {
+		let fittingElements = this.getChild('files').getElements().filter(
+			fileEntity => fileEntity.getFileKey() === fileKey);
+		return fittingElements.length > 0 ? fittingElements[0] : undefined;
+	}
+	
 	createAndAddFile(fileKey) {
 		let newFile = this.getFiles().createAndAddElement();
 		newFile.setFileKey(fileKey);

@@ -1,3 +1,4 @@
+import EntityGui from "./entityGui.mjs";
 import DataGui from "./dataGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 import { showError } from "../config.mjs";
@@ -25,7 +26,7 @@ export default class MultiDataGui extends DataGui {
 				let files = JSON.parse(res).files;
 				if (files) {
 					files.forEach(file => {
-						this._addFileDisplay(file);
+						this._addFileDisplay(file, false);
 					});
 				}
 			}
@@ -49,10 +50,21 @@ export default class MultiDataGui extends DataGui {
 		return span;
 	}
 	
-	_itemChanged(fileKey) {
+	_clearItemStatusIndicators(fileKey) {
+		let guiComponents = this.fileGuiComponents[fileKey];
+		EntityGui.clearChangeIndicator(guiComponents.nameTag);
+		this._updateItemStatusIndicatorsFor(guiComponents.card, false, false);
+	}
+	
+	_updateItemStatusIndicators(fileKey) {
 		let guiComponents = this.fileGuiComponents[fileKey];
 		guiComponents.entityGui._updateStatusIndicators(guiComponents.nameTag);
-		this._updateItemStatusIndicators(guiComponents.card);
+		this._updateItemStatusIndicatorsFor(guiComponents.card, this.changed, this.error);
+	}
+	
+	_itemChanged(fileKey) {
+		this._changed();
+		this._updateItemStatusIndicators(fileKey);
 	}
 	
 	_makeItemCard(data, name, itemEntity, itemModal) {
@@ -89,7 +101,6 @@ export default class MultiDataGui extends DataGui {
 			`${this.guiID}-${fileKey}`,
 			this.modName);
 		entityGui.onChangedOrError(() => {
-			this._changed();
 			this._itemChanged(fileKey);
 		});
 		
@@ -118,13 +129,22 @@ export default class MultiDataGui extends DataGui {
 		return container;
 	}
 	
-	_addFileDisplay(file) {
+	_addFileDisplay(file, addToConfig) {
 		if (file.fileKey in this.fileGuiComponents) {
 			showError(`Duplicate file key: ${file.fileKey}`);
 			return;
 		}
 		
-		let newEntity = this.entity.createAndAddFile(file.fileKey);
+		let newEntity;
+		if (addToConfig) {
+			newEntity = this.entity.createAndAddFile(file.fileKey);
+		} else {
+			newEntity = this.entity.getFileElementByKey(file.fileKey);
+			// Ignore images that aren't part of the configuration
+			if (!newEntity) {
+				return;
+			}
+		}
 		
 		this.fileGuiComponents[file.fileKey] = {};
 		let item = this._makeItem(
@@ -137,7 +157,7 @@ export default class MultiDataGui extends DataGui {
 	}
 	
 	_fileUploaded(savedFile) {
-		this._addFileDisplay(savedFile);
+		this._addFileDisplay(savedFile, true);
 	}
 	
 	_selfRemoved() {
@@ -146,12 +166,18 @@ export default class MultiDataGui extends DataGui {
 		});
 	}
 	
+	clearChangedIndicators() {
+		Object.keys(this.fileGuiComponents).forEach(fileKey => {
+			this._clearItemStatusIndicators(fileKey);
+		});
+	}
 	
-	_updateItemStatusIndicators(jElement) {
-		if (this.error) {
+	
+	_updateItemStatusIndicatorsFor(jElement, changed, error) {
+		if (error) {
 			MultiDataGui.addCardErrorIndicator(jElement);
 			MultiDataGui.clearCardChangeIndicator(jElement);
-		} else if (this.changed) {
+		} else if (changed) {
 			MultiDataGui.addCardChangeIndicator(jElement);
 			MultiDataGui.clearCardErrorIndicator(jElement);
 		} else {

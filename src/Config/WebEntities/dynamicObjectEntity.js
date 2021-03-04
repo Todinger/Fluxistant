@@ -9,11 +9,11 @@ class DynamicObjectEntity extends ObjectEntity {
 	
 	// ---- Overrides ---- //
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		let selfExtraKeys = Object.keys(this.children).filter(key => !(key in descriptor));
 		
 		Object.keys(descriptor).forEach(key => {
-			let child = ConfigEntity.readEntity(descriptor[key]);
+			let child = ConfigEntity.readEntity(descriptor[key], lenient);
 			if (this.hasChild(key)) {
 				this.setChild(key, child);
 			} else {

@@ -1,4 +1,3 @@
-const assert = require('assert').strict;
 const Errors = require('../../errors');
 const EntityFactory = require('../entityFactory');
 
@@ -90,11 +89,18 @@ class ConfigEntity {
 		Errors.abstract();
 	}
 	
-	import(entityInfo) {
-		assert(
-			entityInfo.type === this.type,
-			`Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`);
-		this.importDesc(entityInfo.descriptor);
+	_assignableFrom(type) {
+		return type === this.type;
+	}
+	
+	import(entityInfo, lenient) {
+		if (!lenient && entityInfo.type !== this.type) {
+			throw `Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`;
+		} else if (lenient && !this._assignableFrom(entityInfo.type)) {
+			return;
+		}
+		
+		this.importDesc(entityInfo.descriptor, lenient);
 		
 		// Don't import names and descriptions if we have them already - this is so that when
 		// these are changed in the code the saved configuration files don't override them
@@ -110,7 +116,7 @@ class ConfigEntity {
 	}
 	
 	// noinspection JSUnusedLocalSymbols
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		Errors.abstract();
 	}
 	
@@ -179,10 +185,10 @@ class ConfigEntity {
 		return instance;
 	}
 	
-	static readEntity(entityObject) {
+	static readEntity(entityObject, lenient) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
-		instance.import(entityObject);
+		instance.import(entityObject, lenient);
 		instance.validate();
 		return instance;
 	}

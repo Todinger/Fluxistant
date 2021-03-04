@@ -16,6 +16,10 @@ class IntegerEntity extends NumberEntity {
 			!this.isSet() || Number.isInteger(this.getValue()),
 			`This value must be an integer (whole number).`);
 	}
+	
+	importDesc(descriptor, lenient) {
+		super.importDesc(descriptor !== undefined ? Math.round(descriptor) : undefined, lenient);
+	}
 }
 
 module.exports = IntegerEntity;

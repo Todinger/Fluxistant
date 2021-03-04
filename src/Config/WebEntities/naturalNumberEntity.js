@@ -16,6 +16,10 @@ class NaturalNumberEntity extends IntegerEntity {
 			!this.isSet() || (this.getValue() >= 0),
 			`This value cannot be negative.`);
 	}
+	
+	importDesc(descriptor, lenient) {
+		super.importDesc(descriptor !== undefined ? (descriptor >= 0 ? descriptor : 0) : undefined, lenient);
+	}
 }
 
 module.exports = NaturalNumberEntity;

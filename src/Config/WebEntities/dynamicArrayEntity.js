@@ -23,16 +23,21 @@ class DynamicArrayEntity extends ArrayEntity {
 	
 	// ---- Overrides ---- //
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		this.elementType = descriptor.elementType;
 		assert(this.elementType, 'A DynamicArrayEntity must have an element type.');
 		
 		// Override the contents of the array with those imported
 		this.clear();
 		descriptor.elements.forEach(entryDesc => {
-			let element = ConfigEntity.readEntity(entryDesc);
+			let element = ConfigEntity.readEntity(entryDesc, lenient);
 			this.addElement(element);
 		});
+	}
+	
+	_assignableFrom(type) {
+		return super._assignableFrom(type) ||
+			type === 'FixedArray';
 	}
 }
 

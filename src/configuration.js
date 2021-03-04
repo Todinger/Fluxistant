@@ -126,7 +126,7 @@ class Configuration {
 			assert(
 				rootDescriptor.type === this.configRoot.type,
 				`Bad configuration: Expected root object to have the type '${this.configRoot.type}', instead got '${rootDescriptor.type}'.`);
-			this.configRoot.import(rootDescriptor);
+			this.configRoot.import(rootDescriptor, false);
 		}
 	}
 	
@@ -160,7 +160,7 @@ class Configuration {
 				// Read the configuration from disk and validate it before saving it
 				// as the new configuration
 				let newConfig = this.configRoot.clone();
-				newConfig.import(rootDescriptor);
+				newConfig.import(rootDescriptor, true);
 				newConfig.validate();
 				this.configRoot = newConfig;
 			}

@@ -6,7 +6,14 @@ class NumberEntity extends ValueEntity {
 	static get BUILDER()	{ return value => new NumberEntity(value); 	}
 	
 	constructor(value) {
-		super(value);
+		super(value, 'number');
+	}
+	
+	_assignableFrom(type) {
+		return super._assignableFrom(type) ||
+			type === 'Number' ||
+			type === 'Integer' ||
+			type === 'PositiveNumber';
 	}
 }
 

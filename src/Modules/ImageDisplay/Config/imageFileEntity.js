@@ -14,7 +14,7 @@ class ImageFileEntity extends DataFileEntity {
 	
 	constructor(fileKey) {
 		super(fileKey);
-		this.addInteger('width')
+		this.addNaturalNumber('width')
 			.setName('Width')
 			.setDescription('Display width on screen');
 		this.addInteger('height')

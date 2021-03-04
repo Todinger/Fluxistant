@@ -42,7 +42,7 @@ class ValueEntity extends ConfigEntity {
 		return this.getValue();
 	}
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		this.setValue(descriptor);
 	}
 	

@@ -10,10 +10,10 @@ class ImageEntity extends StaticObjectEntity {
 		this.addSingleData('file', { collection: 'Images', dataType: 'IMAGE' })
 			.setName('Image')
 			.setDescription('The image that will be displayed on the screen');
-		this.addInteger('width')
+		this.addNaturalNumber('width')
 			.setName('Width')
 			.setDescription('Display width on screen');
-		this.addInteger('height')
+		this.addNaturalNumber('height')
 			.setName('Height')
 			.setDescription('Display height on screen');
 		this.addNaturalNumber('duration')

@@ -18932,14 +18932,16 @@ class ChoiceEntity extends ConfigEntity {
 		}
 	}
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		// Every option in this.options should be an object that inherits from
 		// choiceValueEntity, which inherently has an .option property in its
 		// own descriptor, so we just use that instead of saving the type of
 		// the selection ourselves (it'd be redundant data)
 		Object.keys(descriptor.options).forEach(option => {
 			if (option in this.options) {
-				this.options[option].import(descriptor.options[option]);
+				this.options[option].import(descriptor.options[option], lenient);
+			} else if (!lenient) {
+				throw `Unknown option: ${option}`;
 			}
 		});
 		
@@ -19036,12 +19038,11 @@ class ChoiceValueEntity extends StaticObjectEntity {
 module.exports = ChoiceValueEntity;
 
 },{"./staticObjectEntity":45}],17:[function(require,module,exports){
-const assert = require('assert').strict;
 const Errors = require('../../errors');
 const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 const StringEntity = require('./stringEntity');
-const IntegerEntity = require('./integerEntity');
+const NaturalNumberEntity = require('./naturalNumberEntity');
 const CooldownEntity = require('./cooldownEntity');
 const UserFilter = require('./userFilterEntity');
 
@@ -19059,7 +19060,7 @@ class CommandEntity extends StaticObjectEntity {
 			.setDescription('The term that will invoke the command');
 		this.addChild('aliases', new DynamicArrayEntity('String'))
 			.setDescription('Optional additional names for the command');
-		this.addChild('cost', new IntegerEntity(data && data.cost || 0))
+		this.addChild('cost', new NaturalNumberEntity(data && data.cost || 0))
 			.setDescription('Cost in StreamElements loyalty points');
 		this.addChild('message', new StringEntity(data && data.message))
 			.setDescription('A message the bot will send to the chat when the command is invoked');
@@ -19101,7 +19102,7 @@ class CommandEntity extends StaticObjectEntity {
 	getAliases() {
 		return this.getChild('aliases').map(e => e.getValue());
 	}
-	
+	m
 	getCost() {
 		return this.getChild('cost').getValue();
 	}
@@ -19132,6 +19133,7 @@ class CommandEntity extends StaticObjectEntity {
 		
 		let cmdname = this.getCmdName();
 		let cmdnameText = typeof cmdname === 'string' ? `"${cmdname}"` : `${cmdname}`;
+		
 		Errors.ensureRegexString(
 			cmdname,
 			/[^\s]+/,
@@ -19145,17 +19147,16 @@ class CommandEntity extends StaticObjectEntity {
 						'Command aliases must be non-empty strings.');
 				}
 			});
-		
-		assert(
-			this.getCost() >= 0,
-			`Cost must be a non-negative integer (got: ${this.getCost()}).`);
+	}
+	
+	importDesc(descriptor, lenient) {
+		super.importDesc(descriptor, lenient);
 	}
 }
 
 module.exports = CommandEntity;
 
-},{"../../errors":59,"./cooldownEntity":19,"./dynamicArrayEntity":22,"./integerEntity":33,"./staticObjectEntity":45,"./stringEntity":46,"./userFilterEntity":47,"assert":1}],18:[function(require,module,exports){
-const assert = require('assert').strict;
+},{"../../errors":59,"./cooldownEntity":19,"./dynamicArrayEntity":22,"./naturalNumberEntity":38,"./staticObjectEntity":45,"./stringEntity":46,"./userFilterEntity":47}],18:[function(require,module,exports){
 const Errors = require('../../errors');
 const EntityFactory = require('../entityFactory');
 
@@ -19247,11 +19248,18 @@ class ConfigEntity {
 		Errors.abstract();
 	}
 	
-	import(entityInfo) {
-		assert(
-			entityInfo.type === this.type,
-			`Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`);
-		this.importDesc(entityInfo.descriptor);
+	_assignableFrom(type) {
+		return type === this.type;
+	}
+	
+	import(entityInfo, lenient) {
+		if (!lenient && entityInfo.type !== this.type) {
+			throw `Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`;
+		} else if (lenient && !this._assignableFrom(entityInfo.type)) {
+			return;
+		}
+		
+		this.importDesc(entityInfo.descriptor, lenient);
 		
 		// Don't import names and descriptions if we have them already - this is so that when
 		// these are changed in the code the saved configuration files don't override them
@@ -19267,7 +19275,7 @@ class ConfigEntity {
 	}
 	
 	// noinspection JSUnusedLocalSymbols
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		Errors.abstract();
 	}
 	
@@ -19336,10 +19344,10 @@ class ConfigEntity {
 		return instance;
 	}
 	
-	static readEntity(entityObject) {
+	static readEntity(entityObject, lenient) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
-		instance.import(entityObject);
+		instance.import(entityObject, lenient);
 		instance.validate();
 		return instance;
 	}
@@ -19347,7 +19355,7 @@ class ConfigEntity {
 
 module.exports = ConfigEntity;
 
-},{"../../errors":59,"../entityFactory":55,"assert":1}],19:[function(require,module,exports){
+},{"../../errors":59,"../entityFactory":55}],19:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class CooldownEntity extends StaticObjectEntity {
@@ -19505,16 +19513,21 @@ class DynamicArrayEntity extends ArrayEntity {
 	
 	// ---- Overrides ---- //
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		this.elementType = descriptor.elementType;
 		assert(this.elementType, 'A DynamicArrayEntity must have an element type.');
 		
 		// Override the contents of the array with those imported
 		this.clear();
 		descriptor.elements.forEach(entryDesc => {
-			let element = ConfigEntity.readEntity(entryDesc);
+			let element = ConfigEntity.readEntity(entryDesc, lenient);
 			this.addElement(element);
 		});
+	}
+	
+	_assignableFrom(type) {
+		return super._assignableFrom(type) ||
+			type === 'FixedArray';
 	}
 }
 
@@ -19546,11 +19559,11 @@ class DynamicObjectEntity extends ObjectEntity {
 	
 	// ---- Overrides ---- //
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		let selfExtraKeys = Object.keys(this.children).filter(key => !(key in descriptor));
 		
 		Object.keys(descriptor).forEach(key => {
-			let child = ConfigEntity.readEntity(descriptor[key]);
+			let child = ConfigEntity.readEntity(descriptor[key], lenient);
 			if (this.hasChild(key)) {
 				this.setChild(key, child);
 			} else {
@@ -19592,22 +19605,27 @@ class FixedArrayEntity extends ArrayEntity {
 	
 	// ---- Overrides ---- //
 	
-	importDesc(descriptor) {
-		this.elementType = descriptor.elementType;
+	importDesc(descriptor, lenient) {
+		let elementType = descriptor.elementType;
+		if (lenient && elementType !== this.elementType) {
+			elementType = this.elementType;
+		}
+		
 		assert(
-			this.elementType,
+			elementType,
 			'A FixedArrayEntity must have an element type.');
 		
 		assert(
-			descriptor.elements.length === this.elements.length,
+			lenient || descriptor.elements.length === this.elements.length,
 			`A FixedArrayEntity configuration must have the same number of elements as the original (expected ${this.elements.length}, got ${descriptor.elements.length}).`)
 		
-		for (let i = 0; i < this.elements.length; i++) {
-			assert(
-				descriptor.elements[i].type === this.elements[i].type,
-				`Element types in a FixedArrayEntity configuration must match the types of the original configuration.`);
-			
-			this.elements[i].import(descriptor.elements[i]);
+		let importLength = Math.min(this.elements.length, descriptor.elements.length);
+		for (let i = 0; i < importLength; i++) {
+			if (descriptor.elements[i].type === this.elements[i].type) {
+				this.elements[i].import(descriptor.elements[i], lenient);
+			} else if (!lenient) {
+				throw `Element types in a FixedArrayEntity configuration must match the types of the original configuration.`;
+			}
 		}
 	}
 }
@@ -19743,10 +19761,10 @@ class ImageEntity extends StaticObjectEntity {
 		this.addSingleData('file', { collection: 'Images', dataType: 'IMAGE' })
 			.setName('Image')
 			.setDescription('The image that will be displayed on the screen');
-		this.addInteger('width')
+		this.addNaturalNumber('width')
 			.setName('Width')
 			.setDescription('Display width on screen');
-		this.addInteger('height')
+		this.addNaturalNumber('height')
 			.setName('Height')
 			.setDescription('Display height on screen');
 		this.addNaturalNumber('duration')
@@ -19798,6 +19816,7 @@ module.exports = ImageEntity;
 // module.exports = ImageEntity;
 
 },{"./dynamicArrayEntity":22,"./staticObjectEntity":45}],32:[function(require,module,exports){
+const _ = require('lodash');
 const DataFileEntity = require('./dataFileEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
@@ -19813,7 +19832,7 @@ class ImageFileEntity extends DataFileEntity {
 	
 	constructor(fileKey) {
 		super(fileKey);
-		this.addInteger('width')
+		this.addNaturalNumber('width')
 			.setName('Width')
 			.setDescription('Display width on screen');
 		this.addInteger('height')
@@ -19836,7 +19855,7 @@ class ImageFileEntity extends DataFileEntity {
 
 module.exports = ImageFileEntity;
 
-},{"./dataFileEntity":21,"./dynamicArrayEntity":22}],33:[function(require,module,exports){
+},{"./dataFileEntity":21,"./dynamicArrayEntity":22,"lodash":7}],33:[function(require,module,exports){
 const assert = require('assert').strict;
 const NumberEntity = require('./numberEntity');
 
@@ -19854,6 +19873,10 @@ class IntegerEntity extends NumberEntity {
 		assert(
 			!this.isSet() || Number.isInteger(this.getValue()),
 			`This value must be an integer (whole number).`);
+	}
+	
+	importDesc(descriptor, lenient) {
+		super.importDesc(descriptor !== undefined ? Math.round(descriptor) : undefined, lenient);
 	}
 }
 
@@ -20027,6 +20050,12 @@ class MultiDataEntity extends DataEntity {
 		this.getFiles().getElement(index).setFileKey(fileKey);
 	}
 	
+	getFileElementByKey(fileKey) {
+		let fittingElements = this.getChild('files').getElements().filter(
+			fileEntity => fileEntity.getFileKey() === fileKey);
+		return fittingElements.length > 0 ? fittingElements[0] : undefined;
+	}
+	
 	createAndAddFile(fileKey) {
 		let newFile = this.getFiles().createAndAddElement();
 		newFile.setFileKey(fileKey);
@@ -20048,6 +20077,7 @@ class MultiDataEntity extends DataEntity {
 		
 		delete conf.files;
 		conf.files = keyedFiles;
+		return conf;
 	}
 }
 
@@ -20072,6 +20102,10 @@ class NaturalNumberEntity extends IntegerEntity {
 			!this.isSet() || (this.getValue() >= 0),
 			`This value cannot be negative.`);
 	}
+	
+	importDesc(descriptor, lenient) {
+		super.importDesc(descriptor !== undefined ? (descriptor >= 0 ? descriptor : 0) : undefined, lenient);
+	}
 }
 
 module.exports = NaturalNumberEntity;
@@ -20085,7 +20119,14 @@ class NumberEntity extends ValueEntity {
 	static get BUILDER()	{ return value => new NumberEntity(value); 	}
 	
 	constructor(value) {
-		super(value);
+		super(value, 'number');
+	}
+	
+	_assignableFrom(type) {
+		return super._assignableFrom(type) ||
+			type === 'Number' ||
+			type === 'Integer' ||
+			type === 'PositiveNumber';
 	}
 }
 
@@ -20289,6 +20330,11 @@ class PositiveNumberEntity extends NumberEntity {
 			!this.isSet() || this.getValue() > 0,
 			`This value must be positive.`);
 	}
+	
+	importDesc(descriptor, lenient) {
+		// Not sure what I can put here as a default, so I went with 1...
+		super.importDesc(descriptor !== undefined ? (descriptor > 0 ? descriptor : 1) : undefined, lenient);
+	}
 }
 
 module.exports = PositiveNumberEntity;
@@ -20449,11 +20495,13 @@ class StaticObjectEntity extends ObjectEntity {
 	
 	// ---- Overrides ---- //
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		Object.keys(descriptor).forEach(key => {
 			// Only import children we know
 			if (this.hasChild(key)) {
-				this.getChild(key).import(descriptor[key]);
+				this.getChild(key).import(descriptor[key], lenient);
+			} else if (!lenient) {
+				throw `Unknown child key: ${key}`;
 			}
 		});
 	}
@@ -20666,7 +20714,7 @@ class ValueEntity extends ConfigEntity {
 		return this.getValue();
 	}
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		this.setValue(descriptor);
 	}
 	

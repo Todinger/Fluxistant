@@ -7,11 +7,13 @@ class StaticObjectEntity extends ObjectEntity {
 	
 	// ---- Overrides ---- //
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		Object.keys(descriptor).forEach(key => {
 			// Only import children we know
 			if (this.hasChild(key)) {
-				this.getChild(key).import(descriptor[key]);
+				this.getChild(key).import(descriptor[key], lenient);
+			} else if (!lenient) {
+				throw `Unknown child key: ${key}`;
 			}
 		});
 	}

@@ -1,9 +1,8 @@
-const assert = require('assert').strict;
 const Errors = require('../../errors');
 const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 const StringEntity = require('./stringEntity');
-const IntegerEntity = require('./integerEntity');
+const NaturalNumberEntity = require('./naturalNumberEntity');
 const CooldownEntity = require('./cooldownEntity');
 const UserFilter = require('./userFilterEntity');
 
@@ -21,7 +20,7 @@ class CommandEntity extends StaticObjectEntity {
 			.setDescription('The term that will invoke the command');
 		this.addChild('aliases', new DynamicArrayEntity('String'))
 			.setDescription('Optional additional names for the command');
-		this.addChild('cost', new IntegerEntity(data && data.cost || 0))
+		this.addChild('cost', new NaturalNumberEntity(data && data.cost || 0))
 			.setDescription('Cost in StreamElements loyalty points');
 		this.addChild('message', new StringEntity(data && data.message))
 			.setDescription('A message the bot will send to the chat when the command is invoked');
@@ -63,7 +62,7 @@ class CommandEntity extends StaticObjectEntity {
 	getAliases() {
 		return this.getChild('aliases').map(e => e.getValue());
 	}
-	
+	m
 	getCost() {
 		return this.getChild('cost').getValue();
 	}
@@ -94,6 +93,7 @@ class CommandEntity extends StaticObjectEntity {
 		
 		let cmdname = this.getCmdName();
 		let cmdnameText = typeof cmdname === 'string' ? `"${cmdname}"` : `${cmdname}`;
+		
 		Errors.ensureRegexString(
 			cmdname,
 			/[^\s]+/,
@@ -107,10 +107,10 @@ class CommandEntity extends StaticObjectEntity {
 						'Command aliases must be non-empty strings.');
 				}
 			});
-		
-		assert(
-			this.getCost() >= 0,
-			`Cost must be a non-negative integer (got: ${this.getCost()}).`);
+	}
+	
+	importDesc(descriptor, lenient) {
+		super.importDesc(descriptor, lenient);
 	}
 }
 

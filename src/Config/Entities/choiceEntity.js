@@ -68,14 +68,16 @@ class ChoiceEntity extends ConfigEntity {
 		}
 	}
 	
-	importDesc(descriptor) {
+	importDesc(descriptor, lenient) {
 		// Every option in this.options should be an object that inherits from
 		// choiceValueEntity, which inherently has an .option property in its
 		// own descriptor, so we just use that instead of saving the type of
 		// the selection ourselves (it'd be redundant data)
 		Object.keys(descriptor.options).forEach(option => {
 			if (option in this.options) {
-				this.options[option].import(descriptor.options[option]);
+				this.options[option].import(descriptor.options[option], lenient);
+			} else if (!lenient) {
+				throw `Unknown option: ${option}`;
 			}
 		});
 		
