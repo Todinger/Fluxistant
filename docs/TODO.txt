@@ -15,6 +15,8 @@
 	- Controller buttons
 	- Voice command
 	- Channel Reward
+	- Window de/activation
+	- Window open/close
 - Also add function responses.
   Response ideas:
 	- Chat message
@@ -27,6 +29,7 @@
 - User data editor: built-in, data-specific interface that allows visual
   editing of the data (each module will need to define these editors for
   itself).
+- Persistent data for modules
 - OBS Websocket module
 - Voice activation mechanism (in addition to commands and shortcut keys)
 

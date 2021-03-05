@@ -10,7 +10,7 @@ class UniformPool extends FilePool {
 		super(dataDirPath);
 	}
 	
-	_selectFileKey(params) {
+	selectFileKey(params) {
 		return Utils.randomKey(this.savedFiles);
 	}
 }

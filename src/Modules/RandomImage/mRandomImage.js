@@ -3,7 +3,6 @@
 const assert = require('assert').strict;
 const _ = require('lodash');
 const Module = requireMain('module');
-const ImageFileEntity = requireModConfig('ImageDisplay', 'imageFileEntity');
 
 const COMMAND_NAME = 'pixelate';
 
@@ -24,19 +23,13 @@ class RandomImage extends Module {
 				
 				let files = this.config.images.files || {};
 				let imageConf = files[file.fileKey];
-				let displayData = ImageFileEntity.makeDisplayData(imageConf, file);
+				let displayData = imageConf.makeDisplayData(file);
+				// let displayData = ImageFileEntity.makeDisplayData(imageConf, file);
 				this.say(`Showing: ${file.name}`);
 				this.broadcastEvent('showImage', {
 					image: displayData,
 				});
 			});
-		
-		// Module.Assets.getRandomImageFromCache((name, url) => {
-		// 	this.say(`Showing: ${name}`);
-		// 	this.broadcastEvent('showImage', {
-		// 		image: { url: url },
-		// 	});
-		// });
 	}
 	
 	defineModData(modData) {

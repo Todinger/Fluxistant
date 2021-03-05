@@ -33,6 +33,14 @@ class ImageFileEntity extends DataFileEntity {
 	get hasExtraData() {
 		return true;
 	}
+	
+	toConf() {
+		let conf = super.toConf();
+		conf.makeDisplayData = function(savedFile) {
+			return ImageFileEntity.makeDisplayData(conf, savedFile);
+		};
+		return conf;
+	}
 }
 
 module.exports = ImageFileEntity;

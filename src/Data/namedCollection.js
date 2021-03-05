@@ -21,7 +21,7 @@ class NamedCollection extends UserData {
 		return [ params.fileKey ];
 	}
 	
-	_selectFileKey(fileKey) {
+	selectFileKey(fileKey) {
 		this._ensurePresence(fileKey);
 		return fileKey;
 	}

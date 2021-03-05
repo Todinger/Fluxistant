@@ -184,15 +184,25 @@ $.fn.extend({
 			name in ImageEffects,
 			`Unknown effect name: ${name}`);
 		
-		ImageEffects[name].apply($(this), effectData);
-		return $(this);
+		ImageEffects[name].apply(this, effectData);
+		return this;
 	},
 	clearEffect: function(name) {
 		console.assert(
 			name in ImageEffects,
 			`Unknown effect name: ${name}`);
 		
-		ImageEffects[name].clear($(this));
-		return $(this);
+		ImageEffects[name].clear(this);
+		return this;
+	},
+	applyImageEffects: function(imageEffects) {
+		imageEffects.forEach(effectData => {
+			let name = effectData.type.trim().toLowerCase();
+			if (name in ImageEffects) {
+				ImageEffects[name].apply(this, effectData);
+			}
+			
+			return this;
+		});
 	},
 });

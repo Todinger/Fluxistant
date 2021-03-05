@@ -52,7 +52,8 @@ class ImageDisplay extends ModuleClient {
 		.fadeOut(FADE_DURATION, () => this.imageDone(imageParameters));
 		
 		if (imageParameters.effects) {
-			this.applyImageEffects(imageParameters.effects);
+			// this.applyImageEffects(imageParameters.effects);
+			jImage.applyImageEffects(imageParameters.effects);
 		}
 	}
 	

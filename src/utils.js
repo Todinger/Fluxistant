@@ -107,7 +107,7 @@ class Utils {
 	// 
 	// Parameters:
 	// 	obj					The object to choose from.
-	// 	[elementWeightFunc]	A function that takes a value (not a key!) from the
+	// 	[elementWeightFunc]	A function that takes a key and value from the
 	// 						object and returns its weight. It must return the
 	// 						same number for the same value from the moment this
 	// 						function starts and until it finishes (but
@@ -120,17 +120,18 @@ class Utils {
 	// 						the weights.
 	static weightedRandomKey(obj, elementWeightFunc) {
 		if (!elementWeightFunc) {
-			elementWeightFunc = x => x;
+			elementWeightFunc = (k, v) => v;
 		}
 		
-		let totalWeight = Object.values(obj).reduce(
-			(soFar, current) => soFar + elementWeightFunc(current),
+		let totalWeight = Object.keys(obj).reduce(
+			(soFar, current) =>
+				soFar + elementWeightFunc(current, obj[current]),
 			0);
 		
 		let choice = Math.random() * totalWeight;
 		let sum = 0;
 		for (let key in obj) {
-			sum += elementWeightFunc(obj[key]);
+			sum += elementWeightFunc(key, obj[key]);
 			if (choice < sum) {
 				return key;
 			}
@@ -350,6 +351,14 @@ class Utils {
 	
 	static arraysHaveSameValues(arr1, arr2) {
 		return _.isEqual([...arr1].sort(), [...arr2].sort());
+	}
+	
+	static objectMap(obj, func) {
+		let result = {};
+		Object.keys(obj).forEach(key => {
+			result[key] = func(key, obj[key]);
+		});
+		return result;
 	}
 	
 	static ensureDirExists(path) {

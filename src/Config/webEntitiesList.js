@@ -38,6 +38,7 @@ const entities = {
 	UserFilter_IsSubEntity: require('./WebEntities/userFilter_IsSubEntity.js'),
 	UserFilter_IsUserEntity: require('./WebEntities/userFilter_IsUserEntity.js'),
 	ValueEntity: require('./WebEntities/valueEntity.js'),
+	CandyFileEntity: require('./WebEntities/candyFileEntity.js'),
 	CandyInflationEntity: require('./WebEntities/candyInflationEntity.js'),
 	CandyInflation_BaseEntity: require('./WebEntities/candyInflation_BaseEntity.js'),
 	CandyInflation_ExponentialEntity: require('./WebEntities/candyInflation_ExponentialEntity.js'),

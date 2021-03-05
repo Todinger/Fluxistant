@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert').strict;
 const urljoin = require('url-join');
 const Module = requireMain('module');
 const Utils = requireMain('utils');
@@ -78,13 +79,23 @@ class CandyGame extends Module {
 		this.candyCount = 0;
 	}
 	
+	defineModData(modData) {
+		modData.addWeightedPool('Images');
+	}
+	
 	
 	defineModConfig(modConfig) {
 		modConfig.add('candyInflation', 'CandyInflation')
 			.setName('Candy Inflation')
 			.setDescription('Optional inflation of win chances to control the length of the game');
-	
-/*		// TODO: Switch defaults to config system after implementing data system with image selection
+		
+		modConfig.addDynamicArray('winEffects', 'ImageEffect')
+			.setName('Winning Candy Effects')
+			.setDescription('Special effects to apply to winning candy images');
+		modConfig.addDynamicArray('bonusEffects', 'ImageEffect')
+			.setName('Bonus Candy Effects')
+			.setDescription('Special effects to apply to candy images that grant a bonus');
+		
 		let defs = modConfig.addObject('candyDefaults')
 			.setName('Candy Defaults')
 			.setDescription('Default values to use for candy - these are overridden by specific candy settings');
@@ -100,10 +111,20 @@ class CandyGame extends Module {
 		defs.addInteger('imageHeight', 100)
 			.setName('Image Height')
 			.setDescription('Height in pixels');
-		defs.addInteger('userBonus')
+		defs.addInteger('userBonus', 500)
 			.setName('User Bonus')
 			.setDescription('Reward for a user finding their own special candy');
-*/
+		
+		modConfig.add(
+			'images',
+			'MultiData',
+			{
+				collection: 'Images',
+				dataType: 'IMAGE',
+				elementValueType: 'CandyFile',
+			})
+			.setName('Images')
+			.setDescription('The collection of candy that can rain down from above (like frogs!)');
 	}
 	
 	loadModConfig(conf) {
@@ -112,26 +133,23 @@ class CandyGame extends Module {
 			let inflationValue = conf.candyInflation.argument;
 			this.winningWeightInflation = inflationFuncMaker(inflationValue);
 		}
-	
-/*      // TODO: Switch defaults to config system after implementing data system with image selection
+		
+		let defs = conf.candyDefaults;
 		this.candyDefaults = {
-			weight: conf.weight,
-			reward: conf.reward,
+			weight: defs.weight,
+			reward: defs.reward,
 			image: {
-				width: conf.imageWidth,
-				height: conf.imageHeight,
+				width: defs.imageWidth,
+				height: defs.imageHeight,
 			},
 			userBonus: {
-				amount: conf.userBonus,
+				amount: defs.userBonus,
 			},
 		};
-*/
-	}
-	
-	// Sends the given image parameters to the Image Display Module client for
-	// display
-	dropImage(image) {
-		this.broadcastEvent('dropImage', image);
+		
+		this.data.Images.setWeights(Utils.objectMap(
+			conf.images.files,
+			(fileKey, file) => file.weight !== undefined ? file.weight : defs.weight));
 	}
 	
 	
@@ -168,16 +186,17 @@ class CandyGame extends Module {
 		});
 	}
 	
-	getCandyWeight(candy) {
+	getCandyWeight(fileKey, weight) {
+		let files = this.config.images.files || {}; // The "|| {}" is to shut the IDE up with its errors
+		let candy = files[fileKey];
 		if (candy.winning) {
 			// noinspection UnnecessaryLocalVariableJS
-			let weight = this.winningWeightInflation(
-				candy.weight,
+			weight = this.winningWeightInflation(
+				weight,
 				this.candyCount);
-			return weight;
-		} else {
-			return candy.weight;
 		}
+		
+		return weight;
 	}
 	
 	candyRequest(user) {
@@ -185,35 +204,91 @@ class CandyGame extends Module {
 			return;
 		}
 		
-		let candyName = Utils.weightedRandomKey(
-			this.candyData,
-			candy => this.getCandyWeight(candy));
-		let candy = this.candyData[candyName];
+		
+		let fileKey = this.data.Images.selectFileKey(
+			(fileKey, weight) => this.getCandyWeight(fileKey, weight));
+		let files = this.config.images.files || {}; // The "|| {}" is to shut the IDE up with its errors
+		let candy = files[fileKey];
 		this.candyCount++;
 		
 		let reward = candy.reward;
+		if (reward === undefined) {
+			reward = this.candyDefaults.reward;
+		}
+		
 		let userBonusRewarded = false;
 		if (candy.userBonus) {
-			if (candy.userBonus.username.toLowerCase() === user.name.toLowerCase()) {
-				reward += candy.userBonus.amount;
+			if (candy.userBonus.toLowerCase() === user.name.toLowerCase()) {
+				if (candy.userBonusAmount !== undefined) {
+					reward += candy.userBonusAmount;
+				} else {
+					reward += this.candyDefaults.userBonus.amount;
+				}
+				
 				userBonusRewarded = true;
 			}
 		}
 		
 		this.modifyUserPoints(user, reward);
 		
-		let imageData = Utils.clone(candy.image);
-		
-		if (candy.winning || userBonusRewarded) {
-			imageData.effect = 'glow';
-		}
-		
 		if (candy.winning) {
 			this.ongoing = false;
 			this.announceWinner(user);
 		}
 		
-		this.dropImage(imageData);
+		this.data.Images.getFileWebByKey(fileKey)
+			.then(file => {
+				assert(
+					this.config.images.files && (file.fileKey in this.config.images.files),
+					'File missing from random image pool.');
+				
+				let displayData = candy.makeDisplayData(file);
+				if (!displayData.effects || displayData.effects.length === 0) {
+					if (candy.winning) {
+						displayData.effects = this.config.winEffects;
+					} else if (userBonusRewarded) {
+						displayData.effects = this.config.bonusEffects;
+					}
+				}
+				
+				this.broadcastEvent('dropImage', displayData);
+			});
+		
+		
+		// let candyName = Utils.weightedRandomKey(
+		// 	this.candyData,
+		// 	candy => this.getCandyWeight(candy));
+		// let candy = this.candyData[candyName];
+		
+		// let candyName = Utils.weightedRandomKey(
+		// 	this.candyData,
+		// 	candy => this.getCandyWeight(candy));
+		// let candy = this.candyData[candyName];
+		// this.candyCount++;
+		//
+		// let reward = candy.reward;
+		// let userBonusRewarded = false;
+		// if (candy.userBonus) {
+		// 	if (candy.userBonus.username.toLowerCase() === user.name.toLowerCase()) {
+		// 		reward += candy.userBonus.amount;
+		// 		userBonusRewarded = true;
+		// 	}
+		// }
+		//
+		// this.modifyUserPoints(user, reward);
+		//
+		// let imageData = Utils.clone(candy.image);
+		//
+		// if (candy.winning || userBonusRewarded) {
+		// 	imageData.effect = 'glow';
+		// }
+		//
+		// if (candy.winning) {
+		// 	this.ongoing = false;
+		// 	this.announceWinner(user);
+		// }
+		//
+		// this.dropImage(imageData);
 	}
 	
 	preload() {

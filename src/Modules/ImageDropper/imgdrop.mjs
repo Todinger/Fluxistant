@@ -21,7 +21,7 @@ class ImageDropper extends ModuleClient {
 		let jImage = $(`<img class="faller" src="${image.url}" alt="">`);
 		jImage
 		.width(image.width).height(image.height)
-		.css({ 
+		.css({
 			position: "absolute",
 			marginLeft: 0, marginTop: 0,
 		})
@@ -37,15 +37,8 @@ class ImageDropper extends ModuleClient {
 			})
 		.appendTo("#imageholder");
 		
-		if (image.effect) {
-			if (typeof image.effect == 'string') {
-				image.effect = {
-					name: image.effect,
-					effectData: {},
-				}
-			}
-			
-			jImage.applyEffect(image.effect.name, image.effect.effectData);
+		if (image.effects) {
+			jImage.applyImageEffects(image.effects);
 		}
 	}
 	

@@ -49,25 +49,6 @@ class UserData {
 		};
 		
 		return readPromise;
-		
-		// let filePath = this._pathForKey(key, file.name);
-		// file.mv(filePath, async (err) => {
-		// 	if (err) {
-		// 		callback(err);
-		// 	} else {
-		// 		this.savedFiles[key] = {
-		// 			name: file.name,
-		// 			path: filePath,
-		// 		};
-		//
-		// 		try {
-		// 			let fileData = await this._getFileWebByKey(key);
-		// 			callback(undefined, fileData);
-		// 		} catch (err) {
-		// 			callback(err);
-		// 		}
-		// 	}
-		// });
 	}
 	
 	_unAddFile(fileKey) {
@@ -86,19 +67,6 @@ class UserData {
 				delete this.savedFiles[key];
 				return key;
 			});
-		
-		// let filename = this.savedFiles[key].path;
-		// fs.unlink(filename, (err) => {
-		// 	if (err) {
-		// 		cli.warn(`Failed to delete file '${filename}': ${err}`);
-		// 	}
-		//
-		// 	if (callback) {
-		// 		callback(err);
-		// 	}
-		// });
-		//
-		// delete this.savedFiles[key];
 	}
 	
 	hasKey(key) {
@@ -161,7 +129,7 @@ class UserData {
 	}
 	
 	selectFileLocal(...params) {
-		let key = this._selectFileKey(...params);
+		let key = this.selectFileKey(...params);
 		return {
 			name: this.savedFiles[key].name,
 			path: this.savedFiles[key].path,
@@ -182,61 +150,29 @@ class UserData {
 			});
 	}
 	
-	_getFileWebByKey(key) {
+	getFileWebByKey(key) {
 		return this._readFile(this.savedFiles[key].path, this.savedFiles[key].name)
 			.then(file => {
 				file.fileKey = key;
 				return file;
 			});
-		// return fsPromise.readFile(this.savedFiles[key].path)
-		// .then((data) => {
-		// 	let b64Data = Base64.encode(data);
-		// 	let contentType = mime.contentType(this.savedFiles[key].path);
-		// 	return {
-		// 		name: this.savedFiles[key].name,
-		// 		contentType: contentType,
-		// 		data: `data:${contentType}; base64,${b64Data}`,
-		// 	};
-		// });
-		
-		// fs.readFile(this.savedFiles[key].path, (err, data) => {
-		// 	if (err) {
-		// 		callback(err);
-		// 	} else {
-		// 		let b64Data = Base64.encode(data);
-		// 		let contentType = mime.contentType(this.savedFiles[key].path);
-		// 		let sourceString = `data:${contentType}; base64,${b64Data}`;
-		// 		callback(err, sourceString);
-		// 	}
-		// });
 	}
 	
 	getFilesWeb(params) {
 		let keys = this._getFileKeys(params);
-		let promises = keys.map(key => (this._getFileWebByKey(key)));
-		// for (let i = 0; i < keys.length; i++) {
-		// 	promises.push(this._getFileWebByKey(keys[i]));
-		// }
+		let promises = keys.map(key => (this.getFileWebByKey(key)));
 		
 		return Promise.all(promises);
-			// .then(filesArray => {
-			// 	let files = {};
-			// 	for (let i = 0; i < keys.length; i++) {
-			// 		files[keys[i]] = filesArray[i];
-			// 	}
-			//
-			// 	return files;
-			// });
 	}
 	
 	// noinspection JSUnusedLocalSymbols
-	_selectFileKey(params) {
+	selectFileKey(params) {
 		Errors.abstract();
 	}
 	
 	selectFile(...params) {
-		let key = this._selectFileKey(...params);
-		return this._getFileWebByKey(key);
+		let key = this.selectFileKey(...params);
+		return this.getFileWebByKey(key);
 	}
 	
 	import(exportedData) {
@@ -248,24 +184,9 @@ class UserData {
 		// null or undefined (despite our test above to make sure it isn't...)
 		// let files = exportedData.files || {};
 		this.savedFiles = exportedData.files || {};
-		// Object.keys(files).forEach(key => {
-		// 	this.savedFiles[key] = {
-		// 		name: files[key].name,
-		// 		path: this._pathForKey(key, files[key]),
-		// 	};
-		// });
 	}
 	
 	export() {
-		// let filenames = {};
-		// Object.keys(this.savedFiles).forEach(key => {
-		// 	filenames[key] = {
-		// 		name: this.savedFiles[key].name,
-		// 		path:
-		// 	};
-		// });
-		//
-		// return { filenames };
 		return { files: this.savedFiles };
 	}
 }

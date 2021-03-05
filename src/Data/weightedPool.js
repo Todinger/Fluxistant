@@ -21,9 +21,6 @@ class WeightedPool extends FilePool {
 	
 	setWeight(key, weight) {
 		assert(
-			key in this.weights,
-			`Unknown data file key: ${key}`);
-		assert(
 			weight > 0,
 			`Weight must be a positive number (got ${weight}).`);
 		
@@ -37,18 +34,22 @@ class WeightedPool extends FilePool {
 	}
 	
 	
-	_getFileKey() {
-		return Utils.weightedRandomKey(this.savedFiles);
+	selectFileKey(weightAdjustmentFunction) {
+		return Utils.weightedRandomKey(
+			this.weights,
+			weightAdjustmentFunction);
 	}
 	
-	_addFile(key, file, callback) {
-		super._addFile(key, file, callback);
-		
+	_addFile(params) {
 		// Assign the default weight upon saving
-		this.weights[key] = 1;
+		return super._addFile(params)
+			.then(savedFile => {
+				this.weights[savedFile.fileKey] = 1;
+				return savedFile;
+			});
 	}
 	
-	_delete(key) {
+	_deleteFile(key) {
 		delete this.weights[key];
 		return super._deleteFile(key);
 	}
