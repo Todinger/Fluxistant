@@ -43,6 +43,19 @@
 		"sound": "/assets/sfx/burpreeny.mp3"
 	},
 	
+	"burp": {
+		"filters": [
+			{
+				"name": "isOneOf",
+				"argument": ["maxadrums", "yecatsmailbox"]
+			}
+		],
+		"image": {
+			"url": "/assets/image-display/Maxaburp.gif"
+		},
+		"sound": "/assets/sfx/burpreeny.mp3"
+	},
+	
 	"saywhat": {
 		"image": {
 			"url": "/assets/image-display/Mac.gif",
