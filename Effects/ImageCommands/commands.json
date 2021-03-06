@@ -51,9 +51,10 @@
 			}
 		],
 		"image": {
+			"duration": 3000,
 			"url": "/assets/image-display/Maxaburp.gif"
 		},
-		"sound": "/assets/sfx/burpreeny.mp3"
+		"sound": "/assets/sfx/burpreeny-max.mp3"
 	},
 	
 	"saywhat": {
