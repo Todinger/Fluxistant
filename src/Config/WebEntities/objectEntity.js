@@ -83,8 +83,8 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'Boolean', defaultValue);
 	}
 	
-	addDynamicArray(key, valueType, values) {
-		let array = this.add(key, 'DynamicArray', valueType);
+	addDynamicArray(key, valueType, values, ...itemConstructionOptions) {
+		let array = this.add(key, 'DynamicArray', valueType, ...itemConstructionOptions);
 		if (values) {
 			values.forEach(value => {
 				array.addElement(EntityFactory.build(valueType, value));
@@ -115,6 +115,10 @@ class ObjectEntity extends ConfigEntity {
 	
 	addSingleData(key, configData) {
 		return this.add(key, 'SingleData', configData);
+	}
+	
+	addMultiData(key, configData) {
+		return this.add(key, 'MultiData', configData);
 	}
 	
 	addKeyShortcuts(key) {

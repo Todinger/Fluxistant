@@ -121,6 +121,10 @@ class Configuration {
 		return this.configRoot.addSingleData(key, configData);
 	}
 	
+	addMultiData(key, configData) {
+		return this.configRoot.addMultiData(key, configData);
+	}
+	
 	addKeyShortcuts(key) {
 		return this.configRoot.addKeyShortcuts(key);
 	}

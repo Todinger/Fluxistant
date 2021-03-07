@@ -37,9 +37,8 @@ class RandomImage extends Module {
 	}
 	
 	defineModConfig(modConfig) {
-		modConfig.add(
+		modConfig.addMultiData(
 			'images',
-			'MultiData',
 			{
 				collection: 'Images',
 				dataType: 'IMAGE',

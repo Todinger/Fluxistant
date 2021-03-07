@@ -2,27 +2,88 @@
 
 const Module = requireMain('module');
 
+const DEFAULT_GROUP_KEY = '[Defaults]';
+
 class FShower extends Module {
 	constructor() {
 		super({
 			name: 'F Shower',
 			tags: ['imgdrop'], 
 		});
+		
+		this.userGroups = {};
 	}
 	
-	sendFile(fileURL) {
-		this.broadcastEvent('dropImage', { url: fileURL });
+	getGroup(username) {
+		if (username in this.userGroups) {
+			return {
+				key: username,
+				files: this.userGroups[username].files,
+			};
+		} else {
+			return {
+				key: DEFAULT_GROUP_KEY,
+				files: this.config.defaultImages.files,
+			};
+		}
 	}
 	
 	findAndSendFile(user) {
-		Module.Assets.getUserFShowerFile(
-			user.name,
-			(filename, fileURL) => this.sendFile(fileURL),
-			() => {
-				Module.Assets.getRandomFShowerImage(
-					(filename, fileURL) => this.sendFile(fileURL),
-					() => this.error('No FShower images found in cache'));
+		let group = this.getGroup(user.name);
+		this.data.Images.selectFile(group.key)
+			.then(file => {
+				let files = group.files;
+				let imageConf = files[file.fileKey];
+				let displayData = imageConf.makeDisplayData(file);
+				this.broadcastEvent('dropImage', displayData);
 			});
+		
+		
+		// Module.Assets.getUserFShowerFile(
+		// 	user.name,
+		// 	(filename, fileURL) => this.sendFile(fileURL),
+		// 	() => {
+		// 		Module.Assets.getRandomFShowerImage(
+		// 			(filename, fileURL) => this.sendFile(fileURL),
+		// 			() => this.error('No FShower images found in cache'));
+		// 	});
+	}
+	
+	defineModData(modData) {
+		modData.addUniformGroupsPool('Images');
+	}
+
+	defineModConfig(modConfig) {
+		modConfig.add(
+			'defaultImages',
+			'MultiData',
+			{
+				collection: 'Images',
+				dataType: 'IMAGE',
+				elementValueType: 'ImageFile',
+			})
+			.setName('Default Images')
+			.setDescription('An image will be randomly selected from here for users without their own collections');
+		
+		modConfig.addDynamicArray('userGroups', 'UserGroup')
+			.setName('User-Specific Collections')
+			.setDescription('Users in this list will have their image selected from their collection here');
+	}
+	
+	loadModConfig(conf) {
+		this.data.Images.clear();
+		this.userGroups = {};
+		
+		this.data.Images.addGroup(
+			DEFAULT_GROUP_KEY,
+			Object.keys(conf.defaultImages.files));
+		
+		conf.userGroups.forEach(userGroup => {
+			this.data.Images.addGroup(
+				userGroup.username,
+				Object.keys(userGroup.images.files));
+			this.userGroups[userGroup.username] = userGroup.images;
+		});
 	}
 	
 	commands = {

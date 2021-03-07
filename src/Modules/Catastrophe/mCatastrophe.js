@@ -99,11 +99,6 @@ class Catastrophe extends Module {
 				path.resolve(soundFile.path),
 				this.calculateFinalVolume(soundConf.volume));
 		}
-		// Module.Assets.getRandomLocalFile(
-		// 	this.sfxdir,
-		// 	file => sound.play(path.resolve(file), 0.3),
-		// 	() => this.error(`No sounds files found in "${this.sfxdir}".`)
-		// );
 	}
 	
 	defineModData(modData) {

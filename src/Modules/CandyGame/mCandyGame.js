@@ -202,6 +202,11 @@ class CandyGame extends Module {
 		
 		let fileKey = this.data.Images.selectFileKey(
 			(fileKey, weight) => this.getCandyWeight(fileKey, weight));
+		if (!fileKey) {
+			this.warn('No candy files found.');
+			return;
+		}
+		
 		let files = this.config.images.files || {}; // The "|| {}" is to shut the IDE up with its errors
 		let candy = Utils.clone(files[fileKey]);
 		Utils.applyDefaults(candy, this.candyDefaults);
@@ -253,42 +258,6 @@ class CandyGame extends Module {
 				
 				this.broadcastEvent('dropImage', displayData);
 			});
-		
-		
-		// let candyName = Utils.weightedRandomKey(
-		// 	this.candyData,
-		// 	candy => this.getCandyWeight(candy));
-		// let candy = this.candyData[candyName];
-		
-		// let candyName = Utils.weightedRandomKey(
-		// 	this.candyData,
-		// 	candy => this.getCandyWeight(candy));
-		// let candy = this.candyData[candyName];
-		// this.candyCount++;
-		//
-		// let reward = candy.reward;
-		// let userBonusRewarded = false;
-		// if (candy.userBonus) {
-		// 	if (candy.userBonus.username.toLowerCase() === user.name.toLowerCase()) {
-		// 		reward += candy.userBonus.amount;
-		// 		userBonusRewarded = true;
-		// 	}
-		// }
-		//
-		// this.modifyUserPoints(user, reward);
-		//
-		// let imageData = Utils.clone(candy.image);
-		//
-		// if (candy.winning || userBonusRewarded) {
-		// 	imageData.effect = 'glow';
-		// }
-		//
-		// if (candy.winning) {
-		// 	this.ongoing = false;
-		// 	this.announceWinner(user);
-		// }
-		//
-		// this.dropImage(imageData);
 	}
 	
 	preload() {

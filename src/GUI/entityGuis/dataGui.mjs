@@ -51,7 +51,7 @@ export default class DataGui extends EntityGui {
 	_makeUploadArea() {
 		let areaContainer = $('<div class="js-upload uk-placeholder uk-text-center uk-margin-remove"></div>');
 		let icon = $('<span uk-icon="icon: upload"></span>');
-		let text = $('<span class="uk-text-middle">Upload image by dropping it here or </span>');
+		let text = $(`<span class="uk-text-middle">Upload ${this.entity.getDataType().toLowerCase()} by dropping it here or </span>`);
 		
 		let uploadForm = $('<div uk-form-custom></div>');
 		let uploadInput = this._makeUploadInput();

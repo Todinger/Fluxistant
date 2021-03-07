@@ -7,6 +7,7 @@
     <file url="file://$PROJECT_DIR$/src/ClientsCommon/configEntities.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/arrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/booleanEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyFileEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyInflation_BaseEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyInflation_ExponentialEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/candyInflation_LinearEntity.js" />
@@ -42,6 +43,7 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/simpleObjectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/singleDataEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/soundEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/soundFileEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/staticObjectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/stringEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/userFilter_BaseEntity.js" />
@@ -51,6 +53,7 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/userFilter_IsSubEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/userFilter_IsUserEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/userFilterEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/UserGroupEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/valueEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/webEntitiesList.js" />
   </component>

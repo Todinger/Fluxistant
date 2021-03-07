@@ -76,6 +76,7 @@ class ChoiceEntity extends ConfigEntity {
 		Object.keys(descriptor.options).forEach(option => {
 			if (option in this.options) {
 				this.options[option].import(descriptor.options[option], lenient);
+				this.options[option].optionName = option;
 			} else if (!lenient) {
 				throw `Unknown option: ${option}`;
 			}

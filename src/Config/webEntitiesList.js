@@ -44,6 +44,7 @@ const entities = {
 	CandyInflation_ExponentialEntity: require('./WebEntities/candyInflation_ExponentialEntity.js'),
 	CandyInflation_LinearEntity: require('./WebEntities/candyInflation_LinearEntity.js'),
 	CandyInflation_NoneEntity: require('./WebEntities/candyInflation_NoneEntity.js'),
+	UserGroupEntity: require('./WebEntities/UserGroupEntity.js'),
 	ImageCommandEntity: require('./WebEntities/imageCommandEntity.js'),
 	ImageEntity: require('./WebEntities/imageEntity.js'),
 	ImageFileEntity: require('./WebEntities/imageFileEntity.js'),

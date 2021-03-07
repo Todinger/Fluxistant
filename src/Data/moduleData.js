@@ -10,6 +10,7 @@ const SingleFile = require('./singleFile');
 const UniformPool = require('./uniformPool');
 const WeightedPool = require('./weightedPool');
 const NamedCollection = require('./namedCollection');
+const UniformGroupsPool = require('./uniformGroupsPool');
 
 const DATA_EXTENSION = '.data.json';
 
@@ -57,6 +58,12 @@ class ModuleData {
 	addUniformPool(collectionID) {
 		this._verifyAbsence(collectionID);
 		this.add(collectionID, UniformPool);
+		return this;
+	}
+	
+	addUniformGroupsPool(collectionID) {
+		this._verifyAbsence(collectionID);
+		this.add(collectionID, UniformGroupsPool);
 		return this;
 	}
 	

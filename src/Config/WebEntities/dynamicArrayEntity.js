@@ -6,7 +6,7 @@ const EntityFactory = require('../entityFactory');
 class DynamicArrayEntity extends ArrayEntity {
 	static get TYPE()		{ return 'DynamicArray'; 										}
 	static get GUITYPE()	{ return 'DynamicArray'; 										}
-	static get BUILDER()	{ return elementType => new DynamicArrayEntity(elementType); 	}
+	static get BUILDER()	{ return (...params) => new DynamicArrayEntity(...params);		}
 	
 	constructor(elementType, ...itemConstructionOptions) {
 		super(elementType);
@@ -29,10 +29,23 @@ class DynamicArrayEntity extends ArrayEntity {
 		
 		// Override the contents of the array with those imported
 		this.clear();
+		this.itemConstructionOptions = descriptor.itemConstructionOptions;
 		descriptor.elements.forEach(entryDesc => {
 			let element = ConfigEntity.readEntity(entryDesc, lenient);
 			this.addElement(element);
 		});
+	}
+	
+	exportDesc() {
+		let descriptor = super.exportDesc();
+		descriptor.descriptor.itemConstructionOptions = this.itemConstructionOptions;
+		return descriptor;
+	}
+	
+	clone() {
+		let copy = super.clone();
+		copy.itemConstructionOptions = this.itemConstructionOptions;
+		return copy;
 	}
 	
 	_assignableFrom(type) {
