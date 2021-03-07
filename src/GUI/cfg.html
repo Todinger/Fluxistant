@@ -76,25 +76,38 @@
 		</div>
 		<hr>
 	</div>
-	<div class="uk-padding-small">
-		<div class="uk-child-width-1-2@s uk-padding-small" uk-grid>
-			<ul id="configViewSwitcher" class="uk-width-auto@m uk-tab-left uk-width-auto@m" uk-tab uk-switcher="connect: #configView">
-				<li class="uk-active"><a id="mainTabTitle" href="#">Main</a></li>
-				<li><a id="modulesTabTitle" href="#">Modules</a></li>
-			</ul>
-			<ul id="configView" class="uk-switcher switcher-container uk-width-expand@m">
-				<li id="main" class="uk-child-width-expand" uk-grid>
-				</li>
-				<li id="modules" class="uk-child-width-1-2 uk-padding-small" uk-grid>
-					<ul id="modules-tabs" class="uk-width-auto@m uk-tab-left uk-width-auto" uk-tab uk-switcher="connect: #moduleSelection">
-					</ul>
 
-					<ul id="modules-contents" class="uk-switcher switcher-container uk-width-expand@m">
+	<ul id="loadingSwitcher" uk-switcher hidden>
+		<li><a href="#"></a></li>
+		<li><a href="#"></a></li>
+	</ul>
+	<ul class="uk-switcher">
+		<li class="uk-width-large uk-flex uk-flex-center uk-flex-column uk-padding-remove uk-margin-auto uk-container-expand">
+			<h2 class="uk-flex uk-flex-center">Loading Configuration</h2>
+			<div class="uk-flex uk-flex-center uk-flex-column uk-padding-remove uk-margin-auto" uk-spinner="ratio: 3"></div>
+		</li>
+		<li>
+			<div class="uk-padding-small">
+				<div class="uk-child-width-1-2@s uk-padding-small" uk-grid>
+					<ul id="configViewSwitcher" class="uk-width-auto@m uk-tab-left uk-width-auto@m" uk-tab uk-switcher="connect: #configView">
+						<li class="uk-active"><a id="mainTabTitle" href="#">Main</a></li>
+						<li><a id="modulesTabTitle" href="#">Modules</a></li>
 					</ul>
-				</li>
-			</ul>
-		</div>
-	</div>
+					<ul id="configView" class="uk-switcher switcher-container uk-width-expand@m">
+						<li id="main" class="uk-child-width-expand" uk-grid>
+						</li>
+						<li id="modules" class="uk-child-width-1-2 uk-padding-small" uk-grid>
+							<ul id="modules-tabs" class="uk-width-auto@m uk-tab-left uk-width-auto" uk-tab uk-switcher="connect: #moduleSelection">
+							</ul>
+
+							<ul id="modules-contents" class="uk-switcher switcher-container uk-width-expand@m">
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</li>
+	</ul>
 </div>
 
 <!--</form>-->

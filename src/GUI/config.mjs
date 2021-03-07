@@ -21,6 +21,9 @@ class Configurator {
 		}
 		
 		this.error = false;
+		
+		this.loadingSwitcher = $('#loadingSwitcher');
+		this.loadingProgress = $('#loadingProgress');
 	}
 	
 	init() {
@@ -100,6 +103,8 @@ class Configurator {
 	}
 	
 	buildPage() {
+		UIkit.switcher(this.loadingSwitcher).show(0);
+		
 		let mainContainer = $('#main');
 		mainContainer.empty();
 		let mainGUI = GuiRegistry.buildGui(this.displayedConfig.main, 'main-contents', null, 'RawObject');
@@ -153,6 +158,9 @@ class Configurator {
 		}
 		
 		this.clearTabChangeIndicators();
+		setTimeout(
+			() => UIkit.switcher(this.loadingSwitcher).show(1),
+			100);
 	}
 	
 	copyConfigs(src, dest) {
@@ -166,9 +174,14 @@ class Configurator {
 	}
 	
 	buildPageFromActive() {
-		this.copyConfigs(this.activeConfigs, this.displayedConfig);
-		this.buildPage();
-		this.showMain();
+		UIkit.switcher(this.loadingSwitcher).show(0);
+		setTimeout(
+			() => {
+				this.copyConfigs(this.activeConfigs, this.displayedConfig);
+				this.buildPage();
+				this.showMain();
+			},
+			100);
 	}
 	
 	createFromData(exportedData, id) {
