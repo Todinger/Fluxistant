@@ -37,7 +37,7 @@ class ImageFileEntity extends DataFileEntity {
 	toConf() {
 		let conf = super.toConf();
 		conf.makeDisplayData = function(savedFile) {
-			return ImageFileEntity.makeDisplayData(conf, savedFile);
+			return ImageFileEntity.makeDisplayData(this, savedFile);
 		};
 		return conf;
 	}

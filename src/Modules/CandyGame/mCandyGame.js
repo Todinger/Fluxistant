@@ -138,13 +138,9 @@ class CandyGame extends Module {
 		this.candyDefaults = {
 			weight: defs.weight,
 			reward: defs.reward,
-			image: {
-				width: defs.imageWidth,
-				height: defs.imageHeight,
-			},
-			userBonus: {
-				amount: defs.userBonus,
-			},
+			width: defs.imageWidth,
+			height: defs.imageHeight,
+			userBonusAmount: defs.userBonusAmount,
 		};
 		
 		this.data.Images.setWeights(Utils.objectMap(
@@ -204,11 +200,11 @@ class CandyGame extends Module {
 			return;
 		}
 		
-		
 		let fileKey = this.data.Images.selectFileKey(
 			(fileKey, weight) => this.getCandyWeight(fileKey, weight));
 		let files = this.config.images.files || {}; // The "|| {}" is to shut the IDE up with its errors
-		let candy = files[fileKey];
+		let candy = Utils.clone(files[fileKey]);
+		Utils.applyDefaults(candy, this.candyDefaults);
 		this.candyCount++;
 		
 		let reward = candy.reward;
@@ -229,7 +225,11 @@ class CandyGame extends Module {
 			}
 		}
 		
-		this.modifyUserPoints(user, reward);
+		try {
+			this.modifyUserPoints(user, reward);
+		} catch (err) {
+			this.error(err);
+		}
 		
 		if (candy.winning) {
 			this.ongoing = false;

@@ -6,7 +6,7 @@ const cli = require('./cliManager');
 const { User, UserFilters } = require('./user');
 const ModuleManager = require('./moduleManager');
 const SEManager = require('./seManager');
-const DBLog = require('./Logger');
+// const DBLog = require('./Logger');
 const Utils = require('./utils');
 
 // All commands written by users need to start with this prefix, but when
@@ -378,11 +378,11 @@ class TwitchManager extends EventNotifier {
 				user.name,
 				handler.cost,
 				// Success
-				(oldAmount, newAmount) => {
+				() => {
 					// If the command is silent, no response is sent to the chat
 					// nor is an entry added to the database log
 					if (!handler.silent) {
-						DBLog.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
+						// DBLog.info(`${user.name} invoked ${command.cmdname} for ${handler.cost} - had ${oldAmount}, now has ${newAmount}.`);
 					}
 					
 					// Now that everything is finished, we can finally invoke
