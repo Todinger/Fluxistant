@@ -65,7 +65,7 @@ const INFLATIONS = {
 class CandyGame extends Module {
 	constructor() {
 		super({
-			name: 'CandyGame',
+			name: 'Candy Game',
 			tags: ['imgdrop', 'textdisp'], 
 		});
 		

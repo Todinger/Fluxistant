@@ -80,7 +80,7 @@ class Censor extends Module {
 	load() {
 		this.onClientAttached(socket => {
 			Object.values(this.censors).forEach(cd => {
-				socket.emit('addCensor', cd);
+				socket.emit('setCensor', cd);
 			});
 		});
 	}

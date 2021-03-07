@@ -9,8 +9,16 @@ class Censor extends ModuleClient {
 		this.censors = {};
 	}
 	
-	addCensor(id, image) {
-		console.assert(!(id in this.censors), `Censor '${id}' already exists.`);
+	setCensor(id, image) {
+		if (id in this.censors) {
+			this.censors[id]
+				.attr('src', image.url)
+				.css({
+					top: `${image.top}px`,
+					left: `${image.left}px`
+				});
+			return;
+		}
 		
 		let jImage = $(`<img class="cimage" src="${image.url}" alt="">`);
 		jImage.css({
@@ -55,7 +63,7 @@ class Censor extends ModuleClient {
 	}
 	
 	start() {
-		this.server.on('addCensor', censorData => this.addCensor(
+		this.server.on('setCensor', censorData => this.setCensor(
 			censorData.id,
 			censorData.image));
 		this.server.on('removeCensor', id => this.removeCensor(id));
