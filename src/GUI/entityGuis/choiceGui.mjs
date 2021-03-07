@@ -87,9 +87,9 @@ export default class ChoiceGui extends EntityGui {
 		return container;
 	}
 	
-	// Clear the indication that this value has been changed
-	clearChangedIndicators() {
-		Object.values(this.optionGUIs).forEach(gui => gui.clearChangedIndicators());
+	// Accept changes and remove change markers
+	finalizeChanges() {
+		Object.values(this.optionGUIs).forEach(gui => gui.finalizeChanges());
 	}
 }
 

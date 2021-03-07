@@ -103,10 +103,10 @@ export default class ObjectGui extends EntityGui {
 		EntityGui.addChangeIndicator(this.mainGui.guiData.header);
 	}
 	
-	// Clear the indication that this value has been changed
-	clearChangedIndicators() {
+	// Accept changes and remove change markers
+	finalizeChanges() {
 		Object.keys(this.childrenGUIs).forEach(key => {
-			this.childrenGUIs[key].clearChangedIndicators();
+			this.childrenGUIs[key].finalizeChanges();
 			EntityGui.clearChangeIndicator(this.childrenEntries[key].guiData.marker);
 			if (!this.childrenGUIs[key].isContainer) {
 				EntityGui.clearChangeIndicator(
@@ -115,6 +115,8 @@ export default class ObjectGui extends EntityGui {
 		});
 		
 		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);
+		
+		this.updateName();
 	}
 	
 	updateName() {

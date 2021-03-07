@@ -24,7 +24,7 @@ class UniformGroupsPool extends UniformPool {
 		_.assign(this.groups, groups);
 	}
 	
-	clear() {
+	clearGroups() {
 		this.groups = {};
 	}
 	

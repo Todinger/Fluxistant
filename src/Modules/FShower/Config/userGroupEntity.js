@@ -1,14 +1,11 @@
-const StaticObjectEntity = requireConfig('staticObjectEntity');
+const UserEntity = requireConfig('userEntity');
 
-class UserGroupEntity extends StaticObjectEntity {
+class UserGroupEntity extends UserEntity {
 	static get TYPE()		{ return 'UserGroup'; 					}
 	static get BUILDER()	{ return () => new UserGroupEntity(); 	}
 	
 	constructor() {
 		super();
-		this.addString('username')
-			.setName('Username')
-			.setDescription('Twitch username to set these images for');
 		this.addMultiData(
 			'images',
 			{
@@ -18,17 +15,6 @@ class UserGroupEntity extends StaticObjectEntity {
 			})
 			.setName('Images')
 			.setDescription('Collection of images to choose from for this user to drop down on command');
-	}
-	
-	getUsername() {
-		return this.getChild('username').getValue();
-	}
-	
-	getName() {
-		let name = super.getName();
-		if (!name || name === '') {
-			return this.getUsername();
-		}
 	}
 }
 

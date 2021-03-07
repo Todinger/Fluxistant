@@ -9,6 +9,7 @@ export default class LabeledContainerElement extends GuiElement {
 		
 		if (data.label && data.label !== '') {
 			let label = $(`<h4 class="uk-width-1-6"></h4>`);
+			$(document).ready(() => label.removeAttr("tabindex"));
 			label.append(data.label);
 			if (data.tooltip) {
 				label.attr('uk-tooltip', data.tooltip);

@@ -78,8 +78,8 @@ export default class EntityGui extends EventNotifier {
 	activateChangedIndicators() {
 	}
 	
-	// Clear the indication that this value has been changed
-	clearChangedIndicators() {
+	// Accept changes and remove change markers
+	finalizeChanges() {
 		this.changed = false;
 	}
 	

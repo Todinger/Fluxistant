@@ -74,17 +74,17 @@ class Configurator {
 		EntityGui.clearChangeIndicator(this.allModulesTabTitle);
 	}
 	
-	clearContentsChangeIndicators() {
-		this.guis.main.clearChangedIndicators();
+	finalizeContentChanges() {
+		this.guis.main.finalizeChanges();
 		Object.keys(this.guis.modules).forEach(modName => {
-			this.guis.modules[modName].clearChangedIndicators();
+			this.guis.modules[modName].finalizeChanges();
 			EntityGui.clearChangeIndicator(this.guis.tabTitles[modName]);
 		});
 	}
 	
-	clearChangeIndicators() {
+	finalizeChanges() {
 		this.clearTabChangeIndicators();
-		this.clearContentsChangeIndicators();
+		this.finalizeContentChanges();
 	}
 	
 	showMain() {
@@ -222,7 +222,7 @@ class Configurator {
 	
 	configsSaved() {
 		this.copyConfigs(this.displayedConfig, this.activeConfigs);
-		this.clearChangeIndicators();
+		this.finalizeChanges();
 		UIkit.notification({
 			message: '<span uk-icon=\'icon: check\'></span> Configuration saved',
 			status: 'success',

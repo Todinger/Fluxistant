@@ -53,7 +53,7 @@ export default class MultiDataGui extends DataGui {
 	
 	_clearItemStatusIndicators(fileKey) {
 		let guiComponents = this.fileGuiComponents[fileKey];
-		guiComponents.entityGui.clearChangedIndicators();
+		guiComponents.entityGui.finalizeChanges();
 		EntityGui.clearChangeIndicator(guiComponents.nameTag);
 		this._updateItemStatusIndicatorsFor(guiComponents.card, false, false);
 	}
@@ -143,7 +143,7 @@ export default class MultiDataGui extends DataGui {
 	}
 	
 	_addFileDisplay(file, addToConfig) {
-		if (file.fileKey in this.fileGuiComponents) {
+		if (file.fileKey && file.fileKey in this.fileGuiComponents) {
 			showError(`Duplicate file key: ${file.fileKey}`);
 			return;
 		}
@@ -179,7 +179,8 @@ export default class MultiDataGui extends DataGui {
 		});
 	}
 	
-	clearChangedIndicators() {
+	// Accept changes and remove change markers
+	finalizeChanges() {
 		Object.keys(this.fileGuiComponents).forEach(fileKey => {
 			this._clearItemStatusIndicators(fileKey);
 		});

@@ -134,11 +134,11 @@ export default class DynamicArrayGui extends EntityGui {
 		return this.mainGui;
 	}
 	
-	// Clear the indication that this value has been changed
-	clearChangedIndicators() {
+	// Accept changes and remove change markers
+	finalizeChanges() {
 		for (let i = 0; i < this.entity.length; i++) {
 			EntityGui.clearChangeIndicator(this.elementRows[i].guiData.marker);
-			this.elementGUIs[i].clearChangedIndicators();
+			this.elementGUIs[i].finalizeChanges();
 		}
 		
 		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);

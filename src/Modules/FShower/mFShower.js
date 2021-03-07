@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert').strict;
 const Module = requireMain('module');
 
 const DEFAULT_GROUP_KEY = '[Defaults]';
@@ -37,16 +38,6 @@ class FShower extends Module {
 				let displayData = imageConf.makeDisplayData(file);
 				this.broadcastEvent('dropImage', displayData);
 			});
-		
-		
-		// Module.Assets.getUserFShowerFile(
-		// 	user.name,
-		// 	(filename, fileURL) => this.sendFile(fileURL),
-		// 	() => {
-		// 		Module.Assets.getRandomFShowerImage(
-		// 			(filename, fileURL) => this.sendFile(fileURL),
-		// 			() => this.error('No FShower images found in cache'));
-		// 	});
 	}
 	
 	defineModData(modData) {
@@ -71,7 +62,7 @@ class FShower extends Module {
 	}
 	
 	loadModConfig(conf) {
-		this.data.Images.clear();
+		this.data.Images.clearGroups();
 		this.userGroups = {};
 		
 		this.data.Images.addGroup(
@@ -79,10 +70,16 @@ class FShower extends Module {
 			Object.keys(conf.defaultImages.files));
 		
 		conf.userGroups.forEach(userGroup => {
-			this.data.Images.addGroup(
-				userGroup.username,
-				Object.keys(userGroup.images.files));
-			this.userGroups[userGroup.username] = userGroup.images;
+			if (userGroup.username && userGroup.username !== '') {
+				assert(
+					!(userGroup.username in this.userGroups),
+					`F Shower: Duplicate entry for user "${userGroup.username}"`);
+				
+				this.data.Images.addGroup(
+					userGroup.username,
+					Object.keys(userGroup.images.files));
+				this.userGroups[userGroup.username] = userGroup.images;
+			}
 		});
 	}
 	

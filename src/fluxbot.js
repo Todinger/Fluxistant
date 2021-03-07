@@ -175,16 +175,26 @@ class FluxBot {
 					fileKey
 				});
 				
+				let contentType = null;
 				let filesToSend = files.map(file => {
-					return {
-						name: file.name,
-						data: file.data,
-						fileKey: file.fileKey,
-					};
+					if (file.success) {
+						contentType = file.contentType;
+						return {
+							success: true,
+							name: file.name,
+							data: file.data,
+							fileKey: file.fileKey,
+						};
+					} else {
+						return {
+							success: false,
+							fileKey: file.fileKey,
+						}
+					}
 				});
 				
-				if (files.length > 0) {
-					res.set('Content-Type', files[0].contentType);
+				if (contentType) {
+					res.set('Content-Type', contentType);
 				}
 				
 				let sentObject = { files: filesToSend };
@@ -292,7 +302,7 @@ class FluxBot {
 				socket.emit('loadConfig', data);
 			});
 			
-			socket.on('saveConfig', config => {
+			socket.on('saveConfig', async config => {
 				this.cli.log('Received configuration for saving.');
 				try {
 					this.configManager.validateAll(config);
@@ -307,19 +317,15 @@ class FluxBot {
 					return;
 				}
 				
-				this.configManager.importAll(config);
-				this.configManager.saveAll();
-				this.dataManager.commitChanges()
-					.then(() => {
-						socket.emit('configSaved');
-					})
-					.catch(err => {
-						socket.emit(
-							'configSaveError',
-							{
-								message: `${err}`,
-							});
-					});
+				try {
+					this.configManager.importAll(config);
+					this.configManager.saveAll();
+					await this.dataManager.commitChanges();
+					socket.emit('configSaved');
+				} catch (err) {
+					let message = err && err.message ? err.message : `${err}`;
+					socket.emit('configSaveError', { message });
+				}
 			});
 		});
 	}

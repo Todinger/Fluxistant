@@ -105,8 +105,8 @@ export default class KeyGui extends EntityGui {
 		EntityGui.addChangeIndicator(this.keyLabel);
 	}
 	
-	// Clear the indication that this value has been changed
-	clearChangedIndicators() {
+	// Accept changes and remove change markers
+	finalizeChanges() {
 		EntityGui.clearChangeIndicator(this.keyLabel);
 	}
 	

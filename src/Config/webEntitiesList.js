@@ -30,6 +30,7 @@ const entities = {
 	SoundFileEntity: require('./WebEntities/soundFileEntity.js'),
 	StaticObjectEntity: require('./WebEntities/staticObjectEntity.js'),
 	StringEntity: require('./WebEntities/stringEntity.js'),
+	UserEntity: require('./WebEntities/userEntity.js'),
 	UserFilterEntity: require('./WebEntities/userFilterEntity.js'),
 	UserFilter_BaseEntity: require('./WebEntities/userFilter_BaseEntity.js'),
 	UserFilter_IsAtLeastModEntity: require('./WebEntities/userFilter_IsAtLeastModEntity.js'),
@@ -44,11 +45,12 @@ const entities = {
 	CandyInflation_ExponentialEntity: require('./WebEntities/candyInflation_ExponentialEntity.js'),
 	CandyInflation_LinearEntity: require('./WebEntities/candyInflation_LinearEntity.js'),
 	CandyInflation_NoneEntity: require('./WebEntities/candyInflation_NoneEntity.js'),
-	UserGroupEntity: require('./WebEntities/UserGroupEntity.js'),
+	UserGroupEntity: require('./WebEntities/userGroupEntity.js'),
 	ImageCommandEntity: require('./WebEntities/imageCommandEntity.js'),
 	ImageEntity: require('./WebEntities/imageEntity.js'),
 	ImageFileEntity: require('./WebEntities/imageFileEntity.js'),
 	SoundEntity: require('./WebEntities/soundEntity.js'),
+	WelcomeEntity: require('./WebEntities/welcomeEntity.js'),
 };
 
 const factory = require('./entityFactory');

@@ -29,8 +29,8 @@ export default class ValueGui extends EntityGui {
 		EntityGui.addChangeIndicator(this.jInput);
 	}
 	
-	// Clear the indication that this value has been changed
-	clearChangedIndicators() {
+	// Accept changes and remove change markers
+	finalizeChanges() {
 		EntityGui.clearChangeIndicator(this.jInput);
 	}
 }

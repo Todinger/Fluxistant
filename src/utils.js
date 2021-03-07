@@ -361,6 +361,20 @@ class Utils {
 		return result;
 	}
 	
+	static isNonEmptyString(obj) {
+		return (typeof obj == 'string') && (obj.length > 0);
+	}
+	
+	static firstNonEmptyString(...strings) {
+		for (const str of strings) {
+			if (Utils.firstNonEmptyString(str)) {
+				return str;
+			}
+		}
+		
+		return null;
+	}
+	
 	static ensureDirExists(path) {
 		try {
 			fs.mkdirSync(path);

@@ -143,9 +143,16 @@ class UserData {
 				let b64Data = Base64.encode(data);
 				let contentType = mime.contentType(filename);
 				return {
+					success: true,
 					name: filename,
 					contentType: contentType,
 					data: `data:${contentType}; base64,${b64Data}`,
+				};
+			})
+			.catch(err => {
+				return {
+					success: false,
+					err: (err & err.message) || `${err}`,
 				};
 			});
 	}

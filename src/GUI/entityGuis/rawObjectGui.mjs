@@ -37,10 +37,10 @@ export default class RawObjectGui extends ObjectGui {
 		// We have no main GUI ourselves, so we do nothing here
 	}
 	
-	// Clear the indication that this value has been changed
-	clearChangedIndicators() {
+	// Accept changes and remove change markers
+	finalizeChanges() {
 		Object.keys(this.childrenGUIs).forEach(key => {
-			this.childrenGUIs[key].clearChangedIndicators();
+			this.childrenGUIs[key].finalizeChanges();
 			if (!this.childrenGUIs[key].isContainer) {
 				EntityGui.clearChangeIndicator(
 					this.childrenEntries[key].guiData.label);

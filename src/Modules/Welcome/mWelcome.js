@@ -1,9 +1,8 @@
 'use strict';
 
+const assert = require('assert').strict;
 const Module = requireMain('module');
 const Utils = requireMain('utils');
-
-const WELCOME_DATA_FILENAME = 'welcomes.json';
 
 class WelcomeImage extends Module {
 	constructor() {
@@ -20,23 +19,58 @@ class WelcomeImage extends Module {
 		if (user.name in this.welcomeData) {
 			let userWelcome = this.welcomeData[user.name];
 			if (!(user.name in this.lastMessageTimes)) {
-				let image = undefined;
-				if (userWelcome.images) {
-					image = Utils.randomValue(userWelcome.images);
+				let imagePromise;
+				if (Object.keys(userWelcome.images).length > 0) {
+					imagePromise = this.data.Images.selectFile(user.name);
+				} else {
+					imagePromise = Promise.resolve();
 				}
 				
-				let sound = userWelcome.sound;
-				
-				if (image || sound) {
-					this.broadcastEvent('showImage', {
-						image: image,
-						sound: sound,
-					});
+				let soundPromise;
+				if (Object.keys(userWelcome.sounds).length > 0) {
+					soundPromise = this.data.Sounds.selectFile(user.name);
+				} else {
+					soundPromise = Promise.resolve();
 				}
 				
-				if (userWelcome.messages && userWelcome.messages.length > 0) {
-					this.say(Utils.randomValue(userWelcome.messages));
-				}
+				Promise.all([imagePromise, soundPromise])
+					.then(([image, sound]) => {
+						let displayData = {};
+						
+						if (image) {
+							let images = userWelcome.images || {}; // The || {} is to shut the IDE up
+							let imageConf = images[image.fileKey];
+							displayData.image = imageConf.makeDisplayData(image);
+						}
+						
+						if (sound) {
+							let sounds = userWelcome.sounds || {}; // The || {} is to shut the IDE up
+							let soundConf = sounds[sound.fileKey];
+							displayData.sound = soundConf.makeDisplayData(sound);
+						}
+						
+						if (image || sound) {
+							this.broadcastEvent('showImage', displayData);
+						}
+						
+						if (userWelcome.messages && userWelcome.messages.length > 0) {
+							this.say(Utils.randomValue(userWelcome.messages));
+						}
+					})
+				
+				// let image = undefined;
+				// if (userWelcome.images) {
+				// 	image = Utils.randomValue(userWelcome.images);
+				// }
+				//
+				// let sound = userWelcome.sound;
+				//
+				// if (image || sound) {
+				// 	this.broadcastEvent('showImage', {
+				// 		image: image,
+				// 		sound: sound,
+				// 	});
+				// }
 				
 				// Consider putting this outside this if statement if we want to
 				// add a mechanism later for showing welcome messages after a
@@ -44,16 +78,88 @@ class WelcomeImage extends Module {
 				this.lastMessageTimes[user.name] = Utils.now();
 			}
 		}
+		
+		// if (user.name in this.welcomeData) {
+		// 	let userWelcome = this.welcomeData[user.name];
+		// 	if (!(user.name in this.lastMessageTimes)) {
+		// 		let image = undefined;
+		// 		if (userWelcome.images) {
+		// 			image = Utils.randomValue(userWelcome.images);
+		// 		}
+		//
+		// 		let sound = userWelcome.sound;
+		//
+		// 		if (image || sound) {
+		// 			this.broadcastEvent('showImage', {
+		// 				image: image,
+		// 				sound: sound,
+		// 			});
+		// 		}
+		//
+		// 		if (userWelcome.messages && userWelcome.messages.length > 0) {
+		// 			this.say(Utils.randomValue(userWelcome.messages));
+		// 		}
+		//
+		// 		// Consider putting this outside this if statement if we want to
+		// 		// add a mechanism later for showing welcome messages after a
+		// 		// period of inactivity
+		// 		this.lastMessageTimes[user.name] = Utils.now();
+		// 	}
+		// }
 	}
 	
-	loadData() {
-		try {
-			this.welcomeData = this.readJSON(WELCOME_DATA_FILENAME);
-			this.log('Loaded welcome data.');
-		} catch (err) {
-			this.error('Failed to read welcome data:');
-			this.error(err);
-		}
+	// loadData() {
+	// 	try {
+	// 		this.welcomeData = this.readJSON(WELCOME_DATA_FILENAME);
+	// 		this.log('Loaded welcome data.');
+	// 	} catch (err) {
+	// 		this.error('Failed to read welcome data:');
+	// 		this.error(err);
+	// 	}
+	// }
+	
+	defineModData(modData) {
+		modData.addUniformGroupsPool('Images');
+		modData.addUniformGroupsPool('Sounds');
+	}
+	
+	defineModConfig(modConfig) {
+		modConfig.addDynamicArray('entries', 'Welcome')
+			.setName('User Entries')
+			.setDescription('A list of all welcome data for users');
+	}
+	
+	loadModConfig(conf) {
+		this.welcomeData = {};
+		this.data.Images.clearGroups();
+		this.data.Sounds.clearGroups();
+		conf.entries.forEach(entry => {
+			if (entry.username && entry.username !== '') {
+				let username = entry.username.toLowerCase();
+				assert(
+					!(username in this.welcomeData),
+					`Welcome: Duplicate entry for user "${entry.username}"`);
+				
+				this.welcomeData[username] = {
+					username: username,
+					messages: entry.messages,
+					images: entry.images.files,
+					sounds: entry.sounds.files,
+				};
+				
+				if (Object.keys(entry.images.files).length > 0) {
+					this.data.Images.addGroup(
+						username,
+						Object.keys(entry.images.files));
+				}
+				
+				if (Object.keys(entry.sounds.files).length > 0) {
+					this.data.Sounds.addGroup(
+						username,
+						Object.keys(entry.sounds.files));
+				}
+			}
+		});
 	}
 	
 	load() {
