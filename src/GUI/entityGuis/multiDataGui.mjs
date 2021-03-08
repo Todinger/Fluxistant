@@ -183,6 +183,8 @@ export default class MultiDataGui extends DataGui {
 			file.name,
 			newEntity);
 		
+		this._itemChanged(file.fileKey);
+		
 		this.fileGuiComponents[file.fileKey].main = item;
 		this.fileGrid.append(item);
 	}

@@ -134,6 +134,10 @@ export default class DynamicArrayGui extends EntityGui {
 		return this.mainGui;
 	}
 	
+	activateChangedIndicators() {
+		EntityGui.addChangeIndicator(this.mainGui.guiData.header);
+	}
+	
 	// Accept changes and remove change markers
 	finalizeChanges() {
 		for (let i = 0; i < this.entity.length; i++) {

@@ -19329,6 +19329,7 @@ class ConfigEntity {
 		copy.setDescription(this.getDescription());
 		copy.hidden = this.hidden;
 		copy.id = this.id;
+		copy.displayName = this.displayName;
 		return copy;
 	}
 	
