@@ -45,17 +45,6 @@ class ArrayEntity extends ConfigEntity {
 		
 		value.setDisplayName(`#${this.length}`);
 		
-		// let index = this.length;
-		// let originalGetName = value.getName;
-		// value.getName = () => {
-		// 	let name = originalGetName.apply(value, []);
-		// 	if (name && name !== '') {
-		// 		return name;
-		// 	} else {
-		// 		return `#${index}`;
-		// 	}
-		// };
-		
 		return value;
 	}
 	

@@ -49,6 +49,14 @@ class WeightedPool extends FilePool {
 			});
 	}
 	
+	_unAddFile(fileKey) {
+		if (fileKey in this.weights) {
+			delete this.weights[fileKey];
+		}
+		
+		return super._unAddFile(fileKey);
+	}
+	
 	_deleteFile(key) {
 		delete this.weights[key];
 		return super._deleteFile(key);

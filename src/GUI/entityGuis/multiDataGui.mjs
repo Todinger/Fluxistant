@@ -16,8 +16,17 @@ export default class MultiDataGui extends DataGui {
 	
 	_deleteFile(fileKey, notifyChange) {
 		super._deleteFile(fileKey, notifyChange);
+		this.entity.removeFile(fileKey);
 		this.fileGuiComponents[fileKey].main.remove();
 		delete this.fileGuiComponents[fileKey];
+	}
+	
+	_deleteAllFiles() {
+		Object.keys(this.fileGuiComponents).forEach(fileKey => {
+			this._deleteFile(fileKey, false);
+		});
+		
+		this._changed();
 	}
 	
 	_loadFilesFromServer() {
@@ -35,11 +44,20 @@ export default class MultiDataGui extends DataGui {
 	}
 	
 	_makeContents() {
-		this.fileGrid = $(`<div class="uk-margin-small-top uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .uk-card; delay: 80"></div>`);
+		let container = $('<div style="position: relative"></div>');
 		let uploadArea = this._makeUploadArea();
+		container.append(uploadArea);
+		
+		let span = $(`<span style="position: absolute; left: 95%; top: 10px"></span>`);
+		let deleteAllButton = $(`<a href="#" uk-icon="trash" uk-tooltip="Delete all files"></a>`);
+		span.append(deleteAllButton);
+		container.append(span);
+		deleteAllButton.click(() => this._deleteAllFiles());
+		
+		this.fileGrid = $(`<div class="uk-margin-small-top uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .uk-card; delay: 80"></div>`);
 		uploadArea.append(this.fileGrid);
 		
-		return uploadArea;
+		return container;
 	}
 	
 	_makeCardCloseButton(itemKey) {
@@ -220,25 +238,5 @@ export default class MultiDataGui extends DataGui {
 		jElement.removeClass('status-error');
 	}
 }
-
-/*
-<div id="multi-preview" class="uk-grid-match uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-text-center" uk-grid uk-scrollspy="cls: uk-animation-scale-up; target: .list-item; delay: 80">
-	<!-- 3 (THIS ONE!) --><div>
-		<a class="uk-card uk-card-secondary uk-card-hover uk-visible-toggle uk-transition-toggle" tabindex="0" href="#my-modal" uk-toggle>
-			<img src="https://i.stack.imgur.com/1yMhJ.png?s=32" alt="Nope" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
-			<span class="uk-position-absolute uk-transform-center uk-light uk-invisible-hover" style="left: 90%; top: 5%">
-				<button id="axbtn" class="" type="button" uk-close></button>
-			</span>
-			<span class="uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">Bloop</span>
-		</a>
-		<!-- Modal --> <div id="my-modal" class="" uk-modal>
-			<div class="uk-modal-dialog uk-modal-body uk-light uk-background-secondary">
-				<button class="uk-modal-close-default" type="button" uk-close></button>
-				<div>Contents here!</div>
-			</div>
-		</div>
-	</div>
-</div>
-*/
 
 GuiRegistry.register(MultiDataGui);

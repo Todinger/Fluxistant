@@ -43,6 +43,17 @@ class MultiDataEntity extends DataEntity {
 		return newFile;
 	}
 	
+	removeFile(fileKey) {
+		let filesArray = this.getChild('files');
+		let files = filesArray.getElements();
+		for (let i = 0; i < files.length; i++) {
+			if (files[i].getFileKey() === fileKey) {
+				filesArray.removeElementAt(i);
+				return;
+			}
+		}
+	}
+	
 	isEmpty() {
 		return this.getFiles().length === 0;
 	}

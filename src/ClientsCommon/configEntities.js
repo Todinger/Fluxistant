@@ -18621,17 +18621,6 @@ class ArrayEntity extends ConfigEntity {
 		
 		value.setDisplayName(`#${this.length}`);
 		
-		// let index = this.length;
-		// let originalGetName = value.getName;
-		// value.getName = () => {
-		// 	let name = originalGetName.apply(value, []);
-		// 	if (name && name !== '') {
-		// 		return name;
-		// 	} else {
-		// 		return `#${index}`;
-		// 	}
-		// };
-		
 		return value;
 	}
 	
@@ -19538,7 +19527,8 @@ class DynamicArrayEntity extends ArrayEntity {
 	}
 	
 	createAndAddElement() {
-		let newElement = EntityFactory.build(this.elementType, ...this.itemConstructionOptions);
+		let constructionOptions = this.itemConstructionOptions || [];
+		let newElement = EntityFactory.build(this.elementType, ...constructionOptions);
 		this.addElement(newElement);
 		return newElement;
 	}
@@ -20080,6 +20070,17 @@ class MultiDataEntity extends DataEntity {
 		let newFile = this.getFiles().createAndAddElement();
 		newFile.setFileKey(fileKey);
 		return newFile;
+	}
+	
+	removeFile(fileKey) {
+		let filesArray = this.getChild('files');
+		let files = filesArray.getElements();
+		for (let i = 0; i < files.length; i++) {
+			if (files[i].getFileKey() === fileKey) {
+				filesArray.removeElementAt(i);
+				return;
+			}
+		}
 	}
 	
 	isEmpty() {

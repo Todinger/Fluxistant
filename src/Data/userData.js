@@ -66,6 +66,10 @@ class UserData {
 			.then(() => {
 				delete this.savedFiles[key];
 				return key;
+			})
+			.catch(err => {
+				delete this.savedFiles[key];
+				console.warn(`Failed to delete file: ${err.message}`);
 			});
 	}
 	

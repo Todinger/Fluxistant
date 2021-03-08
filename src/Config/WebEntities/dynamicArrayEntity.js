@@ -16,7 +16,8 @@ class DynamicArrayEntity extends ArrayEntity {
 	}
 	
 	createAndAddElement() {
-		let newElement = EntityFactory.build(this.elementType, ...this.itemConstructionOptions);
+		let constructionOptions = this.itemConstructionOptions || [];
+		let newElement = EntityFactory.build(this.elementType, ...constructionOptions);
 		this.addElement(newElement);
 		return newElement;
 	}
