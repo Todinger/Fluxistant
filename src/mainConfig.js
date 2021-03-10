@@ -11,7 +11,7 @@ class MainConfig extends Configuration {
 		// this.addString('streamerName')
 		// 	.setName('Streamer Name')
 		// 	.setDescription('How the bot addresses you in the chat when it does (for whatever reason...)');
-		this.addNaturalNumber('configBackupLimit')
+		this.addNaturalNumber('configBackupLimit', 100)
 			.setName('# of Config Backups')
 			.setDescription('How many previous good configurations should be saved as backup.');
 		
@@ -44,18 +44,18 @@ class MainConfig extends Configuration {
 			.setName('Points Name: Singular')
 			.setDescription('The name of the loyalty points you defined on StreamElements in singular form (e.g. "pixel")');
 		
-		let logs = this.addGroup('logs')
-			.setName('Logs')
-			.setDescription('Settings for information logging by the bot');
-		logs.addInteger('logLevelFile', 0)
-			.setName('File Log Level')
-			.setDescription('Minimum level required for a logged message to be written to the log file');
-		logs.addInteger('logLevelConsole', 0)
-			.setName('Console Log Level')
-			.setDescription('Minimum level required for a logged message to be written to the console');
-		logs.addNaturalNumber('maximumLogFieSize')
-			.setName('Max File Size')
-			.setDescription('Maximum size (in bytes) that a log file can grow to before another one is opened');
+		// let logs = this.addGroup('logs')
+		// 	.setName('Logs')
+		// 	.setDescription('Settings for information logging by the bot');
+		// logs.addInteger('logLevelFile', 0)
+		// 	.setName('File Log Level')
+		// 	.setDescription('Minimum level required for a logged message to be written to the log file');
+		// logs.addInteger('logLevelConsole', 0)
+		// 	.setName('Console Log Level')
+		// 	.setDescription('Minimum level required for a logged message to be written to the console');
+		// logs.addNaturalNumber('maximumLogFieSize')
+		// 	.setName('Max File Size')
+		// 	.setDescription('Maximum size (in bytes) that a log file can grow to before another one is opened');
 	}
 	
 	getValue(key) {
@@ -82,9 +82,9 @@ class MainConfig extends Configuration {
 		return this.getGroupValues('streamElements');
 	}
 	
-	getLoggerParams() {
-		return this.getGroupValues('logs');
-	}
+	// getLoggerParams() {
+	// 	return this.getGroupValues('logs');
+	// }
 }
 
 module.exports = new MainConfig();

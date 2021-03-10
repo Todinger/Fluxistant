@@ -350,7 +350,12 @@ class FluxBot {
 	handleMainConfigChange() {
 		this.twitchManager.connect(this.mainConfig.getTwitchParams());
 		this.seManager.connect(this.mainConfig.getStreamElementsParams());
-		this.logger.init(this.mainConfig.getLoggerParams());
+		// this.logger.init(this.mainConfig.getLoggerParams());
+		this.configManager.createNewBackup();
+	}
+	
+	deleteOldBackups() {
+		this.configManager.deleteOldBackups();
 	}
 	
 	setupAllAndStart() {
@@ -371,6 +376,7 @@ class FluxBot {
 		this.saveData();
 		this.saveConfig();
 		this.registerServerEvents();
+		this.deleteOldBackups();
 		this.startServer();
 	}
 	

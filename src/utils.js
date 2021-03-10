@@ -11,6 +11,23 @@ class Utils {
 		return new Date().getTime();
 	}
 	
+	static formatDate(date, format) {
+		let z = {
+			M: date.getMonth() + 1,
+			D: date.getDate(),
+			H: date.getHours(),
+			m: date.getMinutes(),
+			s: date.getSeconds()
+		};
+		format = format.replace(/(M+|D+|H+|m+|s+)/g, function(v) {
+			return ((v.length > 1 ? "0" : "") + z[v.slice(-1)]).slice(-2)
+		});
+		
+		return format.replace(/(Y+)/g, function(v) {
+			return date.getFullYear().toString().slice(-v.length)
+		});
+	}
+	
 	// Gets a list of all the keys that are in obj1 and not in obj2.
 	static getSubKeys(obj1, obj2) {
 		var k1 = Object.keys(obj1);
