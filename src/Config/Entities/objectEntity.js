@@ -63,6 +63,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'String', defaultValue);
 	}
 	
+	addHiddenString(key, defaultValue) {
+		return this.add(key, 'HiddenString', defaultValue);
+	}
+	
 	addNumber(key, defaultValue) {
 		return this.add(key, 'Number', defaultValue);
 	}

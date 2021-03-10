@@ -20,7 +20,7 @@ const GUI_DIR_WEB = '/gui/';
 
 // TODO: Remove
 // Bot configuration - that is where you make it work with your bot and channel
-const Config = require('./botConfig.json');
+// const Config = require('./botConfig.json');
 
 // Globals object, used to work around circular dependencies
 const Globals = require('./globals');
@@ -127,13 +127,15 @@ class FluxBot {
 	setupTwitch() {
 		this.twitchManager = require('./twitchManager');
 		// TODO: Switch to new configuration system
-		this.twitchManager.init(Config.channel, Config.username, Config.oAuth);
+		this.twitchManager.init();
+		
+		this.twitchManager.connect(this.mainConfig.getTwitchParams());
 	}
 	
 	// Set up StreamElements integration
 	setupStreamElements() {
 		this.seManager = require('./seManager');
-		this.seManager.init();
+		this.seManager.connect(this.mainConfig.getStreamElementsParams());
 	}
 	
 	// Save the current data for the modules - this is to create default data files
@@ -321,6 +323,10 @@ class FluxBot {
 					this.configManager.importAll(config);
 					this.configManager.saveAll();
 					await this.dataManager.commitChanges();
+					
+					this.twitchManager.connect(this.mainConfig.getTwitchParams());
+					this.seManager.connect(this.mainConfig.getStreamElementsParams());
+					
 					socket.emit('configSaved');
 				} catch (err) {
 					let message = err && err.message ? err.message : `${err}`;

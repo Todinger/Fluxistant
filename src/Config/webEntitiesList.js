@@ -12,6 +12,7 @@ const entities = {
 	DynamicDataArrayEntity: require('./WebEntities/dynamicDataArrayEntity.js'),
 	DynamicObjectEntity: require('./WebEntities/dynamicObjectEntity.js'),
 	FixedArrayEntity: require('./WebEntities/fixedArrayEntity.js'),
+	HiddenStringEntity: require('./WebEntities/hiddenStringEntity.js'),
 	ImageEffectEntity: require('./WebEntities/imageEffectEntity.js'),
 	ImageEffect_DunDunDunEntity: require('./WebEntities/imageEffect_DunDunDunEntity.js'),
 	ImageEffect_GlowEntity: require('./WebEntities/imageEffect_GlowEntity.js'),

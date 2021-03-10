@@ -77,17 +77,65 @@ class TwitchManager extends EventNotifier {
 		// Set this to true if you want to see the custom reward IDs of all the
 		// rewards that have text messages that are redeemed in the channel
 		this.printRewardIDs = false;
+		
+		// Connection information - we use this to know where we're connected to
+		// when a new connection request comes in, so we know whether we need to
+		// reconnect or not
+		this.channelParams = null;
+	}
+	
+	// Performs general initialization
+	init() {
+		// Start a recurring cleanup process to get rid of old cooldown data
+		setInterval(() => this._cleanupCooldowns(), COOLDOWN_CLEANUP_INTERVAL);
+		
+		this._registerToCliEvents();
+		this._registerToSEEvents();
+	}
+	
+	// Gets the name of the channel we're connected to
+	get channel() {
+		return this.params.channel;
+	}
+	
+	_validParams(params) {
+		return params && params.channel && params.botname && params.oAuth;
+	}
+	
+	_paramsAreTheSame(params) {
+		return this.params.channel.toLowerCase() === params.channel.toLowerCase() &&
+			this.params.botname.toLowerCase() === params.botname.toLowerCase() &&
+			this.params.oAuth === params.oAuth;
 	}
 	
 	// Starts... everything.
 	// Connects to Twitch through tmi.js and starts listening for events.
-	// 
-	// Parameters:
+	// If it's already connected, this will disconnect from the current
+	// server and connect to the new one given.
+	//
+	// Parameters in params:
 	// 	channel		The name of the channel you want to work with.
 	// 	botname		The name of this bot on your channel.
-	// 	oauth		OAuth token for the bot account
-	init(channel, botname, oauth) {
-		this.channel = channel;
+	// 	oAuth		OAuth token for the bot account
+	connect(params) {
+		if (!this._validParams(params)) {
+			this.disconnect();
+			return;
+		} else if (this.params && this._paramsAreTheSame(params)) {
+			// If we're already connected to the requested channel, do nothing
+			return;
+		}
+		
+		// Disconnect if necessary
+		if (this.client) {
+			this.client.disconnect();
+		}
+		
+		this.params = {
+			channel: params.channel.toLowerCase(),
+			botname: params.botname.toLowerCase(),
+			oAuth: params.oAuth,
+		};
 		
 		this.client = new tmi.Client({
 			// Turn on if you want to see channel messages and debug info
@@ -97,20 +145,37 @@ class TwitchManager extends EventNotifier {
 				secure: true,
 			},
 			identity: {
-				username: botname,
-				password: oauth,
+				username: this.params.botname,
+				password: this.params.oAuth,
 			},
-			channels: [ channel ],
+			channels: [ this.params.channel ],
 		});
 		
 		// Connect to Twitch via tmi.js
-		this.client.connect().catch(console.error);
+		cli.log(`Connecting to channel: ${this.params.channel}`);
+		this.client.connect()
+			.catch(err => {
+				cli.error(`Connection failed: ${err}`);
+				this.params = null;
+				this.client = null;
+			});
 		
 		// Register to all the tmi.js and SE events that we want to know about
-		this._registerAllEvents();
-		
-		// Start a recurring cleanup process to get rid of old cooldown data
-		setInterval(() => this._cleanupCooldowns(), COOLDOWN_CLEANUP_INTERVAL);
+		this._registerToTwitchEvents();
+	}
+	
+	disconnect() {
+		if (this.client) {
+			this.client.disconnect();
+			this.client = null;
+			cli.log(`Disconnected from channel: ${this.params.channel}`);
+			this.params = null;
+		}
+	}
+	
+	// Returns true iff we're currently connected to Twitch
+	get isConnected() {
+		return this.client !== null;
 	}
 	
 	// Forwards an event from StreamElements, to present a unified interface.
@@ -133,9 +198,8 @@ class TwitchManager extends EventNotifier {
 		this._processMessage(userstate, message, false);
 	}
 	
-	// Registers to all the events in tmi.js and StreamElements that we want
-	// to know about.
-	_registerAllEvents() {
+	// Registers to commands given through the command-line interface
+	_registerToCliEvents() {
 		// Message simulation CLI commands
 		cli.on(['m', 'msg', 'message'], message => {
 			// Pretend user, completely bogus, no such person ever existed
@@ -147,7 +211,10 @@ class TwitchManager extends EventNotifier {
 			let message = cmdline.substring(username.length).trim();
 			this._simulateUserMessage(username, message);
 		});
-		
+	}
+	
+	// Registers to all the events in tmi.js that we want to know about.
+	_registerToTwitchEvents() {
 		// Called on every message sent to the channel chat
 		this.client.on('message', (channel, userstate, message, self) => {
 			this._processMessage(userstate, message, self);
@@ -165,7 +232,10 @@ class TwitchManager extends EventNotifier {
 		this.client.on('part', (channel, username, self) => {
 			if (!self) this._notify('userLeft', username);
 		});
-		
+	}
+	
+	// Registers to all the events in StreamElements that we want to know about.
+	_registerToSEEvents() {
 		// Called when someone tips through StreamElements
 		this._forwardSEEvent('tip');
 		
@@ -180,7 +250,11 @@ class TwitchManager extends EventNotifier {
 	// Parameters:
 	// 	msg		The message to send.
 	say(msg) {
-		this.client.say(this.channel, msg);
+		if (this.isConnected) {
+			this.client.say(this.channel, msg);
+		} else {
+			cli.warn(`Can't send message when not connected to Twitch. Message received: ${msg}`)
+		}
 	}
 	
 	// Makes our bot say something on the channel chat to the given user.

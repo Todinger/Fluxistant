@@ -4,6 +4,7 @@
   information about the commands along with the callbacks for them. Then
   I'll link command registration to configuration loading.
 + UI for changing the configuration during runtime.
+- Configuration backup system
 - Support for user data files for modules (for large data that shouldn't
   be in the configurations themselves).
 - Switch to function-trigger based configuration form.
@@ -17,6 +18,7 @@
 	- Channel Reward
 	- Window de/activation
 	- Window open/close
+	- CLI command
 - Also add function responses.
   Response ideas:
 	- Chat message

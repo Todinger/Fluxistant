@@ -6,6 +6,7 @@ import NumberGui		from "./numberGui.mjs";
 import IntegerGui		from "./integerGui.mjs";
 import NaturalNumberGui	from "./naturalNumberGui.mjs";
 import StringGui		from "./stringGui.mjs";
+import HiddenStringGui	from "./hiddenStringGui.mjs";
 import FixedArrayGui	from "./fixedArrayGui.mjs";
 import DynamicArrayGui	from "./dynamicArrayGui.mjs";
 import ObjectGui		from "./objectGui.mjs";
@@ -27,6 +28,7 @@ export default {
 	IntegerGui,
 	NaturalNumberGui,
 	StringGui,
+	HiddenStringGui,
 	FixedArrayGui,
 	DynamicArrayGui,
 	ObjectGui,

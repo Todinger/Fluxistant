@@ -2,6 +2,7 @@
   <dictionary name="user">
     <words>
       <w>backquote</w>
+      <w>botname</w>
       <w>cmdid</w>
       <w>cmdname</w>
       <w>cooldown</w>

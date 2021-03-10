@@ -8,17 +8,65 @@ class MainConfig extends Configuration {
 		this.addInteger('port', DEFAULT_PORT)
 			.setName('Port')
 			.setDescription('Server port to listen on');
-		this.addString('streamerName')
-			.setName('Streamer Name')
-			.setDescription('How the bot addresses you in the chat when it does (for whatever reason...)');
+		// this.addString('streamerName')
+		// 	.setName('Streamer Name')
+		// 	.setDescription('How the bot addresses you in the chat when it does (for whatever reason...)');
+		this.addNaturalNumber('configBackupLimit')
+			.setName('# of Config Backups')
+			.setDescription('How many previous good configurations should be saved as backup.');
+		
+		let twitch = this.addGroup('twitch')
+			.setName('Twitch')
+			.setDescription("Settings for your and your bot's Twitch accounts");
+		twitch.addString('channel')
+			.setName('Channel Name')
+			.setDescription('Name of your channel (the one the bot is going to interact with)');
+		twitch.addString('botname')
+			.setName('Bot Username')
+			.setDescription("The bot's username on Twitch");
+		twitch.addHiddenString('oAuth')
+			.setName('Bot oAuth Token')
+			.setDescription("Twitch oAuth token for the bot - do not share it with people! Get it at twitchapps.com/tmi/ using the bot's account");
+		
+		let se = this.addGroup('streamElements')
+			.setName('Stream Elements')
+			.setDescription('Settings for your StreamElements account');
+		se.addString('accountID')
+			.setName('Account ID')
+			.setDescription("You StreamElements Account ID, as listed in the SE configuration page when you click on your name at the top-right");
+		se.addHiddenString('token')
+			.setName('JWT Token')
+			.setDescription('Find this on your SE account details page after you click on "Show Secrets" there - keep it secret!');
+		se.addString('pointsName')
+			.setName('Points Name')
+			.setDescription('The name of the loyalty points you defined on StreamElements (e.g. "pixels")');
+		se.addString('pointsNameSingular')
+			.setName('Points Name: Singular')
+			.setDescription('The name of the loyalty points you defined on StreamElements in singular form (e.g. "pixel")');
+	}
+	
+	getValue(key) {
+		return this.getChild(key).getValue();
 	}
 	
 	getPort() {
-		return this.getChild('port').getValue();
+		return this.getValue('port');
 	}
 	
 	getStreamerName() {
-		return this.getChild('streamerName').getValue();
+		return this.getValue('streamerName');
+	}
+	
+	getConfigBackupLimit() {
+		return this.getValue('configBackupLimit');
+	}
+	
+	getTwitchParams() {
+		return this.getGroupValues('twitch');
+	}
+	
+	getStreamElementsParams() {
+		return this.getGroupValues('streamElements');
 	}
 }
 

@@ -1,5 +1,7 @@
 const fs = require('fs');
 const assert = require('assert').strict;
+const ObjectEntity = requireConfig('objectEntity');
+const ValueEntity = requireConfig('valueEntity');
 const Utils = require('./utils');
 
 // Holds and manages the configuration of a single entity (e.g. a specific
@@ -83,6 +85,10 @@ class Configuration {
 	
 	addString(key, defaultValue) {
 		return this.configRoot.addString(key, defaultValue);
+	}
+	
+	addHiddenString(key, defaultValue) {
+		return this.configRoot.addHiddenString(key, defaultValue);
 	}
 	
 	addNumber(key, defaultValue) {
@@ -194,6 +200,23 @@ class Configuration {
 				console.log(`Configuration file saved to: ${filename}`);
 			}
 		);
+	}
+	
+	getGroupValues(groupKey) {
+		let values = {};
+		
+		let group = this.getChild(groupKey);
+		assert(
+			group instanceof ObjectEntity,
+			`Cannot get group values - not a group child key: ${groupKey}`);
+		
+		group.forEach((key, child) => {
+			if (child instanceof ValueEntity) {
+				values[key] = child.getValue();
+			}
+		})
+		
+		return values;
 	}
 }
 

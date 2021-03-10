@@ -1,4 +1,8 @@
 {
+	"readThisFirst": "This file (well not this one, the one you're supposed to make with the instructions here) is now deprecated as these settings have been moved to the web-based configuration tool.",
+	
+	
+	
 	"deleteThisLine": "In order for this bot to work, you need to fill out everything below. This includes some sensitive information, so after you fill it out make sure you don't put this file somewhere where people you don't approve can get access to it. Once you've filled everything out, delete this explanatory entry completely (not a must, but no reason to keep it) and rename this file to botConfig.json (that is, without the 'Template' part). Have fun. =)",
 	
 	"username": "TheTwitchUsernameOfYourBot",

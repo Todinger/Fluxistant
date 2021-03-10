@@ -13,7 +13,7 @@ const Assets = require('./assets');
 const CommandManager = require('./commandManager');
 const SEManager = require('./seManager');
 const RewardsManager = require('./rewardsManager');
-const Log = require('./logger')
+// const Log = require('./logger')
 const ModuleConfig = require('./Config/moduleConfig');
 const Command = require('./command');
 const MainConfig = require('./mainConfig');
@@ -31,6 +31,8 @@ class Module {
 	// 	[enabled]	If set specifically to false, prevents the script from
 	// 				being loaded at all (as if the file wasn't there).
 	// 	[webname]	Web identifier. Should be URL-friendly.
+	// 	[websounds]	Means this module's web client has sounds. This means that
+	// 				the volume command will be automatically added.
 	// 	[zindex]	Used by the module aggregator page, ScriptedModule, this
 	// 				specifies th z-index of the Module's frame on the page.
 	// 				Use this to put things in front of or behind other things.
@@ -66,7 +68,6 @@ class Module {
 		// Utility objects
 		this.moduleManager = null;
 		this.commandManager = new CommandManager(this);
-		this.dblog = Log;
 		
 		// Do not set these two; they are set by ModuleManager
 		// after the module has finished construction and validation

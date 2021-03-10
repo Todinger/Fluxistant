@@ -1,8 +1,9 @@
 const io = require('socket.io-client');
 const axios = require('axios');
-const Config = require('./botConfig.json');
+// const Config = require('./botConfig.json');
 const EventNotifier = require('./eventNotifier');
 const cli = require('./cliManager');
+const Utils = require('./utils');
 
 const URL_BASE = 'https://api.streamelements.com/kappa/v2';
 const URL_POINTS = URL_BASE + '/points';
@@ -10,7 +11,6 @@ const URL_BOT = URL_BASE + '/bot'
 const SOCKET_URL = 'https://realtime.streamelements.com';
 
 // Add the authorization token to every Axios request
-axios.defaults.headers.common['Authorization'] = `Bearer ${Config.token}`;
 
 // I started making a general request class here which I meant to fill with
 // invocations of each method, but I ended up abandoning the idea halfway
@@ -88,40 +88,107 @@ class SEManager extends EventNotifier {
 			'tip',			// StreamElements tip
 		]);
 		
+		// Used for event notifications
+		this.socket = null;
+		
+		this._registerToCliEvents();
+	}
+	
+	// Registers to commands given through the command-line interface
+	_registerToCliEvents() {
+		// Message simulation CLI commands
+		cli.on(['se', 'semsg', 'semessage'], message => {
+			// Pretend user, completely bogus, no such person ever existed
+			this.say(message, null, (err) => cli.error(err));
+		});
+	}
+	
+	_validParams(params) {
+		return params && params.accountID && params.token;
+	}
+	
+	_paramsAreTheSame(params) {
+		return this.params.accountID === params.accountID &&
+			this.params.token === params.token;
+	}
+	
+	updatePointNames(params) {
 		// Name of the StreamElements loyalty points (this might be obtainable
 		// through StreamElements but I didn't bother doing that as it's a
 		// pretty static thing)
-		this.POINTS_NAME = Config.pointsName;
-		this.POINTS_NAME_SINGULAR = Config.pointsNameSingular;
+		this.POINTS_NAME =
+			Utils.isNonEmptyString(params.pointsName) ?
+				params.pointsName :
+				'points';
+		this.POINTS_NAME_SINGULAR =
+			Utils.isNonEmptyString(params.pointsNameSingular) ?
+				params.pointsNameSingular
+				: 'point';
 		
-		// Used for event notifications
-		this.socket = null;
+		if (!this.params) {
+			this.params = {};
+		}
+		
+		this.params.pointsName = params.pointsName;
+		this.params.pointsNameSingular = params.pointsNameSingular;
 	}
 	
-	init() {
+	connect(params) {
+		this.updatePointNames(params);
+		
+		if (!this._validParams(params)) {
+			this.disconnect();
+			return;
+		} else if (this.params && this._paramsAreTheSame(params)) {
+			// If we're already connected to the requested channel, do nothing
+			return;
+		}
+		
+		if (!this.params) {
+			this.params = {};
+		}
+		
+		this.params.accountID = params.accountID;
+		this.params.token = params.token;
+		
 		this.socket = io(SOCKET_URL, {
 			transports: ['websocket'],
 		});
+		
+		axios.defaults.headers.common['Authorization'] = `Bearer ${params.token}`;
 		
 		this.socket.on('connect', () => this._onConnected());
 		this.socket.on('disconnect', () => this._onDisconnected());
 		this.socket.on('authenticated', (data) => this._onAuthenticated(data));
 		this.socket.on('event', (data) => this._onEvent(data));
 		this.socket.on('event:message', (data) => this._onEvent(data));
+		
+		this.connected = false;
+	}
+	
+	disconnect() {
+		if (this.socket) {
+			this.connected = false;
+			this.socket.close();
+			this.socket = null;
+			axios.defaults.headers.common['Authorization'] = '';
+		}
 	}
 	
 	// Called when we've established an initial connection to SE.
 	_onConnected() {
+		this.connected = true;
 		cli.log('Connected to StreamElements');
 		this.socket.emit('authenticate', {
 			method: 'jwt',
-			token: Config.token,
+			token: this.params.token,
 		});
 	}
 	
 	// Called when we've been disconnected.
 	_onDisconnected() {
 		cli.log('Disconnected from StreamElements');
+		this.connected = false;
 	}
 	
 	// After connecting we attempt authentication.
@@ -171,7 +238,12 @@ class SEManager extends EventNotifier {
 	// 	onError		Will be invoked if something goes wrong with the request.
 	// 				Should accept a single argument with error details, I think.
 	getUserPoints(username, onDone, onError) {
-		let requestURL = `${URL_POINTS}/${Config.channelID}/${username}`;
+		if (!this.connected) {
+			onError('Not connected to StreamElements.');
+			return;
+		}
+		
+		let requestURL = `${URL_POINTS}/${this.params.accountID}/${username}`;
 		let promise = axios.get(requestURL);
 		if (onDone) {
 			promise = promise.then(response => onDone(response.data.points));
@@ -195,8 +267,13 @@ class SEManager extends EventNotifier {
 	// 	onError		Will be invoked if something goes wrong with the request.
 	// 				Should accept a single argument with error details, I think.
 	addUserPoints(username, amount, onDone, onError) {
+		if (!this.connected) {
+			onError('Not connected to StreamElements.');
+			return;
+		}
+		
 		let requestURL =
-			`${URL_POINTS}/${Config.channelID}/${username}/${amount}`;
+			`${URL_POINTS}/${this.params.accountID}/${username}/${amount}`;
 		let promise = axios.put(requestURL);
 		if (onDone) {
 			promise = promise.then(response => onDone(response.data.newAmount));
@@ -239,6 +316,11 @@ class SEManager extends EventNotifier {
 	// 	onError					Called if something goes wrong that isn't the
 	// 							user not having enough points.
 	consumeUserPoints(username, amount, onDone, onInsufficientPoints, onError) {
+		if (!this.connected) {
+			onError('Not connected to StreamElements.');
+			return;
+		}
+		
 		this.getUserPoints(
 			username,
 			points => {
@@ -273,8 +355,13 @@ class SEManager extends EventNotifier {
 	// 	onDone		Called once the message has been successfully sent.
 	// 	onError		Called if something goes wrong with the request.
 	say(msg, onDone, onError) {
+		if (!this.connected) {
+			onError('Not connected to StreamElements.');
+			return;
+		}
+		
 		let requestURL =
-			`${URL_BOT}/${Config.channelID}/say`;
+			`${URL_BOT}/${this.params.accountID}/say`;
 		
 		let promise = axios.post(requestURL, { message: msg });
 		
