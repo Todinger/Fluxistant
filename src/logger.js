@@ -1,45 +1,80 @@
-// This is used to log events in a database.
-// Everything here is hard-coded at the moment, but there isn't much to begin
-// with, so just change these details to fit your own database.
-const dblogger = require('node-db-logger').createLogger({
-	// config 
-	mongo: {
-		url     : 'mongodb://localhost:27017',
-		options : {
-			useUnifiedTopology: true
-		},
-		database: 'Scripted-Modules',
-		collection: 'Logs'
-	}
+const path = require('path');
+const winston = require('winston');
+require('winston-daily-rotate-file');
+const cli = require('./cliManager');
+const Globals = require('./globals');
+const Utils = require('./utils');
+
+const LOGS_DIR = path.join(Globals.userDir, 'Logs');
+Utils.ensureDirExists(LOGS_DIR);
+
+const MESSAGE_FORMAT = winston.format.printf(({ level, message, timestamp }) => {
+	return `<${timestamp}> ${level}: ${message}`;
 });
 
-// A wrapper class to facilitate writing to the database.
-// The dblogger defined above has one method, .record(), which takes as its
-// first argument the category of the entry, which is one of: info, error, warn,
-// debug and trace.
-// Here we make an object that has a corresponding function for each such event,
-// along with the regular .record() method.
-// In other words, to make an info log entry for example, you can invoke
-// logger.info('Some message'), but logger.record('info', 'Some message') will
-// do the exact same thing.
 class Logger {
 	constructor() {
-		this._addLogMethod('info');
-		this._addLogMethod('error');
-		this._addLogMethod('warn');
-		this._addLogMethod('debug');
-		this._addLogMethod('trace');
+		cli.on(['l', 'log', 'clog'], (level) => this.setConsoleLevel(level));
+		cli.on(['flog', 'fl'], (level) => this.setFileLevel(level));
+		
+		['info', 'warn', 'error', 'debug'].forEach(
+			level => cli.on([level], () => this.setConsoleLevel(level)));
+		
+		Globals.Logger = this;
 	}
 	
-	_addLogMethod(name) {
-		this[name] = function(...theArgs) {
-			theArgs.unshift(name);
-			return dblogger.record.apply(dblogger, theArgs);
-		}
+	init() {
+		this.transports = {
+			console: new winston.transports.Console({
+				level: 'warn',
+				format: winston.format.combine(
+					winston.format.colorize(),
+					winston.format.timestamp({ format: 'HH:mm:ss' }),
+					MESSAGE_FORMAT,
+				),
+			}),
+			file: new winston.transports.DailyRotateFile({
+				level: 'info',
+				format: winston.format.combine(
+					winston.format.timestamp({ format: 'YYYY.MM.DD-HH:mm:ss' }),
+					MESSAGE_FORMAT,
+				),
+				
+				filename: `${LOGS_DIR}/%DATE%.log`,
+				datePattern: 'YYYY.MM.DD',
+				maxSize: '20m',
+				maxFiles: '7d',
+			}),
+		};
+		
+		this.logger = winston.createLogger({
+			level: 'info',
+			transports: Object.values(this.transports),
+		});
 	}
 	
-	record(...theArgs) {
-		return dblogger.record.apply(dblogger, theArgs);
+	info(...params) {
+		this.logger.info(...params);
+	}
+	
+	warn(...params) {
+		this.logger.warn(...params);
+	}
+	
+	error(...params) {
+		this.logger.error(...params);
+	}
+	
+	debug(...params) {
+		this.logger.debug(...params);
+	}
+	
+	setFileLevel(level) {
+		this.transports.file.level = level;
+	}
+	
+	setConsoleLevel(level) {
+		this.transports.console.level = level;
 	}
 }
 

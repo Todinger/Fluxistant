@@ -4,7 +4,7 @@ const assert = require('assert').strict;
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
-const cli = require('./cliManager');
+// const cli = require('./cliManager');
 const User = require('./user');
 const TwitchManager = require('./twitchManager');
 const Enums = require('./enums');
@@ -13,7 +13,7 @@ const Assets = require('./assets');
 const CommandManager = require('./commandManager');
 const SEManager = require('./seManager');
 const RewardsManager = require('./rewardsManager');
-// const Log = require('./logger')
+const Logger = require('./logger');
 const ModuleConfig = require('./Config/moduleConfig');
 const Command = require('./command');
 const MainConfig = require('./mainConfig');
@@ -659,21 +659,30 @@ class Module {
 	}
 	
 	// [For use by inheriting classes]
-	// Logs a message to the console, marked as coming from this Module.
+	// Logs a message to the log, marked as coming from this Module.
 	log(message) {
-		cli.log(this._printForm(message));
+		Logger.info(this._printForm(message));
+		// cli.log(this._printForm(message));
 	}
 	
 	// [For use by inheriting classes]
-	// Logs a warning message to the console, marked as coming from this Module.
+	// Logs a warning message to the log, marked as coming from this Module.
 	warn(message) {
-		cli.warn(this._printForm(message));
+		Logger.warn(this._printForm(message));
+		// cli.warn(this._printForm(message));
 	}
 	
 	// [For use by inheriting classes]
-	// Log an error message to the console, marked as coming from this Module.
+	// Log an error message to the log, marked as coming from this Module.
 	error(message) {
-		cli.error(this._printForm(message));
+		Logger.error(this._printForm(message));
+		// cli.error(this._printForm(message));
+	}
+	
+	// [For use by inheriting classes]
+	// Log a debug message to the log, marked as coming from this Module.
+	debug(message) {
+		Logger.debug(this._printForm(message));
 	}
 	
 	// [For use by inheriting classes]
@@ -682,7 +691,8 @@ class Module {
 			this.log(header);
 		}
 		
-		cli.log(util.inspect(obj, false, null, true));
+		Logger.debug(util.inspect(obj, false, null, true));
+		// cli.log(util.inspect(obj, false, null, true));
 	}
 	
 	// [For use by inheriting classes]

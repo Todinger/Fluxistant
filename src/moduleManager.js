@@ -4,6 +4,7 @@ const assert = require('assert').strict;
 const urljoin = require('url-join');
 const cli = require('./cliManager');
 const KEYCODES = require('./enums').KEYCODES;
+const Logger = require('./logger');
 const KeyboardManager = require('./keyboardManager');
 const ConfigManager = require('./configManager');
 const EntityFileManager = require('./entityFileManager');
@@ -203,7 +204,7 @@ class ModuleManager {
 		// We don't catch errors here because if a Module has a critical
 		// problem then we want to know about it immediately and fix it before
 		// starting the server
-		console.log(`[ModuleManager] mod = ${mod}`);
+		Logger.info(`[ModuleManager] mod = ${mod}`);
 		mod.preload();
 		mod.loadData(); // NOTE: MODULES SHOULD ONLY SAVE DATA IF IT IS VALID 
 		mod.load();

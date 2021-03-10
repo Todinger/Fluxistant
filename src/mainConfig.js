@@ -37,12 +37,25 @@ class MainConfig extends Configuration {
 		se.addHiddenString('token')
 			.setName('JWT Token')
 			.setDescription('Find this on your SE account details page after you click on "Show Secrets" there - keep it secret!');
-		se.addString('pointsName')
+		se.addString('pointsName', 'points')
 			.setName('Points Name')
 			.setDescription('The name of the loyalty points you defined on StreamElements (e.g. "pixels")');
-		se.addString('pointsNameSingular')
+		se.addString('pointsNameSingular', 'point')
 			.setName('Points Name: Singular')
 			.setDescription('The name of the loyalty points you defined on StreamElements in singular form (e.g. "pixel")');
+		
+		let logs = this.addGroup('logs')
+			.setName('Logs')
+			.setDescription('Settings for information logging by the bot');
+		logs.addInteger('logLevelFile', 0)
+			.setName('File Log Level')
+			.setDescription('Minimum level required for a logged message to be written to the log file');
+		logs.addInteger('logLevelConsole', 0)
+			.setName('Console Log Level')
+			.setDescription('Minimum level required for a logged message to be written to the console');
+		logs.addNaturalNumber('maximumLogFieSize')
+			.setName('Max File Size')
+			.setDescription('Maximum size (in bytes) that a log file can grow to before another one is opened');
 	}
 	
 	getValue(key) {
@@ -67,6 +80,10 @@ class MainConfig extends Configuration {
 	
 	getStreamElementsParams() {
 		return this.getGroupValues('streamElements');
+	}
+	
+	getLoggerParams() {
+		return this.getGroupValues('logs');
 	}
 }
 

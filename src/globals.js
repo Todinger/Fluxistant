@@ -12,5 +12,10 @@ class Globals {
 	constructor() {
 		// Set defaults
 		Object.keys(DEFAULTS).forEach(key => this[key] = DEFAULTS[key]);
+		
+		this.userDir = null;
+		this.Logger = null;
 	}
 }
+
+module.exports = new Globals();

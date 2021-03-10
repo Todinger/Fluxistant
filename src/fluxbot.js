@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fileUpload = require('express-fileupload');
-const Utils = require('./utils');
 
 // Directory locations
 const APP_DATA_DIR = path.join(process.env.APPDATA, 'Fluxbot');
@@ -18,12 +17,12 @@ const CONFIG_WEB_ENTITIES_LIST_FILE = CONFIG_DIR + 'webEntitiesList.js';
 const GUI_DIR = './GUI';
 const GUI_DIR_WEB = '/gui/';
 
-// TODO: Remove
-// Bot configuration - that is where you make it work with your bot and channel
-// const Config = require('./botConfig.json');
 
 // Globals object, used to work around circular dependencies
 const Globals = require('./globals');
+Globals.userDir = APP_DATA_DIR;
+const Utils = require('./utils');
+
 
 const KEYCODES = require('./enums').KEYCODES;
 
@@ -64,6 +63,11 @@ class FluxBot {
 		this.cli = require('./cliManager');
 		Globals.cli = this.cli;
 		this.cli.on(['q', 'quit', 'exit'], () => process.exit(0)); // Exit command
+	}
+	
+	setupLogs() {
+		this.logger = require('./logger');
+		this.logger.init();
 	}
 	
 	// Asset- and file-related registration
@@ -324,8 +328,7 @@ class FluxBot {
 					this.configManager.saveAll();
 					await this.dataManager.commitChanges();
 					
-					this.twitchManager.connect(this.mainConfig.getTwitchParams());
-					this.seManager.connect(this.mainConfig.getStreamElementsParams());
+					this.handleMainConfigChange();
 					
 					socket.emit('configSaved');
 				} catch (err) {
@@ -344,6 +347,12 @@ class FluxBot {
 		this.cli.start();
 	}
 	
+	handleMainConfigChange() {
+		this.twitchManager.connect(this.mainConfig.getTwitchParams());
+		this.seManager.connect(this.mainConfig.getStreamElementsParams());
+		this.logger.init(this.mainConfig.getLoggerParams());
+	}
+	
 	setupAllAndStart() {
 		this.prepareDirectories();
 		this.readConfigEntities();
@@ -351,6 +360,7 @@ class FluxBot {
 		this.emptyDataTempDir();
 		this.setupUserData();
 		this.setupCLI();
+		this.setupLogs();
 		this.setupAssets();
 		this.setupWebDirs();
 		this.setupKeyboard();

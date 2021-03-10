@@ -31,7 +31,7 @@ class EntityFactory {
 			this.entityClasses[type] = entityClass;
 			this.register(type, entityClass.BUILDER);
 			
-			console.log(`[EntityFactory] Registered type ${type} from ${filePath}.`);
+			// console.log(`[EntityFactory] Registered type ${type} from ${filePath}.`);
 		}
 	}
 	

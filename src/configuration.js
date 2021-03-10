@@ -1,5 +1,6 @@
 const fs = require('fs');
 const assert = require('assert').strict;
+const Logger = require('./logger');
 const ObjectEntity = requireConfig('objectEntity');
 const ValueEntity = requireConfig('valueEntity');
 const Utils = require('./utils');
@@ -197,7 +198,7 @@ class Configuration {
 			JSON.stringify(descriptor, null, '\t'),
 			err => {
 				if (err) throw err;
-				console.log(`Configuration file saved to: ${filename}`);
+				Logger.info(`Configuration file saved to: ${filename}`);
 			}
 		);
 	}
