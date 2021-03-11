@@ -152,10 +152,10 @@ class TwitchManager extends EventNotifier {
 		});
 		
 		// Connect to Twitch via tmi.js
-		cli.log(`Connecting to channel: ${this.params.channel}`);
+		cli.log(`[Twitch] Connecting to channel: ${this.params.channel}`);
 		this.client.connect()
 			.catch(err => {
-				cli.error(`Connection failed: ${err}`);
+				cli.error(`[Twitch] Connection failed: ${err}`);
 				this.params = null;
 				this.client = null;
 			});
@@ -168,7 +168,7 @@ class TwitchManager extends EventNotifier {
 		if (this.client) {
 			this.client.disconnect();
 			this.client = null;
-			cli.log(`Disconnected from channel: ${this.params.channel}`);
+			cli.log(`[Twitch] Disconnected from channel: ${this.params.channel}`);
 			this.params = null;
 		}
 	}
@@ -253,7 +253,7 @@ class TwitchManager extends EventNotifier {
 		if (this.isConnected) {
 			this.client.say(this.channel, msg);
 		} else {
-			cli.warn(`Can't send message when not connected to Twitch. Message received: ${msg}`)
+			cli.warn(`[Twitch] Can't send message when not connected to Twitch. Message received: ${msg}`)
 		}
 	}
 	
@@ -341,7 +341,7 @@ class TwitchManager extends EventNotifier {
 			cmd.filters = [];
 		}
 		
-		cli.log(`Registering command '${COMMAND_PREFIX}${cmd.cmdname}' for '${id}'`);
+		cli.debug(`[Twitch] Registering command '${COMMAND_PREFIX}${cmd.cmdname}' for '${id}'`);
 		
 		// The same command can activate multiple callbacks, so we store a
 		// dictionary of ID-to-command to keep track of what needs to be invoked
@@ -372,7 +372,7 @@ class TwitchManager extends EventNotifier {
 	unregisterCommand(id) {
 		assert(id in this._commandHandlerIDs, `Unknown handler ID: ${id}`);
 		
-		cli.log(`Unregistering command '${COMMAND_PREFIX}${this._commandHandlerIDs[id]}' for '${id}'`);
+		cli.debug(`[Twitch] Unregistering command '${COMMAND_PREFIX}${this._commandHandlerIDs[id]}' for '${id}'`);
 		
 		delete this._commandHandlers[this._commandHandlerIDs[id]];
 		delete this._commandHandlerIDs[id];
@@ -473,7 +473,7 @@ class TwitchManager extends EventNotifier {
 				},
 				// Failure due to a program error
 				error => {
-					cli.error(`Failed to consume user points: ${error}`);
+					cli.error(`[Twitch] Failed to consume user points: ${error}`);
 				});
 		// Handle free commands
 		} else {
@@ -686,7 +686,7 @@ class TwitchManager extends EventNotifier {
 					this._notify('action', user, message);
 					break;
 				default:
-					cli.warn("Unknown message type received; treating as regular message.");
+					cli.warn("[Twitch] Unknown message type received; treating as regular message.");
 				case 'whisper':
 				case 'chat':
 					// We want to let various message type handlers all examine
@@ -703,9 +703,9 @@ class TwitchManager extends EventNotifier {
 					// that is not yet implemented
 					if (userstate['custom-reward-id']) {
 						if (this.printRewardIDs) {
-							cli.log('Reward redeemed:');
-							cli.log(`  ID: ${userstate['custom-reward-id']}`);
-							cli.log(`  Message: ${message}`);
+							cli.log('[Twitch] Reward redeemed:');
+							cli.log(`[Twitch]   ID: ${userstate['custom-reward-id']}`);
+							cli.log(`[Twitch]   Message: ${message}`);
 						}
 						
 						this._notify(
@@ -739,7 +739,7 @@ class TwitchManager extends EventNotifier {
 		// General try-catch to catch everything so that nothing causes the
 		// server to crash
 		catch (err) {
-			cli.error(err);
+			cli.error(`[Twitch] ${err}`);
 		}
 	}
 }

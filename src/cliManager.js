@@ -1,7 +1,6 @@
 const readline = require('readline');
 const EventNotifier = require('./eventNotifier');
-// const Logger = require('./logger');
-const Globals = require('./globals');
+const Logger = require('./logger');
 
 // Responsible for direct interactions with the user.
 // This constitutes of console input and output presently.
@@ -71,7 +70,7 @@ class CliManager extends EventNotifier {
 	
 	// Outputs information message.
 	log(...params) {
-		Globals.Logger.info(...params)
+		Logger.info(...params)
 		// this._clearLine();
 		// console.log(message);
 		// this.write(this._promptText());
@@ -79,7 +78,7 @@ class CliManager extends EventNotifier {
 	
 	// Outputs a warning message.
 	warn(...params) {
-		Globals.Logger.warn(...params);
+		Logger.warn(...params);
 		// this._clearLine();
 		// console.warn(message);
 		// // console.log(this._promptText());
@@ -87,7 +86,15 @@ class CliManager extends EventNotifier {
 	
 	// Outputs an error message.
 	error(...params) {
-		Globals.Logger.error(...params);
+		Logger.error(...params);
+		// this._clearLine();
+		// console.error(message);
+		// // console.log(this._promptText());
+	}
+	
+	// Outputs a debug message.
+	debug(...params) {
+		Logger.debug(...params);
 		// this._clearLine();
 		// console.error(message);
 		// // console.log(this._promptText());

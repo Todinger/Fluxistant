@@ -4,7 +4,6 @@ const assert = require('assert').strict;
 const urljoin = require('url-join');
 const cli = require('./cliManager');
 const KEYCODES = require('./enums').KEYCODES;
-const Logger = require('./logger');
 const KeyboardManager = require('./keyboardManager');
 const ConfigManager = require('./configManager');
 const EntityFileManager = require('./entityFileManager');
@@ -131,7 +130,7 @@ class ModuleManager {
 		
 		// Save the module and announce it to show initial success
 		this.modules[mod.name] = mod;
-		cli.log(`Read module: ${mod.name}`);
+		cli.log(`[Module Manager] Read module: ${mod.name}`);
 	}
 	
 	// Reads all the Modules, we have in the system, with all that entails.
@@ -182,8 +181,10 @@ class ModuleManager {
 		let modData = DataManager.addModule(mod.name);
 		mod.defineData(modData);
 		
-		mod.defineConfig(mod.modConfig);
-		ConfigManager.addModule(mod.name, mod.modConfig);
+		if (mod.configurable) {
+			mod.defineConfig(mod.modConfig);
+			ConfigManager.addModule(mod.name, mod.modConfig);
+		}
 	}
 	
 	// Loads all the modules' configurations and data from disk.
@@ -204,7 +205,7 @@ class ModuleManager {
 		// We don't catch errors here because if a Module has a critical
 		// problem then we want to know about it immediately and fix it before
 		// starting the server
-		Logger.info(`[ModuleManager] mod = ${mod}`);
+		cli.debug(`[ModuleManager] Loading mod: ${mod.name}`);
 		mod.preload();
 		mod.loadData(); // NOTE: MODULES SHOULD ONLY SAVE DATA IF IT IS VALID 
 		mod.load();
@@ -258,7 +259,7 @@ class ModuleManager {
 		if (this.nameExists(moduleName)) {
 			this.modules[moduleName].attachClient(socket, 'direct');
 		} else {
-			cli.warn(`Unknown module: ${moduleName}`);
+			cli.warn(`[Module Manager] Unknown module: ${moduleName}`);
 		}
 	}
 	
@@ -267,7 +268,7 @@ class ModuleManager {
 		if (tag in this.tags) {
 			this.tags[tag].forEach(mod => mod.attachClient(socket, 'tag'));
 		} else {
-			cli.warn(`Unknown tag: ${tag}`);
+			cli.warn(`[Module Manager] Unknown tag: ${tag}`);
 		}
 	}
 	
@@ -287,8 +288,7 @@ class ModuleManager {
 				// data if the data is valid
 				mod.loadData();
 			} catch (err) {
-				cli.log(`Error loading data in ${mod.name}:`);
-				cli.log(err);
+				cli.log(`[Module Manager] Error loading data in ${mod.name}: ${err}`);
 			}
 		});
 	}

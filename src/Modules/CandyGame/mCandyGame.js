@@ -260,10 +260,6 @@ class CandyGame extends Module {
 			});
 	}
 	
-	preload() {
-		this.imageDirURL = this.registerAssetDir('Images', 'images');
-	}
-	
 	loadData() {
 		try {
 			this.candyData = this.readJSON(CANDY_FILENAME);
@@ -275,8 +271,7 @@ class CandyGame extends Module {
 			this.log('Loaded candy data.');
 			
 		} catch (err) {
-			this.error('Failed to read candy data:');
-			this.error(err);
+			this.warn(`Failed to read candy data: ${err}`);
 		}
 	}
 	

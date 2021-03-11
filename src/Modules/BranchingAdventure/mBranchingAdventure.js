@@ -214,6 +214,8 @@ class BranchingAdventure extends Module {
 	constructor() {
 		super({
 			name: 'Branching Adventure',
+			enabledByDefault: false,
+			configurable: false,
 			// debug: true,
 		});
 		
@@ -288,31 +290,36 @@ class BranchingAdventure extends Module {
 		this.categories = {};
 		this.adventureCache = [];
 		
-		// Load each file
-		let advFiles = Utils.getFiles(path.join(this.workdir, ADVENTURES_DIR));
-		advFiles.forEach(filename => {
-			let parsed = path.parse(filename);
-			this.log(`Loading adventure file: ${filename}`);
-			let adventureFile = this.readJSON(path.join(ADVENTURES_DIR, filename));
-			this.loadAdventureFile(parsed.name, adventureFile);
-		});
-		
-		// Create a cache of adventures out of all of the active
-		// files and adventures
-		// This is so we can choose a random one later and have equal odds
-		// for each adventure to be chosen, rather than choosing a category
-		// at random which makes adventures in categories that have many have
-		// lower odds of being selected than ones in categories that have few
-		Object.keys(this.categories).forEach(category => {
-			Object.keys(this.categories[category].adventures).forEach(adv => {
-				this.adventureCache.push({
-					category: category,
-					name: adv,
+		// If we can't load any data, that's ok, we just won't have any adventures
+		try {
+			// Load each file
+			let advFiles = Utils.getFiles(path.join(this.workdir, ADVENTURES_DIR));
+			advFiles.forEach(filename => {
+				let parsed = path.parse(filename);
+				this.log(`Loading adventure file: ${filename}`);
+				let adventureFile = this.readJSON(path.join(ADVENTURES_DIR, filename));
+				this.loadAdventureFile(parsed.name, adventureFile);
+			});
+			
+			// Create a cache of adventures out of all of the active
+			// files and adventures
+			// This is so we can choose a random one later and have equal odds
+			// for each adventure to be chosen, rather than choosing a category
+			// at random which makes adventures in categories that have many have
+			// lower odds of being selected than ones in categories that have few
+			Object.keys(this.categories).forEach(category => {
+				Object.keys(this.categories[category].adventures).forEach(adv => {
+					this.adventureCache.push({
+						category: category,
+						name: adv,
+					});
 				});
 			});
-		});
-		
-		this.log('Branching adventures loaded, yay!');
+			
+			this.log('Branching adventures loaded, yay!');
+		} catch (err) {
+			this.warn(`Failed to load branching adventures: ${err}`);
+		}
 	}
 	
 	// Loads a single JSON file with adventure data.
@@ -843,10 +850,12 @@ class BranchingAdventure extends Module {
 	// Module entry point.
 	load() {
 		this.onTwitchEvent('message', (user, message) => {
-			if (this.userHasAdventure(user)) {
-				this.processUserMessage(
-					this.activeAdventures[user.name],
-					message);
+			if (this.enabled) {
+				if (this.userHasAdventure(user)) {
+					this.processUserMessage(
+						this.activeAdventures[user.name],
+						message);
+				}
 			}
 		});
 	}

@@ -51,17 +51,17 @@ class AssetManager {
 	}
 	
 	registerAll() {
-		this.registerUserImages();
-		this.registerDisplayImages();
-		this.registerSoundEffects();
-		this.registerRandomImageCache();
-		this.registerFShowerImages();
+		// this.registerUserImages();
+		// this.registerDisplayImages();
+		// this.registerSoundEffects();
+		// this.registerRandomImageCache();
+		// this.registerFShowerImages();
 	}
 	
 	registerDir(dir, url) {
 		assert(this.app, 'Please initialize AssetManager before using it.');
 		
-		cli.log(`Registering "${dir}" as "${url}"`);
+		cli.log(`[Assets] Registering "${dir}" as "${url}"`);
 		this.app.use(url, express.static(dir));
 	}
 	

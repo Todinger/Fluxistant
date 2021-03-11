@@ -99,7 +99,7 @@ class SEManager extends EventNotifier {
 		// Message simulation CLI commands
 		cli.on(['se', 'semsg', 'semessage'], message => {
 			// Pretend user, completely bogus, no such person ever existed
-			this.say(message, null, (err) => cli.error(err));
+			this.say(message, null, (err) => cli.error(`[SE] ${err}`));
 		});
 	}
 	
@@ -178,7 +178,7 @@ class SEManager extends EventNotifier {
 	// Called when we've established an initial connection to SE.
 	_onConnected() {
 		this.connected = true;
-		cli.log('Connected to StreamElements');
+		cli.log('[SE] Connected to StreamElements.');
 		this.socket.emit('authenticate', {
 			method: 'jwt',
 			token: this.params.token,
@@ -187,20 +187,15 @@ class SEManager extends EventNotifier {
 	
 	// Called when we've been disconnected.
 	_onDisconnected() {
-		cli.log('Disconnected from StreamElements');
+		cli.log('[SE] Disconnected from StreamElements.');
 		this.connected = false;
 	}
 	
 	// After connecting we attempt authentication.
 	// This method is called once that's done.
 	// We can start working with the SE socket as soon as this is called.
-	_onAuthenticated(data) {
-		const {
-			channelId
-		} = data;
-		
-		cli.log(
-			`Successfully connected via StreamElements to channel ${channelId}`);
+	_onAuthenticated() {
+		cli.log(`[SE] Successfully connected via StreamElements to channel.`);
 	}
 	
 	// Called every time an event is received from StreamElements via the

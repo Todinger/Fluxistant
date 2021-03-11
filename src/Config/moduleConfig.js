@@ -1,9 +1,9 @@
 const Configuration = requireMain('./configuration');
 
 class ModuleConfig extends Configuration {
-	constructor(modName) {
+	constructor(modName, enabledByDefault) {
 		super(`mod.${modName}`);
-		this.addBoolean('enabled', true);
+		this.addBoolean('enabled', enabledByDefault);
 	}
 }
 

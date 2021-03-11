@@ -7,7 +7,6 @@ const Module = requireMain('module');
 const SECONDS = 1000;
 const MINUTES = 60 * SECONDS;
 
-const SUBDIR_NAME = 'Meows';
 // TODO: Make channel rewards configurable and remove this
 const CHANNEL_REWARD_NAME = 'Catastrophe';
 const DURATION = 3 * MINUTES;
@@ -29,8 +28,6 @@ class Catastrophe extends Module {
 		super({
 			name: 'Catastrophe',
 		});
-		
-		this.sfxdir = path.join(Module.Assets.getSoundEffectsDir(), SUBDIR_NAME);
 		
 		this.ongoing = false;
 		this.endTime = null;

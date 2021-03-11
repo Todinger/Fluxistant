@@ -12,6 +12,8 @@ class ParrotMate extends Module {
 			source: 'parrot.html',
 			tags: ['imgdisp'],
 			webSounds: true,
+			enabledByDefault: false,
+			configurable: false,
 		});
 		
 		this.whatWasThatCooldownActive = false;
@@ -21,7 +23,9 @@ class ParrotMate extends Module {
 		this.broadcastEvent('playSequence', cmd.sequence);
 	}
 	
-	loadData() {
+	// TODO: Replace this with new command (or even better, function) system
+	// loadData() {
+	enable() {
 		this.commandManager.loadFile(
 			USER_COMMANDS_FILE,
 			cmd => this.forwardSequenceCommand(cmd)
@@ -31,14 +35,16 @@ class ParrotMate extends Module {
 	load() {
 		this.onClientAttached(socket => {
 			socket.on('imgdispDone', url => {
-				if (PARROT_IMAGE_URL === url && !this.whatWasThatCooldownActive) {
-					this.whatWasThatCooldownActive = true;
-					setTimeout(
-						() => this.broadcastEvent('playSequence', 'what'),
-						500);
-					setTimeout(
-						() => this.whatWasThatCooldownActive = false,
-						WWT_COOLDOWN_DURATION);
+				if (this.enabled) {
+					if (PARROT_IMAGE_URL === url && !this.whatWasThatCooldownActive) {
+						this.whatWasThatCooldownActive = true;
+						setTimeout(
+							() => this.broadcastEvent('playSequence', 'what'),
+							500);
+						setTimeout(
+							() => this.whatWasThatCooldownActive = false,
+							WWT_COOLDOWN_DURATION);
+					}
 				}
 			});
 		});

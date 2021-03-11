@@ -64,6 +64,7 @@ class Module {
 		this.zindex = description.zindex;
 		this.tags = description.tags;
 		this.webSounds = description.webSounds;
+		this.configurable = description.configurable !== false;
 		
 		// Utility objects
 		this.moduleManager = null;
@@ -84,8 +85,10 @@ class Module {
 		this.data = null; // Filled during defineData
 		
 		// Configuration
-		this.config = {};
-		this.modConfig = new ModuleConfig(this.name);
+		if (this.configurable) {
+			this.config = {};
+			this.modConfig = new ModuleConfig(this.name, this.enabledByDefault !== false);
+		}
 		
 		// This is just to get the IDE to stop whining about this.shortcuts not being
 		// defined (that's kind of the point here...)
@@ -279,6 +282,10 @@ class Module {
 	// Lets the concrete module define its configuration and then adds some common
 	// things that all modules need.
 	defineConfig(modConfig) {
+		if (!this.configurable) {
+			return;
+		}
+		
 		this._addCommonCommands();
 		this.defineModConfig(modConfig); // Common commands may be overridden here - that's fine
 		
@@ -313,6 +320,10 @@ class Module {
 	// This performs some common tasks related to loading module configurations
 	// and lets the concrete inheriting module do the rest.
 	loadConfig(conf) {
+		if (!this.configurable) {
+			return;
+		}
+		
 		// Handle command re-registrations
 		if (this.config.enabled && !conf.enabled) {
 			// Module deactivation

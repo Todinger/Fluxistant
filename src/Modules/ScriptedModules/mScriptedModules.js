@@ -8,12 +8,13 @@ class ScriptedModules extends Module {
 			source: 'ScriptedModules.html',
 		});
 		
+		// TODO: Make this configurable
 		this.modulesToShow = [
-			'Channel Party',
+			// 'Channel Party',
 			'Image Display',
 			'Image Dropper',
 			'Text Display',
-			'Censor',
+			// 'Censor',
 			// 'Parrot Mate',
 		];
 		

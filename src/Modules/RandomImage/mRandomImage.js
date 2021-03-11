@@ -11,6 +11,7 @@ class RandomImage extends Module {
 		super({
 			name: 'Random Image',
 			tags: ['imgdisp'],
+			enabledByDefault: false,
 		});
 	}
 	

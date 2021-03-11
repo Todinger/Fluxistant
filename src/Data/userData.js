@@ -14,7 +14,7 @@ const Utils = require('../utils');
 class UserData {
 	constructor(dataDirPath) {
 		this.dataDirPath = dataDirPath;
-		Utils.ensureDirExists(dataDirPath);
+		Utils.ensureDirExists(this.dataDirPath);
 		
 		this.savedFiles = {};       // Current state
 		this.filesToAdd = {};       // Uncommitted new files
@@ -100,7 +100,8 @@ class UserData {
 		// Then add everything marked for addition (this is so that
 		// if we remove and add something with the same name - i.e.
 		// replace it - then it'll work properly
-		return Promise.all(deletePromises).then(deletedKeys => {
+		return Promise.all(deletePromises).catch().then(deletedKeys => {
+			Utils.ensureDirExists(this.dataDirPath);
 			_.pullAll(this.filesToDelete, deletedKeys);
 			let movePromises = [];
 			Object.keys(this.filesToAdd).forEach(fileKey => {

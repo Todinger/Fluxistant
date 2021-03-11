@@ -8,6 +8,7 @@ class ImageDropper extends Module {
 			name: 'Image Dropper',
 			webname: 'imgdrop',
 			source: 'imgdrop.html',
+			configurable: false,
 		});
 	}
 }

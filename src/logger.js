@@ -1,7 +1,6 @@
 const path = require('path');
 const winston = require('winston');
 require('winston-daily-rotate-file');
-const cli = require('./cliManager');
 const Globals = require('./globals');
 const Utils = require('./utils');
 
@@ -14,13 +13,7 @@ const MESSAGE_FORMAT = winston.format.printf(({ level, message, timestamp }) => 
 
 class Logger {
 	constructor() {
-		cli.on(['l', 'log', 'clog'], (level) => this.setConsoleLevel(level));
-		cli.on(['flog', 'fl'], (level) => this.setFileLevel(level));
-		
-		['info', 'warn', 'error', 'debug'].forEach(
-			level => cli.on([level], () => this.setConsoleLevel(level)));
-		
-		Globals.Logger = this;
+		this.init();
 	}
 	
 	init() {
@@ -53,6 +46,14 @@ class Logger {
 		});
 	}
 	
+	registerCliCommands() {
+		Globals.cli.on(['l', 'log', 'clog'], (level) => this.setConsoleLevel(level));
+		Globals.cli.on(['flog', 'fl'], (level) => this.setFileLevel(level));
+		
+		['info', 'warn', 'error', 'debug'].forEach(
+			level => Globals.cli.on([level], () => this.setConsoleLevel(level)));
+	}
+	
 	info(...params) {
 		this.logger.info(...params);
 	}
@@ -75,6 +76,11 @@ class Logger {
 	
 	setConsoleLevel(level) {
 		this.transports.console.level = level;
+	}
+	
+	setAllLevels(level) {
+		this.setConsoleLevel(level);
+		this.setFileLevel(level);
 	}
 }
 

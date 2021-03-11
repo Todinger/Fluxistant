@@ -208,6 +208,8 @@ class BotFight extends Module {
 	constructor() {
 		super({
 			name: 'Bot Fight',
+			enabledByDefault: false,
+			configurable: false,
 			// debug: true,
 		});
 		
@@ -254,9 +256,13 @@ class BotFight extends Module {
 	// Final result:
 	// this.conversations = <Conversations Collection>
 	loadData() {
-		let data = this.readJSON(CONVERSATIONS_FILE);
-		this.conversations = this.loadConversations(data.conversations);
-		this.log('Conversations loaded.');
+		try {
+			let data = this.readJSON(CONVERSATIONS_FILE);
+			this.conversations = this.loadConversations(data.conversations);
+			this.log('Conversations loaded.');
+		} catch (err) {
+			this.warn(`Failed to load bot fight data: ${err}`);
+		}
 	}
 	
 	// Loads the conversations from direct file data.

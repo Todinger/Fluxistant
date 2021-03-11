@@ -7,6 +7,8 @@ class ChatAlerts extends Module {
 			// webname: 'folderName',
 			// source: 'pageName.html',
 			enabled: false,
+			enabledByDefault: false,
+			configurable: false,
 		});
 	}
 }

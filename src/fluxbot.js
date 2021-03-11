@@ -36,6 +36,10 @@ class FluxBot {
 		this.io = require('socket.io')(this.server);
 	}
 	
+	log(msg) {
+		this.cli.log(`[Main] ${msg}`);
+	}
+	
 	prepareDirectories() {
 		Utils.ensureDirExists(APP_DATA_DIR);
 		Utils.ensureDirExists(DATA_DIR_MAIN);
@@ -58,16 +62,16 @@ class FluxBot {
 		this.configManager.loadMain();
 	}
 	
+	setupLogs() {
+		this.logger = require('./logger');
+	}
+	
 	setupCLI() {
 		// CLI input and output
 		this.cli = require('./cliManager');
 		Globals.cli = this.cli;
 		this.cli.on(['q', 'quit', 'exit'], () => process.exit(0)); // Exit command
-	}
-	
-	setupLogs() {
-		this.logger = require('./logger');
-		this.logger.init();
+		this.logger.registerCliCommands();
 	}
 	
 	// Asset- and file-related registration
@@ -87,7 +91,7 @@ class FluxBot {
 	// Gets a collection of { username: imageurl } pairs for all the users who have
 	// self-images in the user self-image directory
 	getUserImageList(socket) {
-		this.cli.log('User image list requested.');
+		this.log('User image list requested.');
 		this.assets.getUserImages(imageList => socket.emit('userImageList', imageList));
 	}
 	
@@ -276,7 +280,7 @@ class FluxBot {
 	// Register to handle general server events
 	registerServerEvents() {
 		this.io.on('connection', socket => {
-			this.cli.log('Client connected.');
+			this.log('Client connected.');
 			
 			// Requests for the list of user self-images
 			socket.on('getUserImageList', () => this.getUserImageList(socket));
@@ -288,13 +292,13 @@ class FluxBot {
 			// Attachment requests:
 			// Direct attachment, by Module name
 			socket.on('attachTo', moduleName => {
-				this.cli.log(`Attaching client to ${moduleName}`);
+				this.log(`Attaching client to ${moduleName}`);
 				this.moduleManager.attachClient(moduleName, socket);
 			});
 			
 			// Attachment by tag
 			socket.on('attachToTag', tag => {
-				this.cli.log(`Attaching client by tag to ${tag}`);
+				this.log(`Attaching client by tag to ${tag}`);
 				this.moduleManager.attachClientToTag(tag, socket);
 			});
 			
@@ -309,7 +313,7 @@ class FluxBot {
 			});
 			
 			socket.on('saveConfig', async config => {
-				this.cli.log('Received configuration for saving.');
+				this.log('Received configuration for saving.');
 				try {
 					this.configManager.validateAll(config);
 				} catch (err) {
@@ -343,7 +347,7 @@ class FluxBot {
 	startServer() {
 		let port = this.mainConfig.getPort();
 		this.server.listen(port);
-		this.cli.log(`Listening on port ${port}...`);
+		this.log(`Listening on port ${port}...`);
 		this.cli.start();
 	}
 	
@@ -364,8 +368,8 @@ class FluxBot {
 		this.loadConfig();
 		this.emptyDataTempDir();
 		this.setupUserData();
-		this.setupCLI();
 		this.setupLogs();
+		this.setupCLI();
 		this.setupAssets();
 		this.setupWebDirs();
 		this.setupKeyboard();
@@ -381,8 +385,8 @@ class FluxBot {
 	}
 	
 	setupConfigOnly() {
-		this.setupCLI();
 		this.setupLogs();
+		this.setupCLI();
 		Utils.ensureDirExists(CONFIG_WEB_ENTITIES_PATH);
 		this.readConfigEntities(CONFIG_WEB_ENTITIES_PATH);
 		this.setupModules(CONFIG_WEB_ENTITIES_PATH);

@@ -8,10 +8,13 @@ class ChannelParty extends Module {
 			source: 'party.html',
 			zindex: 10,
 			webSounds: true,
+			enabledByDefault: false,
+			configurable: false,
 		});
 	}
 	
-	load() {
+	enable() {
+		// TODO: Remove this since there's no "disable" button for it
 		this.forwardSimpleTwitchEvent('userJoined');
 		this.forwardSimpleTwitchEvent('userLeft');
 	}

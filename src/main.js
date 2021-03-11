@@ -20,6 +20,12 @@ global.requireModConfig =
 const FluxBot = require('./fluxbot');
 
 const args = process.argv.slice(2).map(arg => arg.toLowerCase());
+
+if (args.includes('--debug')) {
+	let logger = require('./logger');
+	logger.setAllLevels('debug');
+}
+
 if (args.includes('--compile-configs')) {
 	FluxBot.setupConfigOnly();
 	process.exit(0);

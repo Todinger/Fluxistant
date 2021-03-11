@@ -18,6 +18,8 @@ class Censor extends Module {
 			name: 'Censor',
 			webname: 'censor',
 			source: 'censor.html',
+			enabledByDefault: false,
+			configurable: false,
 		});
 		
 		this.censorData = {};
@@ -28,9 +30,9 @@ class Censor extends Module {
 		this.broadcastEvent('toggleCensor', id);
 	}
 	
-	preload() {
-		this.imageDirURL = this.registerAssetDir('Images', 'images');
-	}
+	// preload() {
+	// 	this.imageDirURL = this.registerAssetDir('Images', 'images');
+	// }
 	
 	loadData() {
 		try {
@@ -72,8 +74,7 @@ class Censor extends Module {
 			this.censorData = newData;
 			this.log('Loaded censor data.');
 		} catch (err) {
-			this.error('Failed to read censor data:');
-			this.error(err);
+			this.warn(`Failed to read censor data: ${err}`);
 		}
 	}
 	

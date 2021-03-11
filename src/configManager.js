@@ -13,7 +13,6 @@ const MODULES_SUBDIR = 'Modules';
 const BACKUPS_SUBDIR = 'Backups';
 
 const BACKUP_NAME_GLOB_PATTERN = 'DDDD.DD.DD-DD.DD.DD/'.split('D').join('[0-9]'); // Search and replace D with [0-9]
-// const BACKUP_NAME_GLOB_PATTERN = '[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]-[0-9][0-9].[0-9][0-9].[0-9][0-9]'
 
 // Manages the configuration objects of all the configurable entities in the
 // program.
