@@ -190,6 +190,11 @@
 			"Is it a pea? Is it a pigeon? Nobody knows...",
 			"Give me a P! Give me an E! Give me a P! Give me a P! Give me a P! I just want some peas... yecatsMeow",
 			"Hi Peageons! Seen any ghosts lately? ...there's one right behind me isn't there? GET IT OFF! GET IT OFF! GET IT OFF! yecatsScared"
+		],
+		"images": [
+			{
+				"url": "/assets/image-display/Pea.png"
+			}
 		]
 	},
 	
