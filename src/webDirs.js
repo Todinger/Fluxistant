@@ -38,7 +38,7 @@ const FSHOWER_URL = '/assets/fshower/';
 const FSHOWER_SUBDIR_CACHE = 'Defaults/';
 const FSHOWER_SUBDIR_USERS = 'User-Specific/';
 
-// This class is in charge of everything related to the above assets,
+// This class is in charge of everything related to the above directories,
 // and of registering directories with URLs in general
 class AssetManager {
 	constructor() {

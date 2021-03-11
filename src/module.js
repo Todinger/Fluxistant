@@ -9,7 +9,7 @@ const User = require('./user');
 const TwitchManager = require('./twitchManager');
 const Enums = require('./enums');
 const KeyboardManager = require('./keyboardManager');
-const Assets = require('./assets');
+const WebDirs = require('./webDirs');
 const CommandManager = require('./commandManager');
 const SEManager = require('./seManager');
 const RewardsManager = require('./rewardsManager');
@@ -725,7 +725,7 @@ class Module {
 	// clients via a URL.
 	registerAssetDir(localPath, name) {
 		let url = `/assets/modules/${this.name}/${name}`;
-		Assets.registerDir(path.join(this.workdir, localPath), url);
+		WebDirs.registerDir(path.join(this.workdir, localPath), url);
 		return url;
 	}
 	
@@ -778,8 +778,8 @@ class Module {
 	
 	// [For use by inheriting classes]
 	// Utility access to the AssetManager.
-	static get Assets() {
-		return Assets;
+	static get WebDirs() {
+		return WebDirs;
 	}
 	
 	// [For use by inheriting classes]

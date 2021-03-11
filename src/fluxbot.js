@@ -76,15 +76,15 @@ class FluxBot {
 	
 	// Asset- and file-related registration
 	setupAssets() {
-		this.assets = require('./assets');
-		this.assets.init(this.app);
-		this.assets.registerAll();
+		this.webDirs = require('./webDirs');
+		this.webDirs.init(this.app);
+		this.webDirs.registerAll();
 		
 	}
 	
 	setupWebDirs() {
 		// The files here are needed by the HTML pages of the various modules
-		this.assets.registerDir(path.join(__dirname, 'ClientsCommon'), '/common');
+		this.webDirs.registerDir(path.join(__dirname, 'ClientsCommon'), '/common');
 		this.app.use(GUI_DIR_WEB, express.static(GUI_DIR));
 	}
 	
@@ -92,7 +92,7 @@ class FluxBot {
 	// self-images in the user self-image directory
 	getUserImageList(socket) {
 		this.log('User image list requested.');
-		this.assets.getUserImages(imageList => socket.emit('userImageList', imageList));
+		this.webDirs.getUserImages(imageList => socket.emit('userImageList', imageList));
 	}
 	
 	// Initialize keyboard interaction
