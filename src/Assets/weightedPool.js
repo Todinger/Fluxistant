@@ -5,7 +5,7 @@ const FilePool = require('./filePool');
 const Utils = require('../utils');
 const Errors = require('../errors');
 
-// Represents data that contains multiple files, of which we normally choose one at a time.
+// Represents assets that contain multiple files, of which we normally choose one at a time.
 // The selection is done at random, with every file in the pool having its own chances of being chosen,
 // based on a weight value provided for each key.
 // By default all keys are assigned a weight value of 1. If this isn't changed then this object behaves
@@ -14,8 +14,8 @@ const Errors = require('../errors');
 // Weights are relative, so if all keys have the same weight, be it 1 or 31415926, it will still act as
 // a uniform pool (there's no change to efficiency with different weight values, by the way).
 class WeightedPool extends FilePool {
-	constructor(dataDirPath) {
-		super(dataDirPath);
+	constructor(assetsDirPath) {
+		super(assetsDirPath);
 		this.weights = {};
 	}
 	
@@ -62,21 +62,21 @@ class WeightedPool extends FilePool {
 		return super._deleteFile(key);
 	}
 	
-	import(exportedData) {
+	import(exportedAssets) {
 		// Validate weights (each file should have one and nothing else)
 		Errors.ensureKeysMatch(
-			exportedData.files,
-			exportedData.weights,
+			exportedAssets.files,
+			exportedAssets.weights,
 			"Weights data doesn't match files data.");
 		
-		super.import(exportedData);
-		this.weights = exportedData.weights;
+		super.import(exportedAssets);
+		this.weights = exportedAssets.weights;
 	}
 	
 	export() {
-		let exportedData = super.export();
-		exportedData.weights = this.weights;
-		return exportedData;
+		let exportedAssets = super.export();
+		exportedAssets.weights = this.weights;
+		return exportedAssets;
 	}
 }
 

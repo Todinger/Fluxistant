@@ -10,30 +10,30 @@ const _ = require('lodash');
 const Errors = require('../errors');
 const Utils = require('../utils');
 
-// Base class for user data files
-class UserData {
-	constructor(dataDirPath) {
-		this.dataDirPath = dataDirPath;
-		Utils.ensureDirExists(this.dataDirPath);
+// Base class for user asset files
+class UserAssets {
+	constructor(assetsDirPath) {
+		this.assetsDirPath = assetsDirPath;
+		Utils.ensureDirExists(this.assetsDirPath);
 		
 		this.savedFiles = {};       // Current state
 		this.filesToAdd = {};       // Uncommitted new files
 		this.filesToDelete = [];    // Uncommitted deletions
 	}
 	
-	// Selects a file from the stored data, according to the concrete class's own selection rules
+	// Selects a file from the stored assets, according to the concrete class's own selection rules
 	// noinspection JSUnusedLocalSymbols
 	_getFileKeys(params) {
 		Errors.abstract();
 	}
 	
 	_pathFor(filename) {
-		return path.join(this.dataDirPath, filename);
+		return path.join(this.assetsDirPath, filename);
 	}
 	
 	_pathForKey(key, name) {
 		name = name || this.savedFiles[key].name;
-		return path.join(this.dataDirPath, key + path.extname(name));
+		return path.join(this.assetsDirPath, key + path.extname(name));
 	}
 	
 	_addFile(file) {
@@ -101,7 +101,7 @@ class UserData {
 		// if we remove and add something with the same name - i.e.
 		// replace it - then it'll work properly
 		return Promise.all(deletePromises).catch().then(deletedKeys => {
-			Utils.ensureDirExists(this.dataDirPath);
+			Utils.ensureDirExists(this.assetsDirPath);
 			_.pullAll(this.filesToDelete, deletedKeys);
 			let movePromises = [];
 			Object.keys(this.filesToAdd).forEach(fileKey => {
@@ -194,15 +194,15 @@ class UserData {
 		return this.getFileWebByKey(key);
 	}
 	
-	import(exportedData) {
+	import(exportedAssets) {
 		assert(
-			exportedData && exportedData.files,
-			`Invalid exported file data given for import: ${exportedData}`);
+			exportedAssets && exportedAssets.files,
+			`Invalid exported file assets given for import: ${exportedAssets}`);
 		
 		// Added the '|| {}' part to shut the IDE up about it might being
 		// null or undefined (despite our test above to make sure it isn't...)
-		// let files = exportedData.files || {};
-		this.savedFiles = exportedData.files || {};
+		// let files = exportedAssets.files || {};
+		this.savedFiles = exportedAssets.files || {};
 	}
 	
 	export() {
@@ -210,4 +210,4 @@ class UserData {
 	}
 }
 
-module.exports = UserData;
+module.exports = UserAssets;

@@ -1,13 +1,13 @@
 'use strict';
 
-const UserData = require('./userData');
+const UserAssets = require('./userAssets');
 
-// Represents data that contains multiple files, of which we normally choose one at a time.
+// Represents assets that contain multiple files, of which we normally choose one at a time.
 // Note that this is still an abstract class, as it does not specify how to choose a key
 // from our pool.
-class FilePool extends UserData {
-	constructor(dataDirPath) {
-		super(dataDirPath);
+class FilePool extends UserAssets {
+	constructor(assetsDirPath) {
+		super(assetsDirPath);
 	}
 	
 	_getFileKeys(params) {

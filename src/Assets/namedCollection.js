@@ -1,13 +1,13 @@
 'use strict';
 
 const assert = require('assert').strict;
-const UserData = require('./userData');
+const UserAssets = require('./userAssets');
 
-// Represents data that contains multiple files, where we choose a file
+// Represents assets that contain multiple files, where we choose a file
 // directly by its key.
-class NamedCollection extends UserData {
-	constructor(dataDirPath) {
-		super(dataDirPath);
+class NamedCollection extends UserAssets {
+	constructor(assetsDirPath) {
+		super(assetsDirPath);
 	}
 	
 	_ensurePresence(fileKey) {

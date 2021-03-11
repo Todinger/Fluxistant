@@ -12,12 +12,12 @@ const WeightedPool = require('./weightedPool');
 const NamedCollection = require('./namedCollection');
 const UniformGroupsPool = require('./uniformGroupsPool');
 
-const DATA_EXTENSION = '.data.json';
+const ASSETS_EXTENSION = '.assets.json';
 
-class ModuleData {
-	constructor(modName, dataDirPath) {
+class ModuleAssets {
+	constructor(modName, assetsDirPath) {
 		this.modName = modName;
-		this.dataDirPath = dataDirPath;
+		this.assetsDirPath = assetsDirPath;
 		this.collections = {};
 	}
 	
@@ -44,7 +44,7 @@ class ModuleData {
 	}
 	
 	add(collectionID, collectionClass) {
-		let collection = new collectionClass(path.join(this.dataDirPath, collectionID));
+		let collection = new collectionClass(path.join(this.assetsDirPath, collectionID));
 		this.collections[collectionID] = collection;
 		this[collectionID] = collection;
 	}
@@ -117,60 +117,60 @@ class ModuleData {
 			});
 	}
 	
-	import(exportedData) {
+	import(exportedAssets) {
 		// Make sure that
 		Errors.ensureKeysMatch(
-			exportedData,
+			exportedAssets,
 			this.collections,
-			`Exported data doesn't match module configuration for ${this.modName}.`);
+			`Exported assets don't match the module configuration for ${this.modName}.`);
 		
 		Object.keys(this.collections).forEach(collectionID => {
-			this.collections[collectionID].import(exportedData[collectionID]);
+			this.collections[collectionID].import(exportedAssets[collectionID]);
 		});
 	}
 	
 	export() {
-		let exportedData = {};
+		let exportedAssets = {};
 		Object.keys(this.collections).forEach(collectionID => {
-			exportedData[collectionID] = this.collections[collectionID].export();
+			exportedAssets[collectionID] = this.collections[collectionID].export();
 		});
 		
-		return exportedData;
+		return exportedAssets;
 	}
 	
 	_saveFilePath() {
-		return path.join(this.dataDirPath, this.modName + DATA_EXTENSION);
+		return path.join(this.assetsDirPath, this.modName + ASSETS_EXTENSION);
 	}
 	
 	saveToDisk() {
-		// If we have no collections it means the module has no data - skip it
+		// If we have no collections it means the module has no assets - skip it
 		if (_.isEmpty(this.collections)) {
 			return;
 		}
 		
-		let exportedData = this.export();
-		let exportedDataString = JSON.stringify(exportedData, null, '\t');
-		fs.writeFile(this._saveFilePath(), exportedDataString, (err) => {
+		let exportedAssets = this.export();
+		let exportedAssetsString = JSON.stringify(exportedAssets, null, '\t');
+		fs.writeFile(this._saveFilePath(), exportedAssetsString, (err) => {
 			if (err) {
-				cli.error(`Failed to write data of '${this.modName}' module to file: ${err}`);
+				cli.error(`Failed to write assets of '${this.modName}' module to file: ${err}`);
 			}
 		});
 	}
 	
 	loadFromDisk() {
-		// If we have no collections it means the module has no data - skip it
+		// If we have no collections it means the module has no assets - skip it
 		if (_.isEmpty(this.collections)) {
 			return;
 		}
 		
 		try {
-			let exportedDataString = fs.readFileSync(this._saveFilePath());
-			let exportedData = JSON.parse(exportedDataString);
-			this.import(exportedData);
+			let exportedAssetsString = fs.readFileSync(this._saveFilePath());
+			let exportedAssets = JSON.parse(exportedAssetsString);
+			this.import(exportedAssets);
 		} catch (err) {
-			cli.warn(`Failed to load data of '${this.modName}' module from disk: ${err}`);
+			cli.warn(`Failed to load assets of '${this.modName}' module from disk: ${err}`);
 		}
 	}
 }
 
-module.exports = ModuleData;
+module.exports = ModuleAssets;

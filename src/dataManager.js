@@ -2,7 +2,7 @@
 
 const assert = require('assert').strict;
 const path = require('path');
-const ModuleData = require('./Data/moduleData');
+const ModuleData = require('./Assets/moduleAssets');
 
 const MODULES_SUBDIR = 'Modules';
 

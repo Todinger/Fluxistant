@@ -4,11 +4,11 @@ const _ = require('lodash');
 const UniformPool = require('./uniformPool');
 const Utils = require('../utils');
 
-// Represents data that contains multiple files, of which we normally choose one at a time.
+// Represents assets that contain multiple files, of which we normally choose one at a time.
 // The selection is done at random, with every file in the pool having the same odds of being chosen.
 class UniformGroupsPool extends UniformPool {
-	constructor(dataDirPath) {
-		super(dataDirPath);
+	constructor(assetsDirPath) {
+		super(assetsDirPath);
 		this.groups = {};
 	}
 	

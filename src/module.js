@@ -81,7 +81,7 @@ class Module {
 		this._clientDisconnectedHandlers = [];
 		this._connectedClients = {};
 		
-		// Data
+		// Assets
 		this.data = null; // Filled during defineData
 		
 		// Configuration
