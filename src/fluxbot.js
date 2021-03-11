@@ -381,12 +381,16 @@ class FluxBot {
 	}
 	
 	setupConfigOnly() {
+		this.setupCLI();
+		this.setupLogs();
 		Utils.ensureDirExists(CONFIG_WEB_ENTITIES_PATH);
 		this.readConfigEntities(CONFIG_WEB_ENTITIES_PATH);
 		this.setupModules(CONFIG_WEB_ENTITIES_PATH);
 		this.entityFileManager.createRequirementsFile(
 			CONFIG_WEB_ENTITIES_LIST_FILE,
 			'./' + WEB_ENTITIES_SUBDIR);
+		
+		console.log('Configs compiled successfully.');
 	}
 }
 

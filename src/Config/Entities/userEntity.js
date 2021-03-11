@@ -31,6 +31,12 @@ class UserEntity extends StaticObjectEntity {
 			(isNonEmptyString(displayName) && displayName) ||
 			undefined;
 	}
+	
+	// export() {
+	// 	let conf = super.export();
+	// 	conf.username = conf.username.toLowerCase();
+	// 	return conf;
+	// }
 }
 
 module.exports = UserEntity;

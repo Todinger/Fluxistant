@@ -17,6 +17,7 @@ const entities = {
 	ImageEffect_DunDunDunEntity: require('./WebEntities/imageEffect_DunDunDunEntity.js'),
 	ImageEffect_GlowEntity: require('./WebEntities/imageEffect_GlowEntity.js'),
 	ImageEffect_ShadowEntity: require('./WebEntities/imageEffect_ShadowEntity.js'),
+	ImageFileEntity: require('./WebEntities/imageFileEntity.js'),
 	IntegerEntity: require('./WebEntities/integerEntity.js'),
 	KeyEntity: require('./WebEntities/keyEntity.js'),
 	KeyShortcutEntity: require('./WebEntities/keyShortcutEntity.js'),
@@ -49,8 +50,8 @@ const entities = {
 	UserGroupEntity: require('./WebEntities/userGroupEntity.js'),
 	ImageCommandEntity: require('./WebEntities/imageCommandEntity.js'),
 	ImageEntity: require('./WebEntities/imageEntity.js'),
-	ImageFileEntity: require('./WebEntities/imageFileEntity.js'),
 	SoundEntity: require('./WebEntities/soundEntity.js'),
+	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),
 	WelcomeEntity: require('./WebEntities/welcomeEntity.js'),
 };
 

@@ -111,6 +111,12 @@ class WelcomeImage extends Module {
 		this.onTwitchEvent(
 			'message',
 			(user, message) => this.processMessage(user, message));
+		this.onTwitchEvent(
+			'action',
+			(user, message) => this.processMessage(user, message));
+		this.onTwitchEvent(
+			'command',
+			(user, message) => this.processMessage(user, message));
 	}
 }
 

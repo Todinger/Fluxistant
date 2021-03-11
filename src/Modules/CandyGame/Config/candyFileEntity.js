@@ -1,4 +1,4 @@
-const ImageFileEntity = requireModConfig('ImageDisplay', 'imageFileEntity');
+const ImageFileEntity = requireConfig('imageFileEntity');
 
 class CandyFileEntity extends ImageFileEntity {
 	static get TYPE()		{ return 'CandyFile';					}

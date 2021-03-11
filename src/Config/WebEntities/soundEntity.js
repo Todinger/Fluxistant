@@ -1,9 +1,16 @@
 const assert = require('assert').strict;
+const _ = require('lodash');
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class SoundEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Sound'; 					}
 	static get BUILDER()	{ return () => new SoundEntity(); 	}
+	
+	static makeDisplayData(imageFileEntityConf, savedFile) {
+		let dd = _.omit(imageFileEntityConf, 'file');
+		dd.url = savedFile.data;
+		return dd;
+	}
 	
 	constructor() {
 		super();
@@ -37,53 +44,14 @@ class SoundEntity extends StaticObjectEntity {
 			!this.isSet() || !this.isVolumeSet() || (0 <= volume && volume <= 100),
 			`Volume must be bet 0 and 100.`);
 	}
+	
+	toConf() {
+		let conf = super.toConf();
+		conf.makeDisplayData = function(savedFile) {
+			return SoundEntity.makeDisplayData(this, savedFile);
+		};
+		return conf;
+	}
 }
 
 module.exports = SoundEntity;
-
-// const assert = require('assert').strict;
-// const StaticObjectEntity = require('./staticObjectEntity');
-//
-// class SoundEntity extends StaticObjectEntity {
-// 	static get TYPE()		{ return 'Sound'; 					}
-// 	static get BUILDER()	{ return () => new SoundEntity(); 	}
-//
-// 	constructor() {
-// 		super();
-// 		this.addString('filename')
-// 			.setName('File Name')
-// 			.setDescription('The name of the sound file that will be displayed.');
-// 		this.addNumber('volume', 100)
-// 			.setName('Volume')
-// 			.setDescription('Volume at which to play the sound (not implemented yet).');
-// 	}
-//
-// 	getFilename() {
-// 		return this.getChild('filename').getValue();
-// 	}
-//
-// 	getVolume() {
-// 		return this.getChild('volume').getValue();
-// 	}
-//
-// 	isSet() {
-// 		return this.getChild('filename').isSet();
-// 	}
-//
-// 	isVolumeSet() {
-// 		return this.getChild('volume').isSet();
-// 	}
-//
-//
-// 	// ---- Overrides ---- //
-//
-// 	validate() {
-// 		super.validate();
-// 		let volume = this.getVolume();
-// 		assert(
-// 			!this.isSet() || !this.isVolumeSet() || (0 <= volume && volume <= 100),
-// 			`Volume must be bet 0 and 100.`);
-// 	}
-// }
-//
-// module.exports = SoundEntity;

@@ -1,10 +1,17 @@
+const _ = require('lodash');
 const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
 class ImageEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Image'; 					}
 	static get BUILDER()	{ return () => new ImageEntity(); 	}
-
+	
+	static makeDisplayData(imageFileEntityConf, savedFile) {
+		let dd = _.omit(imageFileEntityConf, 'file');
+		dd.url = savedFile.data;
+		return dd;
+	}
+	
 	constructor() {
 		super();
 		this.addSingleData('file', { collection: 'Images', dataType: 'IMAGE' })
@@ -23,9 +30,21 @@ class ImageEntity extends StaticObjectEntity {
 			.setName('Effects')
 			.setDescription('Special effects to apply to the image');
 	}
+	
+	getFile() {
+		return this.getChild('file');
+	}
 
 	isSet() {
-		return this.getChild('file').isSet();
+		return this.getFile().isSet();
+	}
+	
+	toConf() {
+		let conf = super.toConf();
+		conf.makeDisplayData = function(savedFile) {
+			return ImageEntity.makeDisplayData(this, savedFile);
+		};
+		return conf;
 	}
 }
 

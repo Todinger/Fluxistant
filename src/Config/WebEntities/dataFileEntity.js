@@ -5,6 +5,12 @@ class DataFileEntity extends StaticObjectEntity {
 	static get GUITYPE()	{ return 'RawObject';						}
 	static get BUILDER()	{ return data => new DataFileEntity(data);	}
 	
+	static makeDisplayData(soundFileEntityConf, savedFile) {
+		let dd = _.omit(soundFileEntityConf, 'fileKey');
+		dd.url = savedFile.data;
+		return dd;
+	}
+	
 	constructor(fileKey) {
 		super();
 		this.addString('fileKey', fileKey)
@@ -30,6 +36,14 @@ class DataFileEntity extends StaticObjectEntity {
 	// Inheriting classes that add data should change this return value to true
 	get hasExtraData() {
 		return false;
+	}
+	
+	toConf() {
+		let conf = super.toConf();
+		conf.makeDisplayData = function(savedFile) {
+			return DataFileEntity.makeDisplayData(this, savedFile);
+		};
+		return conf;
 	}
 }
 
