@@ -117,8 +117,8 @@ export default class DynamicArrayGui extends EntityGui {
 			this.childrenContainer.append(this.elementRows[i]);
 		}
 		
-		// Before finishing, add the "Add Element" button
-		let addButton = $(`<button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Add Element</button>`);
+		// Before finishing, add the "Add" button for new elements
+		let addButton = $(`<button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Add</button>`);
 		addButton.click(() => this._addButtonPressed());
 		this.childrenContainer.append(addButton);
 		

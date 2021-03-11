@@ -42,29 +42,45 @@
 - NPM Uninstall image-size if I no longer use it
 
 
+IDEAS!
+- Bingo game
+- Chat "Meow?": deletes all messages from people that aren't made of solely meowing.
 
 
-Functions module setup example:
+
+Functions module setup example (NOTE: all trigger variables are available as response variables automatically):
 	functions = {
 		adventure: {
 			name: 'Start Adventure',
 			description: 'Starts the adventure by the user',
 			callback: user => this.startRecruiting(user),
+			cooldown: {
+				user: 10,
+				global: 5,
+			},
 			triggers: [
 				this.trigger.command({
 					cmdname: 'adventure',
 					aliases: ['adv'],
 					filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+					cooldown: {
+						user: 40,
+						global: 20,
+					},
+					parameters: ['$type'],
 				}),
 				this.trigger.keywords({
 					keywords: ['hello', 'there', /abc/],
 					filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
 				}),
-				this,trigger.shorctut({
+				this.trigger.shorctut({
 					keys: [
 						['BACKSPACE'], // The backspace key on the keyboard
 					],
 					filters: [this.filterDesc('windowActive', ['Phasmophobia', 'Spelunky 2'])],
+					varValues: {
+						type: 'pirate',
+					},
 				}),
 				this.trigger.voice({
 					// ???,
@@ -75,6 +91,22 @@ Functions module setup example:
 					filters: [this.filterDesc('isMod')],
 				}),
 			],
+			triggerVariables: {
+				type: {
+					name: 'Adventure Type',
+					description: 'Selected category of adventures to choose from (e.g. spooky, candy)',
+					example: 'Wow, what a $type that was, people, eh?',
+					default: 'spooky',
+					expr: '$type',
+				},
+			},
+			responseVariables: {
+				winner: {
+					name: 'Winner',
+					description: 'Name of the user who won the adventure',
+					example: 'Way to go $winner, you da man!',
+				},
+			},
 			responses: [
 				this.response.chat({
 					message: 'Hello $user, nice to see you!',
@@ -98,6 +130,49 @@ Functions module setup example:
 					message: 'Yay $user!',
 					append: false,  // True by default
 				})
+			],
+		},
+		
+		saythis: {
+			name: 'Say This',
+			description: 'Makes the bot say the specified text',
+			callback: params => this.say(params.msg),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'say',
+					parameters: ['$...msg'],
+				}),
+			],
+			inputVariables: {
+				msg: {
+					name: 'Message',
+					description: 'The message the bot should say',
+					expr: '$msg',
+				},
+			}
+		},
+		
+		sayThis_UsingOnlyFunctionDefinition: {
+			name: 'Say This - but without using a callback!',
+			description: 'Makes the bot say the specified text',
+			// NOT USING THIS --> callback: params => this.say(params.msg),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'say',
+					parameters: ['$...msg'],
+				}),
+			],
+			inputVariables: {
+				msg: {
+					name: 'Message',
+					description: 'The message the bot should say',
+					expr: '$msg',
+				},
+			},
+			responses: [
+				this.response.chat({
+					message: '$msg',
+				}),
 			],
 		},
 	}

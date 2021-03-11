@@ -11,6 +11,7 @@ class TextDisplay extends Module {
 			webname: 'textdisp',
 			source: 'textdisp.html',
 			zindex: 5,
+			configurable: false,
 		});
 		
 		this.styles = null;

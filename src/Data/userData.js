@@ -147,6 +147,13 @@ class UserData {
 			.then((data) => {
 				let b64Data = Base64.encode(data);
 				let contentType = mime.contentType(filename);
+				
+				// I don't know why it gives it like this, but the web page
+				// can't play it when it's "/wave" instead of "/wav"
+				if (contentType === 'audio/wave') {
+					contentType = 'audio/wav';
+				}
+				
 				return {
 					success: true,
 					name: filename,

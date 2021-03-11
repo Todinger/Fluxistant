@@ -11,6 +11,10 @@ export default class DataGui extends EntityGui {
 		this.dataContent = null;
 	}
 	
+	get singleFile() {
+		return true;
+	}
+	
 	_getCollectionURL() {
 		return `/data/mod/${this.modName}/${this.entity.getCollectionID()}`;
 	}
@@ -51,11 +55,18 @@ export default class DataGui extends EntityGui {
 	_makeUploadArea() {
 		let areaContainer = $('<div class="js-upload uk-placeholder uk-text-center uk-margin-remove"></div>');
 		let icon = $('<span uk-icon="icon: upload"></span>');
-		let text = $(`<span class="uk-text-middle">Upload ${this.entity.getDataType().toLowerCase()} by dropping it here or </span>`);
+		let text;
+		let uploadLink;
+		if (this.singleFile) {
+			text = $(`<span class="uk-text-middle">Upload ${this.entity.getDataType().toLowerCase()} by dropping it here or </span>`);
+			uploadLink = $('<span class="uk-link">selecting one</span>');
+		} else {
+			text = $(`<span class="uk-text-middle">Upload ${this.entity.getDataType().toLowerCase()}s by dropping them here or </span>`);
+			uploadLink = $('<span class="uk-link">selecting some</span>');
+		}
 		
 		let uploadForm = $('<div uk-form-custom></div>');
 		let uploadInput = this._makeUploadInput();
-		let uploadLink = $('<span class="uk-link">selecting one</span>');
 		uploadForm.append(uploadInput, uploadLink, '.'); // Include end-of-sentence period
 		this._createUploader(areaContainer);
 		

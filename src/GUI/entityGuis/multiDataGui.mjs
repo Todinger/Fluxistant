@@ -14,6 +14,10 @@ export default class MultiDataGui extends DataGui {
 		this.fileGuiComponents = {};
 	}
 	
+	get singleFile() {
+		return false;
+	}
+	
 	_deleteFile(fileKey, notifyChange) {
 		super._deleteFile(fileKey, notifyChange);
 		this.entity.removeFile(fileKey);
@@ -26,7 +30,9 @@ export default class MultiDataGui extends DataGui {
 			this._deleteFile(fileKey, false);
 		});
 		
-		this._changed();
+		if (Object.keys(this.fileGuiComponents).length > 0) {
+			this._changed();
+		}
 	}
 	
 	_loadFilesFromServer() {
@@ -160,14 +166,14 @@ export default class MultiDataGui extends DataGui {
 		return container;
 	}
 	
-	_addFileDisplay(file, addToConfig) {
+	_addFileDisplay(file, newFile) {
 		if (file.fileKey && file.fileKey in this.fileGuiComponents) {
 			showError(`Duplicate file key: ${file.fileKey}`);
 			return;
 		}
 		
 		let newEntity;
-		if (addToConfig) {
+		if (newFile) {
 			newEntity = this.entity.createAndAddFile(file.fileKey);
 		} else {
 			newEntity = this.entity.getFileElementByKey(file.fileKey);
@@ -183,7 +189,9 @@ export default class MultiDataGui extends DataGui {
 			file.name,
 			newEntity);
 		
-		this._itemChanged(file.fileKey);
+		if (newFile) {
+			this._itemChanged(file.fileKey);
+		}
 		
 		this.fileGuiComponents[file.fileKey].main = item;
 		this.fileGrid.append(item);
