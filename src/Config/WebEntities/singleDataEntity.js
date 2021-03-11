@@ -1,9 +1,9 @@
-const DataEntity = require('./dataEntity');
+const AssetEntity = require('./assetEntity');
 
-class SingleDataEntity extends DataEntity {
+class SingleAssetEntity extends AssetEntity {
 	static get TYPE()		{ return 'SingleData'; 							}
 	static get GUITYPE()	{ return 'SingleData'; 							}
-	static get BUILDER()	{ return data => new SingleDataEntity(data); 	}
+	static get BUILDER()	{ return data => new SingleAssetEntity(data); 	}
 	
 	constructor(data) {
 		super(data);
@@ -36,4 +36,4 @@ class SingleDataEntity extends DataEntity {
 	}
 }
 
-module.exports = SingleDataEntity;
+module.exports = SingleAssetEntity;

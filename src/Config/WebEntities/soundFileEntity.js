@@ -1,7 +1,6 @@
-const _ = require('lodash');
-const DataFileEntity = require('./dataFileEntity');
+const AssetFileEntity = require('./assetFileEntity');
 
-class SoundFileEntity extends DataFileEntity {
+class SoundFileEntity extends AssetFileEntity {
 	static get TYPE()		{ return 'SoundFile';					}
 	static get BUILDER()	{ return () => new SoundFileEntity();	}
 	

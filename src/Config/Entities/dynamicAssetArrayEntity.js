@@ -1,12 +1,12 @@
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
-class DynamicDataArrayEntity extends DynamicArrayEntity {
+class DynamicAssetArrayEntity extends DynamicArrayEntity {
 	static get TYPE()		{ return 'DynamicDataArray'; 							}
-	static get BUILDER()	{ return value => new DynamicDataArrayEntity(value);	}
+	static get BUILDER()	{ return value => new DynamicAssetArrayEntity(value);	}
 	
 	constructor(collection, dataType) {
 		super('SingleData', { collection, dataType });
 	}
 }
 
-module.exports = DynamicDataArrayEntity;
+module.exports = DynamicAssetArrayEntity;

@@ -14,7 +14,7 @@ class ImageEntity extends StaticObjectEntity {
 	
 	constructor() {
 		super();
-		this.addSingleData('file', { collection: 'Images', dataType: 'IMAGE' })
+		this.addSingleAsset('file', { collection: 'Images', dataType: 'IMAGE' })
 			.setName('Image')
 			.setDescription('The image that will be displayed on the screen');
 		this.addNaturalNumber('width')

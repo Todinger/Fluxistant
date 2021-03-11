@@ -98,7 +98,7 @@ class ObjectEntity extends ConfigEntity {
 		return array;
 	}
 	
-	addDynamicDataArray(key, collection, dataType, values) {
+	addDynamicAssetArray(key, collection, dataType, values) {
 		let array = this.add(key, 'DynamicDataArray', collection, dataType);
 		if (values) {
 			values.forEach(value => {
@@ -117,11 +117,11 @@ class ObjectEntity extends ConfigEntity {
 		return this.addObject(key);
 	}
 	
-	addSingleData(key, configData) {
+	addSingleAsset(key, configData) {
 		return this.add(key, 'SingleData', configData);
 	}
 	
-	addMultiData(key, configData) {
+	addMultiAsset(key, configData) {
 		return this.add(key, 'MultiData', configData);
 	}
 	

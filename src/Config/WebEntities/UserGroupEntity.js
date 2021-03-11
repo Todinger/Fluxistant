@@ -6,7 +6,7 @@ class UserGroupEntity extends UserEntity {
 	
 	constructor() {
 		super();
-		this.addMultiData(
+		this.addMultiAsset(
 			'images',
 			{
 				collection: 'Images',

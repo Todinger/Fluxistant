@@ -113,7 +113,7 @@ class Module {
 	}
 	
 	get enabled() {
-		return this.config.enabled;
+		return this.config && this.config.enabled;
 	}
 	
 	filterDesc(type, arg) {

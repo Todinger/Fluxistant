@@ -1,7 +1,7 @@
-const DataFileEntity = require('./dataFileEntity');
+const AssetFileEntity = require('./assetFileEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
-class ImageFileEntity extends DataFileEntity {
+class ImageFileEntity extends AssetFileEntity {
 	static get TYPE()		{ return 'ImageFile';					}
 	static get BUILDER()	{ return () => new ImageFileEntity(); 	}
 	

@@ -1,16 +1,9 @@
-const _ = require('lodash');
-const DataFileEntity = require('./dataFileEntity');
+const AssetFileEntity = require('./assetFileEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
-class ImageFileEntity extends DataFileEntity {
+class ImageFileEntity extends AssetFileEntity {
 	static get TYPE()		{ return 'ImageFile';					}
 	static get BUILDER()	{ return () => new ImageFileEntity(); 	}
-	
-	static makeDisplayData(imageFileEntityConf, savedFile) {
-		let dd = _.omit(imageFileEntityConf, 'fileKey');
-		dd.url = savedFile.data;
-		return dd;
-	}
 	
 	constructor(fileKey) {
 		super(fileKey);
@@ -32,14 +25,6 @@ class ImageFileEntity extends DataFileEntity {
 	
 	get hasExtraData() {
 		return true;
-	}
-	
-	toConf() {
-		let conf = super.toConf();
-		conf.makeDisplayData = function(savedFile) {
-			return ImageFileEntity.makeDisplayData(this, savedFile);
-		};
-		return conf;
 	}
 }
 

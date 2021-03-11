@@ -11,7 +11,7 @@ class WelcomeEntity extends UserEntity {
 			.setName('Messages')
 			.setDescription('One of these will be selected by the bot to say when the user first talks');
 		
-		this.addMultiData(
+		this.addMultiAsset(
 			'images',
 			{
 				collection: 'Images',
@@ -21,7 +21,7 @@ class WelcomeEntity extends UserEntity {
 			.setName('Images')
 			.setDescription('Collection of images to choose from to show for this user when they first talk');
 		
-		this.addMultiData(
+		this.addMultiAsset(
 			'sounds',
 			{
 				collection: 'Sounds',

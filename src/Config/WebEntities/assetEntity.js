@@ -1,8 +1,8 @@
 const assert = require('assert').strict;
-const Errors = requireMain('./errors');
+const Errors = require('../../errors');
 const StaticObjectEntity = require('./staticObjectEntity');
 
-class DataEntity extends StaticObjectEntity {
+class AssetEntity extends StaticObjectEntity {
 	static get TYPE()		{ return null; }
 	
 	static get SUPPORTED_DATA_TYPES() {
@@ -40,9 +40,9 @@ class DataEntity extends StaticObjectEntity {
 		
 		let dataType = this.getDataType();
 		assert(
-			DataEntity.SUPPORTED_DATA_TYPES.includes(dataType),
+			AssetEntity.SUPPORTED_DATA_TYPES.includes(dataType),
 			`Unsupported data type: ${dataType}`);
 	}
 }
 
-module.exports = DataEntity;
+module.exports = AssetEntity;

@@ -1,6 +1,4 @@
 const UserEntity = require('./userEntity');
-const ImageFileEntity = require('./imageFileEntity');
-const SoundFileEntity = require('./soundFileEntity');
 const ImageEntity = require('./imageEntity');
 const SoundEntity = require('./soundEntity');
 

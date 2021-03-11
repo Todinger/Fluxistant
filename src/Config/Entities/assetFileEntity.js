@@ -1,9 +1,10 @@
+const _ = require('lodash');
 const StaticObjectEntity = require('./staticObjectEntity');
 
-class DataFileEntity extends StaticObjectEntity {
+class AssetFileEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'DataFile';						}
 	static get GUITYPE()	{ return 'RawObject';						}
-	static get BUILDER()	{ return data => new DataFileEntity(data);	}
+	static get BUILDER()	{ return data => new AssetFileEntity(data);	}
 	
 	static makeDisplayData(soundFileEntityConf, savedFile) {
 		let dd = _.omit(soundFileEntityConf, 'fileKey');
@@ -41,10 +42,10 @@ class DataFileEntity extends StaticObjectEntity {
 	toConf() {
 		let conf = super.toConf();
 		conf.makeDisplayData = function(savedFile) {
-			return DataFileEntity.makeDisplayData(this, savedFile);
+			return AssetFileEntity.makeDisplayData(this, savedFile);
 		};
 		return conf;
 	}
 }
 
-module.exports = DataFileEntity;
+module.exports = AssetFileEntity;

@@ -18714,7 +18714,110 @@ class ArrayEntity extends ConfigEntity {
 
 module.exports = ArrayEntity;
 
-},{"../entityFactory":62,"./configEntity":19,"assert":1}],9:[function(require,module,exports){
+},{"../entityFactory":62,"./configEntity":21,"assert":1}],9:[function(require,module,exports){
+const assert = require('assert').strict;
+const Errors = require('../../errors');
+const StaticObjectEntity = require('./staticObjectEntity');
+
+class AssetEntity extends StaticObjectEntity {
+	static get TYPE()		{ return null; }
+	
+	static get SUPPORTED_DATA_TYPES() {
+		return [
+			'IMAGE',
+			'SOUND',
+		];
+	}
+	
+	constructor(data) {
+		super();
+		this.addString('collection', data && data.collection || '') // Identifies the collection for functional purposes
+			.hide();
+		this.addString('dataType', data && data.dataType || '')
+			.hide();
+	}
+	
+	getCollectionID() {
+		return this.getChild('collection').getValue();
+	}
+	
+	getDataType() {
+		return this.getChild('dataType').getValue();
+	}
+	
+	// ---- Overrides ---- //
+	
+	validate() {
+		super.validate();
+		
+		let collection = this.getCollectionID();
+		Errors.ensureNonEmptyString(
+			collection,
+			`collection must be a non-empty string. Got: ${collection}`);
+		
+		let dataType = this.getDataType();
+		assert(
+			AssetEntity.SUPPORTED_DATA_TYPES.includes(dataType),
+			`Unsupported data type: ${dataType}`);
+	}
+}
+
+module.exports = AssetEntity;
+
+},{"../../errors":66,"./staticObjectEntity":48,"assert":1}],10:[function(require,module,exports){
+const _ = require('lodash');
+const StaticObjectEntity = require('./staticObjectEntity');
+
+class AssetFileEntity extends StaticObjectEntity {
+	static get TYPE()		{ return 'DataFile';						}
+	static get GUITYPE()	{ return 'RawObject';						}
+	static get BUILDER()	{ return data => new AssetFileEntity(data);	}
+	
+	static makeDisplayData(soundFileEntityConf, savedFile) {
+		let dd = _.omit(soundFileEntityConf, 'fileKey');
+		dd.url = savedFile.data;
+		return dd;
+	}
+	
+	constructor(fileKey) {
+		super();
+		this.addString('fileKey', fileKey)
+			.hide();
+	}
+	
+	getFileKey() {
+		return this.getChild('fileKey').getValue();
+	}
+	
+	setFileKey(fileKey) {
+		return this.getChild('fileKey').setValue(fileKey);
+	}
+	
+	isSet() {
+		return !!this.getFileKey();
+	}
+	
+	clearKey() {
+		this.getChild('fileKey').setValue(undefined);
+	}
+	
+	// Inheriting classes that add data should change this return value to true
+	get hasExtraData() {
+		return false;
+	}
+	
+	toConf() {
+		let conf = super.toConf();
+		conf.makeDisplayData = function(savedFile) {
+			return AssetFileEntity.makeDisplayData(this, savedFile);
+		};
+		return conf;
+	}
+}
+
+module.exports = AssetFileEntity;
+
+},{"./staticObjectEntity":48,"lodash":7}],11:[function(require,module,exports){
 const ValueEntity = require('./valueEntity');
 
 class BooleanEntity extends ValueEntity {
@@ -18729,7 +18832,7 @@ class BooleanEntity extends ValueEntity {
 
 module.exports = BooleanEntity;
 
-},{"./valueEntity":60}],10:[function(require,module,exports){
+},{"./valueEntity":60}],12:[function(require,module,exports){
 const ImageFileEntity = require('./imageFileEntity');
 
 class CandyFileEntity extends ImageFileEntity {
@@ -18760,7 +18863,7 @@ class CandyFileEntity extends ImageFileEntity {
 
 module.exports = CandyFileEntity;
 
-},{"./imageFileEntity":34}],11:[function(require,module,exports){
+},{"./imageFileEntity":34}],13:[function(require,module,exports){
 const ChoiceEntity = require('./choiceEntity');
 
 class CandyInflationEntity extends ChoiceEntity {
@@ -18781,7 +18884,7 @@ class CandyInflationEntity extends ChoiceEntity {
 
 module.exports = CandyInflationEntity;
 
-},{"./choiceEntity":16}],12:[function(require,module,exports){
+},{"./choiceEntity":18}],14:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class CandyInflation_BaseEntity extends ChoiceValueEntity {
@@ -18796,7 +18899,7 @@ class CandyInflation_BaseEntity extends ChoiceValueEntity {
 
 module.exports = CandyInflation_BaseEntity;
 
-},{"./choiceValueEntity":17}],13:[function(require,module,exports){
+},{"./choiceValueEntity":19}],15:[function(require,module,exports){
 const assert = require('assert').strict;
 const CandyInflation_BaseEntity = require('./candyInflation_BaseEntity');
 
@@ -18831,7 +18934,7 @@ class CandyInflation_ExponentialEntity extends CandyInflation_BaseEntity {
 
 module.exports = CandyInflation_ExponentialEntity;
 
-},{"./candyInflation_BaseEntity":12,"assert":1}],14:[function(require,module,exports){
+},{"./candyInflation_BaseEntity":14,"assert":1}],16:[function(require,module,exports){
 const assert = require('assert').strict;
 const CandyInflation_BaseEntity = require('./candyInflation_BaseEntity');
 
@@ -18866,7 +18969,7 @@ class CandyInflation_LinearEntity extends CandyInflation_BaseEntity {
 
 module.exports = CandyInflation_LinearEntity;
 
-},{"./candyInflation_BaseEntity":12,"assert":1}],15:[function(require,module,exports){
+},{"./candyInflation_BaseEntity":14,"assert":1}],17:[function(require,module,exports){
 const CandyInflation_BaseEntity = require('./candyInflation_BaseEntity');
 
 class CandyInflation_NoneEntity extends CandyInflation_BaseEntity {
@@ -18881,7 +18984,7 @@ class CandyInflation_NoneEntity extends CandyInflation_BaseEntity {
 
 module.exports = CandyInflation_NoneEntity;
 
-},{"./candyInflation_BaseEntity":12}],16:[function(require,module,exports){
+},{"./candyInflation_BaseEntity":14}],18:[function(require,module,exports){
 const assert = require('assert').strict;
 const ConfigEntity = require('./configEntity');
 const EntityFactory = require('../entityFactory');
@@ -19022,7 +19125,7 @@ class ChoiceEntity extends ConfigEntity {
 
 module.exports = ChoiceEntity;
 
-},{"../entityFactory":62,"./configEntity":19,"assert":1}],17:[function(require,module,exports){
+},{"../entityFactory":62,"./configEntity":21,"assert":1}],19:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class ChoiceValueEntity extends StaticObjectEntity {
@@ -19058,7 +19161,7 @@ class ChoiceValueEntity extends StaticObjectEntity {
 
 module.exports = ChoiceValueEntity;
 
-},{"./staticObjectEntity":48}],18:[function(require,module,exports){
+},{"./staticObjectEntity":48}],20:[function(require,module,exports){
 const Errors = require('../../errors');
 const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
@@ -19177,7 +19280,7 @@ class CommandEntity extends StaticObjectEntity {
 
 module.exports = CommandEntity;
 
-},{"../../errors":66,"./cooldownEntity":20,"./dynamicArrayEntity":23,"./naturalNumberEntity":40,"./staticObjectEntity":48,"./stringEntity":49,"./userFilterEntity":51}],19:[function(require,module,exports){
+},{"../../errors":66,"./cooldownEntity":22,"./dynamicArrayEntity":23,"./naturalNumberEntity":40,"./staticObjectEntity":48,"./stringEntity":49,"./userFilterEntity":51}],21:[function(require,module,exports){
 const Errors = require('../../errors');
 const EntityFactory = require('../entityFactory');
 
@@ -19377,7 +19480,7 @@ class ConfigEntity {
 
 module.exports = ConfigEntity;
 
-},{"../../errors":66,"../entityFactory":62}],20:[function(require,module,exports){
+},{"../../errors":66,"../entityFactory":62}],22:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class CooldownEntity extends StaticObjectEntity {
@@ -19420,108 +19523,6 @@ class CooldownEntity extends StaticObjectEntity {
 }
 
 module.exports = CooldownEntity;
-
-},{"./staticObjectEntity":48}],21:[function(require,module,exports){
-const assert = require('assert').strict;
-const Errors = require('../../errors');
-const StaticObjectEntity = require('./staticObjectEntity');
-
-class DataEntity extends StaticObjectEntity {
-	static get TYPE()		{ return null; }
-	
-	static get SUPPORTED_DATA_TYPES() {
-		return [
-			'IMAGE',
-			'SOUND',
-		];
-	}
-	
-	constructor(data) {
-		super();
-		this.addString('collection', data && data.collection || '') // Identifies the collection for functional purposes
-			.hide();
-		this.addString('dataType', data && data.dataType || '')
-			.hide();
-	}
-	
-	getCollectionID() {
-		return this.getChild('collection').getValue();
-	}
-	
-	getDataType() {
-		return this.getChild('dataType').getValue();
-	}
-	
-	// ---- Overrides ---- //
-	
-	validate() {
-		super.validate();
-		
-		let collection = this.getCollectionID();
-		Errors.ensureNonEmptyString(
-			collection,
-			`collection must be a non-empty string. Got: ${collection}`);
-		
-		let dataType = this.getDataType();
-		assert(
-			DataEntity.SUPPORTED_DATA_TYPES.includes(dataType),
-			`Unsupported data type: ${dataType}`);
-	}
-}
-
-module.exports = DataEntity;
-
-},{"../../errors":66,"./staticObjectEntity":48,"assert":1}],22:[function(require,module,exports){
-const StaticObjectEntity = require('./staticObjectEntity');
-
-class DataFileEntity extends StaticObjectEntity {
-	static get TYPE()		{ return 'DataFile';						}
-	static get GUITYPE()	{ return 'RawObject';						}
-	static get BUILDER()	{ return data => new DataFileEntity(data);	}
-	
-	static makeDisplayData(soundFileEntityConf, savedFile) {
-		let dd = _.omit(soundFileEntityConf, 'fileKey');
-		dd.url = savedFile.data;
-		return dd;
-	}
-	
-	constructor(fileKey) {
-		super();
-		this.addString('fileKey', fileKey)
-			.hide();
-	}
-	
-	getFileKey() {
-		return this.getChild('fileKey').getValue();
-	}
-	
-	setFileKey(fileKey) {
-		return this.getChild('fileKey').setValue(fileKey);
-	}
-	
-	isSet() {
-		return !!this.getFileKey();
-	}
-	
-	clearKey() {
-		this.getChild('fileKey').setValue(undefined);
-	}
-	
-	// Inheriting classes that add data should change this return value to true
-	get hasExtraData() {
-		return false;
-	}
-	
-	toConf() {
-		let conf = super.toConf();
-		conf.makeDisplayData = function(savedFile) {
-			return DataFileEntity.makeDisplayData(this, savedFile);
-		};
-		return conf;
-	}
-}
-
-module.exports = DataFileEntity;
 
 },{"./staticObjectEntity":48}],23:[function(require,module,exports){
 const assert = require('assert').strict;
@@ -19583,19 +19584,19 @@ class DynamicArrayEntity extends ArrayEntity {
 
 module.exports = DynamicArrayEntity;
 
-},{"../entityFactory":62,"./arrayEntity":8,"./configEntity":19,"assert":1}],24:[function(require,module,exports){
+},{"../entityFactory":62,"./arrayEntity":8,"./configEntity":21,"assert":1}],24:[function(require,module,exports){
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
-class DynamicDataArrayEntity extends DynamicArrayEntity {
+class DynamicAssetArrayEntity extends DynamicArrayEntity {
 	static get TYPE()		{ return 'DynamicDataArray'; 							}
-	static get BUILDER()	{ return value => new DynamicDataArrayEntity(value);	}
+	static get BUILDER()	{ return value => new DynamicAssetArrayEntity(value);	}
 	
 	constructor(collection, dataType) {
 		super('SingleData', { collection, dataType });
 	}
 }
 
-module.exports = DynamicDataArrayEntity;
+module.exports = DynamicAssetArrayEntity;
 
 },{"./dynamicArrayEntity":23}],25:[function(require,module,exports){
 const ConfigEntity = require('./configEntity');
@@ -19637,7 +19638,7 @@ class DynamicObjectEntity extends ObjectEntity {
 
 module.exports = DynamicObjectEntity;
 
-},{"../entityFactory":62,"./configEntity":19,"./objectEntity":42}],26:[function(require,module,exports){
+},{"../entityFactory":62,"./configEntity":21,"./objectEntity":42}],26:[function(require,module,exports){
 const assert = require('assert').strict;
 const ArrayEntity = require('./arrayEntity');
 
@@ -19719,7 +19720,7 @@ class ImageCommandEntity extends CommandEntity {
 
 module.exports = ImageCommandEntity;
 
-},{"./commandEntity":18,"./imageEntity":33,"./soundEntity":46}],29:[function(require,module,exports){
+},{"./commandEntity":20,"./imageEntity":33,"./soundEntity":46}],29:[function(require,module,exports){
 const ChoiceEntity = require('./choiceEntity');
 
 class ImageEffectEntity extends ChoiceEntity {
@@ -19740,7 +19741,7 @@ class ImageEffectEntity extends ChoiceEntity {
 
 module.exports = ImageEffectEntity;
 
-},{"./choiceEntity":16}],30:[function(require,module,exports){
+},{"./choiceEntity":18}],30:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class ImageEffect_DunDunDunEntity extends ChoiceValueEntity {
@@ -19775,7 +19776,7 @@ class ImageEffect_DunDunDunEntity extends ChoiceValueEntity {
 
 module.exports = ImageEffect_DunDunDunEntity;
 
-},{"./choiceValueEntity":17}],31:[function(require,module,exports){
+},{"./choiceValueEntity":19}],31:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class ImageEffect_GlowEntity extends ChoiceValueEntity {
@@ -19794,7 +19795,7 @@ class ImageEffect_GlowEntity extends ChoiceValueEntity {
 
 module.exports = ImageEffect_GlowEntity;
 
-},{"./choiceValueEntity":17}],32:[function(require,module,exports){
+},{"./choiceValueEntity":19}],32:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class ImageEffect_ShadowEntity extends ChoiceValueEntity {
@@ -19813,7 +19814,7 @@ class ImageEffect_ShadowEntity extends ChoiceValueEntity {
 
 module.exports = ImageEffect_ShadowEntity;
 
-},{"./choiceValueEntity":17}],33:[function(require,module,exports){
+},{"./choiceValueEntity":19}],33:[function(require,module,exports){
 const _ = require('lodash');
 const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
@@ -19830,7 +19831,7 @@ class ImageEntity extends StaticObjectEntity {
 	
 	constructor() {
 		super();
-		this.addSingleData('file', { collection: 'Images', dataType: 'IMAGE' })
+		this.addSingleAsset('file', { collection: 'Images', dataType: 'IMAGE' })
 			.setName('Image')
 			.setDescription('The image that will be displayed on the screen');
 		this.addNaturalNumber('width')
@@ -19867,19 +19868,12 @@ class ImageEntity extends StaticObjectEntity {
 module.exports = ImageEntity;
 
 },{"./dynamicArrayEntity":23,"./staticObjectEntity":48,"lodash":7}],34:[function(require,module,exports){
-const _ = require('lodash');
-const DataFileEntity = require('./dataFileEntity');
+const AssetFileEntity = require('./assetFileEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
-class ImageFileEntity extends DataFileEntity {
+class ImageFileEntity extends AssetFileEntity {
 	static get TYPE()		{ return 'ImageFile';					}
 	static get BUILDER()	{ return () => new ImageFileEntity(); 	}
-	
-	static makeDisplayData(imageFileEntityConf, savedFile) {
-		let dd = _.omit(imageFileEntityConf, 'fileKey');
-		dd.url = savedFile.data;
-		return dd;
-	}
 	
 	constructor(fileKey) {
 		super(fileKey);
@@ -19902,19 +19896,11 @@ class ImageFileEntity extends DataFileEntity {
 	get hasExtraData() {
 		return true;
 	}
-	
-	toConf() {
-		let conf = super.toConf();
-		conf.makeDisplayData = function(savedFile) {
-			return ImageFileEntity.makeDisplayData(this, savedFile);
-		};
-		return conf;
-	}
 }
 
 module.exports = ImageFileEntity;
 
-},{"./dataFileEntity":22,"./dynamicArrayEntity":23,"lodash":7}],35:[function(require,module,exports){
+},{"./assetFileEntity":10,"./dynamicArrayEntity":23}],35:[function(require,module,exports){
 const assert = require('assert').strict;
 const NumberEntity = require('./numberEntity');
 
@@ -20076,12 +20062,12 @@ class KeyShortcutsEntity extends StaticObjectEntity {
 module.exports = KeyShortcutsEntity;
 
 },{"./staticObjectEntity":48}],39:[function(require,module,exports){
-const DataEntity = require('./dataEntity');
+const AssetEntity = require('./assetEntity');
 
-class MultiDataEntity extends DataEntity {
+class MultiAssetEntity extends AssetEntity {
 	static get TYPE()		{ return 'MultiData'; 							}
 	static get GUITYPE()	{ return 'MultiData'; 							}
-	static get BUILDER()	{ return data => new MultiDataEntity(data); 	}
+	static get BUILDER()	{ return data => new MultiAssetEntity(data); 	}
 	
 	constructor(data) {
 		super(data);
@@ -20151,9 +20137,9 @@ class MultiDataEntity extends DataEntity {
 	}
 }
 
-module.exports = MultiDataEntity;
+module.exports = MultiAssetEntity;
 
-},{"./dataEntity":21}],40:[function(require,module,exports){
+},{"./assetEntity":9}],40:[function(require,module,exports){
 const assert = require('assert').strict;
 const IntegerEntity = require('./integerEntity');
 
@@ -20303,7 +20289,7 @@ class ObjectEntity extends ConfigEntity {
 		return array;
 	}
 	
-	addDynamicDataArray(key, collection, dataType, values) {
+	addDynamicAssetArray(key, collection, dataType, values) {
 		let array = this.add(key, 'DynamicDataArray', collection, dataType);
 		if (values) {
 			values.forEach(value => {
@@ -20322,11 +20308,11 @@ class ObjectEntity extends ConfigEntity {
 		return this.addObject(key);
 	}
 	
-	addSingleData(key, configData) {
+	addSingleAsset(key, configData) {
 		return this.add(key, 'SingleData', configData);
 	}
 	
-	addMultiData(key, configData) {
+	addMultiAsset(key, configData) {
 		return this.add(key, 'MultiData', configData);
 	}
 	
@@ -20389,7 +20375,7 @@ class ObjectEntity extends ConfigEntity {
 
 module.exports = ObjectEntity;
 
-},{"../entityFactory":62,"./configEntity":19,"assert":1,"lodash":7}],43:[function(require,module,exports){
+},{"../entityFactory":62,"./configEntity":21,"assert":1,"lodash":7}],43:[function(require,module,exports){
 const assert = require('assert').strict;
 const NumberEntity = require('./numberEntity');
 
@@ -20432,12 +20418,12 @@ class SimpleObjectEntity extends DynamicObjectEntity {
 module.exports = SimpleObjectEntity;
 
 },{"./dynamicObjectEntity":25}],45:[function(require,module,exports){
-const DataEntity = require('./dataEntity');
+const AssetEntity = require('./assetEntity');
 
-class SingleDataEntity extends DataEntity {
+class SingleAssetEntity extends AssetEntity {
 	static get TYPE()		{ return 'SingleData'; 							}
 	static get GUITYPE()	{ return 'SingleData'; 							}
-	static get BUILDER()	{ return data => new SingleDataEntity(data); 	}
+	static get BUILDER()	{ return data => new SingleAssetEntity(data); 	}
 	
 	constructor(data) {
 		super(data);
@@ -20470,9 +20456,9 @@ class SingleDataEntity extends DataEntity {
 	}
 }
 
-module.exports = SingleDataEntity;
+module.exports = SingleAssetEntity;
 
-},{"./dataEntity":21}],46:[function(require,module,exports){
+},{"./assetEntity":9}],46:[function(require,module,exports){
 const assert = require('assert').strict;
 const _ = require('lodash');
 const StaticObjectEntity = require('./staticObjectEntity');
@@ -20489,7 +20475,7 @@ class SoundEntity extends StaticObjectEntity {
 	
 	constructor() {
 		super();
-		this.addSingleData('file', { collection: 'Sounds', dataType: 'SOUND' })
+		this.addSingleAsset('file', { collection: 'Sounds', dataType: 'SOUND' })
 			.setName('Sound')
 			.setDescription('The sound that will be played');
 		this.addNumber('volume', 100)
@@ -20532,10 +20518,9 @@ class SoundEntity extends StaticObjectEntity {
 module.exports = SoundEntity;
 
 },{"./staticObjectEntity":48,"assert":1,"lodash":7}],47:[function(require,module,exports){
-const _ = require('lodash');
-const DataFileEntity = require('./dataFileEntity');
+const AssetFileEntity = require('./assetFileEntity');
 
-class SoundFileEntity extends DataFileEntity {
+class SoundFileEntity extends AssetFileEntity {
 	static get TYPE()		{ return 'SoundFile';					}
 	static get BUILDER()	{ return () => new SoundFileEntity();	}
 	
@@ -20555,7 +20540,7 @@ class SoundFileEntity extends DataFileEntity {
 
 module.exports = SoundFileEntity;
 
-},{"./dataFileEntity":22,"lodash":7}],48:[function(require,module,exports){
+},{"./assetFileEntity":10}],48:[function(require,module,exports){
 const ObjectEntity = require('./objectEntity');
 const EntityFactory = require('../entityFactory');
 
@@ -20669,7 +20654,7 @@ class UserFilterEntity extends ChoiceEntity {
 
 module.exports = UserFilterEntity;
 
-},{"./choiceEntity":16}],52:[function(require,module,exports){
+},{"./choiceEntity":18}],52:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class UserFilter_BaseEntity extends ChoiceValueEntity {
@@ -20684,7 +20669,7 @@ class UserFilter_BaseEntity extends ChoiceValueEntity {
 
 module.exports = UserFilter_BaseEntity;
 
-},{"./choiceValueEntity":17}],53:[function(require,module,exports){
+},{"./choiceValueEntity":19}],53:[function(require,module,exports){
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 
 class UserFilter_IsAtLeastModEntity extends UserFilter_BaseEntity {
@@ -20792,7 +20777,7 @@ class UserGroupEntity extends UserEntity {
 	
 	constructor() {
 		super();
-		this.addMultiData(
+		this.addMultiAsset(
 			'images',
 			{
 				collection: 'Images',
@@ -20808,8 +20793,6 @@ module.exports = UserGroupEntity;
 
 },{"./userEntity":50}],59:[function(require,module,exports){
 const UserEntity = require('./userEntity');
-const ImageFileEntity = require('./imageFileEntity');
-const SoundFileEntity = require('./soundFileEntity');
 const ImageEntity = require('./imageEntity');
 const SoundEntity = require('./soundEntity');
 
@@ -20830,7 +20813,7 @@ class UserMediaEntity extends UserEntity {
 
 module.exports = UserMediaEntity;
 
-},{"./imageEntity":33,"./imageFileEntity":34,"./soundEntity":46,"./soundFileEntity":47,"./userEntity":50}],60:[function(require,module,exports){
+},{"./imageEntity":33,"./soundEntity":46,"./userEntity":50}],60:[function(require,module,exports){
 const assert = require('assert').strict;
 const ConfigEntity = require('./configEntity');
 const EntityFactory = require('../entityFactory');
@@ -20896,7 +20879,7 @@ class ValueEntity extends ConfigEntity {
 
 module.exports = ValueEntity;
 
-},{"../entityFactory":62,"./configEntity":19,"assert":1}],61:[function(require,module,exports){
+},{"../entityFactory":62,"./configEntity":21,"assert":1}],61:[function(require,module,exports){
 const UserEntity = require('./userEntity');
 
 class WelcomeEntity extends UserEntity {
@@ -20910,7 +20893,7 @@ class WelcomeEntity extends UserEntity {
 			.setName('Messages')
 			.setDescription('One of these will be selected by the bot to say when the user first talks');
 		
-		this.addMultiData(
+		this.addMultiAsset(
 			'images',
 			{
 				collection: 'Images',
@@ -20920,7 +20903,7 @@ class WelcomeEntity extends UserEntity {
 			.setName('Images')
 			.setDescription('Collection of images to choose from to show for this user when they first talk');
 		
-		this.addMultiData(
+		this.addMultiAsset(
 			'sounds',
 			{
 				collection: 'Sounds',
@@ -20988,16 +20971,16 @@ module.exports = new EntityFactory();
 },{"assert":1}],63:[function(require,module,exports){
 const entities = {
 	ArrayEntity: require('./WebEntities/arrayEntity.js'),
+	AssetEntity: require('./WebEntities/assetEntity.js'),
+	AssetFileEntity: require('./WebEntities/assetFileEntity.js'),
 	BooleanEntity: require('./WebEntities/booleanEntity.js'),
 	ChoiceEntity: require('./WebEntities/choiceEntity.js'),
 	ChoiceValueEntity: require('./WebEntities/choiceValueEntity.js'),
 	CommandEntity: require('./WebEntities/commandEntity.js'),
 	ConfigEntity: require('./WebEntities/configEntity.js'),
 	CooldownEntity: require('./WebEntities/cooldownEntity.js'),
-	DataEntity: require('./WebEntities/dataEntity.js'),
-	DataFileEntity: require('./WebEntities/dataFileEntity.js'),
 	DynamicArrayEntity: require('./WebEntities/dynamicArrayEntity.js'),
-	DynamicDataArrayEntity: require('./WebEntities/dynamicDataArrayEntity.js'),
+	DynamicAssetArrayEntity: require('./WebEntities/dynamicAssetArrayEntity.js'),
 	DynamicObjectEntity: require('./WebEntities/dynamicObjectEntity.js'),
 	FixedArrayEntity: require('./WebEntities/fixedArrayEntity.js'),
 	HiddenStringEntity: require('./WebEntities/hiddenStringEntity.js'),
@@ -21010,7 +20993,7 @@ const entities = {
 	KeyEntity: require('./WebEntities/keyEntity.js'),
 	KeyShortcutEntity: require('./WebEntities/keyShortcutEntity.js'),
 	KeyShortcutsEntity: require('./WebEntities/keyShortcutsEntity.js'),
-	MultiDataEntity: require('./WebEntities/multiDataEntity.js'),
+	MultiAssetEntity: require('./WebEntities/multiAssetEntity.js'),
 	NaturalNumberEntity: require('./WebEntities/naturalNumberEntity.js'),
 	NumberEntity: require('./WebEntities/numberEntity.js'),
 	ObjectEntity: require('./WebEntities/objectEntity.js'),
@@ -21058,7 +21041,7 @@ module.exports = {
 	RegisterAll: registerAll,
 	Enums: enums,
 }
-},{"../enums":65,"./WebEntities/arrayEntity.js":8,"./WebEntities/booleanEntity.js":9,"./WebEntities/candyFileEntity.js":10,"./WebEntities/candyInflationEntity.js":11,"./WebEntities/candyInflation_BaseEntity.js":12,"./WebEntities/candyInflation_ExponentialEntity.js":13,"./WebEntities/candyInflation_LinearEntity.js":14,"./WebEntities/candyInflation_NoneEntity.js":15,"./WebEntities/choiceEntity.js":16,"./WebEntities/choiceValueEntity.js":17,"./WebEntities/commandEntity.js":18,"./WebEntities/configEntity.js":19,"./WebEntities/cooldownEntity.js":20,"./WebEntities/dataEntity.js":21,"./WebEntities/dataFileEntity.js":22,"./WebEntities/dynamicArrayEntity.js":23,"./WebEntities/dynamicDataArrayEntity.js":24,"./WebEntities/dynamicObjectEntity.js":25,"./WebEntities/fixedArrayEntity.js":26,"./WebEntities/hiddenStringEntity.js":27,"./WebEntities/imageCommandEntity.js":28,"./WebEntities/imageEffectEntity.js":29,"./WebEntities/imageEffect_DunDunDunEntity.js":30,"./WebEntities/imageEffect_GlowEntity.js":31,"./WebEntities/imageEffect_ShadowEntity.js":32,"./WebEntities/imageEntity.js":33,"./WebEntities/imageFileEntity.js":34,"./WebEntities/integerEntity.js":35,"./WebEntities/keyEntity.js":36,"./WebEntities/keyShortcutEntity.js":37,"./WebEntities/keyShortcutsEntity.js":38,"./WebEntities/multiDataEntity.js":39,"./WebEntities/naturalNumberEntity.js":40,"./WebEntities/numberEntity.js":41,"./WebEntities/objectEntity.js":42,"./WebEntities/positiveNumberEntity.js":43,"./WebEntities/simpleObjectEntity.js":44,"./WebEntities/singleDataEntity.js":45,"./WebEntities/soundEntity.js":46,"./WebEntities/soundFileEntity.js":47,"./WebEntities/staticObjectEntity.js":48,"./WebEntities/stringEntity.js":49,"./WebEntities/userEntity.js":50,"./WebEntities/userFilterEntity.js":51,"./WebEntities/userFilter_BaseEntity.js":52,"./WebEntities/userFilter_IsAtLeastModEntity.js":53,"./WebEntities/userFilter_IsModEntity.js":54,"./WebEntities/userFilter_IsOneOfEntity.js":55,"./WebEntities/userFilter_IsSubEntity.js":56,"./WebEntities/userFilter_IsUserEntity.js":57,"./WebEntities/userGroupEntity.js":58,"./WebEntities/userMediaEntity.js":59,"./WebEntities/valueEntity.js":60,"./WebEntities/welcomeEntity.js":61,"./entityFactory":62}],64:[function(require,module,exports){
+},{"../enums":65,"./WebEntities/arrayEntity.js":8,"./WebEntities/assetEntity.js":9,"./WebEntities/assetFileEntity.js":10,"./WebEntities/booleanEntity.js":11,"./WebEntities/candyFileEntity.js":12,"./WebEntities/candyInflationEntity.js":13,"./WebEntities/candyInflation_BaseEntity.js":14,"./WebEntities/candyInflation_ExponentialEntity.js":15,"./WebEntities/candyInflation_LinearEntity.js":16,"./WebEntities/candyInflation_NoneEntity.js":17,"./WebEntities/choiceEntity.js":18,"./WebEntities/choiceValueEntity.js":19,"./WebEntities/commandEntity.js":20,"./WebEntities/configEntity.js":21,"./WebEntities/cooldownEntity.js":22,"./WebEntities/dynamicArrayEntity.js":23,"./WebEntities/dynamicAssetArrayEntity.js":24,"./WebEntities/dynamicObjectEntity.js":25,"./WebEntities/fixedArrayEntity.js":26,"./WebEntities/hiddenStringEntity.js":27,"./WebEntities/imageCommandEntity.js":28,"./WebEntities/imageEffectEntity.js":29,"./WebEntities/imageEffect_DunDunDunEntity.js":30,"./WebEntities/imageEffect_GlowEntity.js":31,"./WebEntities/imageEffect_ShadowEntity.js":32,"./WebEntities/imageEntity.js":33,"./WebEntities/imageFileEntity.js":34,"./WebEntities/integerEntity.js":35,"./WebEntities/keyEntity.js":36,"./WebEntities/keyShortcutEntity.js":37,"./WebEntities/keyShortcutsEntity.js":38,"./WebEntities/multiAssetEntity.js":39,"./WebEntities/naturalNumberEntity.js":40,"./WebEntities/numberEntity.js":41,"./WebEntities/objectEntity.js":42,"./WebEntities/positiveNumberEntity.js":43,"./WebEntities/simpleObjectEntity.js":44,"./WebEntities/singleDataEntity.js":45,"./WebEntities/soundEntity.js":46,"./WebEntities/soundFileEntity.js":47,"./WebEntities/staticObjectEntity.js":48,"./WebEntities/stringEntity.js":49,"./WebEntities/userEntity.js":50,"./WebEntities/userFilterEntity.js":51,"./WebEntities/userFilter_BaseEntity.js":52,"./WebEntities/userFilter_IsAtLeastModEntity.js":53,"./WebEntities/userFilter_IsModEntity.js":54,"./WebEntities/userFilter_IsOneOfEntity.js":55,"./WebEntities/userFilter_IsSubEntity.js":56,"./WebEntities/userFilter_IsUserEntity.js":57,"./WebEntities/userGroupEntity.js":58,"./WebEntities/userMediaEntity.js":59,"./WebEntities/valueEntity.js":60,"./WebEntities/welcomeEntity.js":61,"./entityFactory":62}],64:[function(require,module,exports){
 const Enums = {};   
 
 // Keyboard keycodes, used to register key shortcuts and events in

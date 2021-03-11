@@ -124,12 +124,12 @@ class Configuration {
 		return this.configRoot.addGroup(key);
 	}
 	
-	addSingleData(key, configData) {
-		return this.configRoot.addSingleData(key, configData);
+	addSingleAsset(key, configData) {
+		return this.configRoot.addSingleAsset(key, configData);
 	}
 	
-	addMultiData(key, configData) {
-		return this.configRoot.addMultiData(key, configData);
+	addMultiAsset(key, configData) {
+		return this.configRoot.addMultiAsset(key, configData);
 	}
 	
 	addKeyShortcuts(key) {
