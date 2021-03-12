@@ -173,7 +173,7 @@ class FluxBot {
 			tempFileDir: DATA_DIR_TEMP,
 		}));
 		
-		this.app.get('/data/mod/:modName/:collection', async (req, res) => {
+		this.app.get('/assets/mod/:modName/:collection', async (req, res) => {
 			let modName = req.params.modName;
 			let collection = req.params.collection;
 			let fileKey = req.query.fileKey;
@@ -214,7 +214,7 @@ class FluxBot {
 			}
 		});
 		
-		this.app.post('/data/mod/:modName/:collection', (req, res) => {
+		this.app.post('/assets/mod/:modName/:collection', (req, res) => {
 			if (!req.files || Object.keys(req.files).length === 0) {
 				return res.status(400).send('No files were uploaded.');
 			}
@@ -254,7 +254,7 @@ class FluxBot {
 			});
 		});
 		
-		this.app.delete('/data/mod/:modName/:collection', (req, res) => {
+		this.app.delete('/assets/mod/:modName/:collection', (req, res) => {
 			let modName = req.params.modName;
 			let collection = req.params.collection;
 			let fileKey = req.query.fileKey;

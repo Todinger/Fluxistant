@@ -18,6 +18,11 @@ class RandomImage extends Module {
 	showRandomImage() {
 		this.assets.Images.selectFile()
 			.then(file => {
+				if (!file) {
+					this.say("Wait, oh no! The random image pool is empty! SOMEONE SEND HELP I'M NOT DROWNING!");
+					return;
+				}
+				
 				assert(
 					!this.config.images.files || !(this.fileKey in this.config.images.files),
 					'File missing from random image pool.');

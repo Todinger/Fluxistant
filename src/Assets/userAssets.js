@@ -191,7 +191,11 @@ class UserAssets {
 	
 	selectFile(...params) {
 		let key = this.selectFileKey(...params);
-		return this.getFileWebByKey(key);
+		if (key) {
+			return this.getFileWebByKey(key);
+		} else {
+			return Promise.resolve(null);
+		}
 	}
 	
 	import(exportedAssets) {
