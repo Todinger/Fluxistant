@@ -6,7 +6,7 @@ const ModuleData = require('./Assets/moduleAssets');
 
 const MODULES_SUBDIR = 'Modules';
 
-class DataManager {
+class AssetManager {
 	constructor() {
 		this.dataDirRoot = null;
 		this.moduleData = {};
@@ -71,4 +71,4 @@ class DataManager {
 	}
 }
 
-module.exports = new DataManager();
+module.exports = new AssetManager();

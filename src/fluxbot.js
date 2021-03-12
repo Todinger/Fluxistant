@@ -150,7 +150,7 @@ class FluxBot {
 	// asset files if they did not exist.
 	// Do this AFTER loading the modules.
 	saveData() {
-		this.dataManager.saveAll();
+		this.assetManager.saveAll();
 	}
 	
 	// Save the current configuration (main and modules) - this is to create default
@@ -165,8 +165,8 @@ class FluxBot {
 	}
 	
 	setupUserData() {
-		this.dataManager = require('./dataManager');
-		this.dataManager.init(APP_DATA_DIR);
+		this.assetManager = require('./assetManager');
+		this.assetManager.init(APP_DATA_DIR);
 		
 		this.app.use(fileUpload({
 			useTempFiles: true,
@@ -179,7 +179,7 @@ class FluxBot {
 			let fileKey = req.query.fileKey;
 			
 			try {
-				let files = await this.dataManager.getFilesWeb({
+				let files = await this.assetManager.getFilesWeb({
 					modName,
 					collection,
 					fileKey
@@ -228,7 +228,7 @@ class FluxBot {
 			let uploadPromises = [];
 			Object.keys(files).forEach(uploadKey => {
 				let file = files[uploadKey];
-				let promise = this.dataManager.upload({
+				let promise = this.assetManager.upload({
 					modName,
 					collection,
 					file,
@@ -260,7 +260,7 @@ class FluxBot {
 			let fileKey = req.query.fileKey;
 			
 			try {
-				this.dataManager.delete({
+				this.assetManager.delete({
 					modName,
 					collection,
 					fileKey,
@@ -273,7 +273,7 @@ class FluxBot {
 		});
 		
 		this.io.on('dropDataChanges', () => {
-			this.dataManager.dropChanges().then(() => this.emptyDataTempDir());
+			this.assetManager.dropChanges().then(() => this.emptyDataTempDir());
 		});
 	}
 	
@@ -330,7 +330,7 @@ class FluxBot {
 				try {
 					this.configManager.importAll(config);
 					this.configManager.saveAll();
-					await this.dataManager.commitChanges();
+					await this.assetManager.commitChanges();
 					
 					this.handleMainConfigChange();
 					

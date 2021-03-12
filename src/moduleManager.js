@@ -7,7 +7,7 @@ const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
 const ConfigManager = require('./configManager');
 const EntityFileManager = require('./entityFileManager');
-const DataManager = require('./dataManager');
+const DataManager = require('./assetManager');
 const Utils = require('./utils');
 
 // Every Module needs to have a file by this name in its root directory
