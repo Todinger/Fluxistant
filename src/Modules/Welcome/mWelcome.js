@@ -21,14 +21,14 @@ class WelcomeImage extends Module {
 			if (!(user.name in this.lastMessageTimes)) {
 				let imagePromise;
 				if (Object.keys(userWelcome.images).length > 0) {
-					imagePromise = this.data.Images.selectFile(user.name);
+					imagePromise = this.assets.Images.selectFile(user.name);
 				} else {
 					imagePromise = Promise.resolve();
 				}
 				
 				let soundPromise;
 				if (Object.keys(userWelcome.sounds).length > 0) {
-					soundPromise = this.data.Sounds.selectFile(user.name);
+					soundPromise = this.assets.Sounds.selectFile(user.name);
 				} else {
 					soundPromise = Promise.resolve();
 				}
@@ -76,8 +76,8 @@ class WelcomeImage extends Module {
 	
 	loadModConfig(conf) {
 		this.welcomeData = {};
-		this.data.Images.clearGroups();
-		this.data.Sounds.clearGroups();
+		this.assets.Images.clearGroups();
+		this.assets.Sounds.clearGroups();
 		conf.entries.forEach(entry => {
 			if (entry.username && entry.username !== '') {
 				let username = entry.username.toLowerCase();
@@ -93,13 +93,13 @@ class WelcomeImage extends Module {
 				};
 				
 				if (Object.keys(entry.images.files).length > 0) {
-					this.data.Images.addGroup(
+					this.assets.Images.addGroup(
 						username,
 						Object.keys(entry.images.files));
 				}
 				
 				if (Object.keys(entry.sounds.files).length > 0) {
-					this.data.Sounds.addGroup(
+					this.assets.Sounds.addGroup(
 						username,
 						Object.keys(entry.sounds.files));
 				}

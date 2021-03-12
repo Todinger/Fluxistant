@@ -174,7 +174,7 @@ class ModuleManager {
 		Object.values(this.modules).forEach(mod => this._defineConfigAndData(mod));
 	}
 	
-	// Calls the module's configuration and data definition methods.
+	// Calls the module's configuration and asset definition methods.
 	// This creates its ModuleConfig with all its fields, using default values
 	// for everything, and registers the module in DataManager.
 	_defineConfigAndData(mod) {
@@ -187,7 +187,7 @@ class ModuleManager {
 		}
 	}
 	
-	// Loads all the modules' configurations and data from disk.
+	// Loads all the modules' configurations and assets from disk.
 	_loadConfigAndDataAll() {
 		DataManager.loadAll();
 		ConfigManager.loadModules();

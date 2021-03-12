@@ -16,7 +16,7 @@ class RandomImage extends Module {
 	}
 	
 	showRandomImage() {
-		this.data.Images.selectFile()
+		this.assets.Images.selectFile()
 			.then(file => {
 				assert(
 					!this.config.images.files || !(this.fileKey in this.config.images.files),

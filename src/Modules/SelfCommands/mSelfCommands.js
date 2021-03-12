@@ -25,11 +25,11 @@ class SelfCommands extends Module {
 			let hasSound = entry.sound.file.fileKey !== undefined;
 			
 			let imagePromise = hasImage ?
-				this.data.getFileWeb(entry.image.file) :
+				this.assets.getFileWeb(entry.image.file) :
 				Promise.resolve();
 			
 			let soundPromise = hasSound ?
-				this.data.getFileWeb(entry.sound.file) :
+				this.assets.getFileWeb(entry.sound.file) :
 				Promise.resolve();
 			
 			let _this = this;

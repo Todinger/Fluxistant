@@ -87,7 +87,7 @@ class Catastrophe extends Module {
 	}
 	
 	keyPressedHandler() {
-		let soundFile = this.data.Sounds.selectFileLocal();
+		let soundFile = this.assets.Sounds.selectFileLocal();
 		if (soundFile) {
 			let files = this.config.sounds.files || {};
 			let soundConf = files[soundFile.fileKey];

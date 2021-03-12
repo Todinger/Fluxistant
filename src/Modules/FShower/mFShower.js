@@ -31,7 +31,7 @@ class FShower extends Module {
 	
 	findAndSendFile(user) {
 		let group = this.getGroup(user.name);
-		this.data.Images.selectFile(group.key)
+		this.assets.Images.selectFile(group.key)
 			.then(file => {
 				let files = group.files;
 				let imageConf = files[file.fileKey];
@@ -62,10 +62,10 @@ class FShower extends Module {
 	}
 	
 	loadModConfig(conf) {
-		this.data.Images.clearGroups();
+		this.assets.Images.clearGroups();
 		this.userGroups = {};
 		
-		this.data.Images.addGroup(
+		this.assets.Images.addGroup(
 			DEFAULT_GROUP_KEY,
 			Object.keys(conf.defaultImages.files));
 		
@@ -75,7 +75,7 @@ class FShower extends Module {
 					!(userGroup.username in this.userGroups),
 					`F Shower: Duplicate entry for user "${userGroup.username}"`);
 				
-				this.data.Images.addGroup(
+				this.assets.Images.addGroup(
 					userGroup.username,
 					Object.keys(userGroup.images.files));
 				this.userGroups[userGroup.username] = userGroup.images;

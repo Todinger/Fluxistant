@@ -143,7 +143,7 @@ class CandyGame extends Module {
 			userBonusAmount: defs.userBonusAmount,
 		};
 		
-		this.data.Images.setWeights(Utils.objectMap(
+		this.assets.Images.setWeights(Utils.objectMap(
 			conf.images.files,
 			(fileKey, file) => file.weight !== undefined ? file.weight : defs.weight));
 	}
@@ -200,7 +200,7 @@ class CandyGame extends Module {
 			return;
 		}
 		
-		let fileKey = this.data.Images.selectFileKey(
+		let fileKey = this.assets.Images.selectFileKey(
 			(fileKey, weight) => this.getCandyWeight(fileKey, weight));
 		if (!fileKey) {
 			this.warn('No candy files found.');
@@ -241,7 +241,7 @@ class CandyGame extends Module {
 			this.announceWinner(user);
 		}
 		
-		this.data.Images.getFileWebByKey(fileKey)
+		this.assets.Images.getFileWebByKey(fileKey)
 			.then(file => {
 				assert(
 					this.config.images.files && (file.fileKey in this.config.images.files),

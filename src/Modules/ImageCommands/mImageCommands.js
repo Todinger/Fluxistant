@@ -22,15 +22,15 @@ class ImageCommands extends Module {
 	_sendCommand(cmdObject) {
 		let _this = this;
 		
-		let hasImage = this.data.Images.hasKey(cmdObject.image.file.fileKey);
-		let hasSound = this.data.Sounds.hasKey(cmdObject.sound.file.fileKey);
+		let hasImage = this.assets.Images.hasKey(cmdObject.image.file.fileKey);
+		let hasSound = this.assets.Sounds.hasKey(cmdObject.sound.file.fileKey);
 		
 		let imagePromise = hasImage ?
-			this.data.getFileWeb(cmdObject.image.file) :
+			this.assets.getFileWeb(cmdObject.image.file) :
 			Promise.resolve();
 		
 		let soundPromise = hasSound ?
-			this.data.getFileWeb(cmdObject.sound.file) :
+			this.assets.getFileWeb(cmdObject.sound.file) :
 			Promise.resolve();
 		
 		if (hasImage || hasSound) {

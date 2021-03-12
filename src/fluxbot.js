@@ -146,8 +146,8 @@ class FluxBot {
 		this.seManager.connect(this.mainConfig.getStreamElementsParams());
 	}
 	
-	// Save the current data for the modules - this is to create default data files
-	// if they did not exist.
+	// Save the current assets for the modules - this is to create default
+	// asset files if they did not exist.
 	// Do this AFTER loading the modules.
 	saveData() {
 		this.dataManager.saveAll();
