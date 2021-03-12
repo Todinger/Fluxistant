@@ -1,27 +1,26 @@
 'use strict';
 
 const assert = require('assert').strict;
-const urljoin = require('url-join');
 const Module = requireMain('module');
 const Utils = requireMain('utils');
 
-// File structure:
-// 	{
-// 		"CandyName"
-// 	}
-const CANDY_FILENAME = 'candy.json';
-
-const CANDY_DEFAULTS = {
-	weight: 25,
-	reward: 50,
-	image: {
-		width: 100,
-		height: 100,
-	},
-	userBonus: {
-		amount: 500,
-	},
-};
+// // File structure:
+// // 	{
+// // 		"CandyName"
+// // 	}
+// const CANDY_FILENAME = 'candy.json';
+//
+// const CANDY_DEFAULTS = {
+// 	weight: 25,
+// 	reward: 50,
+// 	image: {
+// 		width: 100,
+// 		height: 100,
+// 	},
+// 	userBonus: {
+// 		amount: 500,
+// 	},
+// };
 
 const INFLATIONS = {
 	none:			()		 =>	(start)       => start,
@@ -260,29 +259,16 @@ class CandyGame extends Module {
 			});
 	}
 	
-	loadData() {
-		try {
-			this.candyData = this.readJSON(CANDY_FILENAME);
-			Object.values(this.candyData).forEach(cd => {
-				cd.image.url = urljoin(this.imageDirURL, cd.image.url);
-				Utils.applyDefaults(cd, CANDY_DEFAULTS);
-			});
-			
-			this.log('Loaded candy data.');
-			
-		} catch (err) {
-			this.warn(`Failed to read candy data: ${err}`);
-		}
-	}
-	
 	load() {
 		this.onChannelReward(
 			'Start a Candy Game',
 			user => {
-				if (!this.startGame(user)) {
-					this.tell(
-						user,
-						"Sorry, like the description says, we can't refund the points for this...");
+				if (this.enabled) {
+					if (!this.startGame(user)) {
+						this.tell(
+							user,
+							"Sorry, like the description says, we can't refund the points for this...");
+					}
 				}
 			}
 		);
