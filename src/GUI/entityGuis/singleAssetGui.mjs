@@ -4,7 +4,7 @@ import DataContentFactory from "./dataContents/dataContentFactory.mjs";
 import { showError } from "../config.mjs";
 
 export default class SingleAssetGui extends AssetGui {
-	static get GUITYPE()    { return 'SingleData';                                                          }
+	static get GUITYPE()    { return 'SingleAsset';                                                          }
 	static get BUILDER()    { return (entity, guiID, modName) => new SingleAssetGui(entity, guiID, modName); }
 	
 	constructor(entity, guiID, modName) {

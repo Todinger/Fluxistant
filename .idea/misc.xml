@@ -38,6 +38,7 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicArrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicArrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicAssetArrayEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicAssetArrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicDataArrayEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicObjectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/dynamicObjectEntity.js" />
@@ -75,10 +76,12 @@
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/numberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/objectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/objectEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/objectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/positiveNumberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/positiveNumberEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/simpleObjectEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/simpleObjectEntity.js" />
+    <file url="file://$PROJECT_DIR$/src/Config/WebEntities/singleDataEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/singleDataEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/singleDataEntity.js" />
     <file url="file://$PROJECT_DIR$/src/Config/WebEntities/soundEntity.js" />

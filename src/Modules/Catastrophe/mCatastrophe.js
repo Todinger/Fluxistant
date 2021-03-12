@@ -109,7 +109,7 @@ class Catastrophe extends Module {
 		
 		modConfig.add(
 			'sounds',
-			'MultiData',
+			'MultiAsset',
 			{
 				collection: 'Sounds',
 				dataType: 'SOUND',

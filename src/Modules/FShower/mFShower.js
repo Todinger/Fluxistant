@@ -47,7 +47,7 @@ class FShower extends Module {
 	defineModConfig(modConfig) {
 		modConfig.add(
 			'defaultImages',
-			'MultiData',
+			'MultiAsset',
 			{
 				collection: 'Images',
 				dataType: 'IMAGE',

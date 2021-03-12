@@ -1,8 +1,8 @@
 const AssetEntity = require('./assetEntity');
 
 class MultiAssetEntity extends AssetEntity {
-	static get TYPE()		{ return 'MultiData'; 							}
-	static get GUITYPE()	{ return 'MultiData'; 							}
+	static get TYPE()		{ return 'MultiAsset'; 							}
+	static get GUITYPE()	{ return 'MultiAsset'; 							}
 	static get BUILDER()	{ return data => new MultiAssetEntity(data); 	}
 	
 	constructor(data) {

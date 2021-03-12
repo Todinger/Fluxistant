@@ -19592,7 +19592,7 @@ class DynamicAssetArrayEntity extends DynamicArrayEntity {
 	static get BUILDER()	{ return value => new DynamicAssetArrayEntity(value);	}
 	
 	constructor(collection, dataType) {
-		super('SingleData', { collection, dataType });
+		super('SingleAsset', { collection, dataType });
 	}
 }
 
@@ -20065,8 +20065,8 @@ module.exports = KeyShortcutsEntity;
 const AssetEntity = require('./assetEntity');
 
 class MultiAssetEntity extends AssetEntity {
-	static get TYPE()		{ return 'MultiData'; 							}
-	static get GUITYPE()	{ return 'MultiData'; 							}
+	static get TYPE()		{ return 'MultiAsset'; 							}
+	static get GUITYPE()	{ return 'MultiAsset'; 							}
 	static get BUILDER()	{ return data => new MultiAssetEntity(data); 	}
 	
 	constructor(data) {
@@ -20293,7 +20293,7 @@ class ObjectEntity extends ConfigEntity {
 		let array = this.add(key, 'DynamicDataArray', collection, dataType);
 		if (values) {
 			values.forEach(value => {
-				array.addElement(EntityFactory.build('SingleData', { collection, dataType }, value));
+				array.addElement(EntityFactory.build('SingleAsset', { collection, dataType }, value));
 			});
 		}
 		
@@ -20309,11 +20309,11 @@ class ObjectEntity extends ConfigEntity {
 	}
 	
 	addSingleAsset(key, configData) {
-		return this.add(key, 'SingleData', configData);
+		return this.add(key, 'SingleAsset', configData);
 	}
 	
 	addMultiAsset(key, configData) {
-		return this.add(key, 'MultiData', configData);
+		return this.add(key, 'MultiAsset', configData);
 	}
 	
 	addKeyShortcuts(key) {
@@ -20421,8 +20421,8 @@ module.exports = SimpleObjectEntity;
 const AssetEntity = require('./assetEntity');
 
 class SingleAssetEntity extends AssetEntity {
-	static get TYPE()		{ return 'SingleData'; 							}
-	static get GUITYPE()	{ return 'SingleData'; 							}
+	static get TYPE()		{ return 'SingleAsset'; 							}
+	static get GUITYPE()	{ return 'SingleAsset'; 							}
 	static get BUILDER()	{ return data => new SingleAssetEntity(data); 	}
 	
 	constructor(data) {

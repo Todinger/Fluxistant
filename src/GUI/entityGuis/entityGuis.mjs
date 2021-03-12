@@ -37,8 +37,8 @@ export default {
 	ConfigGui,
 	CommandGui,
 	UploadGui: AssetGui,
-	SingleDataGui: SingleAssetGui,
-	MultiDataGui: MultiAssetGui,
+	SingleAsset: SingleAssetGui,
+	MultiAssetGui: MultiAssetGui,
 	KeyGui,
 };
 

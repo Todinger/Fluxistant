@@ -117,7 +117,7 @@ class CandyGame extends Module {
 		
 		modConfig.add(
 			'images',
-			'MultiData',
+			'MultiAsset',
 			{
 				collection: 'Images',
 				dataType: 'IMAGE',

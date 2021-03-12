@@ -5,7 +5,7 @@ class DynamicAssetArrayEntity extends DynamicArrayEntity {
 	static get BUILDER()	{ return value => new DynamicAssetArrayEntity(value);	}
 	
 	constructor(collection, dataType) {
-		super('SingleData', { collection, dataType });
+		super('SingleAsset', { collection, dataType });
 	}
 }
 

@@ -5,7 +5,7 @@ import { showError } from "../config.mjs";
 import DataContentFactory from "./dataContents/dataContentFactory.mjs";
 
 export default class MultiAssetGui extends AssetGui {
-	static get GUITYPE()    { return 'MultiData';                                                          }
+	static get GUITYPE()    { return 'MultiAsset';                                                          }
 	static get BUILDER()    { return (entity, guiID, modName) => new MultiAssetGui(entity, guiID, modName); }
 	
 	constructor(entity, guiID, modName) {
