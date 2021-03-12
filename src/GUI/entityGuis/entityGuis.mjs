@@ -14,9 +14,9 @@ import ChoiceGui		from "./choiceGui.mjs";
 import RawObjectGui		from "./rawObjectGui.mjs";
 import ConfigGui		from "./configGui.mjs";
 import CommandGui		from "./commandGui.mjs";
-import DataGui			from "./dataGui.mjs";
-import SingleDataGui	from "./singleDataGui.mjs";
-import MultiDataGui		from "./multiDataGui.mjs";
+import AssetGui			from "./assetGui.mjs";
+import SingleAssetGui	from "./singleAssetGui.mjs";
+import MultiAssetGui		from "./multiAssetGui.mjs";
 import KeyGui			from "./keyGui.mjs";
 
 export default {
@@ -36,9 +36,9 @@ export default {
 	RawObjectGui,
 	ConfigGui,
 	CommandGui,
-	UploadGui: DataGui,
-	SingleDataGui,
-	MultiDataGui,
+	UploadGui: AssetGui,
+	SingleDataGui: SingleAssetGui,
+	MultiDataGui: MultiAssetGui,
 	KeyGui,
 };
 

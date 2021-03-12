@@ -1,11 +1,11 @@
-import DataGui from "./dataGui.mjs";
+import AssetGui from "./assetGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 import DataContentFactory from "./dataContents/dataContentFactory.mjs";
 import { showError } from "../config.mjs";
 
-export default class SingleDataGui extends DataGui {
+export default class SingleAssetGui extends AssetGui {
 	static get GUITYPE()    { return 'SingleData';                                                          }
-	static get BUILDER()    { return (entity, guiID, modName) => new SingleDataGui(entity, guiID, modName); }
+	static get BUILDER()    { return (entity, guiID, modName) => new SingleAssetGui(entity, guiID, modName); }
 	
 	constructor(entity, guiID, modName) {
 		super(entity, guiID, modName);
@@ -144,4 +144,4 @@ export default class SingleDataGui extends DataGui {
 	}
 }
 
-GuiRegistry.register(SingleDataGui);
+GuiRegistry.register(SingleAssetGui);

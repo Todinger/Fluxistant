@@ -1,12 +1,12 @@
 import EntityGui from "./entityGui.mjs";
-import DataGui from "./dataGui.mjs";
+import AssetGui from "./assetGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 import { showError } from "../config.mjs";
 import DataContentFactory from "./dataContents/dataContentFactory.mjs";
 
-export default class MultiDataGui extends DataGui {
+export default class MultiAssetGui extends AssetGui {
 	static get GUITYPE()    { return 'MultiData';                                                          }
-	static get BUILDER()    { return (entity, guiID, modName) => new MultiDataGui(entity, guiID, modName); }
+	static get BUILDER()    { return (entity, guiID, modName) => new MultiAssetGui(entity, guiID, modName); }
 	
 	constructor(entity, guiID, modName) {
 		super(entity, guiID, modName);
@@ -217,14 +217,14 @@ export default class MultiDataGui extends DataGui {
 	
 	_updateItemStatusIndicatorsFor(jElement, changed, error) {
 		if (error) {
-			MultiDataGui.addCardErrorIndicator(jElement);
-			MultiDataGui.clearCardChangeIndicator(jElement);
+			MultiAssetGui.addCardErrorIndicator(jElement);
+			MultiAssetGui.clearCardChangeIndicator(jElement);
 		} else if (changed) {
-			MultiDataGui.addCardChangeIndicator(jElement);
-			MultiDataGui.clearCardErrorIndicator(jElement);
+			MultiAssetGui.addCardChangeIndicator(jElement);
+			MultiAssetGui.clearCardErrorIndicator(jElement);
 		} else {
-			MultiDataGui.clearCardErrorIndicator(jElement);
-			MultiDataGui.clearCardChangeIndicator(jElement);
+			MultiAssetGui.clearCardErrorIndicator(jElement);
+			MultiAssetGui.clearCardChangeIndicator(jElement);
 		}
 	}
 	
@@ -249,4 +249,4 @@ export default class MultiDataGui extends DataGui {
 	}
 }
 
-GuiRegistry.register(MultiDataGui);
+GuiRegistry.register(MultiAssetGui);

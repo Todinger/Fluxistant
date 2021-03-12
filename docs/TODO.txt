@@ -38,6 +38,7 @@
 - Persistent data for modules
 - OBS Websocket module
 - Voice activation mechanism (in addition to commands and shortcut keys)
+- Make WebEntities generation clear the WebEntities dir before writing to it.
 
 - NPM Uninstall image-size if I no longer use it
 

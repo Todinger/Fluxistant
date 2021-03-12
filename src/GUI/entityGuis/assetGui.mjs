@@ -2,7 +2,7 @@ import EntityGui from "./entityGui.mjs";
 import DataContentRegistry from "./dataContents/dataContentFactory.mjs";
 import { showError } from "../config.mjs";
 
-export default class DataGui extends EntityGui {
+export default class AssetGui extends EntityGui {
 	static get GUITYPE()    { return null; }   // Abstract class, should not be instantiated
 	
 	constructor(entity, guiID, modName) {
