@@ -41,15 +41,103 @@
 - Make WebEntities generation clear the WebEntities dir before writing to it.
 
 - NPM Uninstall image-size if I no longer use it
-
+- Mark library directories as excluded in IDE after comitting, see if it does what I think it does
 
 IDEAS!
 - Bingo game
 - Chat "Meow?": deletes all messages from people that aren't made of solely meowing.
 
 
+Selected functions module setup example (what I'm acutally gonna do now):
+	functions = {
+		adventure: {
+			name: 'Start Adventure',
+			description: 'Starts the adventure by the user',
+			parameters: [ // Order matters
+				{
+					name: 'Type', // Must be unique in the function
+					description: 'The type of adventure to start (e.g. spooky, candy)',
+					default: 'spooky',
+					// Will have a .value filled in by the invocation
+				}
+			],
+			callback: user => this.startRecruiting(user),
+			cooldown: {
+				user: 10,
+				global: 5,
+			},
+			triggers: [
+				this.trigger.command({
+					cmdname: 'adventure',
+					aliases: ['adv'],
+					filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+					cooldown: {
+						user: 40,
+						global: 20,
+					},
+				}),
+				this.trigger.keywords({
+					keywords: ['hello', 'there', /abc/],
+					filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+				}),
+				this.trigger.shorctut({
+					keys: [
+						['BACKSPACE'], // The backspace key on the keyboard
+					],
+					filters: [this.filterDesc('windowActive', ['Phasmophobia', 'Spelunky 2'])],
+					paramValues: [
+						'candy',
+					]
+				}),
+				this.trigger.voice({
+					// ???,
+					filters: [this.filterDesc('windowActive', ['Phasmophobia', 'Spelunky 2'])],
+				}),
+				this.trigger.channelReward({
+					name: 'Catastrophe',
+					filters: [this.filterDesc('isMod')],
+				}),
+			],
+			variables: [
+				this.variable.out('type', {
+					name: 'Adventure Type ($type)',
+					description: 'Selected category of adventures to choose from (e.g. spooky, candy)',
+					example: 'Wow, what a $type that was, people, eh?',
+				},
+			],
+			responses: [
+				this.response.chat({
+					message: 'Hello $user, nice to see you! One $type adventure, coming up!',
+				}),
+				this.response.whisper({
+					usernames: ['yecatsmailbox', '$user'],
+					message: 'I saw you say that!',
+				}),
+				this.response.se({
+					message: "Hi, I'm StreamElements!",
+				}),
+				this.response.tts({
+					message: "Don't do that, $user!",
+					voice: 'Brian',
+				}),
+				this.log({
+					// Location? Category?
+					message: '$user did that thing.',
+				}),
+				this.file({
+					message: 'Yay $user!',
+					path: 'C:/Path/to/file.txt',
+					append: false,  // True by default
+				})
+			],
+		},
+	}
 
-Functions module setup example (NOTE: all trigger variables are available as response variables automatically):
+
+
+
+
+Potential functions module setup example (NOTE: all trigger variables are available as response variables automatically):
 	functions = {
 		adventure: {
 			name: 'Start Adventure',

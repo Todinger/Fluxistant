@@ -31,7 +31,7 @@ class MainConfig extends Configuration {
 		let se = this.addGroup('streamElements')
 			.setName('Stream Elements')
 			.setDescription('Settings for your StreamElements account');
-		se.addString('accountID')
+		se.addHiddenString('accountID')
 			.setName('Account ID')
 			.setDescription("You StreamElements Account ID, as listed in the SE configuration page when you click on your name at the top-right");
 		se.addHiddenString('token')
@@ -67,7 +67,7 @@ class MainConfig extends Configuration {
 	}
 	
 	getStreamerName() {
-		return this.getValue('streamerName');
+		return this.getChild('twitch').getChild('channel').getValue();
 	}
 	
 	getConfigBackupLimit() {

@@ -22,6 +22,20 @@ class User {
 	}
 }
 
+function MakeBroadcasterUser(username) {
+	let userstate = {
+		name: username,
+		// TODO: Get display name from Twitch (get entire UserState object if possible)
+		['display-name']: username,
+		badges: {
+			broadcaster: '1',
+		},
+		subscriber: true,
+	};
+	
+	return new User(userstate);
+}
+
 // User Filters:
 // These are meant to be used in commands to specify who can use them.
 // A Filter is any function that takes a User object and returns a boolean
@@ -78,6 +92,7 @@ class Filters {
 }
 
 module.exports = {
-	User: User,
-	Filters: Filters,
+	User,
+	Filters,
+	MakeBroadcasterUser,
 };

@@ -300,6 +300,65 @@ class CandyGame extends Module {
 			callback: user => this.candyRequest(user),
 		},
 	}
+	
+	// noinspection JSUnusedLocalSymbols
+	test(invocationData) {
+		this.log('This is your testain speaking... All is well!');
+		return {
+			varvar: 'Wheeeee!',
+		}
+	}
+	
+	functions = {
+		testTest: {
+			name: 'Testy Test',
+			description: 'Tests testable tests',
+			action: (...p) => this.test(...p),
+			parameters: [
+				{
+					name: 'First',
+					default: 'Hi?'
+				},
+				{
+					name: 'Rest',
+					takeAll: true,
+				},
+			],
+			variables: [
+				this.variable.out('varvar', {
+					name: 'My Variable',
+				}),
+				this.variable.custom({
+					name: 'Something',
+					description: 'Another thing',
+					example: 'More things',
+					expr: '$thing',
+					replacement: 'stuff',
+				})
+			],
+			triggers: [
+				this.trigger.command({
+					cmdname: 'aa'
+				}),
+				this.trigger.shortcut({
+					keys: [
+						['SHIFT_L', '8'],
+					],
+				}),
+			],
+			responses: [
+				// this.response.console('Hey, it worked!'),
+				this.response.console({
+					level: 'warn',
+					message: 'Blame it on $user: 1: $1 2: $2 3: $3 all: $all.',
+				}),
+				this.response.console({
+					level: 'warn',
+					message: 'varvar = $varvar, thing = $thing',
+				}),
+			],
+		},
+	}
 }
 
 module.exports = new CandyGame();

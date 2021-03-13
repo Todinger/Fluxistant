@@ -15,6 +15,7 @@ class Globals {
 		
 		this.userDir = null;
 		this.Logger = null;
+		this.StreamerUser = null;
 	}
 }
 

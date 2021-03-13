@@ -367,6 +367,25 @@ class TwitchManager extends EventNotifier {
 		this._commandHandlers[cmd.cmdname][id] = cmd;
 	}
 	
+	registerCommandWithAliases(cmd) {
+		let aliases = cmd.aliases && [...cmd.aliases] || [];
+		if (!aliases.includes(cmd.cmdname)) {
+			aliases.unshift(cmd.cmdname);
+		}
+		
+		let originalCmdID = cmd.id;
+		let cmdname = cmd.cmdname;
+		aliases.forEach(alias => {
+			let cmdid = `${originalCmdID} : ${alias}`;
+			cmd.id = cmdid;
+			cmd.cmdname = alias;
+			this.registerCommand(cmdid, cmd);
+		});
+		
+		cmd.cmdname = cmdname;
+		cmd.id = originalCmdID;
+	}
+	
 	// Unregisters a previously registered command based on the unique ID given
 	// at the time of its registration.
 	unregisterCommand(id) {
@@ -377,6 +396,18 @@ class TwitchManager extends EventNotifier {
 		delete this._commandHandlers[this._commandHandlerIDs[id]];
 		delete this._commandHandlerIDs[id];
 		delete this._cooldownData[id];
+	}
+	
+	
+	unregisterCommandWithAliases(cmd) {
+		let aliases = cmd.aliases && [...cmd.aliases] || [];
+		if (!aliases.includes(cmd.cmdname)) {
+			aliases.unshift(cmd.cmdname);
+		}
+		
+		aliases.forEach(alias => {
+			this.unregisterCommand(`${cmd.id} : ${alias}`);
+		});
 	}
 	
 	// Examines a message to see if it has the structure of a command and

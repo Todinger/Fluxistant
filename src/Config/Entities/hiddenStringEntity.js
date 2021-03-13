@@ -8,6 +8,11 @@ class HiddenStringEntity extends StringEntity {
 	constructor(value) {
 		super(value);
 	}
+	
+	_assignableFrom(type) {
+		return super._assignableFrom(type) ||
+			type === 'String';
+	}
 }
 
 module.exports = HiddenStringEntity;

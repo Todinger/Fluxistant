@@ -54,6 +54,10 @@ class Logger {
 			level => Globals.cli.on([level], () => this.setConsoleLevel(level)));
 	}
 	
+	log(...params) {
+		this.logger.log(...params);
+	}
+	
 	info(...params) {
 		this.logger.info(...params);
 	}

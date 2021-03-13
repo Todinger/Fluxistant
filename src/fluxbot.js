@@ -60,6 +60,14 @@ class FluxBot {
 		this.configManager.init(APP_DATA_DIR);
 		this.configManager.setMain(this.mainConfig);
 		this.configManager.loadMain();
+		
+		const { MakeBroadcasterUser } = require('./user');
+		// TODO: Get name from channel name or use a default
+		let username = this.mainConfig.getStreamerName();
+		if (!Utils.isNonEmptyString(username)) {
+			username = 'streamer';
+		}
+		Globals.StreamerUser = MakeBroadcasterUser(username);
 	}
 	
 	setupLogs() {

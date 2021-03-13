@@ -18,6 +18,8 @@ const ModuleConfig = require('./Config/moduleConfig');
 const Command = require('./command');
 const MainConfig = require('./mainConfig');
 
+const FunctionBuilders = require('./Functions/builders');
+
 // This is the base class for all server-side Module-specific logic classes.
 // 
 // To create a new Module, create a subdirectory within ./Modules/ from where
@@ -115,6 +117,35 @@ class Module {
 	get enabled() {
 		return this.config && this.config.enabled;
 	}
+	
+	// ----------- START OF FUNCTION FEATURES ----------- //
+	
+	createFunctionObjects(funcs) {
+		funcs = funcs || this.functions;
+		let funcObjs = {};
+		if (funcs) {
+			Object.keys(funcs).forEach(funcName => {
+				funcObjs[funcName] = FunctionBuilders.Func(funcs[funcName]);
+				// TODO: Remove
+				funcObjs[funcName].activate();
+			});
+		}
+		
+		return funcObjs;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// ------------ END OF FUNCTION FEATURES ------------ //
 	
 	filterDesc(type, arg) {
 		return {
@@ -300,6 +331,12 @@ class Module {
 		if (this.shortcuts) {
 			this.registerShortcuts();
 			modConfig.addShortcuts(this.shortcuts);
+		}
+		
+		if (this.functions) {
+			// This will contain all of our Functions (with a capital F, see
+			// Functions/ folder) in their full form
+			this.funcObjects = this.createFunctionObjects();
 		}
 		
 		this.config = modConfig.toConf();
@@ -762,6 +799,24 @@ class Module {
 	// Also adjusts for singular when the quantity is 1 or -1.
 	pointsString(points) {
 		return SEManager.pointsString(points);
+	}
+	
+	// [For use by inheriting classes]
+	// A set of methods for creating Function Variables
+	get variable() {
+		return FunctionBuilders.Variables;
+	}
+	
+	// [For use by inheriting classes]
+	// A set of methods for creating Function Triggers
+	get trigger() {
+		return FunctionBuilders.Triggers;
+	}
+	
+	// [For use by inheriting classes]
+	// A set of methods for creating Function Responses
+	get response() {
+		return FunctionBuilders.Responses;
 	}
 	
 	// [For use by inheriting classes]

@@ -1,5 +1,7 @@
 const assert = require('assert').strict;
+const _ = require('lodash');
 const Globals = require('./globals');
+const Logger = require('./logger');
 
 // General event notification class.
 // Lets you use on(...) and invokes registered callbacks upon _notify(...).
@@ -70,6 +72,19 @@ class EventNotifier {
 		}
 	}
 	
+	// Removes a callback from the list for the given event
+	removeCallback(eventName, callback) {
+		if (this._ignoreCase) {
+			eventName = eventName.toLowerCase();
+		}
+		
+		if (eventName in this._eventHandlers) {
+			_.pull(this._eventHandlers[eventName], callback);
+		} else {
+			Logger.warn(`Cannot remove event handler for nonexistent event "${eventName}"`);
+		}
+	}
+	
 	// Invokes all the callbacks that registered for the specified event.
 	// If the event has arguments, simply list them after the event name when
 	// invoking this function.
@@ -92,12 +107,14 @@ class EventNotifier {
 		
 		// assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
 		
-		if (!this.silent) {
-			Globals.cli.log(`Invoking event: ${eventName}`);
+		if (eventName in this._eventHandlers) {
+			if (!this.silent) {
+				Globals.cli.log(`Invoking event: ${eventName}`);
+			}
+			
+			this._eventHandlers[eventName].forEach(
+				callback => callback.apply(null, args));
 		}
-		
-		this._eventHandlers[eventName].forEach(
-			callback => callback.apply(null, args));
 	}
 	
 	_isEvent(eventName) {
