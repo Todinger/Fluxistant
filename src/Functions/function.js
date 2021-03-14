@@ -13,7 +13,7 @@ class Function {
 		this.name = settings.name;
 		this.active = false;
 		this.description = settings.description || '';
-		this.parameters = settings.parameters || [];
+		this.parameters = this._makeParameters(settings.parameters);
 		this.action = settings.action || EMPTY_ACTION;
 		this.variables = settings.variables || [];
 		this.cooldowns = settings.cooldowns;
