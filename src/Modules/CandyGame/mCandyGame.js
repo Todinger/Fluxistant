@@ -314,6 +314,10 @@ class CandyGame extends Module {
 			name: 'Testy Test',
 			description: 'Tests testable tests',
 			action: (...p) => this.test(...p),
+			// cooldowns: {
+			// 	user: 3000,
+			// 	// global: 2000,
+			// },
 			parameters: [
 				{
 					name: 'First',
@@ -338,12 +342,20 @@ class CandyGame extends Module {
 			],
 			triggers: [
 				this.trigger.command({
-					cmdname: 'aa'
+					cmdname: 'aa',
+					// cooldowns: {
+					// 	user: 3000,
+					// 	// global: 2000,
+					// },
 				}),
 				this.trigger.shortcut({
 					keys: [
-						['SHIFT_L', '8'],
+						['SHIFT_L', 'SPACE'],
 					],
+					// cooldowns: {
+					// 	user: 10000,
+					// 	// global: 2000,
+					// },
 				}),
 			],
 			responses: [

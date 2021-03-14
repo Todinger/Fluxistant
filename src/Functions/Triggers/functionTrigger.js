@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const EventNotifier = requireMain('eventNotifier');
+const CooldownManager = require('../../cooldownManager');
 const Errors = require('../../errors');
 const Globals = requireMain('./globals');
 const Utils = require('../../utils');
@@ -16,6 +17,8 @@ class FunctionTrigger extends EventNotifier {
 		this.cooldowns = settings.cooldowns;
 		this.filter = settings.filter || EMPTY_FILTER;
 		this.paramValues = settings.paramValues || [];
+		
+		this.cooldownID = CooldownManager.addCooldown(this.cooldowns);
 	}
 	
 	get selfUser() {
@@ -30,6 +33,7 @@ class FunctionTrigger extends EventNotifier {
 	
 	deactivate() {
 		if (this.active) {
+			CooldownManager.resetCooldowns(this.cooldownID);
 			this._deactivateImpl();
 		}
 	}
@@ -87,11 +91,17 @@ class FunctionTrigger extends EventNotifier {
 		return finalParams;
 	}
 	
-	_trigger(triggerData) {
-		triggerData.triggerVariables = this.variables || [];
-		triggerData.params = this._composeParams(triggerData);
+	_trigger(invocationData) {
+		if (!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user)) {
+			return;
+		}
 		
-		this._notify('triggered', triggerData);
+		CooldownManager.applyCooldowns(this.cooldownID, invocationData.user);
+		
+		invocationData.triggerVariables = this.variables || [];
+		invocationData.params = this._composeParams(invocationData);
+		
+		this._notify('triggered', invocationData);
 	}
 }
 

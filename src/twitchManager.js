@@ -6,7 +6,6 @@ const cli = require('./cliManager');
 const { User, UserFilters } = require('./user');
 const ModuleManager = require('./moduleManager');
 const SEManager = require('./seManager');
-// const DBLog = require('./Logger');
 const Utils = require('./utils');
 
 // All commands written by users need to start with this prefix, but when

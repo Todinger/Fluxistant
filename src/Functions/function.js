@@ -1,6 +1,7 @@
 const assert = require('assert').strict;
 const Utils = requireMain('utils');
 const Parameter = require('./functionParameter');
+const CooldownManager = require('../cooldownManager');
 
 function EMPTY_ACTION() {
 	// Do nothing because that's what we do best
@@ -20,6 +21,8 @@ class Function {
 		this.responses = settings.responses || [];
 		this.triggerHandler = (triggerData) => this.invoke(triggerData);
 		this._registerTriggers();
+		
+		this.cooldownID = CooldownManager.addCooldown(this.cooldowns);
 		// this.configure(settings);
 	}
 	
@@ -51,6 +54,7 @@ class Function {
 	deactivate() {
 		if (this.active) {
 			this.triggers.forEach(trigger => trigger.deactivate());
+			CooldownManager.resetCooldowns(this.cooldownID);
 			this.active = false;
 		}
 	}
@@ -110,6 +114,12 @@ class Function {
 	}
 	
 	invoke(invocationData) {
+		if (!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user)) {
+			return;
+		}
+		
+		CooldownManager.applyCooldowns(this.cooldownID, invocationData.user);
+		
 		invocationData.func = this;
 		this._applyDefaultParamValues(invocationData);
 		this._processLastParam(invocationData);
