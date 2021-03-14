@@ -19309,8 +19309,10 @@ class ConfigEntity {
 		this.hidden = false;
 		this.id = null; // EVERY entity should have this, set from outside by its parent
 		
+		// Information pertaining to the GUI display only (nothing functional)
 		this.displayName = null;
 		this.displayIndex = undefined;
+		this.advanced = false; // Any entity with this set to true will only show up in "Advanced Mode"
 	}
 	
 	hasName() {
@@ -19347,6 +19349,20 @@ class ConfigEntity {
 	
 	show() {
 		this.hidden = false;
+		return this;
+	}
+	
+	get isAdvanced() {
+		return this.advanced;
+	}
+	
+	setAdvanced() {
+		this.advanced = true;
+		return this;
+	}
+	
+	setSimple() {
+		this.advanced = false;
 		return this;
 	}
 	
@@ -19457,6 +19473,7 @@ class ConfigEntity {
 		copy.id = this.id;
 		copy.displayName = this.displayName;
 		copy.displayIndex = this.displayIndex;
+		copy.advanced = this.advanced;
 		return copy;
 	}
 	
@@ -19726,7 +19743,8 @@ class FunctionEntity extends StaticObjectEntity {
 			.setName('Enabled')
 			.setDescription('Enables/disables this function');
 		this.addCooldowns('cooldowns')
-			.setDescription('Function-wide cooldowns (work in addition to trigger-specific cooldowns)');
+			.setDescription('Function-wide cooldowns (work in addition to trigger-specific cooldowns)')
+			.setAdvanced();
 		this.addDynamicArray('triggers', 'TriggerChoice')
 			.setName('Triggers')
 			.setDescription('Defines when this function will be invoked');
@@ -20893,12 +20911,15 @@ class TriggerEntity extends ChoiceValueEntity {
 			.setName('Enabled')
 			.setDescription('Enables/disables this trigger');
 		this.addString('filter')
-			.setDescription('Specifies when and by whom this trigger can be activated');
+			.setDescription('Specifies when and by whom this trigger can be activated')
+			.setAdvanced();
 		this.addCooldowns('cooldowns')
-			.setDescription('Function-wide cooldowns (work in addition to function-wide cooldowns)');
+			.setDescription('Function-wide cooldowns (work in addition to function-wide cooldowns)')
+			.setAdvanced();
 		this.addDynamicArray('paramValues', 'String')
 			.setName('Parameter Values')
-			.setDescription('Values to give to the function as parameters (simulates what you would get from a command with arguments)');
+			.setDescription('Values to give to the function as parameters (simulates what you would get from a command with arguments)')
+			.setAdvanced();
 		
 		this.setData(data);
 	}
@@ -20944,7 +20965,8 @@ class Trigger_CommandEntity extends TriggerEntity {
 			.setName('Name')
 			.setDescription('The term that will invoke the command');
 		this.addDynamicArray('aliases', 'String')
-			.setDescription('Optional additional names for the command');
+			.setDescription('Optional additional names for the command')
+			.setAdvanced();
 		this.addNaturalNumber('cost', data && data.cost || 0)
 			.setDescription('Cost in StreamElements loyalty points');
 		
@@ -20953,8 +20975,8 @@ class Trigger_CommandEntity extends TriggerEntity {
 		this._defineChildrenOrder([
 			'active',
 			'cmdname',
-			'filter',
 			'cost',
+			'filter',
 			'aliases',
 			'cooldowns',
 			'paramValues',

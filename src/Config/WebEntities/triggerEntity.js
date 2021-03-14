@@ -10,12 +10,15 @@ class TriggerEntity extends ChoiceValueEntity {
 			.setName('Enabled')
 			.setDescription('Enables/disables this trigger');
 		this.addString('filter')
-			.setDescription('Specifies when and by whom this trigger can be activated');
+			.setDescription('Specifies when and by whom this trigger can be activated')
+			.setAdvanced();
 		this.addCooldowns('cooldowns')
-			.setDescription('Function-wide cooldowns (work in addition to function-wide cooldowns)');
+			.setDescription('Function-wide cooldowns (work in addition to function-wide cooldowns)')
+			.setAdvanced();
 		this.addDynamicArray('paramValues', 'String')
 			.setName('Parameter Values')
-			.setDescription('Values to give to the function as parameters (simulates what you would get from a command with arguments)');
+			.setDescription('Values to give to the function as parameters (simulates what you would get from a command with arguments)')
+			.setAdvanced();
 		
 		this.setData(data);
 	}

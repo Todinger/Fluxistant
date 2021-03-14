@@ -41,6 +41,10 @@ export default class ObjectGui extends EntityGui {
 			contents: childLabeledContainer,
 		});
 		
+		if (childLabeledContainer.hasClass('advanced')) {
+			childEntry.addClass('advanced');
+		}
+		
 		childGui.onChangedOrError(() => {
 			childGui._updateStatusIndicators(childEntry.guiData.marker);
 		});
@@ -68,11 +72,16 @@ export default class ObjectGui extends EntityGui {
 					this._contentsChanged();
 				});
 			} else {
+				let childGUI = childrenGUIs[key].getGUI();
 				let labeledContainer = GuiElements.labeledContainer({
 					label: childEntity.getName(),
-					contents: childrenGUIs[key].getGUI(),
+					contents: childGUI,
 					tooltip: childDescription,
 				});
+				
+				if (childGUI.hasClass('advanced')) {
+					labeledContainer.addClass('advanced');
+				}
 				
 				childEntry = this._buildChildEntry(this.childrenGUIs[key], labeledContainer);
 				

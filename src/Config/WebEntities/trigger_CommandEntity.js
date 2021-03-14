@@ -12,7 +12,8 @@ class Trigger_CommandEntity extends TriggerEntity {
 			.setName('Name')
 			.setDescription('The term that will invoke the command');
 		this.addDynamicArray('aliases', 'String')
-			.setDescription('Optional additional names for the command');
+			.setDescription('Optional additional names for the command')
+			.setAdvanced();
 		this.addNaturalNumber('cost', data && data.cost || 0)
 			.setDescription('Cost in StreamElements loyalty points');
 		
@@ -21,8 +22,8 @@ class Trigger_CommandEntity extends TriggerEntity {
 		this._defineChildrenOrder([
 			'active',
 			'cmdname',
-			'filter',
 			'cost',
+			'filter',
 			'aliases',
 			'cooldowns',
 			'paramValues',

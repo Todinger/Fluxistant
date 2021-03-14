@@ -12,24 +12,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="css/uikit.min.css" />
-	<style>
-		/*noinspection CssUnusedSymbol*/
-		.file-upload-name {
-			background: #585858;
-			padding: 0.5rem;
-			color: white;
-		}
-		/*noinspection CssUnusedSymbol*/
-		.status-changed {
-			border: 2px solid #faa05a;
-			border-radius: 7px;
-		}
-		/*noinspection CssUnusedSymbol*/
-		.status-error {
-			border: 2px solid #d54567;
-			border-radius: 7px;
-		}
-	</style>
+	<link rel="stylesheet" href="./cfg.css" />
 	<script src="js/uikit.min.js"></script>
 	<script src="js/uikit-icons.min.js"></script>
 
@@ -73,10 +56,13 @@
 			<div>
 				<button id="btn-apply" class="uk-button uk-button-default uk-width-small">Apply</button>
 			</div>
+			<div class="uk-overlay uk-position-center-right uk-flex uk-flex-center">
+				<label for="chk-advanced" class="uk-link-heading uk-margin-small-right uk-margin-remove-bottom" style="user-select: none; cursor: pointer">Advanced Mode</label>
+				<input id="chk-advanced" class="uk-checkbox uk-margin-auto-top uk-margin-auto-bottom" type="checkbox">
+			</div>
 		</div>
 		<hr>
 	</div>
-
 	<ul id="loadingSwitcher" uk-switcher hidden>
 		<li><a href="#"></a></li>
 		<li><a href="#"></a></li>

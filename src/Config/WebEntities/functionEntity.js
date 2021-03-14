@@ -16,7 +16,8 @@ class FunctionEntity extends StaticObjectEntity {
 			.setName('Enabled')
 			.setDescription('Enables/disables this function');
 		this.addCooldowns('cooldowns')
-			.setDescription('Function-wide cooldowns (work in addition to trigger-specific cooldowns)');
+			.setDescription('Function-wide cooldowns (work in addition to trigger-specific cooldowns)')
+			.setAdvanced();
 		this.addDynamicArray('triggers', 'TriggerChoice')
 			.setName('Triggers')
 			.setDescription('Defines when this function will be invoked');

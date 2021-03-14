@@ -31,6 +31,9 @@ export default class EntityGui extends EventNotifier {
 		if (!this.gui) {
 			this.gui = this._buildGUI();
 			this.gui.attr('id', this.guiID);
+			if (this.entity.isAdvanced) {
+				this.gui.addClass('advanced');
+			}
 		}
 		
 		return this.gui;

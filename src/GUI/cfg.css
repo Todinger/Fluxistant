@@ -1,0 +1,19 @@
+.file-upload-name {
+	background: #585858;
+	padding: 0.5rem;
+	color: white;
+}
+
+.status-changed {
+	border: 2px solid #faa05a;
+	border-radius: 7px;
+}
+
+.status-error {
+	border: 2px solid #d54567;
+	border-radius: 7px;
+}
+
+.advanced {
+	display: none;
+}

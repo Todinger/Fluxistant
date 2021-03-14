@@ -1,6 +1,23 @@
 import GuiRegistry from "./entityGuis/guiRegistry.mjs";
 import EntityGui from "./entityGuis/entityGui.mjs";
 
+function setStyleRule(sheetName, selector, property, value) {
+	let styleSheet = document.querySelector('link[href*=' + sheetName + ']')
+	
+	if (styleSheet){
+		let rule = Object.values(styleSheet.sheet.rules).filter(rule => rule.selectorText === selector)[0];
+		if (value !== undefined) {
+			rule.style[property] = value;
+		} else {
+			delete rule.style[property];
+		}
+	}
+}
+
+function setAdvancedVisibility(value) {
+	setStyleRule('cfg', '.advanced', 'display', value);
+}
+
 class Configurator {
 	constructor() {
 		this.socket = io();
@@ -29,6 +46,14 @@ class Configurator {
 	init() {
 		$('#btn-apply').click(() => this.applyButtonClicked());
 		$('#btn-revert').click(() => this.revertButtonClicked());
+		$('#chk-advanced').change(function() {
+			if (this.checked) {
+				setAdvancedVisibility('');
+			} else {
+				setAdvancedVisibility('none');
+			}
+		});
+		
 		this.configViewSwitcher = $('#configViewSwitcher');
 		this.mainTabTitle = $('#mainTabTitle');
 		this.allModulesTabTitle = $('#modulesTabTitle');

@@ -12,8 +12,10 @@ class ConfigEntity {
 		this.hidden = false;
 		this.id = null; // EVERY entity should have this, set from outside by its parent
 		
+		// Information pertaining to the GUI display only (nothing functional)
 		this.displayName = null;
 		this.displayIndex = undefined;
+		this.advanced = false; // Any entity with this set to true will only show up in "Advanced Mode"
 	}
 	
 	hasName() {
@@ -50,6 +52,20 @@ class ConfigEntity {
 	
 	show() {
 		this.hidden = false;
+		return this;
+	}
+	
+	get isAdvanced() {
+		return this.advanced;
+	}
+	
+	setAdvanced() {
+		this.advanced = true;
+		return this;
+	}
+	
+	setSimple() {
+		this.advanced = false;
 		return this;
 	}
 	
@@ -160,6 +176,7 @@ class ConfigEntity {
 		copy.id = this.id;
 		copy.displayName = this.displayName;
 		copy.displayIndex = this.displayIndex;
+		copy.advanced = this.advanced;
 		return copy;
 	}
 	
