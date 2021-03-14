@@ -6,6 +6,10 @@ class ConsoleResponse extends FunctionResponse {
 		super(params);
 	}
 	
+	get type() {
+		return 'console';
+	}
+	
 	_defaultInit() {
 		this.level = 'info';
 	}

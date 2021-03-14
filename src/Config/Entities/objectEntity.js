@@ -51,6 +51,12 @@ class ObjectEntity extends ConfigEntity {
 		}
 	}
 	
+	_defineChildrenOrder(sortedKeys) {
+		for (let i = 0; i < sortedKeys.length; i++) {
+			this.getChild(sortedKeys[i]).setDisplayIndex(i);
+		}
+	}
+	
 	// ------------- Child Manufacturing ------------- //
 	
 	add(key, type, ...params) {
@@ -115,6 +121,10 @@ class ObjectEntity extends ConfigEntity {
 	
 	addGroup(key) {
 		return this.addObject(key);
+	}
+	
+	addCooldowns(key) {
+		return this.add(key, 'Cooldown');
 	}
 	
 	addSingleAsset(key, configData) {

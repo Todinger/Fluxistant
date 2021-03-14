@@ -22,8 +22,8 @@ class ShortcutTrigger extends Trigger {
 		this.keys = settings.keys || [];
 	}
 	
-	get commandID() {
-		return `<Trigger> ${this.triggerID}`;
+	get type() {
+		return "shortcut";
 	}
 	
 	_registerShortcutKey(index, keycodes) {

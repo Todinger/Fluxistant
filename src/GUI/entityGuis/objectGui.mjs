@@ -51,7 +51,12 @@ export default class ObjectGui extends EntityGui {
 	_buildChildrenContainer() {
 		let childrenContainer = $(`<div></div>`);
 		let childrenGUIs = this._buildChildrenGUIs();
-		Object.keys(childrenGUIs).forEach(key => {
+		let sortedChildrenKeys = Object.keys(childrenGUIs).sort(
+			(keyA, keyB) =>
+				this.entity.getChild(keyA).getDisplayIndex() -
+				this.entity.getChild(keyB).getDisplayIndex()
+		);
+		sortedChildrenKeys.forEach(key => {
 			let childEntity = this.entity.getChild(key);
 			let childDescription = childEntity.getDescription();
 			
@@ -64,7 +69,7 @@ export default class ObjectGui extends EntityGui {
 				});
 			} else {
 				let labeledContainer = GuiElements.labeledContainer({
-					label: childEntity.getDisplayName(),
+					label: childEntity.getName(),
 					contents: childrenGUIs[key].getGUI(),
 					tooltip: childDescription,
 				});
@@ -72,7 +77,8 @@ export default class ObjectGui extends EntityGui {
 				childEntry = this._buildChildEntry(this.childrenGUIs[key], labeledContainer);
 				
 				this.childrenGUIs[key].onChangedOrError(() => {
-					labeledContainer.guiData.label.text(childEntity.getDisplayName());
+					// Why did I add this line again...?
+					// labeledContainer.guiData.label.text(childEntity.getDisplayName());
 					this._contentsChanged();
 					childrenGUIs[key]._updateStatusIndicators(labeledContainer.guiData.label);
 				});

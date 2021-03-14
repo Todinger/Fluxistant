@@ -10,7 +10,7 @@ class CommandEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Command'; 				    	}
 	static get GUITYPE()	{ return 'Command'; 				    	}
 	static get BUILDER()	{ return data => new CommandEntity(data); 	}
-	
+	c
 	constructor(data) {
 		super();
 		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')) // Identifies the command for functional purposes
@@ -62,7 +62,7 @@ class CommandEntity extends StaticObjectEntity {
 	getAliases() {
 		return this.getChild('aliases').map(e => e.getValue());
 	}
-	m
+	
 	getCost() {
 		return this.getChild('cost').getValue();
 	}

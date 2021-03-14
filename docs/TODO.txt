@@ -39,6 +39,7 @@
 - OBS Websocket module
 - Voice activation mechanism (in addition to commands and shortcut keys)
 - Make WebEntities generation clear the WebEntities dir before writing to it.
+- Generate commands information page to automatically be put online for viewers to see
 
 - NPM Uninstall image-size if I no longer use it
 - Mark library directories as excluded in IDE after comitting, see if it does what I think it does
@@ -106,6 +107,11 @@ Selected functions module setup example (what I'm acutally gonna do now):
 				},
 			],
 			responses: [
+				this.response.console('Hey, it worked!'),
+				this.response.console({
+					level: 'warn',
+					message: 'Blame it on $user: 1: $1 2: $2 3: $3 all: $all.',
+				}),
 				this.response.chat({
 					message: 'Hello $user, nice to see you! One $type adventure, coming up!',
 				}),

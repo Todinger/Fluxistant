@@ -1,9 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
 const EventNotifier = requireMain('eventNotifier');
-const CooldownManager = require('../../cooldownManager');
-const Errors = require('../../errors');
+const CooldownManager = requireMain('./cooldownManager');
+const Errors = requireMain('./errors');
 const Globals = requireMain('./globals');
-const Utils = require('../../utils');
+const Utils = requireMain('./utils');
 
 const EMPTY_FILTER = () => true;
 
@@ -23,6 +23,10 @@ class FunctionTrigger extends EventNotifier {
 	
 	get selfUser() {
 		return Globals.StreamerUser;
+	}
+	
+	get type() {
+		Errors.abstract();
 	}
 	
 	activate() {

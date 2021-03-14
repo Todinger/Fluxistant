@@ -6,6 +6,10 @@ class ChatResponse extends FunctionResponse {
 		super(params);
 	}
 	
+	get type() {
+		return 'chat';
+	}
+	
 	_sendImpl(finalText) {
 		TwitchManager.say(finalText);
 	}

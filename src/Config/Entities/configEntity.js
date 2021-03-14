@@ -13,6 +13,7 @@ class ConfigEntity {
 		this.id = null; // EVERY entity should have this, set from outside by its parent
 		
 		this.displayName = null;
+		this.displayIndex = undefined;
 	}
 	
 	hasName() {
@@ -72,6 +73,14 @@ class ConfigEntity {
 	
 	setDisplayName(displayName) {
 		this.displayName = displayName;
+	}
+	
+	getDisplayIndex() {
+		return this.displayIndex;
+	}
+	
+	setDisplayIndex(displayIndex) {
+		this.displayIndex = displayIndex;
 	}
 	
 	_escapeID(value) {
@@ -150,6 +159,7 @@ class ConfigEntity {
 		copy.hidden = this.hidden;
 		copy.id = this.id;
 		copy.displayName = this.displayName;
+		copy.displayIndex = this.displayIndex;
 		return copy;
 	}
 	

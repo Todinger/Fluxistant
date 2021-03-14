@@ -72,8 +72,7 @@ class Configuration {
 		this.getChild('shortcuts').addShortcut(key, data);
 	}
 	
-	// Uses addCommand() to add all of the commands in the given object while assuming
-	// that the keys represent each command's cmdid.
+	// Uses addShortcut() to add all of the shortcuts in the given object
 	addShortcuts(shortcutsMap) {
 		Object.keys(shortcutsMap).forEach(
 			key => this.addShortcut(key, shortcutsMap[key]));

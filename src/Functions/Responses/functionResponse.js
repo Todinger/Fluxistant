@@ -5,11 +5,16 @@ class FunctionResponse {
 	constructor(params) {
 		if (typeof params === 'string') {
 			this.message = params;
+			this.active = params.active !== false;
 			this._defaultInit(params);
 		} else {
 			this.message = params.message;
 			this._paramsInit(params);
 		}
+	}
+	
+	get type() {
+		Errors.abstract();
 	}
 	
 	_defaultInit() {
@@ -21,8 +26,10 @@ class FunctionResponse {
 	}
 	
 	send(funcResults) {
-		let response = this._buildResponse(funcResults);
-		this._sendImpl(response);
+		if (this.active) {
+			let response = this._buildResponse(funcResults);
+			this._sendImpl(response);
+		}
 	}
 	
 	_buildResponse(context) {

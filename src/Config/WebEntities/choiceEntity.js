@@ -9,7 +9,6 @@ class ChoiceEntity extends ConfigEntity {
 	constructor() {
 		super();
 		this.options = {};
-		this.selectedValue = null;
 		this.selectedOption = null;
 	}
 	
@@ -48,7 +47,11 @@ class ChoiceEntity extends ConfigEntity {
 	}
 	
 	getSelection() {
-		return this.options[this.selectedOption];
+		if (this.hasSelection()) {
+			return this.options[this.selectedOption];
+		} else {
+			return null;
+		}
 	}
 	
 	
@@ -133,6 +136,17 @@ class ChoiceEntity extends ConfigEntity {
 		Object.keys(descriptor.options).forEach(option => {
 			this.options[option] = ConfigEntity.buildEntity(descriptor.options[option]);
 		});
+	}
+	
+	getDisplayName() {
+		let displayName = super.getDisplayName();
+		if (displayName) {
+			if (this.hasSelection()) {
+				return `${displayName} (${this.getSelection().getDisplayText()})`;
+			}
+		}
+		
+		return displayName;
 	}
 }
 

@@ -92,10 +92,13 @@ class Module {
 			this.modConfig = new ModuleConfig(this.name, this.enabledByDefault !== false);
 		}
 		
-		// This is just to get the IDE to stop whining about this.shortcuts not being
+		// This is just to get the IDE to stop whining about things not being
 		// defined (that's kind of the point here...)
 		if (!this.shortcuts) {
 			this.shortcuts = undefined;
+		}
+		if (!this.functions) {
+			this.functions = undefined;
 		}
 		
 		// Loads the module in debug mode, replacing chat messages with
@@ -337,6 +340,7 @@ class Module {
 			// This will contain all of our Functions (with a capital F, see
 			// Functions/ folder) in their full form
 			this.funcObjects = this.createFunctionObjects();
+			modConfig.addFunctions(this.functions);
 		}
 		
 		this.config = modConfig.toConf();

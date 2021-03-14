@@ -6,15 +6,25 @@ const SEManager = requireMain('./seManager');
 class CommandTrigger extends Trigger {
 	constructor(settings) {
 		super(settings);
+		this.cmdid = this.commandID;
+		this.cmdname = settings.cmdname;
+		this.callback = (...params) => this._invoked(...params);
+		this.cost = settings.cost || 0;
+		this.aliases = settings.aliases || [];
+		
 		this.command = {
-			id: this.commandID,
-			cmdname: settings.cmdname,
-			callback: (...params) => this._invoked(...params),
+			id: this.cmdid,
+			cmdname: this.cmdname,
+			callback: this.callback,
 			filters: [this.filter],
-			cost: settings.cost || 0,
+			cost: this.cost,
 			cooldowns: this.cooldowns,
-			aliases: settings.aliases || [],
+			aliases: this.aliases,
 		};
+	}
+	
+	get type() {
+		return "command";
 	}
 	
 	get commandID() {

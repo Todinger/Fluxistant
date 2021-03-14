@@ -359,7 +359,7 @@ class CandyGame extends Module {
 				}),
 			],
 			responses: [
-				// this.response.console('Hey, it worked!'),
+				this.response.console('Hey, it worked!'),
 				this.response.console({
 					level: 'warn',
 					message: 'Blame it on $user: 1: $1 2: $2 3: $3 all: $all.',
