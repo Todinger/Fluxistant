@@ -9,10 +9,13 @@ class FunctionEntity extends StaticObjectEntity {
 	
 	constructor(data) {
 		super();
-		// this.addString('name', data && data.name)
-		// 	.setName('Name')
-		// 	.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you");
-		this.addBoolean('active', !!(data && data.active))
+		this.addString('funcID', data && data.funcID)
+			.hide();
+		this.addString('name', data && data.name)
+			.setName('Name')
+			.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you")
+			.hide();
+		this.addBoolean('enabled', !!(data && data.enabled))
 			.setName('Enabled')
 			.setDescription('Enables/disables this function');
 		this.addCooldowns('cooldowns')

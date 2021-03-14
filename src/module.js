@@ -18,6 +18,7 @@ const ModuleConfig = require('./Config/moduleConfig');
 const Command = require('./command');
 const MainConfig = require('./mainConfig');
 
+const Function = require('./Functions/function');
 const FunctionBuilders = require('./Functions/builders');
 
 // This is the base class for all server-side Module-specific logic classes.
@@ -127,19 +128,40 @@ class Module {
 		funcs = funcs || this.functions;
 		let funcObjs = {};
 		if (funcs) {
-			Object.keys(funcs).forEach(funcName => {
-				funcObjs[funcName] = FunctionBuilders.Func(funcs[funcName]);
-				// TODO: Remove
-				funcObjs[funcName].activate();
+			Object.keys(funcs).forEach(funcID => {
+				if (!funcs[funcID].funcID) {
+					funcs[funcID].funcID = funcID;
+				}
+				
+				funcObjs[funcID] = new Function(funcs[funcID]);
 			});
 		}
 		
 		return funcObjs;
 	}
 	
+	activateFunctions(funcObjects) {
+		funcObjects = funcObjects || this.funcObjects;
+		if (funcObjects) {
+			Object.values(funcObjects).forEach(func => func.activate());
+		}
+	}
 	
+	deactivateFunctions(funcObjects) {
+		funcObjects = funcObjects || this.funcObjects;
+		if (funcObjects) {
+			Object.values(funcObjects).forEach(func => func.deactivate());
+		}
+	}
 	
-	
+	configureFunctions(funcConfigs, funcObjects) {
+		funcObjects = funcObjects || this.funcObjects;
+		if (funcObjects && funcConfigs) {
+			funcConfigs.forEach(funcConfig => {
+				funcObjects[funcConfig.funcID].configure(funcConfig);
+			});
+		}
+	}
 	
 	
 	
@@ -340,7 +362,7 @@ class Module {
 			// This will contain all of our Functions (with a capital F, see
 			// Functions/ folder) in their full form
 			this.funcObjects = this.createFunctionObjects();
-			modConfig.addFunctions(this.functions);
+			modConfig.addFunctions(this.funcObjects);
 		}
 		
 		this.config = modConfig.toConf();
@@ -388,6 +410,12 @@ class Module {
 				this.registerCommands();
 				this.registerShortcuts();
 			}
+		}
+		
+		this.deactivateFunctions();
+		this.configureFunctions(conf.functions);
+		if (conf.enabled) {
+			this.activateFunctions();
 		}
 		
 		// Invoke the enable/disable convenience functions

@@ -2,6 +2,7 @@ const assert = require('assert').strict;
 const Utils = requireMain('utils');
 const Parameter = require('./functionParameter');
 const CooldownManager = require('../cooldownManager');
+const Builders = require('./builders');
 
 function EMPTY_ACTION() {
 	// Do nothing because that's what we do best
@@ -10,8 +11,9 @@ function EMPTY_ACTION() {
 class Function {
 	constructor(settings) {
 		this.validateSettings(settings);
+		this.funcID = settings.funcID;
 		this.name = settings.name;
-		this.active = false;
+		this.enabled = settings.enabled !== false;
 		this.description = settings.description || '';
 		this.parameters = this._makeParameters(settings.parameters);
 		this.action = settings.action || EMPTY_ACTION;
@@ -22,6 +24,7 @@ class Function {
 		this.triggerHandler = (triggerData) => this.invoke(triggerData);
 		this._registerTriggers();
 		
+		this._active = false;
 		this.cooldownID = CooldownManager.addCooldown(this.cooldowns);
 		// this.configure(settings);
 	}
@@ -34,28 +37,51 @@ class Function {
 		}
 	}
 	
+	_makeObjects(buildersCollection, objectsData) {
+		let objects = [];
+		if (objectsData) {
+			objectsData.forEach(objectData => {
+				let object = buildersCollection[objectData.type](objectData);
+				objects.push(object);
+			});
+		}
+		
+		return objects;
+	}
+	
+	_makeTriggers(triggersData) {
+		return this._makeObjects(Builders.Triggers, triggersData);
+	}
+	
+	_makeResponses(responsesData) {
+		return this._makeObjects(Builders.Responses, responsesData);
+	}
+	
 	configure(settings) {
+		this.enabled = settings.enabled;
+		
+		CooldownManager.changeCooldown(this.cooldownID, settings.cooldowns);
 		this.cooldowns = settings.cooldowns;
 		
 		this._unregisterTriggers();
-		this.triggers = settings.triggers || [];
+		this.triggers = this._makeTriggers(settings.triggers);
 		this._registerTriggers();
 		
-		this.responses = settings.responses || [];
+		this.responses = this._makeResponses(settings.responses);
 	}
 	
 	activate() {
-		if (!this.active) {
+		if (this.enabled && !this._active) {
 			this.triggers.forEach(trigger => trigger.activate());
-			this.active = true;
+			this._active = true;
 		}
 	}
 	
 	deactivate() {
-		if (this.active) {
+		if (this._active) {
 			this.triggers.forEach(trigger => trigger.deactivate());
 			CooldownManager.resetCooldowns(this.cooldownID);
-			this.active = false;
+			this._active = false;
 		}
 	}
 	
@@ -113,7 +139,24 @@ class Function {
 		}
 	}
 	
+	// If the input parameters are all undefined (a side-effect of
+	// _applyDefaultParamValues when there are no set or default values),
+	// resets it to an empty array
+	_cleanPrams(invocationData) {
+		for (let i = 0; i < invocationData.params.length; i++) {
+			if (invocationData.params[i] !== undefined) {
+				return;
+			}
+		}
+		
+		invocationData.params = [];
+	}
+	
 	invoke(invocationData) {
+		if (!this._active) {
+			return;
+		}
+		
 		if (!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user)) {
 			return;
 		}
@@ -123,6 +166,7 @@ class Function {
 		invocationData.func = this;
 		this._applyDefaultParamValues(invocationData);
 		this._processLastParam(invocationData);
+		this._cleanPrams(invocationData);
 		
 		let results = this.action(invocationData);
 		

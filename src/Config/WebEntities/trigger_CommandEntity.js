@@ -20,7 +20,7 @@ class Trigger_CommandEntity extends TriggerEntity {
 		this.setData(data);
 		
 		this._defineChildrenOrder([
-			'active',
+			'enabled',
 			'cmdname',
 			'cost',
 			'filter',

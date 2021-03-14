@@ -1,6 +1,6 @@
-const ChoiceValueEntity = require('./choiceValueEntity');
+const LogLevel_BaseEntity = require('./logLevel_BaseEntity');
 
-class LogLevel_ErrorEntity extends ChoiceValueEntity {
+class LogLevel_ErrorEntity extends LogLevel_BaseEntity {
 	static get TYPE()		{ return 'LogLevel_Error'; 					}
 	static get BUILDER()	{ return () => new LogLevel_ErrorEntity(); 	}
 	

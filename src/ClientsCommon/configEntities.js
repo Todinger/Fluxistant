@@ -18714,7 +18714,7 @@ class ArrayEntity extends ConfigEntity {
 
 module.exports = ArrayEntity;
 
-},{"../entityFactory":76,"./configEntity":21,"assert":1}],9:[function(require,module,exports){
+},{"../entityFactory":77,"./configEntity":21,"assert":1}],9:[function(require,module,exports){
 const assert = require('assert').strict;
 const Errors = require('../../errors');
 const StaticObjectEntity = require('./staticObjectEntity');
@@ -18764,7 +18764,7 @@ class AssetEntity extends StaticObjectEntity {
 
 module.exports = AssetEntity;
 
-},{"../../errors":80,"./staticObjectEntity":58,"assert":1}],10:[function(require,module,exports){
+},{"../../errors":81,"./staticObjectEntity":59,"assert":1}],10:[function(require,module,exports){
 const _ = require('lodash');
 const StaticObjectEntity = require('./staticObjectEntity');
 
@@ -18817,7 +18817,7 @@ class AssetFileEntity extends StaticObjectEntity {
 
 module.exports = AssetFileEntity;
 
-},{"./staticObjectEntity":58,"lodash":7}],11:[function(require,module,exports){
+},{"./staticObjectEntity":59,"lodash":7}],11:[function(require,module,exports){
 const ValueEntity = require('./valueEntity');
 
 class BooleanEntity extends ValueEntity {
@@ -18832,7 +18832,7 @@ class BooleanEntity extends ValueEntity {
 
 module.exports = BooleanEntity;
 
-},{"./valueEntity":74}],12:[function(require,module,exports){
+},{"./valueEntity":75}],12:[function(require,module,exports){
 const ImageFileEntity = require('./imageFileEntity');
 
 class CandyFileEntity extends ImageFileEntity {
@@ -19139,7 +19139,7 @@ class ChoiceEntity extends ConfigEntity {
 
 module.exports = ChoiceEntity;
 
-},{"../entityFactory":76,"./configEntity":21,"assert":1}],19:[function(require,module,exports){
+},{"../entityFactory":77,"./configEntity":21,"assert":1}],19:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class ChoiceValueEntity extends StaticObjectEntity {
@@ -19175,7 +19175,7 @@ class ChoiceValueEntity extends StaticObjectEntity {
 
 module.exports = ChoiceValueEntity;
 
-},{"./staticObjectEntity":58}],20:[function(require,module,exports){
+},{"./staticObjectEntity":59}],20:[function(require,module,exports){
 const Errors = require('../../errors');
 const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
@@ -19294,7 +19294,7 @@ class CommandEntity extends StaticObjectEntity {
 
 module.exports = CommandEntity;
 
-},{"../../errors":80,"./cooldownEntity":22,"./dynamicArrayEntity":23,"./naturalNumberEntity":46,"./staticObjectEntity":58,"./stringEntity":59,"./userFilterEntity":65}],21:[function(require,module,exports){
+},{"../../errors":81,"./cooldownEntity":22,"./dynamicArrayEntity":23,"./naturalNumberEntity":47,"./staticObjectEntity":59,"./stringEntity":60,"./userFilterEntity":66}],21:[function(require,module,exports){
 const Errors = require('../../errors');
 const EntityFactory = require('../entityFactory');
 
@@ -19521,7 +19521,7 @@ class ConfigEntity {
 
 module.exports = ConfigEntity;
 
-},{"../../errors":80,"../entityFactory":76}],22:[function(require,module,exports){
+},{"../../errors":81,"../entityFactory":77}],22:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class CooldownEntity extends StaticObjectEntity {
@@ -19565,7 +19565,7 @@ class CooldownEntity extends StaticObjectEntity {
 
 module.exports = CooldownEntity;
 
-},{"./staticObjectEntity":58}],23:[function(require,module,exports){
+},{"./staticObjectEntity":59}],23:[function(require,module,exports){
 const assert = require('assert').strict;
 const ArrayEntity = require('./arrayEntity');
 const ConfigEntity = require('./configEntity');
@@ -19625,7 +19625,7 @@ class DynamicArrayEntity extends ArrayEntity {
 
 module.exports = DynamicArrayEntity;
 
-},{"../entityFactory":76,"./arrayEntity":8,"./configEntity":21,"assert":1}],24:[function(require,module,exports){
+},{"../entityFactory":77,"./arrayEntity":8,"./configEntity":21,"assert":1}],24:[function(require,module,exports){
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
 class DynamicAssetArrayEntity extends DynamicArrayEntity {
@@ -19679,7 +19679,7 @@ class DynamicObjectEntity extends ObjectEntity {
 
 module.exports = DynamicObjectEntity;
 
-},{"../entityFactory":76,"./configEntity":21,"./objectEntity":48}],26:[function(require,module,exports){
+},{"../entityFactory":77,"./configEntity":21,"./objectEntity":49}],26:[function(require,module,exports){
 const assert = require('assert').strict;
 const ArrayEntity = require('./arrayEntity');
 
@@ -19736,10 +19736,13 @@ class FunctionEntity extends StaticObjectEntity {
 	
 	constructor(data) {
 		super();
-		// this.addString('name', data && data.name)
-		// 	.setName('Name')
-		// 	.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you");
-		this.addBoolean('active', !!(data && data.active))
+		this.addString('funcID', data && data.funcID)
+			.hide();
+		this.addString('name', data && data.name)
+			.setName('Name')
+			.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you")
+			.hide();
+		this.addBoolean('enabled', !!(data && data.enabled))
 			.setName('Enabled')
 			.setDescription('Enables/disables this function');
 		this.addCooldowns('cooldowns')
@@ -19786,7 +19789,7 @@ class FunctionEntity extends StaticObjectEntity {
 
 module.exports = FunctionEntity;
 
-},{"./responseChoiceEntity":50,"./staticObjectEntity":58,"./triggerChoiceEntity":60}],28:[function(require,module,exports){
+},{"./responseChoiceEntity":51,"./staticObjectEntity":59,"./triggerChoiceEntity":61}],28:[function(require,module,exports){
 const StringEntity = require('./stringEntity');
 
 class HiddenStringEntity extends StringEntity {
@@ -19806,7 +19809,7 @@ class HiddenStringEntity extends StringEntity {
 
 module.exports = HiddenStringEntity;
 
-},{"./stringEntity":59}],29:[function(require,module,exports){
+},{"./stringEntity":60}],29:[function(require,module,exports){
 const CommandEntity = require('./commandEntity');
 const ImageEntity = require('./imageEntity');
 const SoundEntity = require('./soundEntity');
@@ -19828,7 +19831,7 @@ class ImageCommandEntity extends CommandEntity {
 
 module.exports = ImageCommandEntity;
 
-},{"./commandEntity":20,"./imageEntity":34,"./soundEntity":56}],30:[function(require,module,exports){
+},{"./commandEntity":20,"./imageEntity":34,"./soundEntity":57}],30:[function(require,module,exports){
 const ChoiceEntity = require('./choiceEntity');
 
 class ImageEffectEntity extends ChoiceEntity {
@@ -19975,7 +19978,7 @@ class ImageEntity extends StaticObjectEntity {
 
 module.exports = ImageEntity;
 
-},{"./dynamicArrayEntity":23,"./staticObjectEntity":58,"lodash":7}],35:[function(require,module,exports){
+},{"./dynamicArrayEntity":23,"./staticObjectEntity":59,"lodash":7}],35:[function(require,module,exports){
 const AssetFileEntity = require('./assetFileEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 
@@ -20035,7 +20038,7 @@ class IntegerEntity extends NumberEntity {
 
 module.exports = IntegerEntity;
 
-},{"./numberEntity":47,"assert":1}],37:[function(require,module,exports){
+},{"./numberEntity":48,"assert":1}],37:[function(require,module,exports){
 const assert = require('assert').strict;
 const ValueEntity = require('./valueEntity');
 const Enums = require('../../Enums');
@@ -20088,7 +20091,7 @@ class KeyEntity extends ValueEntity {
 
 module.exports = KeyEntity;
 
-},{"../../Enums":78,"./valueEntity":74,"assert":1}],38:[function(require,module,exports){
+},{"../../Enums":79,"./valueEntity":75,"assert":1}],38:[function(require,module,exports){
 const assert = require('assert').strict;
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 const Enums = require('../../Enums');
@@ -20143,7 +20146,7 @@ class KeyShortcutEntity extends DynamicArrayEntity {
 
 module.exports = KeyShortcutEntity;
 
-},{"../../Enums":78,"./dynamicArrayEntity":23,"assert":1}],39:[function(require,module,exports){
+},{"../../Enums":79,"./dynamicArrayEntity":23,"assert":1}],39:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class KeyShortcutsEntity extends StaticObjectEntity {
@@ -20169,7 +20172,7 @@ class KeyShortcutsEntity extends StaticObjectEntity {
 
 module.exports = KeyShortcutsEntity;
 
-},{"./staticObjectEntity":58}],40:[function(require,module,exports){
+},{"./staticObjectEntity":59}],40:[function(require,module,exports){
 const ChoiceEntity = require('./choiceEntity');
 
 class LogLevelEntity extends ChoiceEntity {
@@ -20194,7 +20197,24 @@ module.exports = LogLevelEntity;
 },{"./choiceEntity":18}],41:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 
-class logLevel_DebugEntity extends ChoiceValueEntity {
+class LogLevel_BaseEntity extends ChoiceValueEntity {
+	static get TYPE()		{ return null;	}	// Avoid construction (abstract type)
+	
+	constructor(displayText) {
+		super(displayText);
+	}
+	
+	toConf() {
+		return super.toConf().type;
+	}
+}
+
+module.exports = LogLevel_BaseEntity;
+
+},{"./choiceValueEntity":19}],42:[function(require,module,exports){
+const LogLevel_BaseEntity = require('./logLevel_BaseEntity');
+
+class logLevel_DebugEntity extends LogLevel_BaseEntity {
 	static get TYPE()		{ return 'LogLevel_Debug'; 					}
 	static get BUILDER()	{ return () => new logLevel_DebugEntity(); 	}
 	
@@ -20206,10 +20226,10 @@ class logLevel_DebugEntity extends ChoiceValueEntity {
 
 module.exports = logLevel_DebugEntity;
 
-},{"./choiceValueEntity":19}],42:[function(require,module,exports){
-const ChoiceValueEntity = require('./choiceValueEntity');
+},{"./logLevel_BaseEntity":41}],43:[function(require,module,exports){
+const LogLevel_BaseEntity = require('./logLevel_BaseEntity');
 
-class LogLevel_ErrorEntity extends ChoiceValueEntity {
+class LogLevel_ErrorEntity extends LogLevel_BaseEntity {
 	static get TYPE()		{ return 'LogLevel_Error'; 					}
 	static get BUILDER()	{ return () => new LogLevel_ErrorEntity(); 	}
 	
@@ -20221,10 +20241,10 @@ class LogLevel_ErrorEntity extends ChoiceValueEntity {
 
 module.exports = LogLevel_ErrorEntity;
 
-},{"./choiceValueEntity":19}],43:[function(require,module,exports){
-const ChoiceValueEntity = require('./choiceValueEntity');
+},{"./logLevel_BaseEntity":41}],44:[function(require,module,exports){
+const LogLevel_BaseEntity = require('./logLevel_BaseEntity');
 
-class LogLevel_InfoEntity extends ChoiceValueEntity {
+class LogLevel_InfoEntity extends LogLevel_BaseEntity {
 	static get TYPE()		{ return 'LogLevel_Info'; 					}
 	static get BUILDER()	{ return () => new LogLevel_InfoEntity(); 	}
 	
@@ -20236,10 +20256,10 @@ class LogLevel_InfoEntity extends ChoiceValueEntity {
 
 module.exports = LogLevel_InfoEntity;
 
-},{"./choiceValueEntity":19}],44:[function(require,module,exports){
-const ChoiceValueEntity = require('./choiceValueEntity');
+},{"./logLevel_BaseEntity":41}],45:[function(require,module,exports){
+const LogLevel_BaseEntity = require('./logLevel_BaseEntity');
 
-class logLevel_WarnEntity extends ChoiceValueEntity {
+class logLevel_WarnEntity extends LogLevel_BaseEntity {
 	static get TYPE()		{ return 'LogLevel_Warn'; 					}
 	static get BUILDER()	{ return () => new logLevel_WarnEntity(); 	}
 	
@@ -20251,7 +20271,7 @@ class logLevel_WarnEntity extends ChoiceValueEntity {
 
 module.exports = logLevel_WarnEntity;
 
-},{"./choiceValueEntity":19}],45:[function(require,module,exports){
+},{"./logLevel_BaseEntity":41}],46:[function(require,module,exports){
 const AssetEntity = require('./assetEntity');
 
 class MultiAssetEntity extends AssetEntity {
@@ -20329,7 +20349,7 @@ class MultiAssetEntity extends AssetEntity {
 
 module.exports = MultiAssetEntity;
 
-},{"./assetEntity":9}],46:[function(require,module,exports){
+},{"./assetEntity":9}],47:[function(require,module,exports){
 const assert = require('assert').strict;
 const IntegerEntity = require('./integerEntity');
 
@@ -20356,7 +20376,7 @@ class NaturalNumberEntity extends IntegerEntity {
 
 module.exports = NaturalNumberEntity;
 
-},{"./integerEntity":36,"assert":1}],47:[function(require,module,exports){
+},{"./integerEntity":36,"assert":1}],48:[function(require,module,exports){
 const ValueEntity = require('./valueEntity');
 
 class NumberEntity extends ValueEntity {
@@ -20378,7 +20398,7 @@ class NumberEntity extends ValueEntity {
 
 module.exports = NumberEntity;
 
-},{"./valueEntity":74}],48:[function(require,module,exports){
+},{"./valueEntity":75}],49:[function(require,module,exports){
 const assert = require('assert').strict;
 const _ = require('lodash');
 const ConfigEntity = require('./configEntity');
@@ -20575,7 +20595,7 @@ class ObjectEntity extends ConfigEntity {
 
 module.exports = ObjectEntity;
 
-},{"../entityFactory":76,"./configEntity":21,"assert":1,"lodash":7}],49:[function(require,module,exports){
+},{"../entityFactory":77,"./configEntity":21,"assert":1,"lodash":7}],50:[function(require,module,exports){
 const assert = require('assert').strict;
 const NumberEntity = require('./numberEntity');
 
@@ -20603,7 +20623,7 @@ class PositiveNumberEntity extends NumberEntity {
 
 module.exports = PositiveNumberEntity;
 
-},{"./numberEntity":47,"assert":1}],50:[function(require,module,exports){
+},{"./numberEntity":48,"assert":1}],51:[function(require,module,exports){
 const ChoiceEntity = require('./choiceEntity');
 
 class ResponseChoiceEntity extends ChoiceEntity {
@@ -20622,7 +20642,7 @@ class ResponseChoiceEntity extends ChoiceEntity {
 
 module.exports = ResponseChoiceEntity;
 
-},{"./choiceEntity":18}],51:[function(require,module,exports){
+},{"./choiceEntity":18}],52:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class ResponseEntity extends ChoiceValueEntity {
@@ -20630,7 +20650,7 @@ class ResponseEntity extends ChoiceValueEntity {
 	
 	constructor(displayText) {
 		super(displayText);
-		this.addBoolean('active')
+		this.addBoolean('enabled', true)
 			.setName('Enabled')
 			.setDescription('Enables/disables this response');
 		this.addString('message')
@@ -20639,6 +20659,7 @@ class ResponseEntity extends ChoiceValueEntity {
 	
 	setData(data) {
 		if (data) {
+			this.getChild('enabled').setValue(data.enabled);
 			this.getChild('message').setValue(data.message);
 		}
 	}
@@ -20646,7 +20667,7 @@ class ResponseEntity extends ChoiceValueEntity {
 
 module.exports = ResponseEntity;
 
-},{"./choiceValueEntity":19}],52:[function(require,module,exports){
+},{"./choiceValueEntity":19}],53:[function(require,module,exports){
 const ResponseEntity = require('./responseEntity');
 
 class Response_ChatEntity extends ResponseEntity {
@@ -20665,7 +20686,7 @@ class Response_ChatEntity extends ResponseEntity {
 
 module.exports = Response_ChatEntity;
 
-},{"./responseEntity":51}],53:[function(require,module,exports){
+},{"./responseEntity":52}],54:[function(require,module,exports){
 const ResponseEntity = require('./responseEntity');
 
 class Response_ConsoleEntity extends ResponseEntity {
@@ -20675,22 +20696,22 @@ class Response_ConsoleEntity extends ResponseEntity {
 	constructor() {
 		super('Console');
 		this.setDescription('Prints the response on the bot console');
-		this.add('logLevel', 'LogLevel')
+		this.add('level', 'LogLevel')
 			.setName('Log Level')
 			.setDescription('Level of the message in the chat (which messages show up depends on the active viewing level)');
 	}
 	
 	setData(data) {
 		super.setData(data);
-		if (data && data.logLevel) {
-			this.getChild('logLevel').select(data.logLevel);
+		if (data && data.level) {
+			this.getChild('level').select(data.level);
 		}
 	}
 }
 
 module.exports = Response_ConsoleEntity;
 
-},{"./responseEntity":51}],54:[function(require,module,exports){
+},{"./responseEntity":52}],55:[function(require,module,exports){
 const DynamicObjectEntity = require('./dynamicObjectEntity');
 
 class SimpleObjectEntity extends DynamicObjectEntity {
@@ -20704,7 +20725,7 @@ class SimpleObjectEntity extends DynamicObjectEntity {
 
 module.exports = SimpleObjectEntity;
 
-},{"./dynamicObjectEntity":25}],55:[function(require,module,exports){
+},{"./dynamicObjectEntity":25}],56:[function(require,module,exports){
 const AssetEntity = require('./assetEntity');
 
 class SingleAssetEntity extends AssetEntity {
@@ -20745,7 +20766,7 @@ class SingleAssetEntity extends AssetEntity {
 
 module.exports = SingleAssetEntity;
 
-},{"./assetEntity":9}],56:[function(require,module,exports){
+},{"./assetEntity":9}],57:[function(require,module,exports){
 const assert = require('assert').strict;
 const _ = require('lodash');
 const StaticObjectEntity = require('./staticObjectEntity');
@@ -20804,7 +20825,7 @@ class SoundEntity extends StaticObjectEntity {
 
 module.exports = SoundEntity;
 
-},{"./staticObjectEntity":58,"assert":1,"lodash":7}],57:[function(require,module,exports){
+},{"./staticObjectEntity":59,"assert":1,"lodash":7}],58:[function(require,module,exports){
 const AssetFileEntity = require('./assetFileEntity');
 
 class SoundFileEntity extends AssetFileEntity {
@@ -20827,7 +20848,7 @@ class SoundFileEntity extends AssetFileEntity {
 
 module.exports = SoundFileEntity;
 
-},{"./assetFileEntity":10}],58:[function(require,module,exports){
+},{"./assetFileEntity":10}],59:[function(require,module,exports){
 const ObjectEntity = require('./objectEntity');
 const EntityFactory = require('../entityFactory');
 
@@ -20859,7 +20880,7 @@ class StaticObjectEntity extends ObjectEntity {
 
 module.exports = StaticObjectEntity;
 
-},{"../entityFactory":76,"./objectEntity":48}],59:[function(require,module,exports){
+},{"../entityFactory":77,"./objectEntity":49}],60:[function(require,module,exports){
 const ValueEntity = require('./valueEntity');
 
 class StringEntity extends ValueEntity {
@@ -20879,7 +20900,7 @@ class StringEntity extends ValueEntity {
 
 module.exports = StringEntity;
 
-},{"./valueEntity":74}],60:[function(require,module,exports){
+},{"./valueEntity":75}],61:[function(require,module,exports){
 const ChoiceEntity = require('./choiceEntity');
 
 class TriggerChoiceEntity extends ChoiceEntity {
@@ -20898,7 +20919,7 @@ class TriggerChoiceEntity extends ChoiceEntity {
 
 module.exports = TriggerChoiceEntity;
 
-},{"./choiceEntity":18}],61:[function(require,module,exports){
+},{"./choiceEntity":18}],62:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 const EntityFactory = require('../entityFactory');
 
@@ -20907,7 +20928,7 @@ class TriggerEntity extends ChoiceValueEntity {
 	
 	constructor(displayText, data) {
 		super(displayText);
-		this.addBoolean('active', true)
+		this.addBoolean('enabled', true)
 			.setName('Enabled')
 			.setDescription('Enables/disables this trigger');
 		this.addString('filter')
@@ -20930,6 +20951,10 @@ class TriggerEntity extends ChoiceValueEntity {
 				this.setName(data.name);
 			}
 			
+			if (data.enabled !== undefined) {
+				this.getChild('enabled').setValue(data.enabled);
+			}
+			
 			if (data.description) {
 				this.setDescription(data.description);
 			}
@@ -20950,7 +20975,7 @@ class TriggerEntity extends ChoiceValueEntity {
 
 module.exports = TriggerEntity;
 
-},{"../entityFactory":76,"./choiceValueEntity":19}],62:[function(require,module,exports){
+},{"../entityFactory":77,"./choiceValueEntity":19}],63:[function(require,module,exports){
 const TriggerEntity = require('./triggerEntity');
 const EntityFactory = require('../entityFactory');
 
@@ -20973,7 +20998,7 @@ class Trigger_CommandEntity extends TriggerEntity {
 		this.setData(data);
 		
 		this._defineChildrenOrder([
-			'active',
+			'enabled',
 			'cmdname',
 			'cost',
 			'filter',
@@ -21006,7 +21031,7 @@ class Trigger_CommandEntity extends TriggerEntity {
 
 module.exports = Trigger_CommandEntity;
 
-},{"../entityFactory":76,"./triggerEntity":61}],63:[function(require,module,exports){
+},{"../entityFactory":77,"./triggerEntity":62}],64:[function(require,module,exports){
 const TriggerEntity = require('./triggerEntity');
 
 class Trigger_ShortcutEntity extends TriggerEntity {
@@ -21034,7 +21059,7 @@ class Trigger_ShortcutEntity extends TriggerEntity {
 
 module.exports = Trigger_ShortcutEntity;
 
-},{"./triggerEntity":61}],64:[function(require,module,exports){
+},{"./triggerEntity":62}],65:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
 
 function isNonEmptyString(obj) {
@@ -21078,7 +21103,7 @@ class UserEntity extends StaticObjectEntity {
 
 module.exports = UserEntity;
 
-},{"./staticObjectEntity":58}],65:[function(require,module,exports){
+},{"./staticObjectEntity":59}],66:[function(require,module,exports){
 const ChoiceEntity = require('./choiceEntity');
 
 class UserFilterEntity extends ChoiceEntity {
@@ -21101,7 +21126,7 @@ class UserFilterEntity extends ChoiceEntity {
 
 module.exports = UserFilterEntity;
 
-},{"./choiceEntity":18}],66:[function(require,module,exports){
+},{"./choiceEntity":18}],67:[function(require,module,exports){
 const ChoiceValueEntity = require('./choiceValueEntity');
 
 class UserFilter_BaseEntity extends ChoiceValueEntity {
@@ -21116,7 +21141,7 @@ class UserFilter_BaseEntity extends ChoiceValueEntity {
 
 module.exports = UserFilter_BaseEntity;
 
-},{"./choiceValueEntity":19}],67:[function(require,module,exports){
+},{"./choiceValueEntity":19}],68:[function(require,module,exports){
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 
 class UserFilter_IsAtLeastModEntity extends UserFilter_BaseEntity {
@@ -21131,7 +21156,7 @@ class UserFilter_IsAtLeastModEntity extends UserFilter_BaseEntity {
 
 module.exports = UserFilter_IsAtLeastModEntity;
 
-},{"./userFilter_BaseEntity":66}],68:[function(require,module,exports){
+},{"./userFilter_BaseEntity":67}],69:[function(require,module,exports){
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 
 class UserFilter_IsModEntity extends UserFilter_BaseEntity {
@@ -21146,7 +21171,7 @@ class UserFilter_IsModEntity extends UserFilter_BaseEntity {
 
 module.exports = UserFilter_IsModEntity;
 
-},{"./userFilter_BaseEntity":66}],69:[function(require,module,exports){
+},{"./userFilter_BaseEntity":67}],70:[function(require,module,exports){
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
 const StringEntity = require('./stringEntity');
@@ -21175,7 +21200,7 @@ class UserFilter_IsOneOfEntity extends UserFilter_BaseEntity {
 
 module.exports = UserFilter_IsOneOfEntity;
 
-},{"./dynamicArrayEntity":23,"./stringEntity":59,"./userFilter_BaseEntity":66}],70:[function(require,module,exports){
+},{"./dynamicArrayEntity":23,"./stringEntity":60,"./userFilter_BaseEntity":67}],71:[function(require,module,exports){
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 
 class UserFilter_IsSubEntity extends UserFilter_BaseEntity {
@@ -21190,7 +21215,7 @@ class UserFilter_IsSubEntity extends UserFilter_BaseEntity {
 
 module.exports = UserFilter_IsSubEntity;
 
-},{"./userFilter_BaseEntity":66}],71:[function(require,module,exports){
+},{"./userFilter_BaseEntity":67}],72:[function(require,module,exports){
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 const StringEntity = require('./stringEntity');
 
@@ -21215,7 +21240,7 @@ class UserFilter_IsUserEntity extends UserFilter_BaseEntity {
 
 module.exports = UserFilter_IsUserEntity;
 
-},{"./stringEntity":59,"./userFilter_BaseEntity":66}],72:[function(require,module,exports){
+},{"./stringEntity":60,"./userFilter_BaseEntity":67}],73:[function(require,module,exports){
 const UserEntity = require('./userEntity');
 
 class UserGroupEntity extends UserEntity {
@@ -21238,7 +21263,7 @@ class UserGroupEntity extends UserEntity {
 
 module.exports = UserGroupEntity;
 
-},{"./userEntity":64}],73:[function(require,module,exports){
+},{"./userEntity":65}],74:[function(require,module,exports){
 const UserEntity = require('./userEntity');
 const ImageEntity = require('./imageEntity');
 const SoundEntity = require('./soundEntity');
@@ -21260,7 +21285,7 @@ class UserMediaEntity extends UserEntity {
 
 module.exports = UserMediaEntity;
 
-},{"./imageEntity":34,"./soundEntity":56,"./userEntity":64}],74:[function(require,module,exports){
+},{"./imageEntity":34,"./soundEntity":57,"./userEntity":65}],75:[function(require,module,exports){
 const assert = require('assert').strict;
 const ConfigEntity = require('./configEntity');
 const EntityFactory = require('../entityFactory');
@@ -21326,7 +21351,7 @@ class ValueEntity extends ConfigEntity {
 
 module.exports = ValueEntity;
 
-},{"../entityFactory":76,"./configEntity":21,"assert":1}],75:[function(require,module,exports){
+},{"../entityFactory":77,"./configEntity":21,"assert":1}],76:[function(require,module,exports){
 const UserEntity = require('./userEntity');
 
 class WelcomeEntity extends UserEntity {
@@ -21364,7 +21389,7 @@ class WelcomeEntity extends UserEntity {
 
 module.exports = WelcomeEntity;
 
-},{"./userEntity":64}],76:[function(require,module,exports){
+},{"./userEntity":65}],77:[function(require,module,exports){
 const assert = require('assert').strict;
 // const Utils = requireMain('./utils');
 
@@ -21415,7 +21440,7 @@ class EntityFactory {
 
 module.exports = new EntityFactory();
 
-},{"assert":1}],77:[function(require,module,exports){
+},{"assert":1}],78:[function(require,module,exports){
 const entities = {
 	ArrayEntity: require('./WebEntities/arrayEntity.js'),
 	AssetEntity: require('./WebEntities/assetEntity.js'),
@@ -21442,6 +21467,7 @@ const entities = {
 	KeyShortcutEntity: require('./WebEntities/keyShortcutEntity.js'),
 	KeyShortcutsEntity: require('./WebEntities/keyShortcutsEntity.js'),
 	LogLevelEntity: require('./WebEntities/logLevelEntity.js'),
+	LogLevel_BaseEntity: require('./WebEntities/logLevel_BaseEntity.js'),
 	LogLevel_DebugEntity: require('./WebEntities/logLevel_DebugEntity.js'),
 	LogLevel_ErrorEntity: require('./WebEntities/logLevel_ErrorEntity.js'),
 	LogLevel_InfoEntity: require('./WebEntities/logLevel_InfoEntity.js'),
@@ -21502,7 +21528,7 @@ module.exports = {
 	RegisterAll: registerAll,
 	Enums: enums,
 }
-},{"../enums":79,"./WebEntities/arrayEntity.js":8,"./WebEntities/assetEntity.js":9,"./WebEntities/assetFileEntity.js":10,"./WebEntities/booleanEntity.js":11,"./WebEntities/candyFileEntity.js":12,"./WebEntities/candyInflationEntity.js":13,"./WebEntities/candyInflation_BaseEntity.js":14,"./WebEntities/candyInflation_ExponentialEntity.js":15,"./WebEntities/candyInflation_LinearEntity.js":16,"./WebEntities/candyInflation_NoneEntity.js":17,"./WebEntities/choiceEntity.js":18,"./WebEntities/choiceValueEntity.js":19,"./WebEntities/commandEntity.js":20,"./WebEntities/configEntity.js":21,"./WebEntities/cooldownEntity.js":22,"./WebEntities/dynamicArrayEntity.js":23,"./WebEntities/dynamicAssetArrayEntity.js":24,"./WebEntities/dynamicObjectEntity.js":25,"./WebEntities/fixedArrayEntity.js":26,"./WebEntities/functionEntity.js":27,"./WebEntities/hiddenStringEntity.js":28,"./WebEntities/imageCommandEntity.js":29,"./WebEntities/imageEffectEntity.js":30,"./WebEntities/imageEffect_DunDunDunEntity.js":31,"./WebEntities/imageEffect_GlowEntity.js":32,"./WebEntities/imageEffect_ShadowEntity.js":33,"./WebEntities/imageEntity.js":34,"./WebEntities/imageFileEntity.js":35,"./WebEntities/integerEntity.js":36,"./WebEntities/keyEntity.js":37,"./WebEntities/keyShortcutEntity.js":38,"./WebEntities/keyShortcutsEntity.js":39,"./WebEntities/logLevelEntity.js":40,"./WebEntities/logLevel_DebugEntity.js":41,"./WebEntities/logLevel_ErrorEntity.js":42,"./WebEntities/logLevel_InfoEntity.js":43,"./WebEntities/logLevel_WarnEntity.js":44,"./WebEntities/multiAssetEntity.js":45,"./WebEntities/naturalNumberEntity.js":46,"./WebEntities/numberEntity.js":47,"./WebEntities/objectEntity.js":48,"./WebEntities/positiveNumberEntity.js":49,"./WebEntities/responseChoiceEntity.js":50,"./WebEntities/responseEntity.js":51,"./WebEntities/response_ChatEntity.js":52,"./WebEntities/response_ConsoleEntity.js":53,"./WebEntities/simpleObjectEntity.js":54,"./WebEntities/singleDataEntity.js":55,"./WebEntities/soundEntity.js":56,"./WebEntities/soundFileEntity.js":57,"./WebEntities/staticObjectEntity.js":58,"./WebEntities/stringEntity.js":59,"./WebEntities/triggerChoiceEntity.js":60,"./WebEntities/triggerEntity.js":61,"./WebEntities/trigger_CommandEntity.js":62,"./WebEntities/trigger_ShortcutEntity.js":63,"./WebEntities/userEntity.js":64,"./WebEntities/userFilterEntity.js":65,"./WebEntities/userFilter_BaseEntity.js":66,"./WebEntities/userFilter_IsAtLeastModEntity.js":67,"./WebEntities/userFilter_IsModEntity.js":68,"./WebEntities/userFilter_IsOneOfEntity.js":69,"./WebEntities/userFilter_IsSubEntity.js":70,"./WebEntities/userFilter_IsUserEntity.js":71,"./WebEntities/userGroupEntity.js":72,"./WebEntities/userMediaEntity.js":73,"./WebEntities/valueEntity.js":74,"./WebEntities/welcomeEntity.js":75,"./entityFactory":76}],78:[function(require,module,exports){
+},{"../enums":80,"./WebEntities/arrayEntity.js":8,"./WebEntities/assetEntity.js":9,"./WebEntities/assetFileEntity.js":10,"./WebEntities/booleanEntity.js":11,"./WebEntities/candyFileEntity.js":12,"./WebEntities/candyInflationEntity.js":13,"./WebEntities/candyInflation_BaseEntity.js":14,"./WebEntities/candyInflation_ExponentialEntity.js":15,"./WebEntities/candyInflation_LinearEntity.js":16,"./WebEntities/candyInflation_NoneEntity.js":17,"./WebEntities/choiceEntity.js":18,"./WebEntities/choiceValueEntity.js":19,"./WebEntities/commandEntity.js":20,"./WebEntities/configEntity.js":21,"./WebEntities/cooldownEntity.js":22,"./WebEntities/dynamicArrayEntity.js":23,"./WebEntities/dynamicAssetArrayEntity.js":24,"./WebEntities/dynamicObjectEntity.js":25,"./WebEntities/fixedArrayEntity.js":26,"./WebEntities/functionEntity.js":27,"./WebEntities/hiddenStringEntity.js":28,"./WebEntities/imageCommandEntity.js":29,"./WebEntities/imageEffectEntity.js":30,"./WebEntities/imageEffect_DunDunDunEntity.js":31,"./WebEntities/imageEffect_GlowEntity.js":32,"./WebEntities/imageEffect_ShadowEntity.js":33,"./WebEntities/imageEntity.js":34,"./WebEntities/imageFileEntity.js":35,"./WebEntities/integerEntity.js":36,"./WebEntities/keyEntity.js":37,"./WebEntities/keyShortcutEntity.js":38,"./WebEntities/keyShortcutsEntity.js":39,"./WebEntities/logLevelEntity.js":40,"./WebEntities/logLevel_BaseEntity.js":41,"./WebEntities/logLevel_DebugEntity.js":42,"./WebEntities/logLevel_ErrorEntity.js":43,"./WebEntities/logLevel_InfoEntity.js":44,"./WebEntities/logLevel_WarnEntity.js":45,"./WebEntities/multiAssetEntity.js":46,"./WebEntities/naturalNumberEntity.js":47,"./WebEntities/numberEntity.js":48,"./WebEntities/objectEntity.js":49,"./WebEntities/positiveNumberEntity.js":50,"./WebEntities/responseChoiceEntity.js":51,"./WebEntities/responseEntity.js":52,"./WebEntities/response_ChatEntity.js":53,"./WebEntities/response_ConsoleEntity.js":54,"./WebEntities/simpleObjectEntity.js":55,"./WebEntities/singleDataEntity.js":56,"./WebEntities/soundEntity.js":57,"./WebEntities/soundFileEntity.js":58,"./WebEntities/staticObjectEntity.js":59,"./WebEntities/stringEntity.js":60,"./WebEntities/triggerChoiceEntity.js":61,"./WebEntities/triggerEntity.js":62,"./WebEntities/trigger_CommandEntity.js":63,"./WebEntities/trigger_ShortcutEntity.js":64,"./WebEntities/userEntity.js":65,"./WebEntities/userFilterEntity.js":66,"./WebEntities/userFilter_BaseEntity.js":67,"./WebEntities/userFilter_IsAtLeastModEntity.js":68,"./WebEntities/userFilter_IsModEntity.js":69,"./WebEntities/userFilter_IsOneOfEntity.js":70,"./WebEntities/userFilter_IsSubEntity.js":71,"./WebEntities/userFilter_IsUserEntity.js":72,"./WebEntities/userGroupEntity.js":73,"./WebEntities/userMediaEntity.js":74,"./WebEntities/valueEntity.js":75,"./WebEntities/welcomeEntity.js":76,"./entityFactory":77}],79:[function(require,module,exports){
 const Enums = {};   
 
 // Keyboard keycodes, used to register key shortcuts and events in
@@ -21781,9 +21807,9 @@ Enums.withNumLock = (htmlCode, numpadOn) => {
 
 module.exports = Enums;
 
-},{}],79:[function(require,module,exports){
-arguments[4][78][0].apply(exports,arguments)
-},{"dup":78}],80:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
+arguments[4][79][0].apply(exports,arguments)
+},{"dup":79}],81:[function(require,module,exports){
 const assert = require('assert').strict;
 
 function _getStack() {
@@ -21835,5 +21861,5 @@ class Errors {
 
 module.exports = new Errors();
 
-},{"assert":1}]},{},[77])(77)
+},{"assert":1}]},{},[78])(78)
 });

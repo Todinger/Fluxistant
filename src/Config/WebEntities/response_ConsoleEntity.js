@@ -7,15 +7,15 @@ class Response_ConsoleEntity extends ResponseEntity {
 	constructor() {
 		super('Console');
 		this.setDescription('Prints the response on the bot console');
-		this.add('logLevel', 'LogLevel')
+		this.add('level', 'LogLevel')
 			.setName('Log Level')
 			.setDescription('Level of the message in the chat (which messages show up depends on the active viewing level)');
 	}
 	
 	setData(data) {
 		super.setData(data);
-		if (data && data.logLevel) {
-			this.getChild('logLevel').select(data.logLevel);
+		if (data && data.level) {
+			this.getChild('level').select(data.level);
 		}
 	}
 }

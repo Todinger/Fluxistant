@@ -40,6 +40,7 @@
 - Voice activation mechanism (in addition to commands and shortcut keys)
 - Make WebEntities generation clear the WebEntities dir before writing to it.
 - Generate commands information page to automatically be put online for viewers to see
+- ZIP configuration text files
 
 - NPM Uninstall image-size if I no longer use it
 - Mark library directories as excluded in IDE after comitting, see if it does what I think it does
@@ -47,6 +48,19 @@
 IDEAS!
 - Bingo game
 - Chat "Meow?": deletes all messages from people that aren't made of solely meowing.
+
+
+Next:
+- Filters
+- Variables, help display, auto-complete variable names
+- Switch everything to work with functions
+- Phase out old code (commands, shortcuts, user filters if I do something completely different)
+- Add more triggers and responses (see list above)
+Then other things, probably in the following order:
+- Add asset cleanup that gets rid of assets without linked configurations
+	- Make that happen on configuration saves and startup
+- Persistent data
+- Complex data configuration (graphs for adventures, video for Channel Party, sequences for Parrot Mate)
 
 
 Selected functions module setup example (what I'm acutally gonna do now):

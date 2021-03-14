@@ -24,6 +24,7 @@ const entities = {
 	KeyShortcutEntity: require('./WebEntities/keyShortcutEntity.js'),
 	KeyShortcutsEntity: require('./WebEntities/keyShortcutsEntity.js'),
 	LogLevelEntity: require('./WebEntities/logLevelEntity.js'),
+	LogLevel_BaseEntity: require('./WebEntities/logLevel_BaseEntity.js'),
 	LogLevel_DebugEntity: require('./WebEntities/logLevel_DebugEntity.js'),
 	LogLevel_ErrorEntity: require('./WebEntities/logLevel_ErrorEntity.js'),
 	LogLevel_InfoEntity: require('./WebEntities/logLevel_InfoEntity.js'),

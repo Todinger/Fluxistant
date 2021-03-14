@@ -1,5 +1,3 @@
-const Function = require('./function');
-
 class Builders {
 	constructor(classes) {
 		this.builders = {};
@@ -11,10 +9,6 @@ class Builders {
 }
 
 
-
-function func(funcDesc) {
-	return new Function(funcDesc);
-}
 
 const VariableBuilder = new Builders({
 	custom: require('./Variables/functionVariable'),
@@ -56,7 +50,6 @@ const ResponseBuilder = new Builders({
 // }
 
 module.exports = {
-	Func: func,
 	Variables: VariableBuilder.builders,
 	Triggers: TriggerBuilder.builders,
 	Responses: ResponseBuilder.builders,

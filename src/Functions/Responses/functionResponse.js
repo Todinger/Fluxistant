@@ -4,10 +4,11 @@ const GlobalVariables = require('../globalVariables');
 class FunctionResponse {
 	constructor(params) {
 		if (typeof params === 'string') {
+			this.enabled = true;
 			this.message = params;
-			this.active = params.active !== false;
 			this._defaultInit(params);
 		} else {
+			this.enabled = params.enabled !== false;
 			this.message = params.message;
 			this._paramsInit(params);
 		}
@@ -26,7 +27,7 @@ class FunctionResponse {
 	}
 	
 	send(funcResults) {
-		if (this.active) {
+		if (this.enabled) {
 			let response = this._buildResponse(funcResults);
 			this._sendImpl(response);
 		}

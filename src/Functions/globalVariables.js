@@ -19,7 +19,7 @@ const GlobalVars = [
 		replacement: data => {
 			let args = data.context.params.in;
 			let num = Number(data.matchData[1]);
-			if (1 <= num && num <= args.length) {
+			if (1 <= num && num <= args.length && args[num - 1] !== undefined) {
 				return args[num - 1];
 			} else {
 				return data.matchString; // Return the expression unchanged
@@ -34,7 +34,7 @@ const GlobalVars = [
 		
 		expr: '$all',
 		replacement: data => {
-			if (data.context.params.in.length > 0) {
+			if (data.context.params.in.length > 0 && data.context.params.in[0] !== undefined) {
 				return data.context.params.in.join(' ');
 			} else {
 				return data.matchString; // Return the expression unchanged

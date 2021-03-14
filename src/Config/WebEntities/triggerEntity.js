@@ -6,7 +6,7 @@ class TriggerEntity extends ChoiceValueEntity {
 	
 	constructor(displayText, data) {
 		super(displayText);
-		this.addBoolean('active', true)
+		this.addBoolean('enabled', true)
 			.setName('Enabled')
 			.setDescription('Enables/disables this trigger');
 		this.addString('filter')
@@ -27,6 +27,10 @@ class TriggerEntity extends ChoiceValueEntity {
 		if (data) {
 			if (data.name) {
 				this.setName(data.name);
+			}
+			
+			if (data.enabled !== undefined) {
+				this.getChild('enabled').setValue(data.enabled);
 			}
 			
 			if (data.description) {

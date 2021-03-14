@@ -49,11 +49,9 @@ class ShortcutTrigger extends Trigger {
 	}
 	
 	_deactivateImpl() {
-		this.keys.forEach(keys => {
-			for (let i = 0; i < keys.length; i++) {
-				this._unregisterShortcutKey(i);
-			}
-		});
+		for (let i = 0; i < this.keys.length; i++) {
+			this._unregisterShortcutKey(i);
+		}
 	}
 }
 

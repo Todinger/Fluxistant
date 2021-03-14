@@ -11,13 +11,13 @@ class FunctionTrigger extends EventNotifier {
 	constructor(settings) {
 		super();
 		this._addEvent('triggered');
-		
 		this.triggerID = `Trigger <${uuidv4()}>`;
-		this.active = false;
+		this.enabled = settings.enabled !== false;
 		this.cooldowns = settings.cooldowns;
 		this.filter = settings.filter || EMPTY_FILTER;
 		this.paramValues = settings.paramValues || [];
 		
+		this._active = false;
 		this.cooldownID = CooldownManager.addCooldown(this.cooldowns);
 	}
 	
@@ -30,15 +30,17 @@ class FunctionTrigger extends EventNotifier {
 	}
 	
 	activate() {
-		if (!this.active) {
+		if (this.enabled && !this._active) {
 			this._activateImpl();
+			this._active = true;
 		}
 	}
 	
 	deactivate() {
-		if (this.active) {
+		if (this._active) {
 			CooldownManager.resetCooldowns(this.cooldownID);
 			this._deactivateImpl();
+			this._active = false;
 		}
 	}
 	

@@ -5,7 +5,7 @@ class ResponseEntity extends ChoiceValueEntity {
 	
 	constructor(displayText) {
 		super(displayText);
-		this.addBoolean('active')
+		this.addBoolean('enabled', true)
 			.setName('Enabled')
 			.setDescription('Enables/disables this response');
 		this.addString('message')
@@ -14,6 +14,7 @@ class ResponseEntity extends ChoiceValueEntity {
 	
 	setData(data) {
 		if (data) {
+			this.getChild('enabled').setValue(data.enabled);
 			this.getChild('message').setValue(data.message);
 		}
 	}
