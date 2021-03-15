@@ -5,6 +5,8 @@ const Utils = require('./utils');
 const SECONDS = 1;
 const MINUTES = 60 * SECONDS;
 
+const USER_SECONDS = 1000;
+
 const COOLDOWN_CLEANUP_INTERVAL = 30 * MINUTES;
 
 class CooldownManager {
@@ -112,7 +114,7 @@ class CooldownManager {
 			// Specify that the given user may not use this command until
 			// handler.cooldowns.user milliseconds have passed
 			cooldownData.users[user.name] =
-				Utils.now() + cooldownDef.user;
+				Utils.now() + cooldownDef.user * USER_SECONDS;
 		}
 		
 		// This means there is a global cooldown - that is, when someone
@@ -121,7 +123,7 @@ class CooldownManager {
 		if (cooldownDef.global) {
 			// Specify that no user may use this command until
 			// handler.cooldowns.global milliseconds have passed
-			cooldownData.global = Utils.now() + cooldownDef.global;
+			cooldownData.global = Utils.now() + cooldownDef.global * USER_SECONDS;
 		}
 		
 		// Save the information we just created/updated

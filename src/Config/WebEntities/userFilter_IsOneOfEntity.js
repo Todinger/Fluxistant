@@ -1,6 +1,6 @@
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
-const StringEntity = require('./stringEntity');
+const StringEntity = require('./Values/stringEntity');
 
 class UserFilter_IsOneOfEntity extends UserFilter_BaseEntity {
 	static get TYPE()		{ return 'UserFilter_IsOneOf'; 					}

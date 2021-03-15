@@ -1,4 +1,4 @@
-const ImageFileEntity = require('./imageFileEntity');
+const ImageFileEntity = require('./Assets/imageFileEntity');
 
 class CandyFileEntity extends ImageFileEntity {
 	static get TYPE()		{ return 'CandyFile';					}

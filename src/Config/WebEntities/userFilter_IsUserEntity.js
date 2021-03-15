@@ -1,5 +1,5 @@
 const UserFilter_BaseEntity = require('./userFilter_BaseEntity');
-const StringEntity = require('./stringEntity');
+const StringEntity = require('./Values/stringEntity');
 
 class UserFilter_IsUserEntity extends UserFilter_BaseEntity {
 	static get TYPE()		{ return 'UserFilter_IsUser'; 					}

@@ -10,15 +10,19 @@ const ENTITY_SUFFIX = 'Entity.js';
 const REPLACEMENTS = [
 	{
 		find: /requireMain\s*\(\s*['"]\.\/([^'"]+)['"]\s*\)/gi,
-		replace: "require('../../$1')",
+		replace: (destFile) => {
+			let subDirCount = (destFile.match(/\\/g) || []).length;
+			let dirsUpString = '../'.repeat(subDirCount);
+			return `require('${dirsUpString}$1')`;
+		},
 	},
 	{
 		find: /requireConfig\s*\(\s*['"]([^'"]+)['"]\s*\)/gi,
-		replace: "require('./$1')",
+		replace: () => "require('./$1')",
 	},
 	{
 		find: /requireModConfig\s*\([^,]+,\s*['"]([^'"]+)['"]\s*\)/gi,
-		replace: "require('./$1')",
+		replace: () => "require('./$1')",
 	},
 ];
 
@@ -31,14 +35,21 @@ class EntityFileManager {
 		// fs.copyFileSync(sourceFile, destFile);
 		let data = fs.readFileSync(sourceFile, 'utf8');
 		REPLACEMENTS.forEach(replacement => {
-			data = data.replace(replacement.find, replacement.replace);
+			data = data.replace(replacement.find, replacement.replace(destFile));
 		});
+		
+		fs.mkdir(
+			path.dirname(destFile),
+			{ recursive: true },
+			err => {
+				if (err) throw err;
+			});
 		
 		fs.writeFileSync(destFile, data, 'utf8');
 	}
 	
 	registerEntities(entitiesPath, generationDir) {
-		let entityFiles = Utils.getFileNamesAndPaths(entitiesPath);
+		let entityFiles = Utils.getFileNamesAndPathsRecursive(entitiesPath);
 		Object.keys(entityFiles).forEach(filename => {
 			if (filename.endsWith(ENTITY_SUFFIX)) {
 				let filePath = entityFiles[filename];

@@ -1,4 +1,4 @@
-class Builders {
+class Builder {
 	constructor(classes) {
 		this.builders = {};
 		Object.keys(classes).forEach(key => {
@@ -8,48 +8,32 @@ class Builders {
 	}
 }
 
+const FilterBuilder = new Builder({
+	specificUser: require('./Filters/specificUserFilter'),
+	isMod: require('./Filters/isModFilter'),
+	isSub: require('./Filters/isSubFilter'),
+	and: require('./Filters/andFilter'),
+	or: require('./Filters/orFilter'),
+	not: require('./Filters/notFilter'),
+});
 
-
-const VariableBuilder = new Builders({
+const VariableBuilder = new Builder({
 	custom: require('./Variables/functionVariable'),
 	out: require('./Variables/outputVariable'),
 });
 
-const TriggerBuilder = new Builders({
+const TriggerBuilder = new Builder({
 	command: require('./Triggers/commandTrigger'),
 	shortcut: require('./Triggers/shortcutTrigger'),
 });
 
-const ResponseBuilder = new Builders({
+const ResponseBuilder = new Builder({
 	chat: require('./Responses/chatResponse'),
 	console: require('./Responses/consoleResponse'),
 });
 
-// const AllBuilders = {};
-//
-// function _makeBuilders(classes) {
-// 	let uniqueID = uuidv4();
-// 	assert(
-// 		!(uniqueID in AllBuilders),
-// 		`Duplicate registration of supposedly-unique ID "${uniqueID}".`);
-// 	AllBuilders[uniqueID] = new Builders(uniqueID, classes);
-// 	return AllBuilders[uniqueID].builders;
-// }
-//
-// function makeTriggerBuilders() {
-// 	return _makeBuilders({
-// 		command: CommandTrigger,
-// 		shortcut: ShortcutTrigger,
-// 	});
-// }
-//
-// function makeResponseBuilders() {
-// 	return _makeBuilders({
-// 		chat: ChatResponse,
-// 	});
-// }
-
 module.exports = {
+	Filters: FilterBuilder.builders,
 	Variables: VariableBuilder.builders,
 	Triggers: TriggerBuilder.builders,
 	Responses: ResponseBuilder.builders,

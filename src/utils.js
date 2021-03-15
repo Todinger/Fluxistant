@@ -266,6 +266,37 @@ class Utils {
 	 	return res;
 	}
 	
+	static forwardSlashJoin(...paths) {
+		return path.join(...paths).replace(/\\/g, '/');
+	}
+	
+	static getFileNamesAndPathsRecursive(source = "./", subDirPath = '') {
+		let dirPath = path.join(source, subDirPath);
+		const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+		
+		// Get files within the current directory and add a path key to the file objects
+		const files = {};
+		entries.forEach(dirent => {
+			if (!dirent.isDirectory()) {
+				let subFilePath = Utils.forwardSlashJoin(subDirPath, dirent.name);
+				files[subFilePath] = path.resolve(source, subFilePath);
+			}
+		});
+		
+		// Get folders within the current directory
+		const folders = entries.filter(folder => folder.isDirectory());
+		
+		for (const folder of folders) {
+			/*
+			  Add the found files within the subdirectory to the files array by calling the
+			  current function itself
+			*/
+			let subFiles = Utils.getFileNamesAndPathsRecursive(source, Utils.forwardSlashJoin(subDirPath, folder.name));
+			_.assign(files, subFiles);
+		}
+		
+		return files;
+	}
 	static tryReadJSON(path) {
 		let rawData = null;
 		
@@ -432,7 +463,7 @@ class Utils {
 	}
 	
 	static baseName(filename) {
-		return filename.split('.').slice(0, -1).join('.');
+		return path.basename(filename).split('.').slice(0, -1).join('.');
 	}
 	
 	static objectWith(obj, extras) {

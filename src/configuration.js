@@ -2,7 +2,7 @@ const fs = require('fs');
 const assert = require('assert').strict;
 const Logger = require('./logger');
 const ObjectEntity = requireConfig('objectEntity');
-const ValueEntity = requireConfig('valueEntity');
+const ValueEntity = requireConfig('Values/valueEntity');
 const Utils = require('./utils');
 
 // Holds and manages the configuration of a single entity (e.g. a specific

@@ -835,6 +835,12 @@ class Module {
 	
 	// [For use by inheriting classes]
 	// A set of methods for creating Function Variables
+	get filter() {
+		return FunctionBuilders.Filters;
+	}
+	
+	// [For use by inheriting classes]
+	// A set of methods for creating Function Variables
 	get variable() {
 		return FunctionBuilders.Variables;
 	}

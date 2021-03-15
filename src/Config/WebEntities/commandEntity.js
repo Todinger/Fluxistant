@@ -1,8 +1,8 @@
 const Errors = require('../../errors');
 const StaticObjectEntity = require('./staticObjectEntity');
 const DynamicArrayEntity = require('./dynamicArrayEntity');
-const StringEntity = require('./stringEntity');
-const NaturalNumberEntity = require('./naturalNumberEntity');
+const StringEntity = require('./Values/stringEntity');
+const NaturalNumberEntity = require('./Values/naturalNumberEntity');
 const CooldownEntity = require('./cooldownEntity');
 const UserFilter = require('./userFilterEntity');
 
