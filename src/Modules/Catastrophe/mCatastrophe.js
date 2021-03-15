@@ -15,7 +15,7 @@ let instance = null;
 
 // TODO: Transition to key-based registration and change this to anonymous lambda function
 function doKeyPress() {
-	instance.keyPressedHandler();
+	instance.playMeow();
 }
 
 // Catastrophe
@@ -41,7 +41,7 @@ class Catastrophe extends Module {
 			this.say("IT'S A CATASTROPHE! FIND A BOX TO HIDE IN!");
 			this.endTime = Date.now() + DURATION;
 			this.timer = setTimeout(() => this.timerDone(), DURATION);
-			this.startListeningForKeys();
+			// this.startListeningForKeys();
 			this.ongoing = true;
 		}
 	}
@@ -60,7 +60,7 @@ class Catastrophe extends Module {
 			this.ongoing = false;
 			clearTimeout(this.timer);
 			this.timer = null;
-			this.stopListeningForKeys();
+			// this.stopListeningForKeys();
 			this.say("Phew, it's over. You can come out now! Meow.");
 		}
 	}
@@ -86,15 +86,17 @@ class Catastrophe extends Module {
 			this.normalizeVolume(volume);
 	}
 	
-	keyPressedHandler() {
-		let soundFile = this.assets.Sounds.selectFileLocal();
-		if (soundFile) {
-			let files = this.config.sounds.files || {};
-			let soundConf = files[soundFile.fileKey];
-			
-			sound.play(
-				path.resolve(soundFile.path),
-				this.calculateFinalVolume(soundConf.volume));
+	playMeow() {
+		if (this.ongoing) {
+			let soundFile = this.assets.Sounds.selectFileLocal();
+			if (soundFile) {
+				let files = this.config.sounds.files || {};
+				let soundConf = files[soundFile.fileKey];
+				
+				sound.play(
+					path.resolve(soundFile.path),
+					this.calculateFinalVolume(soundConf.volume));
+			}
 		}
 	}
 	
@@ -126,19 +128,58 @@ class Catastrophe extends Module {
 		);
 	}
 	
-	commands = {
-		['catastrophe']: {
+	// commands = {
+	// 	['catastrophe']: {
+	// 		name: 'Start Catastrophe',
+	// 		description: 'Starts the cat apocalypse',
+	// 		filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
+	// 		callback: () => this.start(),
+	// 	},
+	//
+	// 	['endcatastrophe']: {
+	// 		name: 'End Catastrophe',
+	// 		description: 'Ends the cat apocalypse',
+	// 		filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
+	// 		callback: () => this.end(),
+	// 	},
+	// }
+	
+	functions = {
+		start: {
 			name: 'Start Catastrophe',
 			description: 'Starts the cat apocalypse',
-			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
-			callback: () => this.start(),
+			filters: [
+				this.filter.oneOfUsers(['fluxistence', 'yecatsmailbox']),
+			],
+			action: () => this.start(),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'catastrophe',
+				}),
+			],
 		},
 		
-		['endcatastrophe']: {
+		stop: {
 			name: 'End Catastrophe',
 			description: 'Ends the cat apocalypse',
-			filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
-			callback: () => this.end(),
+			filters: [
+				this.filter.oneOfUsers(['fluxistence', 'yecatsmailbox']),
+			],
+			action: () => this.end(),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'endcatastrophe',
+				}),
+			],
+		},
+		
+		play: {
+			name: 'Meow',
+			description: 'Plays a random Meow sound from the pool',
+			action: () => this.playMeow(),
+			triggers: [
+				this.trigger.keyUp(),
+			],
 		},
 	}
 }

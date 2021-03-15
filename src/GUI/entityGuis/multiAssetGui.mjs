@@ -3,6 +3,7 @@ import AssetGui from "./assetGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
 import { showError } from "../config.mjs";
 import DataContentFactory from "./dataContents/dataContentFactory.mjs";
+import GuiElements from "./guiElements/guiElements.mjs";
 
 export default class MultiAssetGui extends AssetGui {
 	static get GUITYPE()    { return 'MultiAsset';                                                          }
@@ -12,10 +13,16 @@ export default class MultiAssetGui extends AssetGui {
 		super(entity, guiID, modName);
 		this.fileGrid = null;
 		this.fileGuiComponents = {};
+		this.mainGui = null;
 	}
 	
 	get singleFile() {
 		return false;
+	}
+	
+	_changed() {
+		super._changed();
+		this._updateStatusIndicators(this.mainGui.guiData.header);
 	}
 	
 	_deleteFile(fileKey, notifyChange) {
@@ -91,6 +98,7 @@ export default class MultiAssetGui extends AssetGui {
 	_itemChanged(fileKey) {
 		this._changed();
 		this._updateItemStatusIndicators(fileKey);
+		this._updateStatusIndicators(this.mainGui.guiData.header);
 	}
 	
 	_makeItemCard(data, name, itemEntity, itemModal) {
@@ -201,10 +209,26 @@ export default class MultiAssetGui extends AssetGui {
 		this._addFileDisplay(savedFile, true);
 	}
 	
+	_buildGUI() {
+		let gui = super._buildGUI();
+		this.mainGui = GuiElements.folder({
+			header: this.entity.getDisplayName(),
+			contents: gui,
+			tooltip: this.entity.getDescription(),
+		});
+		
+		return this.mainGui;
+	}
+	
 	_selfRemoved() {
 		Object.keys(this.fileGuiComponents).forEach(fileKey => {
 			this._deleteFile(fileKey, false);
 		});
+	}
+	
+	// Add an indication that this value has been changed (note: not its children)
+	activateChangedIndicators() {
+		EntityGui.addChangeIndicator(this.mainGui.guiData.header);
 	}
 	
 	// Accept changes and remove change markers
@@ -212,6 +236,8 @@ export default class MultiAssetGui extends AssetGui {
 		Object.keys(this.fileGuiComponents).forEach(fileKey => {
 			this._clearItemStatusIndicators(fileKey);
 		});
+		
+		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);
 	}
 	
 	

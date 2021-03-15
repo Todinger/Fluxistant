@@ -13,6 +13,7 @@ class NumberEntity extends ValueEntity {
 		return super._assignableFrom(type) ||
 			type === 'Number' ||
 			type === 'Integer' ||
+			type === 'NonNegativeNumber' ||
 			type === 'PositiveNumber';
 	}
 }

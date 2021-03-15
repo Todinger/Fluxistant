@@ -3,15 +3,16 @@ const GlobalVariables = require('../globalVariables');
 const replaceVariables = require('./MultiReplace/multiReplaceEngine');
 
 class FunctionResponse {
-	constructor(params) {
-		if (typeof params === 'string') {
+	constructor(settings) {
+		settings = settings || {};
+		if (typeof settings === 'string') {
 			this.enabled = true;
-			this.message = params;
-			this._defaultInit(params);
+			this.message = settings;
+			this._defaultInit(settings);
 		} else {
-			this.enabled = params.enabled !== false;
-			this.message = params.message;
-			this._paramsInit(params);
+			this.enabled = settings.enabled !== false;
+			this.message = settings.message;
+			this._paramsInit(settings);
 		}
 	}
 	

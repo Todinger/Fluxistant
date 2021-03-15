@@ -9,6 +9,7 @@ const Utils = requireMain('./utils');
 class FunctionTrigger extends EventNotifier {
 	constructor(settings) {
 		super();
+		settings = settings || {};
 		this._addEvent('triggered');
 		this.triggerID = `Trigger <${uuidv4()}>`;
 		this.enabled = settings.enabled !== false;

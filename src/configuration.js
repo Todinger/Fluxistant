@@ -107,6 +107,10 @@ class Configuration {
 		return this.configRoot.addNaturalNumber(key, defaultValue);
 	}
 	
+	addNonNegativeNumber(key, defaultValue) {
+		return this.configRoot.addNonNegativeNumber(key, defaultValue);
+	}
+	
 	addBoolean(key, defaultValue) {
 		return this.configRoot.addBoolean(key, defaultValue);
 	}

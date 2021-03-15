@@ -11,6 +11,10 @@ export default class AssetGui extends EntityGui {
 		this.dataContent = null;
 	}
 	
+	get isContainer() {
+		return !this.singleFile;
+	}
+	
 	get singleFile() {
 		return true;
 	}

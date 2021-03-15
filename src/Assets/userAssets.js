@@ -135,11 +135,15 @@ class UserAssets {
 	
 	selectFileLocal(...params) {
 		let key = this.selectFileKey(...params);
-		return {
-			name: this.savedFiles[key].name,
-			path: this.savedFiles[key].path,
-			fileKey: key,
-		};
+		if (key) {
+			return {
+				name: this.savedFiles[key].name,
+				path: this.savedFiles[key].path,
+				fileKey: key,
+			};
+		} else {
+			return null;
+		}
 	}
 	
 	_readFile(filePath, filename) {

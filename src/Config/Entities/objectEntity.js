@@ -89,6 +89,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'NaturalNumber', defaultValue);
 	}
 	
+	addNonNegativeNumber(key, defaultValue) {
+		return this.add(key, 'NonNegativeNumber', defaultValue);
+	}
+	
 	addBoolean(key, defaultValue) {
 		return this.add(key, 'Boolean', defaultValue);
 	}

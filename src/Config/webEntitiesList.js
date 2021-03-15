@@ -61,6 +61,7 @@ const entities = {
 	HiddenStringEntity: require('./WebEntities/Values/hiddenStringEntity.js'),
 	IntegerEntity: require('./WebEntities/Values/integerEntity.js'),
 	NaturalNumberEntity: require('./WebEntities/Values/naturalNumberEntity.js'),
+	NonNegativeNumberEntity: require('./WebEntities/Values/nonNegativeNumberEntity.js'),
 	NumberEntity: require('./WebEntities/Values/numberEntity.js'),
 	PositiveNumberEntity: require('./WebEntities/Values/positiveNumberEntity.js'),
 	StringEntity: require('./WebEntities/Values/stringEntity.js'),
