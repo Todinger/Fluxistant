@@ -40,21 +40,13 @@ class CommandTrigger extends Trigger {
 	}
 	
 	_invoked(user, ...args) {
-		// let escapedArgs = args.map(arg =>
-		// 	arg.replace(/\\/g, '\\\\')
-		// 		.replace(/\$/g, '\\$'));
-		
 		this._trigger({
 			user: user,
 			params: [...args],
-			// params: escapedArgs,
 			triggerParams: {
 				cost: this.command.cost,
 				cmdname: this.command.cmdname,
 			},
-			// outputPostProcessing: output =>
-			// 	output.replace(/\\\$/g, '$')
-			// 		.replace(/\\\\/g, '\\'),
 		});
 	}
 	
@@ -75,15 +67,6 @@ class CommandTrigger extends Trigger {
 			
 			expr: '$cost',
 			replacement: data => data.context.params.trigger.cost.toString(),
-			// 	if (data.context.params.trigger &&
-			// 		data.context.params.trigger.cost) {
-			// 		return data.context.params.trigger.cost.toString();
-			// 	} else {
-			// 		// If the function wasn't activated by a command then this
-			// 		// variable is irrelevant and shouldn't do anything
-			// 		return '$cost';
-			// 	}
-			// },
 		}),
 		
 		new Variable({
@@ -93,15 +76,6 @@ class CommandTrigger extends Trigger {
 			
 			expr: '$pcost',
 			replacement: data => SEManager.pointsString(data.context.params.trigger.cost),
-			// 	if (data.context.params.trigger &&
-			// 		data.context.params.trigger.cost) {
-			// 		return SEManager.pointsString(data.context.params.trigger.cost);
-			// 	} else {
-			// 		// If the function wasn't activated by a command then this
-			// 		// variable is irrelevant and shouldn't do anything
-			// 		return '$pcost';
-			// 	}
-			// },
 		}),
 	]
 }

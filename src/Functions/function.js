@@ -192,7 +192,6 @@ class Function {
 				out: results,
 				trigger: invocationData.triggerParams,
 			},
-			outputPostProcessing: invocationData.outputPostProcessing,
 		};
 		
 		this._sendResponses(context);
