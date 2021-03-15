@@ -124,6 +124,10 @@ class Module {
 	
 	// ----------- START OF FUNCTION FEATURES ----------- //
 	
+	createFunctionObject(func) {
+		return new Function(func);
+	}
+	
 	createFunctionObjects(funcs) {
 		funcs = funcs || this.functions;
 		let funcObjs = {};
@@ -133,7 +137,7 @@ class Module {
 					funcs[funcID].funcID = funcID;
 				}
 				
-				funcObjs[funcID] = new Function(funcs[funcID]);
+				funcObjs[funcID] = this.createFunctionObject(funcs[funcID]);
 			});
 		}
 		

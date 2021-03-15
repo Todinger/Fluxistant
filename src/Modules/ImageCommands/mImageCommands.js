@@ -10,7 +10,7 @@ class ImageCommands extends Module {
 			tags: ['imgdisp'],
 		});
 		
-		this.imageCommands = {};
+		this.imageFunctions = {};
 	}
 	
 	_makeDisplayData(displayObject, file) {
@@ -19,18 +19,18 @@ class ImageCommands extends Module {
 		return dd;
 	}
 	
-	_sendCommand(cmdObject) {
+	_sendToDisplay(funcObject) {
 		let _this = this;
 		
-		let hasImage = this.assets.Images.hasKey(cmdObject.image.file.fileKey);
-		let hasSound = this.assets.Sounds.hasKey(cmdObject.sound.file.fileKey);
+		let hasImage = this.assets.Images.hasKey(funcObject.image.file.fileKey);
+		let hasSound = this.assets.Sounds.hasKey(funcObject.sound.file.fileKey);
 		
 		let imagePromise = hasImage ?
-			this.assets.getFileWeb(cmdObject.image.file) :
+			this.assets.getFileWeb(funcObject.image.file) :
 			Promise.resolve();
 		
 		let soundPromise = hasSound ?
-			this.assets.getFileWeb(cmdObject.sound.file) :
+			this.assets.getFileWeb(funcObject.sound.file) :
 			Promise.resolve();
 		
 		if (hasImage || hasSound) {
@@ -38,12 +38,11 @@ class ImageCommands extends Module {
 			.then(function([imageFile, soundFile]) {
 				let parameters = {};
 				if (hasImage) {
-					parameters.image = _this._makeDisplayData(cmdObject.image, imageFile); //Utils.objectWith(cmdObject.image, { url: imageFile.data });
+					parameters.image = _this._makeDisplayData(funcObject.image, imageFile); //Utils.objectWith(cmdObject.image, { url: imageFile.data });
 				}
 				
 				if (hasSound) {
-					// parameters.sound = Utils.objectWith(cmdObject.sound, { url: soundFile.data });
-					parameters.sound = _this._makeDisplayData(cmdObject.sound, soundFile);
+					parameters.sound = _this._makeDisplayData(funcObject.sound, soundFile);
 				}
 				
 				_this.broadcastEvent('showImage', parameters);
@@ -58,35 +57,35 @@ class ImageCommands extends Module {
 	
 	defineModConfig(modConfig) {
 		modConfig.add(
-			'imageCommands',
+			'imageFunctions',
 			'DynamicArray',
-			'ImageCommand')
-		.setName('Image Commands')
-		.setDescription('Commands for showing images and/or playing sounds');
+			'ImageFunction')
+		.setName('Image Functions')
+		.setDescription('Functions for showing images and/or playing sounds');
 	}
 	
 	loadModConfig(conf) {
-		this.unregisterCommands(this.imageCommands);
-		this.imageCommands = {};
-		if (conf.imageCommands) {
-			for (let i = 0; i < conf.imageCommands.length; i++) {
-				let cmd = conf.imageCommands[i];
-				let cmdObject = this.createCommandObject(cmd);
+		this.deactivateFunctions(this.imageFunctions || {});
+		this.imageFunctions = {};
+		if (conf.imageFunctions) {
+			for (let i = 0; i < conf.imageFunctions.length; i++) {
+				let func = conf.imageFunctions[i];
+				let funcObject = this.createFunctionObject(func);
 				
-				if (!cmdObject.cmdid) {
-					cmdObject.cmdid = `ImageCommand[${i}]`;
+				if (!funcObject.funcID) {
+					funcObject.funcID = `ImageFunc[${i}]`;
 				}
 				
-				cmdObject.image = cmd.image;
-				cmdObject.sound = cmd.sound;
-				cmdObject.callback = () => {
-					this._sendCommand(cmdObject);
+				funcObject.image = func.image;
+				funcObject.sound = func.sound;
+				funcObject.action = () => {
+					this._sendToDisplay(funcObject);
 				};
-				this.imageCommands[cmdObject.cmdid] = cmdObject;
+				this.imageFunctions[funcObject.funcID] = funcObject;
 			}
 		}
 		
-		this.registerCommands(this.imageCommands);
+		this.activateFunctions(this.imageFunctions);
 	}
 }
 

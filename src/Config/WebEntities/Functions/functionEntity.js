@@ -5,7 +5,6 @@ const ResponseChoiceEntity = require('./Responses/responseChoiceEntity');
 
 class FunctionEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Function'; 							}
-	// static get GUITYPE()	{ return 'Function'; 							}
 	static get BUILDER()	{ return (...p) => new FunctionEntity(...p); 	}
 	
 	constructor(data) {
@@ -16,7 +15,7 @@ class FunctionEntity extends StaticObjectEntity {
 			.setName('Name')
 			.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you")
 			.hide();
-		this.addBoolean('enabled', !!(data && data.enabled))
+		this.addBoolean('enabled', (data && data.enabled) !== false)
 			.setName('Enabled')
 			.setDescription('Enables/disables this function');
 		this.addCooldowns('cooldowns')
@@ -85,6 +84,17 @@ class FunctionEntity extends StaticObjectEntity {
 			helpText: data.getAllVariables().map(variable => variable.toMarkdown()).join('\n'),
 		}
 		this.addObject(response, 'responses', ResponseChoiceEntity, responseData);
+	}
+	
+	// ---- Overrides ---- //
+	
+	getDisplayName() {
+		let displayName = this.getName();
+		if (!displayName) {
+			displayName = this.getChild('name').getValue();
+		}
+		
+		return displayName || super.getDisplayName();
 	}
 }
 

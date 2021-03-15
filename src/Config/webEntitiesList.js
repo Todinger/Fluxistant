@@ -74,6 +74,7 @@ const entities = {
 	CandyInflation_NoneEntity: require('./WebEntities/candyInflation_NoneEntity.js'),
 	UserGroupEntity: require('./WebEntities/userGroupEntity.js'),
 	ImageCommandEntity: require('./WebEntities/imageCommandEntity.js'),
+	ImageFunctionEntity: require('./WebEntities/imageFunctionEntity.js'),
 	ImageEntity: require('./WebEntities/imageEntity.js'),
 	SoundEntity: require('./WebEntities/soundEntity.js'),
 	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),

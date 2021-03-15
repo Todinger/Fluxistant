@@ -3,7 +3,7 @@ const FunctionFilter = require('./functionFilter');
 class OrFilter extends FunctionFilter {
 	constructor(settings) {
 		super(settings);
-		this.filters = settings.filters || [];
+		this.filters = (settings && settings.filters) || [];
 	}
 	
 	get type() {

@@ -2,6 +2,9 @@ const assert = require('assert').strict;
 const Utils = requireMain('utils');
 const Parameter = require('./functionParameter');
 const CooldownManager = require('../cooldownManager');
+const Trigger = require('./Triggers/functionTrigger');
+const Response = require('./Responses/functionResponse');
+const Filter = require('./Filters/functionFilter');
 const Builders = require('./builders');
 const GlobalVariables = require('./globalVariables');
 
@@ -18,11 +21,11 @@ class Function {
 		this.description = settings.description || '';
 		this.parameters = this._makeParameters(settings.parameters);
 		this.action = settings.action || EMPTY_ACTION;
-		this.filter = settings.filters ? Builders.Filters.or({ filters: settings.filters }) : undefined;
+		this.filter = this._makeFilter(settings.filters);
 		this.variables = settings.variables || [];
 		this.cooldowns = settings.cooldowns;
-		this.triggers = settings.triggers || [];
-		this.responses = settings.responses || [];
+		this.triggers = this._makeTriggers(settings.triggers);
+		this.responses = this._makeResponses(settings.responses);
 		this.triggerHandler = (triggerData) => this.invoke(triggerData);
 		this._registerTriggers();
 		
@@ -51,17 +54,41 @@ class Function {
 	}
 	
 	_makeFilter(filtersData) {
-		// let filters = this._makeObjects(Builders.Filters, filtersData);
-		// return new OrFilter({ filters });
-		return Builders.combineFilters(filtersData);
+		if (filtersData) {
+			if (filtersData.length > 0) {
+				if (filtersData[0] instanceof Filter) {
+					return Builders.Filters.or({filters: filtersData})
+				}
+			} else {
+				return Builders.combineFilters(filtersData);
+			}
+		} else {
+			return Builders.Filters.or();
+		}
 	}
 	
 	_makeTriggers(triggersData) {
-		return this._makeObjects(Builders.Triggers, triggersData);
+		if (triggersData && triggersData.length > 0) {
+			if (triggersData[0] instanceof Trigger) {
+				return triggersData;
+			} else {
+				return this._makeObjects(Builders.Triggers, triggersData);
+			}
+		} else {
+			return [];
+		}
 	}
 	
 	_makeResponses(responsesData) {
-		return this._makeObjects(Builders.Responses, responsesData);
+		if (responsesData && responsesData.length > 0) {
+			if (responsesData[0] instanceof Response) {
+				return responsesData;
+			} else {
+				return this._makeObjects(Builders.Responses, responsesData);
+			}
+		} else {
+			return [];
+		}
 	}
 	
 	getAllVariables() {
