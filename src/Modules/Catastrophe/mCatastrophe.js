@@ -4,19 +4,13 @@ const path = require('path');
 const sound = require("sound-play");
 const Module = requireMain('module');
 
-const SECONDS = 1000;
+const SECONDS = 1;
 const MINUTES = 60 * SECONDS;
+const USER_SECONDS = 1000;
 
 // TODO: Make channel rewards configurable and remove this
 const CHANNEL_REWARD_NAME = 'Catastrophe';
-const DURATION = 3 * MINUTES;
-
-let instance = null;
-
-// TODO: Transition to key-based registration and change this to anonymous lambda function
-function doKeyPress() {
-	instance.playMeow();
-}
+const DEFAULT_DURATION = 3 * MINUTES;
 
 // Catastrophe
 // -----------
@@ -35,13 +29,14 @@ class Catastrophe extends Module {
 	}
 	
 	start() {
+		let duration = this.config.duration !== undefined ? this.config.duration : DEFAULT_DURATION;
+		duration *= USER_SECONDS;
 		if (this.ongoing) {
-			this.endTime += DURATION;
+			this.endTime += duration;
 		} else {
 			this.say("IT'S A CATASTROPHE! FIND A BOX TO HIDE IN!");
-			this.endTime = Date.now() + DURATION;
-			this.timer = setTimeout(() => this.timerDone(), DURATION);
-			// this.startListeningForKeys();
+			this.endTime = Date.now() + duration;
+			this.timer = setTimeout(() => this.timerDone(), duration);
 			this.ongoing = true;
 		}
 	}
@@ -60,17 +55,8 @@ class Catastrophe extends Module {
 			this.ongoing = false;
 			clearTimeout(this.timer);
 			this.timer = null;
-			// this.stopListeningForKeys();
 			this.say("Phew, it's over. You can come out now! Meow.");
 		}
-	}
-	
-	startListeningForKeys() {
-		this.onKeyUp(doKeyPress);
-	}
-	
-	stopListeningForKeys() {
-		this.removeKeyUpHandler(doKeyPress);
 	}
 	
 	normalizeVolume(volume) {
@@ -105,6 +91,9 @@ class Catastrophe extends Module {
 	}
 	
 	defineModConfig(modConfig) {
+		modConfig.addNonNegativeNumber('duration', DEFAULT_DURATION)
+			.setName('Duration')
+			.setDescription('Time in seconds that the Catastrophe lasts (subsequent activations increase by this much as well)');
 		modConfig.addNaturalNumber('masterVolume', 100)
 			.setName('Master Volume')
 			.setDescription('Global volume modifier for all sounds');
@@ -127,22 +116,6 @@ class Catastrophe extends Module {
 			() => this.start()
 		);
 	}
-	
-	// commands = {
-	// 	['catastrophe']: {
-	// 		name: 'Start Catastrophe',
-	// 		description: 'Starts the cat apocalypse',
-	// 		filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
-	// 		callback: () => this.start(),
-	// 	},
-	//
-	// 	['endcatastrophe']: {
-	// 		name: 'End Catastrophe',
-	// 		description: 'Ends the cat apocalypse',
-	// 		filters: [this.filterDesc('isOneOf', ['fluxistence', 'yecatsmailbox'])],
-	// 		callback: () => this.end(),
-	// 	},
-	// }
 	
 	functions = {
 		start: {
@@ -184,5 +157,4 @@ class Catastrophe extends Module {
 	}
 }
 
-instance = new Catastrophe();
-module.exports = instance;
+module.exports = new Catastrophe();
