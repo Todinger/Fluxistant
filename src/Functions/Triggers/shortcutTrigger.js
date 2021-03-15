@@ -19,7 +19,7 @@ function keyShortToLongForm(key) {
 class ShortcutTrigger extends Trigger {
 	constructor(settings) {
 		super(settings);
-		this.keys = settings.keys || [];
+		this.keys = (settings && settings.keys) || [];
 	}
 	
 	get type() {

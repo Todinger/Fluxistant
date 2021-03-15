@@ -307,164 +307,297 @@ class Phasmophobia extends Module {
 		});
 	}
 	
-	commands = {
-		['name']: {
+	functions = {
+		name: {
 			name: "Set Ghost's Name",
 			description: 'Adds the given evidence to the current level evidence',
-			aliases: ['ghostname', 'gname'],
-			filters: [this.filterDesc('isAtLeastMod')],
-			callback: this.ifRunning((user, ...name) => this.ghostNameCommand(user, ...name)),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'name',
+					aliases: ['ghostname', 'gname'],
+				}),
+			],
+			filters: [this.filter.isMod()],
+			parameters: [
+				{
+					name: 'Ghost Name',
+					takeAll: true,
+				},
+			],
+			action: this.ifRunning(data => this.ghostNameCommand(data.user, data.getParam(0))),
 		},
-		['evidence']: {
+		
+		evidence: {
 			name: 'Announce Evidence',
 			description: 'Makes the bot say in the chat what the current evidence and possible ghosts are',
-			aliases: ['ghosts', 'ghost'],
-			callback: this.ifRunning(() => this.sayState()),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'evidence',
+					aliases: ['ghosts', 'ghost'],
+				}),
+			],
+			action: this.ifRunning(() => this.sayState()),
 		},
-		['addevidence']: {
+		
+		addEvidence: {
 			name: 'Add Evidence',
 			description: 'Adds the given evidence to the current level evidence',
-			aliases: ['addev', 'evidence+', 'ev+', '+ev', '+evidence'],
-			filters: [this.filterDesc('isAtLeastMod')],
-			callback: this.ifRunning((user, ev) => this.addEvidence(ev)),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'addevidence',
+					aliases: ['addev', 'evidence+', 'ev+', '+ev', '+evidence'],
+				}),
+				this.trigger.shortcut({
+					keys: [['1']],
+					paramValues: ['emf5'],
+				}),
+				this.trigger.shortcut({
+					keys: [['2']],
+					paramValues: ['box'],
+				}),
+				this.trigger.shortcut({
+					keys: [['3']],
+					paramValues: ['prints'],
+				}),
+				this.trigger.shortcut({
+					keys: [['4']],
+					paramValues: ['orb'],
+				}),
+				this.trigger.shortcut({
+					keys: [['5']],
+					paramValues: ['book'],
+				}),
+				this.trigger.shortcut({
+					keys: [['6']],
+					paramValues: ['temps'],
+				}),
+			],
+			filters: [this.filter.isMod()],
+			action: this.ifActive(data => this.addEvidence(data.getParam(0))),
 		},
-		['removeevidence']: {
+		
+		removeEvidence: {
 			name: 'Remove Evidence',
 			description: 'Remove the given evidence from the current level evidence',
-			aliases: ['removeev', 'evidence-', 'ev-', '-ev', '-evidence'],
-			filters: [this.filterDesc('isAtLeastMod')],
-			callback: this.ifRunning((user, ev) => this.removeEvidence(ev)),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'removeevidence',
+					aliases: ['removeev', 'evidence-', 'ev-', '-ev', '-evidence'],
+				}),
+				this.trigger.shortcut({
+					keys: [['SHIFT_L', '1']],
+					paramValues: ['emf5'],
+				}),
+				this.trigger.shortcut({
+					keys: [['SHIFT_L', '2']],
+					paramValues: ['box'],
+				}),
+				this.trigger.shortcut({
+					keys: [['SHIFT_L', '3']],
+					paramValues: ['prints'],
+				}),
+				this.trigger.shortcut({
+					keys: [['SHIFT_L', '4']],
+					paramValues: ['orb'],
+				}),
+				this.trigger.shortcut({
+					keys: [['SHIFT_L', '5']],
+					paramValues: ['book'],
+				}),
+				this.trigger.shortcut({
+					keys: [['SHIFT_L', '6']],
+					paramValues: ['temps'],
+				}),
+			],
+			filters: [this.filter.isMod()],
+			action: this.ifActive(this.ifRunning(data => this.removeEvidence(data.getParam(0)))),
 		},
-		['guess']: {
-			name: 'Guess',
-			description: 'Guess what the ghost is going to be',
-			callback: (user, ghost) => this.ifRunning(this.guessGhost(user, ghost)),
-		},
-	}
-	
-	shortcuts = {
+		// guess: {
+		// 	name: 'Guess',
+		// 	description: 'Guess what the ghost is going to be',
+		// 	action: (user, ghost) => this.ifRunning(this.guessGhost(user, ghost)),
+		// },
+		
 		newLevel: {
 			name: 'New Level',
 			description: 'Removes all evidence and starts a new level',
-			keys: [
-				['BACKSPACE'], // The backspace key on the keyboard
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['BACKSPACE'], // The backspace key on the keyboard
+					],
+				})
 			],
-			callback: this.ifActive(() => this.newLevel()),
+			action: this.ifActive(() => this.newLevel()),
 		},
 		
 		showInfo: {
 			name: 'Show Information',
 			description: 'Invokes the evidence message to the chat (same as using the !evidence command)',
-			callback: this.ifActive(() => this.sayState()),
+			action: this.ifActive(() => this.sayState()),
 		},
 		
 		showConciseInfo: {
 			name: 'Show Concise Information',
 			description: 'Shows all the interesting information for the streamer in a single, concise message',
-			keys: [
-				['BACKQUOTE'],
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['BACKQUOTE'], // The backspace key on the keyboard
+					],
+				})
 			],
-			callback: this.ifActive(() => this.sayConciseState()),
+			action: this.ifActive(() => this.sayConciseState()),
 		},
+/*
 		
 		// --------- Evidence --------- //
 		addEMF5: {
 			name: 'Add Evidence: EMF Level 5',
 			description: 'Adds EMF Level 5 as a piece of evidence for the current ghost',
-			keys: [
-				['1'], // The 1 key on the keyboard
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['1'], // The 1 key on the keyboard
+					],
+				})
 			],
-			callback: this.ifActive(() => this.addEvidence('emf5')),
+			action: this.ifActive(() => this.addEvidence('emf5')),
 		},
 		removeEMF5: {
 			name: 'Remove Evidence: EMF Level 5',
 			description: 'Removes EMF Level 5 as a piece of evidence for the current ghost',
-			keys: [
-				['SHIFT_L', '1'], // Shift + 1
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['SHIFT_L', '1'], // Shift + 1
+					],
+				})
 			],
-			callback: this.ifActive(() => this.removeEvidence('emf5')),
+			action: this.ifActive(() => this.removeEvidence('emf5')),
 		},
 		addBox: {
 			name: 'Add Evidence: Spirit Box',
 			description: 'Adds Spirit Box as a piece of evidence for the current ghost',
-			keys: [
-				['2'], // The 2 key on the keyboard
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['2'], // The 2 key on the keyboard
+					],
+				})
 			],
-			callback: this.ifActive(() => this.addEvidence('box')),
+			action: this.ifActive(() => this.addEvidence('box')),
 		},
 		removeBox: {
 			name: 'Remove Evidence: Spirit Box',
 			description: 'Removes Spirit Box as a piece of evidence for the current ghost',
-			keys: [
-				['SHIFT_L', '2'], // Shift + 2
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['SHIFT_L', '2'], // Shift + 2
+					],
+				})
 			],
-			callback: this.ifActive(() => this.removeEvidence('box')),
+			action: this.ifActive(() => this.removeEvidence('box')),
 		},
 		addPrints: {
 			name: 'Add Evidence: Fingerprints',
 			description: 'Adds Fingerprints as a piece of evidence for the current ghost',
-			keys: [
-				['3'], // The 3 key on the keyboard
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['3'], // The 3 key on the keyboard
+					],
+				})
 			],
-			callback: this.ifActive(() => this.addEvidence('prints')),
+			action: this.ifActive(() => this.addEvidence('prints')),
 		},
 		removePrints: {
 			name: 'Remove Evidence: Fingerprints',
 			description: 'Removes Fingerprints as a piece of evidence for the current ghost',
-			keys: [
-				['SHIFT_L', '3'], // Shift + 3
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['SHIFT_L', '3'], // Shift + 3
+					],
+				})
 			],
-			callback: this.ifActive(() => this.removeEvidence('prints')),
+			action: this.ifActive(() => this.removeEvidence('prints')),
 		},
 		addOrb: {
 			name: 'Add Evidence: Ghost Orb',
 			description: 'Adds Ghost Orb as a piece of evidence for the current ghost',
-			keys: [
-				['4'], // The 4 key on the keyboard
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['4'], // The 4 key on the keyboard
+					],
+				})
 			],
-			callback: this.ifActive(() => this.addEvidence('orb')),
+			action: this.ifActive(() => this.addEvidence('orb')),
 		},
 		removeOrb: {
 			name: 'Remove Evidence: Ghost Orb',
 			description: 'Removes Ghost Orb as a piece of evidence for the current ghost',
-			keys: [
-				['SHIFT_L', '4'], // Shift + 4
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['SHIFT_L', '4'], // Shift + 4
+					],
+				})
 			],
-			callback: this.ifActive(() => this.removeEvidence('orb')),
+			action: this.ifActive(() => this.removeEvidence('orb')),
 		},
 		addBook: {
 			name: 'Add Evidence: Ghost Writing',
 			description: 'Adds Ghost Writing as a piece of evidence for the current ghost',
-			keys: [
-				['5'], // The 5 key on the keyboard
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['5'], // The 5 key on the keyboard
+					],
+				})
 			],
-			callback: this.ifActive(() => this.addEvidence('book')),
+			action: this.ifActive(() => this.addEvidence('book')),
 		},
 		removeBook: {
 			name: 'Remove Evidence: Ghost Writing',
 			description: 'Removes Ghost Writing as a piece of evidence for the current ghost',
-			keys: [
-				['SHIFT_L', '5'], // Shift + 5
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['SHIFT_L', '5'], // Shift + 5
+					],
+				})
 			],
-			callback: this.ifActive(() => this.removeEvidence('book')),
+			action: this.ifActive(() => this.removeEvidence('book')),
 		},
 		addTemps: {
 			name: 'Add Evidence: Freezing Temperatures',
 			description: 'Adds Freezing Temperatures as a piece of evidence for the current ghost',
-			keys: [
-				['6'], // The 6 key on the keyboard
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['6'], // The 6 key on the keyboard
+					],
+				})
 			],
-			callback: this.ifActive(() => this.addEvidence('temps')),
+			action: this.ifActive(() => this.addEvidence('temps')),
 		},
 		removeTemps: {
 			name: 'Remove Evidence: Freezing Temperatures',
 			description: 'Removes Freezing Temperatures as a piece of evidence for the current ghost',
-			keys: [
-				['SHIFT_L', '6'], // Shift + 6
+			triggers: [
+				this.trigger.shortcut({
+					keys: [
+						['SHIFT_L', '6'], // Shift + 6
+					],
+				})
 			],
-			callback: this.ifActive(() => this.removeEvidence('temps')),
+			action: this.ifActive(() => this.removeEvidence('temps')),
 		},
 		// ---------------------------- //
+*/
 	}
 }
 

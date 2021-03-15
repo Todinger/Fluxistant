@@ -54,11 +54,9 @@ class Function {
 	}
 	
 	_makeFilter(filtersData) {
-		if (filtersData) {
-			if (filtersData.length > 0) {
-				if (filtersData[0] instanceof Filter) {
-					return Builders.Filters.or({filters: filtersData})
-				}
+		if (filtersData && filtersData.length > 0) {
+			if (filtersData[0] instanceof Filter) {
+				return Builders.Filters.or({filters: filtersData})
 			} else {
 				return Builders.combineFilters(filtersData);
 			}
@@ -207,6 +205,13 @@ class Function {
 		this._applyDefaultParamValues(invocationData);
 		this._processLastParam(invocationData);
 		this._cleanPrams(invocationData);
+		invocationData.getParam = (index) => {
+			if (invocationData.params.length > index) {
+				return invocationData.params[index];
+			} else {
+				return undefined;
+			}
+		};
 		
 		let results = this.action(invocationData);
 		
