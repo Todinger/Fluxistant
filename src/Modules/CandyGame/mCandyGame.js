@@ -10,17 +10,13 @@ const Utils = requireMain('utils');
 // // 	}
 // const CANDY_FILENAME = 'candy.json';
 //
-// const CANDY_DEFAULTS = {
-// 	weight: 25,
-// 	reward: 50,
-// 	image: {
-// 		width: 100,
-// 		height: 100,
-// 	},
-// 	userBonus: {
-// 		amount: 500,
-// 	},
-// };
+const CANDY_DEFAULTS = {
+	weight: 25,
+	reward: 50,
+	imageWidth: 100,
+	imageHeight: 100,
+	userBonusAmount: 500,
+};
 
 const INFLATIONS = {
 	none:			()		 =>	(start)       => start,
@@ -135,11 +131,11 @@ class CandyGame extends Module {
 		
 		let defs = conf.candyDefaults;
 		this.candyDefaults = {
-			weight: defs.weight,
-			reward: defs.reward,
-			width: defs.imageWidth,
-			height: defs.imageHeight,
-			userBonusAmount: defs.userBonusAmount,
+			weight: defs.weight || CANDY_DEFAULTS.weight,
+			reward: defs.reward || CANDY_DEFAULTS.reward,
+			width: defs.imageWidth || CANDY_DEFAULTS.imageWidth,
+			height: defs.imageHeight || CANDY_DEFAULTS.imageHeight,
+			userBonusAmount: defs.userBonusAmount || CANDY_DEFAULTS.userBonusAmount,
 		};
 		
 		this.assets.Images.setWeights(Utils.objectMap(
@@ -274,33 +270,79 @@ class CandyGame extends Module {
 		);
 	}
 	
-	commands = {
-		['trickortreat']: {
+	// commands = {
+	// 	['trickortreat']: {
+	// 		name: 'Start Game',
+	// 		description: 'Starts a candy game.',
+	// 		filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+	// 		callback: user => this.startGame(user),
+	// 	},
+	//
+	// 	['nomorecandy']: {
+	// 		name: 'Stop Game',
+	// 		description: 'Stops the currently ongoing candy game.',
+	// 		filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
+	// 		callback: user => this.endGame(user),
+	// 	},
+	//
+	// 	['gimme']: {
+	// 		name: 'Drop Candy',
+	// 		description: 'Randomly chooses a piece of candy for the user and drops it down from above.',
+	// 		cost: 10,
+	// 		silent: true,
+	// 		cooldowns: {
+	// 			user: 3000,
+	// 		},
+	// 		callback: user => this.candyRequest(user),
+	// 	},
+	// }
+	
+	functions = {
+		startGame: {
 			name: 'Start Game',
 			description: 'Starts a candy game.',
-			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
-			callback: user => this.startGame(user),
+			filters: [
+				this.filter.oneOfUsers(['fluxistence', 'yecatsmailbox']),
+			],
+			action: data => this.startGame(data.user),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'trickortreat',
+				}),
+			],
 		},
 		
-		['nomorecandy']: {
+		stopGame: {
 			name: 'Stop Game',
 			description: 'Stops the currently ongoing candy game.',
-			filters: [this.filterDesc('isOneOf', ['yecatsmailbox', 'fluxistence'])],
-			callback: user => this.endGame(user),
+			filters: [
+				this.filter.oneOfUsers(['fluxistence', 'yecatsmailbox']),
+			],
+			action: data => this.endGame(data.user),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'nomorecandy',
+				}),
+			],
 		},
 		
-		['gimme']: {
+		dropCandy: {
 			name: 'Drop Candy',
 			description: 'Randomly chooses a piece of candy for the user and drops it down from above.',
-			cost: 10,
-			silent: true,
-			cooldowns: {
-				user: 3000,
-			},
-			callback: user => this.candyRequest(user),
+			action: data => this.candyRequest(data.user),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'gimme',
+					cost: 10,
+					cooldowns: {
+						user: 3,
+					},
+				}),
+			],
 		},
 	}
 	
+/*
 	// noinspection JSUnusedLocalSymbols
 	test(invocationData) {
 		this.log('This is your testain speaking... All is well!');
@@ -381,6 +423,7 @@ class CandyGame extends Module {
 			],
 		},
 	}
+*/
 }
 
 module.exports = new CandyGame();

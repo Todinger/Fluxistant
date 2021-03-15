@@ -11,10 +11,10 @@
   be in the configurations themselves).
 - Switch to function-trigger based configuration form.
   Trigger ideas:
-	- Command (with filters)
+	+ Command (with filters)
 	- Keywords (+ filters, regex)
 	- Twitch events (message, action, etc.)
-	- Key shortcut
+	+ Key shortcut
 	- Key down/up
 	- Controller buttons
 	- Voice command
@@ -30,6 +30,17 @@
 	- TTS
 	- Log
 	- File?
+- Filter ideas:
+	+ Specific user
+	+ One of specific users
+	+ Is mod
+	+ Is sub
+	+ And
+	+ Or
+	- Window running
+	- Window active
+	- Complex
+	- Temporary window "switch"? (something switches it on - allowed, something switches it off - disallowed)
 - Trigger variants
 - "Not user" filter
 - Fix: single-time GIFs not starting over when shown again
