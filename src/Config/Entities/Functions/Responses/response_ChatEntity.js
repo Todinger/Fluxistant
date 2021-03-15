@@ -8,10 +8,6 @@ class Response_ChatEntity extends ResponseEntity {
 		super('Chat Message');
 		this.setDescription('Sends the response to the channel Chat');
 	}
-	
-	setData(data) {
-		super.setData(data);
-	}
 }
 
 module.exports = Response_ChatEntity;

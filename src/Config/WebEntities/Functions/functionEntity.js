@@ -51,15 +51,15 @@ class FunctionEntity extends StaticObjectEntity {
 			}
 			
 			if (data.responses) {
-				data.responses.forEach(response => this.addResponse(response));
+				data.responses.forEach(response => this.addResponse(data, response));
 			}
 		}
 	}
 	
-	addObject(object, childName, objectClass) {
+	addObject(object, childName, objectClass, data) {
 		let choiceEntity = this.getChild(childName).addElement(new objectClass());
 		let selectedObject = choiceEntity.select(object.type);
-		selectedObject.setData(object);
+		selectedObject.setData(data || object);
 	}
 	
 	addFilter(filter) {
@@ -76,11 +76,15 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addObject(trigger, 'triggers', TriggerChoiceEntity);
 	}
 	
-	addResponse(response) {
+	addResponse(data, response) {
 		// let responseChoiceEntity = this.getChild('responses').addElement(new ResponseChoiceEntity());
 		// let selectedResponse = responseChoiceEntity.select(response.type);
 		// selectedResponse.setData(response);
-		this.addObject(response, 'responses', ResponseChoiceEntity);
+		let responseData = {
+			response,
+			helpText: data.getAllVariables().map(variable => variable.toMarkdown()).join('\n'),
+		}
+		this.addObject(response, 'responses', ResponseChoiceEntity, responseData);
 	}
 }
 

@@ -12,10 +12,13 @@ class ResponseEntity extends ChoiceValueEntity {
 			.setDescription('The message that will be sent by this response (variables are available)');
 	}
 	
-	setData(data) {
-		if (data) {
-			this.getChild('enabled').setValue(data.enabled);
-			this.getChild('message').setValue(data.message);
+	setData(responseData) {
+		if (responseData) {
+			let response = responseData.response;
+			this.getChild('enabled').setValue(response.enabled);
+			this.getChild('message').setValue(response.message);
+			
+			this.getChild('message').setHelp(responseData.helpText);
 		}
 	}
 }

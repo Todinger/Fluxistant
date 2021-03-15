@@ -1,5 +1,7 @@
 import EventNotifier from "/common/eventNotifier.mjs";
 
+const markdownConverter = new showdown.Converter();
+
 // This is how a EntityGui class should look (override all of these methods)
 export default class EntityGui extends EventNotifier {
 	// This needs to match the TYPE in the entity whose GUI the definer describes
@@ -15,7 +17,9 @@ export default class EntityGui extends EventNotifier {
 		this.entity = entity;
 		this.guiID = guiID;
 		this.modName = modName;
+		this.mainContainer = null;
 		this.gui = null;
+		this.helpText = null;
 		
 		this.changed = false;
 		this.error = false;
@@ -30,18 +34,43 @@ export default class EntityGui extends EventNotifier {
 	getGUI() {
 		if (!this.gui) {
 			this.gui = this._buildGUI();
-			this.gui.attr('id', this.guiID);
+			
+			if (this.entity.getHelp()) {
+				this.mainContainer = $(`<div id="${this.guiID}" class="uk-width-expand uk-flex uk-flex-center uk-flex-column"></div>`);
+				this.mainContainer.append(this.gui);
+				
+				this.helpText = $(`<ul uk-accordion class="uk-margin-remove"></ul>`);
+				let helpTextContents = $(`<li><div class="help-text uk-accordion-content">${markdownConverter.makeHtml(this.entity.getHelp() || '')}</div></li>`)
+				this.helpText.append(helpTextContents);
+				
+				this.mainContainer.append(this.helpText);
+			} else {
+				this.mainContainer = this.gui;
+			}
+			
 			if (this.entity.isAdvanced) {
-				this.gui.addClass('advanced');
+				this.mainContainer.addClass('advanced');
 			}
 		}
 		
-		return this.gui;
+		return this.mainContainer;
 	}
 	
 	// Creates and returns the GUI element for editing the entity
 	_buildGUI() {
 		throw 'Abstract function called.';
+	}
+	
+	showHelp() {
+		if (this.entity.getHelp()) {
+			UIkit.accordion(this.helpText).toggle(0);
+		}
+	}
+	
+	hideHelp() {
+		if (this.entity.getHelp()) {
+			UIkit.accordion(this.helpText).toggle(0);
+		}
 	}
 	
 	// Loads data from the entity to the GUI

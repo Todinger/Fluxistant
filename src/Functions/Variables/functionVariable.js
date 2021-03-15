@@ -65,6 +65,12 @@ class Variable {
 			return message;
 		}
 	}
+	
+	toMarkdown() {
+		return `  - ${this.name}:
+    - ${this.description}
+    - Example: ${this.example}`;
+	}
 }
 
 module.exports = Variable;

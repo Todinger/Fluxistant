@@ -3,6 +3,7 @@ const Utils = requireMain('utils');
 const Parameter = require('./functionParameter');
 const CooldownManager = require('../cooldownManager');
 const Builders = require('./builders');
+const GlobalVariables = require('./globalVariables');
 
 function EMPTY_ACTION() {
 	// Do nothing because that's what we do best
@@ -27,7 +28,6 @@ class Function {
 		
 		this._active = false;
 		this.cooldownID = CooldownManager.addCooldown(this.cooldowns);
-		// this.configure(settings);
 	}
 	
 	_makeParameters(parameters) {
@@ -62,6 +62,12 @@ class Function {
 	
 	_makeResponses(responsesData) {
 		return this._makeObjects(Builders.Responses, responsesData);
+	}
+	
+	getAllVariables() {
+		let vars = this.variables;
+		vars.push(...GlobalVariables);
+		return vars;
 	}
 	
 	configure(settings) {
@@ -176,14 +182,6 @@ class Function {
 		this._cleanPrams(invocationData);
 		
 		let results = this.action(invocationData);
-		
-		// let parameters = {};
-		// results.paramValues = results.paramValues || [];
-		// for (let i = 0; i < results.paramValues.length; i++) {
-		// 	let filledParameter = _.clone(this.parameters[i]);
-		// 	filledParameter.value = results.paramValues[i];
-		// 	parameters[this.parameters[i].name] = filledParameter;
-		// }
 		
 		let context = {
 			func: this,

@@ -18978,10 +18978,13 @@ class ResponseEntity extends ChoiceValueEntity {
 			.setDescription('The message that will be sent by this response (variables are available)');
 	}
 	
-	setData(data) {
-		if (data) {
-			this.getChild('enabled').setValue(data.enabled);
-			this.getChild('message').setValue(data.message);
+	setData(responseData) {
+		if (responseData) {
+			let response = responseData.response;
+			this.getChild('enabled').setValue(response.enabled);
+			this.getChild('message').setValue(response.message);
+			
+			this.getChild('message').setHelp(responseData.helpText);
 		}
 	}
 }
@@ -18998,10 +19001,6 @@ class Response_ChatEntity extends ResponseEntity {
 	constructor() {
 		super('Chat Message');
 		this.setDescription('Sends the response to the channel Chat');
-	}
-	
-	setData(data) {
-		super.setData(data);
 	}
 }
 
@@ -19022,10 +19021,10 @@ class Response_ConsoleEntity extends ResponseEntity {
 			.setDescription('Level of the message in the chat (which messages show up depends on the active viewing level)');
 	}
 	
-	setData(data) {
-		super.setData(data);
-		if (data && data.level) {
-			this.getChild('level').select(data.level);
+	setData(responseData) {
+		super.setData(responseData);
+		if (responseData && responseData.response && responseData.response.level) {
+			this.getChild('level').select(responseData.response.level);
 		}
 	}
 }
@@ -19257,15 +19256,15 @@ class FunctionEntity extends StaticObjectEntity {
 			}
 			
 			if (data.responses) {
-				data.responses.forEach(response => this.addResponse(response));
+				data.responses.forEach(response => this.addResponse(data, response));
 			}
 		}
 	}
 	
-	addObject(object, childName, objectClass) {
+	addObject(object, childName, objectClass, data) {
 		let choiceEntity = this.getChild(childName).addElement(new objectClass());
 		let selectedObject = choiceEntity.select(object.type);
-		selectedObject.setData(object);
+		selectedObject.setData(data || object);
 	}
 	
 	addFilter(filter) {
@@ -19282,11 +19281,15 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addObject(trigger, 'triggers', TriggerChoiceEntity);
 	}
 	
-	addResponse(response) {
+	addResponse(data, response) {
 		// let responseChoiceEntity = this.getChild('responses').addElement(new ResponseChoiceEntity());
 		// let selectedResponse = responseChoiceEntity.select(response.type);
 		// selectedResponse.setData(response);
-		this.addObject(response, 'responses', ResponseChoiceEntity);
+		let responseData = {
+			response,
+			helpText: data.getAllVariables().map(variable => variable.toMarkdown()).join('\n'),
+		}
+		this.addObject(response, 'responses', ResponseChoiceEntity, responseData);
 	}
 }
 
@@ -20457,8 +20460,9 @@ class ConfigEntity {
 	
 	constructor() {
 		this.type = this.constructor.TYPE;
-		this.description = undefined;
 		this.name = undefined;
+		this.description = undefined;
+		this.helpText = undefined;
 		this.hidden = false;
 		this.id = null; // EVERY entity should have this, set from outside by its parent
 		
@@ -20488,6 +20492,16 @@ class ConfigEntity {
 	
 	setDescription(description) {
 		this.description = description;
+		return this;
+	}
+	
+	getHelp() {
+		return this.helpText;
+	}
+	
+	
+	setHelp(helpText) {
+		this.helpText = helpText;
 		return this;
 	}
 	
@@ -20587,6 +20601,10 @@ class ConfigEntity {
 			this.setDescription(entityInfo.description);
 		}
 		
+		if (entityInfo.helpText && !this.helpText) {
+			this.setHelp(entityInfo.helpText);
+		}
+		
 		this.hidden = !!entityInfo.hidden;
 	}
 	
@@ -20600,6 +20618,7 @@ class ConfigEntity {
 		descriptor.type = this.type;
 		descriptor.name = this.name;
 		descriptor.description = this.description;
+		descriptor.helpText = this.helpText;
 		if (this.hidden) {
 			descriptor.hidden = true;
 		}
@@ -20622,6 +20641,7 @@ class ConfigEntity {
 		let copy = this.cloneImpl();
 		copy.setName(this.getName());
 		copy.setDescription(this.getDescription());
+		copy.setHelp(this.getHelp());
 		copy.hidden = this.hidden;
 		copy.id = this.id;
 		copy.displayName = this.displayName;
@@ -20659,6 +20679,7 @@ class ConfigEntity {
 		instance.setID(id);
 		instance.setName(entityObject.name);
 		instance.setDescription(entityObject.description);
+		instance.setHelp(entityObject.helpText);
 		instance.validate();
 		return instance;
 	}

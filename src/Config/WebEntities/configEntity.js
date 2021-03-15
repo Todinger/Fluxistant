@@ -7,8 +7,9 @@ class ConfigEntity {
 	
 	constructor() {
 		this.type = this.constructor.TYPE;
-		this.description = undefined;
 		this.name = undefined;
+		this.description = undefined;
+		this.helpText = undefined;
 		this.hidden = false;
 		this.id = null; // EVERY entity should have this, set from outside by its parent
 		
@@ -38,6 +39,16 @@ class ConfigEntity {
 	
 	setDescription(description) {
 		this.description = description;
+		return this;
+	}
+	
+	getHelp() {
+		return this.helpText;
+	}
+	
+	
+	setHelp(helpText) {
+		this.helpText = helpText;
 		return this;
 	}
 	
@@ -137,6 +148,10 @@ class ConfigEntity {
 			this.setDescription(entityInfo.description);
 		}
 		
+		if (entityInfo.helpText && !this.helpText) {
+			this.setHelp(entityInfo.helpText);
+		}
+		
 		this.hidden = !!entityInfo.hidden;
 	}
 	
@@ -150,6 +165,7 @@ class ConfigEntity {
 		descriptor.type = this.type;
 		descriptor.name = this.name;
 		descriptor.description = this.description;
+		descriptor.helpText = this.helpText;
 		if (this.hidden) {
 			descriptor.hidden = true;
 		}
@@ -172,6 +188,7 @@ class ConfigEntity {
 		let copy = this.cloneImpl();
 		copy.setName(this.getName());
 		copy.setDescription(this.getDescription());
+		copy.setHelp(this.getHelp());
 		copy.hidden = this.hidden;
 		copy.id = this.id;
 		copy.displayName = this.displayName;
@@ -209,6 +226,7 @@ class ConfigEntity {
 		instance.setID(id);
 		instance.setName(entityObject.name);
 		instance.setDescription(entityObject.description);
+		instance.setHelp(entityObject.helpText);
 		instance.validate();
 		return instance;
 	}

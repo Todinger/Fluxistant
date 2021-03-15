@@ -12,10 +12,10 @@ class Response_ConsoleEntity extends ResponseEntity {
 			.setDescription('Level of the message in the chat (which messages show up depends on the active viewing level)');
 	}
 	
-	setData(data) {
-		super.setData(data);
-		if (data && data.level) {
-			this.getChild('level').select(data.level);
+	setData(responseData) {
+		super.setData(responseData);
+		if (responseData && responseData.response && responseData.response.level) {
+			this.getChild('level').select(responseData.response.level);
 		}
 	}
 }
