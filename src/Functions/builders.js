@@ -12,6 +12,7 @@ class Builder {
 
 const FilterBuilder = new Builder({
 	specificUser: require('./Filters/specificUserFilter'),
+	oneOfUsers: require('./Filters/oneOfUsersFilter'),
 	isMod: require('./Filters/isModFilter'),
 	isSub: require('./Filters/isSubFilter'),
 	and: require('./Filters/andFilter'),

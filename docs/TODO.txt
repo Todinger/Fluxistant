@@ -55,8 +55,8 @@ IDEAS!
 Next:
 + Filters
 - Variables, help display, auto-complete variable names
-	- Make help text not close if focusing on that
-- Fix replacement with escaping so that using input text (written in a Twitch message by someone) on text replacements doesn't register as text to replace
+	+ Make help text not close if focusing on that
++ Fix replacement with escaping so that using input text (written in a Twitch message by someone) on text replacements doesn't register as text to replace
 - Switch everything to work with functions
 - Phase out old code (commands, shortcuts, user filters if I do something completely different)
 - Add more triggers and responses (see list above)

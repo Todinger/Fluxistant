@@ -6,7 +6,7 @@ class SpecificUserFilter extends FunctionFilter {
 		if (typeof settings === 'string') {
 			this._setUsername(settings);
 		} else {
-			this._setUsername(settings.username);
+			this._setUsername(settings && settings.username);
 		}
 	}
 	

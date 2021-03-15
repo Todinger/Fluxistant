@@ -9,6 +9,7 @@ class FilterChoiceEntity extends ChoiceEntity {
 		super();
 		this._addOptions({
 			["specificUser"]:	'Filter_SpecificUser',
+			["oneOfUsers"]:		'Filter_OneOfUsers',
 			["isMod"]:			'Filter_IsMod',
 			["isSub"]:			'Filter_IsSub',
 		});

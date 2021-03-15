@@ -351,13 +351,16 @@ class CandyGame extends Module {
 					// 	// global: 2000,
 					// },
 					filters: [
-						this.filter.specificUser('fluxistence'),
+						this.filter.oneOfUsers(['fluxistence', 'yecatsmailbox']),
 						this.filter.isMod(),
 					],
 				}),
 				this.trigger.shortcut({
 					keys: [
 						['SHIFT_L', 'SPACE'],
+					],
+					filters: [
+						this.filter.specificUser('fluxistence'),
 					],
 					// cooldowns: {
 					// 	user: 10000,
