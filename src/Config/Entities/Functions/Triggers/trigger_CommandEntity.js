@@ -23,9 +23,9 @@ class Trigger_CommandEntity extends TriggerEntity {
 			'enabled',
 			'cmdname',
 			'cost',
-			'filter',
 			'aliases',
 			'cooldowns',
+			'filters',
 			'paramValues',
 		]);
 	}

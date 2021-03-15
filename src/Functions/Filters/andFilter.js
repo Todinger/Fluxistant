@@ -10,9 +10,13 @@ class AndFilter extends FunctionFilter {
 		return "and";
 	}
 	
+	getSubFilters() {
+		return this.filters;
+	}
+	
 	test(context) {
 		return this.filters.reduce(
-			(soFar, currentFilter) => soFar && currentFilter(context),
+			(soFar, currentFilter) => soFar && currentFilter.test(context),
 			true);
 	}
 }

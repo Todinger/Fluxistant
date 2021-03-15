@@ -16,7 +16,7 @@ class CommandTrigger extends Trigger {
 			id: this.cmdid,
 			cmdname: this.cmdname,
 			callback: this.callback,
-			filters: [this.filter],
+			// filters: [this.filter],
 			cost: this.cost,
 			cooldowns: this.cooldowns,
 			aliases: this.aliases,

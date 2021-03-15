@@ -1,4 +1,5 @@
 const ChoiceValueEntity = require('../../choiceValueEntity');
+const FilterChoiceEntity = require('../Filters/filterChoiceEntity');
 const EntityFactory = require('../../../entityFactory');
 
 class TriggerEntity extends ChoiceValueEntity {
@@ -9,11 +10,12 @@ class TriggerEntity extends ChoiceValueEntity {
 		this.addBoolean('enabled', true)
 			.setName('Enabled')
 			.setDescription('Enables/disables this trigger');
-		this.addString('filter')
-			.setDescription('Specifies when and by whom this trigger can be activated')
-			.setAdvanced();
 		this.addCooldowns('cooldowns')
 			.setDescription('Function-wide cooldowns (work in addition to function-wide cooldowns)')
+			.setAdvanced();
+		this.addDynamicArray('filters', 'FilterChoice')
+			.setName('Filters')
+			.setDescription('Specifies when and by whom this trigger can be activated')
 			.setAdvanced();
 		this.addDynamicArray('paramValues', 'String')
 			.setName('Parameter Values')
@@ -21,6 +23,12 @@ class TriggerEntity extends ChoiceValueEntity {
 			.setAdvanced();
 		
 		this.setData(data);
+	}
+	
+	addFilter(filter) {
+		let filterChoiceEntity = this.getChild('filters').addElement(new FilterChoiceEntity());
+		let selectedTrigger = filterChoiceEntity.select(filter.type);
+		selectedTrigger.setData(filter);
 	}
 	
 	setData(data) {
@@ -39,6 +47,10 @@ class TriggerEntity extends ChoiceValueEntity {
 			
 			if (data.cooldowns) {
 				this.getChild('cooldowns').set(data.cooldowns);
+			}
+			
+			if (data.filter) {
+				data.filter.getSubFilters().forEach(filter => this.addFilter(filter));
 			}
 			
 			if (data.paramValues) {

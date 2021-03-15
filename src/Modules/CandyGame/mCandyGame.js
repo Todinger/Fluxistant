@@ -328,6 +328,9 @@ class CandyGame extends Module {
 					takeAll: true,
 				},
 			],
+			filters: [
+				this.filter.isSub(),
+			],
 			variables: [
 				this.variable.out('varvar', {
 					name: 'My Variable',
@@ -347,6 +350,10 @@ class CandyGame extends Module {
 					// 	user: 3000,
 					// 	// global: 2000,
 					// },
+					filters: [
+						this.filter.specificUser('fluxistence'),
+						this.filter.isMod(),
+					],
 				}),
 				this.trigger.shortcut({
 					keys: [

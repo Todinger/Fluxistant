@@ -2,7 +2,6 @@ const assert = require('assert').strict;
 const Utils = requireMain('utils');
 const Parameter = require('./functionParameter');
 const CooldownManager = require('../cooldownManager');
-const OrFilter = require('./Filters/orFilter');
 const Builders = require('./builders');
 
 function EMPTY_ACTION() {
@@ -18,7 +17,7 @@ class Function {
 		this.description = settings.description || '';
 		this.parameters = this._makeParameters(settings.parameters);
 		this.action = settings.action || EMPTY_ACTION;
-		this.filters = this._makeFilter(settings.filters);
+		this.filter = settings.filters ? Builders.Filters.or({ filters: settings.filters }) : undefined;
 		this.variables = settings.variables || [];
 		this.cooldowns = settings.cooldowns;
 		this.triggers = settings.triggers || [];
@@ -52,8 +51,9 @@ class Function {
 	}
 	
 	_makeFilter(filtersData) {
-		let filters = this._makeObjects(Builders.Filters, filtersData);
-		return new OrFilter({ filters });
+		// let filters = this._makeObjects(Builders.Filters, filtersData);
+		// return new OrFilter({ filters });
+		return Builders.combineFilters(filtersData);
 	}
 	
 	_makeTriggers(triggersData) {
@@ -67,7 +67,7 @@ class Function {
 	configure(settings) {
 		this.enabled = settings.enabled;
 		
-		this.filters = this._makeFilter(settings.filters);
+		this.filter = this._makeFilter(settings.filters);
 		
 		CooldownManager.changeCooldown(this.cooldownID, settings.cooldowns);
 		this.cooldowns = settings.cooldowns;
@@ -162,12 +162,10 @@ class Function {
 	}
 	
 	invoke(invocationData) {
-		if (!this._active) {
-			return;
-		}
-		
-		if (!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user)) {
-			return;
+		if (!this._active ||
+			!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user) ||
+			!this.filter.test(invocationData)) {
+				return;
 		}
 		
 		CooldownManager.applyCooldowns(this.cooldownID, invocationData.user);

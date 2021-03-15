@@ -10,10 +10,15 @@ class OrFilter extends FunctionFilter {
 		return "or";
 	}
 	
+	getSubFilters() {
+		return this.filters;
+	}
+	
 	test(context) {
-		return this.filters.reduce(
-			(soFar, currentFilter) => soFar || currentFilter(context),
-			false);
+		return this.filters.length === 0 ||
+			this.filters.reduce(
+				(soFar, currentFilter) => soFar || currentFilter.test(context),
+				false);
 	}
 }
 

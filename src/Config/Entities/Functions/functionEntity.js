@@ -1,4 +1,5 @@
 const StaticObjectEntity = require('../staticObjectEntity');
+const FilterChoiceEntity = require('./Filters/filterChoiceEntity');
 const TriggerChoiceEntity = require('./Triggers/triggerChoiceEntity');
 const ResponseChoiceEntity = require('./Responses/responseChoiceEntity');
 
@@ -21,6 +22,10 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addCooldowns('cooldowns')
 			.setDescription('Function-wide cooldowns (work in addition to trigger-specific cooldowns)')
 			.setAdvanced();
+		this.addDynamicArray('filters', 'FilterChoice')
+			.setName('Filters')
+			.setDescription('Defines who can invoke this function')
+			.setAdvanced();
 		this.addDynamicArray('triggers', 'TriggerChoice')
 			.setName('Triggers')
 			.setDescription('Defines when this function will be invoked');
@@ -37,6 +42,10 @@ class FunctionEntity extends StaticObjectEntity {
 				this.getChild('cooldowns').set(data.cooldowns);
 			}
 			
+			if (data.filter) {
+				data.filter.getSubFilters().forEach(filter => this.addFilter(filter));
+			}
+			
 			if (data.triggers) {
 				data.triggers.forEach(trigger => this.addTrigger(trigger));
 			}
@@ -47,16 +56,31 @@ class FunctionEntity extends StaticObjectEntity {
 		}
 	}
 	
+	addObject(object, childName, objectClass) {
+		let choiceEntity = this.getChild(childName).addElement(new objectClass());
+		let selectedObject = choiceEntity.select(object.type);
+		selectedObject.setData(object);
+	}
+	
+	addFilter(filter) {
+		// let filterChoiceEntity = this.getChild('filters').addElement(new FilterChoiceEntity());
+		// let selectedTrigger = filterChoiceEntity.select(filter.type);
+		// selectedTrigger.setData(filter);
+		this.addObject(filter, 'filters', FilterChoiceEntity);
+	}
+	
 	addTrigger(trigger) {
-		let triggerChoiceEntity = this.getChild('triggers').addElement(new TriggerChoiceEntity());
-		let selectedTrigger = triggerChoiceEntity.select(trigger.type);
-		selectedTrigger.setData(trigger);
+		// let triggerChoiceEntity = this.getChild('triggers').addElement(new TriggerChoiceEntity());
+		// let selectedTrigger = triggerChoiceEntity.select(trigger.type);
+		// selectedTrigger.setData(trigger);
+		this.addObject(trigger, 'triggers', TriggerChoiceEntity);
 	}
 	
 	addResponse(response) {
-		let responseChoiceEntity = this.getChild('responses').addElement(new ResponseChoiceEntity());
-		let selectedResponse = responseChoiceEntity.select(response.type);
-		selectedResponse.setData(response);
+		// let responseChoiceEntity = this.getChild('responses').addElement(new ResponseChoiceEntity());
+		// let selectedResponse = responseChoiceEntity.select(response.type);
+		// selectedResponse.setData(response);
+		this.addObject(response, 'responses', ResponseChoiceEntity);
 	}
 }
 

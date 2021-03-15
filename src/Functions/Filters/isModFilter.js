@@ -10,7 +10,7 @@ class IsModFilter extends FunctionFilter {
 	}
 	
 	test(context) {
-		return context.user.isMod;
+		return context.user.isMod || context.user.isBroadcaster;
 	}
 }
 

@@ -10,7 +10,7 @@ class IsSubFilter extends FunctionFilter {
 	}
 	
 	test(context) {
-		return context.user.isSub;
+		return context.user.isSub || context.user.isBroadcaster;
 	}
 }
 

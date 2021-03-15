@@ -1,11 +1,10 @@
 const { v4: uuidv4 } = require('uuid');
 const EventNotifier = requireMain('eventNotifier');
 const CooldownManager = requireMain('./cooldownManager');
+const Filter = require('../Filters/functionFilter');
 const Errors = requireMain('./errors');
 const Globals = requireMain('./globals');
 const Utils = requireMain('./utils');
-
-const EMPTY_FILTER = () => true;
 
 class FunctionTrigger extends EventNotifier {
 	constructor(settings) {
@@ -14,7 +13,7 @@ class FunctionTrigger extends EventNotifier {
 		this.triggerID = `Trigger <${uuidv4()}>`;
 		this.enabled = settings.enabled !== false;
 		this.cooldowns = settings.cooldowns;
-		this.filter = settings.filter || EMPTY_FILTER;
+		this.filter = this._makeFilter(settings.filters);
 		this.paramValues = settings.paramValues || [];
 		
 		this._active = false;
@@ -23,6 +22,18 @@ class FunctionTrigger extends EventNotifier {
 	
 	get selfUser() {
 		return Globals.StreamerUser;
+	}
+	
+	_makeFilter(filters) {
+		if (filters && filters.length > 0) {
+			if (filters[0] instanceof Filter) {
+				return Globals.functionBuilders.Filters.or({ filters });
+			} else {
+				return Globals.functionBuilders.combineFilters(filters);
+			}
+		} else {
+			return undefined;
+		}
 	}
 	
 	get type() {
@@ -55,9 +66,9 @@ class FunctionTrigger extends EventNotifier {
 		Errors.abstract();
 	}
 	
-	filterTest() {
+	filterTest(context) {
 		if (this.filter) {
-			return this.filter.test();
+			return this.filter.test(context);
 		} else {
 			return true;
 		}
@@ -98,8 +109,9 @@ class FunctionTrigger extends EventNotifier {
 	}
 	
 	_trigger(invocationData) {
-		if (!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user)) {
-			return;
+		if (!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user) ||
+			!this.filterTest(invocationData)) {
+				return;
 		}
 		
 		CooldownManager.applyCooldowns(this.cooldownID, invocationData.user);

@@ -24,7 +24,7 @@ class User {
 
 function MakeBroadcasterUser(username) {
 	let userstate = {
-		name: username,
+		username: username,
 		// TODO: Get display name from Twitch (get entire UserState object if possible)
 		['display-name']: username,
 		badges: {
