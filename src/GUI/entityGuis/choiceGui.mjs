@@ -1,5 +1,6 @@
 import EntityGui from "./entityGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
+import FocusManager from "../focusManager.mjs";
 
 export default class ChoiceGui extends EntityGui {
 	static get GUITYPE()    { return 'Choice';                                                          }
@@ -73,6 +74,9 @@ export default class ChoiceGui extends EntityGui {
 		
 		// Set initial selection
 		selector.val(this.entity.selectedOption);
+		
+		// Announce when we get focus
+		selector.focusin(() => FocusManager.obtainedMainFocus());
 		
 		// Changing the switcher doesn't seem to work when we haven't yet attached
 		// these elements to the page, so for the initial selection we do this with

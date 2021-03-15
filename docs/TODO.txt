@@ -5,6 +5,7 @@
   I'll link command registration to configuration loading.
 + UI for changing the configuration during runtime.
 + Configuration backup system
+- Add image floating (opposite of dropping), then add a random image pool to Catastrophe that floats up images randomly with keypresses and possible cooldown (e.g. no more than 1 image per 5 seconds).
 - Disable tab index on labels in GUI
 - Support for user data files for modules (for large data that shouldn't
   be in the configurations themselves).
@@ -55,6 +56,7 @@ Next:
 + Filters
 - Variables, help display, auto-complete variable names
 	- Make help text not close if focusing on that
+- Fix replacement with escaping so that using input text (written in a Twitch message by someone) on text replacements doesn't register as text to replace
 - Switch everything to work with functions
 - Phase out old code (commands, shortcuts, user filters if I do something completely different)
 - Add more triggers and responses (see list above)

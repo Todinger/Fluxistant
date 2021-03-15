@@ -119,6 +119,14 @@ export default class EntityGui extends EventNotifier {
 		EntityGui.updateStatusIndicator(jElement, this.changed, this.error);
 	}
 	
+	gotFocus() {
+		this.showHelp();
+	}
+	
+	lostFocus() {
+		this.hideHelp();
+	}
+	
 	static updateStatusIndicator(jElement, changed, error) {
 		if (error) {
 			EntityGui.addErrorIndicator(jElement);

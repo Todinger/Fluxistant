@@ -1,5 +1,6 @@
 import EntityGui from "./entityGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
+import FocusManager from "../focusManager.mjs";
 
 export default class KeyGui extends EntityGui {
 	static get GUITYPE()    { return 'Key';                                                          }
@@ -37,6 +38,7 @@ export default class KeyGui extends EntityGui {
 		KeyGui.stopActiveListener();
 		KeyGui.activeListener = this;
 		this.showKeypressPrompt();
+		FocusManager.obtainedMainFocus(this);
 	}
 	
 	setKey(keyCode) {

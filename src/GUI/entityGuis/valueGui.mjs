@@ -1,4 +1,5 @@
 import EntityGui from "./entityGui.mjs";
+import FocusManager from "../focusManager.mjs";
 
 export default class ValueGui extends EntityGui {
 	static get GUITYPE()    { return null; }   // Abstract class, should not be instantiated
@@ -21,6 +22,7 @@ export default class ValueGui extends EntityGui {
 	
 	_buildGUI() {
 		this._setupInput();
+		this.jInput.focusin(() => FocusManager.obtainedMainFocus(this));
 		return this.jInput;
 	}
 	

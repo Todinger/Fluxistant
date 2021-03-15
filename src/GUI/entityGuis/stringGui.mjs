@@ -26,8 +26,8 @@ export default class StringGui extends ValueGui {
 		}
 		
 		this.jInput.change(() => this._guiValueChanged(this.jInput.val()));
-		this.jInput.focusin(() => this.showHelp());
-		this.jInput.focusout(() => this.hideHelp());
+		// this.jInput.focusin(() => this.showHelp());
+		// this.jInput.focusout(() => this.hideHelp());
 	}
 }
 

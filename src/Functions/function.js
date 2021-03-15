@@ -65,7 +65,7 @@ class Function {
 	}
 	
 	getAllVariables() {
-		let vars = this.variables;
+		let vars = [...this.variables];
 		vars.push(...GlobalVariables);
 		return vars;
 	}
