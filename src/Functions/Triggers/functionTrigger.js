@@ -108,6 +108,10 @@ class FunctionTrigger extends EventNotifier {
 		return finalParams;
 	}
 	
+	_triggerDefault() {
+		this._trigger({ user: this.selfUser });
+	}
+	
 	_trigger(invocationData) {
 		if (!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user) ||
 			!this.filterTest(invocationData)) {

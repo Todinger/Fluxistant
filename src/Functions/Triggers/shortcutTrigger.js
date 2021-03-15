@@ -30,9 +30,7 @@ class ShortcutTrigger extends Trigger {
 		KeyboardManager.registerShortcut(
 			`<Trigger> ${this.triggerID} : ${index}`,
 			keycodes,
-			() => this._trigger({
-				user: this.selfUser,
-			})
+			() => this._triggerDefault()
 		);
 	}
 	

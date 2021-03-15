@@ -21,9 +21,11 @@ const FluxBot = require('./fluxbot');
 
 const args = process.argv.slice(2).map(arg => arg.toLowerCase());
 
+const logger = require('./logger');
 if (args.includes('--debug')) {
-	let logger = require('./logger');
 	logger.setAllLevels('debug');
+} else if (args.includes('--info')) {
+	logger.setAllLevels('info');
 }
 
 if (args.includes('--compile-configs')) {
