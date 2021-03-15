@@ -83,11 +83,16 @@ class FShower extends Module {
 		});
 	}
 	
-	commands = {
-		['f']: {
+	functions = {
+		dropImage: {
 			name: 'Drop F Image',
 			description: 'Drops down user-specific or a randomly selected F images from the top of the screen.',
-			callback: user => this.findAndSendFile(user),
+			action: data => this.findAndSendFile(data.user),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'f',
+				})
+			]
 		}
 	}
 }
