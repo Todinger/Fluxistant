@@ -40,14 +40,21 @@ class CommandTrigger extends Trigger {
 	}
 	
 	_invoked(user, ...args) {
+		// let escapedArgs = args.map(arg =>
+		// 	arg.replace(/\\/g, '\\\\')
+		// 		.replace(/\$/g, '\\$'));
+		
 		this._trigger({
 			user: user,
-			// cmdname: cmdname,
 			params: [...args],
+			// params: escapedArgs,
 			triggerParams: {
 				cost: this.command.cost,
 				cmdname: this.command.cmdname,
-			}
+			},
+			// outputPostProcessing: output =>
+			// 	output.replace(/\\\$/g, '$')
+			// 		.replace(/\\\\/g, '\\'),
 		});
 	}
 	

@@ -1,5 +1,6 @@
 const Errors = requireMain('./errors');
 const GlobalVariables = require('../globalVariables');
+const replaceVariables = require('./MultiReplace/multiReplaceEngine');
 
 class FunctionResponse {
 	constructor(params) {
@@ -34,15 +35,20 @@ class FunctionResponse {
 	}
 	
 	_buildResponse(context) {
-		let result = this.message;
+		let allVars = [...context.variables].concat(GlobalVariables);
+		let result = replaceVariables(allVars, this.message, context);
 		
-		context.variables.forEach(variable => {
-			result = variable.consume(result, context);
-		});
-		
-		GlobalVariables.forEach(variable => {
-			result = variable.consume(result, context);
-		});
+		// context.variables.forEach(variable => {
+		// 	result = variable.consume(result, context);
+		// });
+		//
+		// GlobalVariables.forEach(variable => {
+		// 	result = variable.consume(result, context);
+		// });
+		//
+		// if (context.outputPostProcessing) {
+		// 	result = context.outputPostProcessing(result);
+		// }
 		
 		return result;
 	}
