@@ -57,7 +57,7 @@
 - Duration picker GUI for time-related values
 
 - NPM Uninstall image-size if I no longer use it
-- Mark library directories as excluded in IDE after comitting, see if it does what I think it does
++ Mark library directories as excluded in IDE after comitting, see if it does what I think it does
 
 IDEAS!
 - Bingo game

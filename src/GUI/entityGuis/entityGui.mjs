@@ -1,6 +1,6 @@
 import EventNotifier from "/common/eventNotifier.mjs";
 
-const markdownConverter = new showdown.Converter();
+const markdownConverter = new showdown.Converter({simplifiedAutoLink: true});
 
 // This is how a EntityGui class should look (override all of these methods)
 export default class EntityGui extends EventNotifier {

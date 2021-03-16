@@ -19,15 +19,12 @@ export default class StringGui extends ValueGui {
 			.attr('class', 'uk-input')
 			.val(this.entity.getValue() || '')
 			.attr('placeholder', 'Value...');
-		//this.jInput = $(`<input id="${this.guiID}-input" class="uk-input" type="text" value="${this.entity.getValue() || ''}" placeholder="Value...">`);
 		let description = this.entity.getDescription();
 		if (description && description !== '') {
 			this.jInput.attr('uk-tooltip', description);
 		}
 		
 		this.jInput.change(() => this._guiValueChanged(this.jInput.val()));
-		// this.jInput.focusin(() => this.showHelp());
-		// this.jInput.focusout(() => this.hideHelp());
 	}
 }
 
