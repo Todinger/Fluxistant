@@ -2,7 +2,7 @@ import GuiElement from './guiElement.mjs';
 
 export default class IconButtonElement extends GuiElement {
 	build(data) {
-		let button = $(`<button class="uk-button uk-button-default uk-width-auto uk-padding-remove"></button>`);
+		let button = $(`<button class="uk-button uk-button-default uk-width-auto uk-padding-remove" tabindex="-1"></button>`);
 		let icon = $(`<span uk-icon="icon: trash"></span>`);
 		button.append(icon);
 		

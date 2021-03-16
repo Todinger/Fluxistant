@@ -15,6 +15,7 @@
 - Duration still in milliseconds in image functions
 - Module descriptions
 - Changes marked in previously-accepted modules on any change
+- GUI: Hitting Enter should switch to next field
 
 GUI User Feedback:
 - Lables should be unmarkable, cursor should stay a pointer
