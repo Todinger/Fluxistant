@@ -93,6 +93,7 @@ export default class ChoiceGui extends EntityGui {
 	
 	// Accept changes and remove change markers
 	finalizeChanges() {
+		super.finalizeChanges();
 		Object.values(this.optionGUIs).forEach(gui => gui.finalizeChanges());
 	}
 }

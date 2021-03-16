@@ -10,7 +10,7 @@ export default class NumberGui extends ValueGui {
 	}
 	
 	_setupInput() {
-		this.jInput = $(`<input id="${this.guiID}-input" class="uk-input" type="number" value="${this.entity.getValue() || ''}" placeholder="Value...">`);
+		this.jInput = $(`<input id="${this.guiID}-input" class="uk-input" type="number" value="${this.entity.getValue() || ''}">`);
 		let description = this.entity.getDescription();
 		if (description && description !== '') {
 			this.jInput.attr('uk-tooltip', description);

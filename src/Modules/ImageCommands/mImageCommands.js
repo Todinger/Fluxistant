@@ -16,21 +16,26 @@ class ImageCommands extends Module {
 	_makeDisplayData(displayObject, file) {
 		let dd = _.omit(displayObject, 'file');
 		dd.url = file.data;
+		dd.duration = dd.duration ? 1000 * dd.duration : undefined;
 		return dd;
 	}
 	
 	_sendToDisplay(funcObject) {
 		let _this = this;
 		
-		let hasImage = this.assets.Images.hasKey(funcObject.image.file.fileKey);
-		let hasSound = this.assets.Sounds.hasKey(funcObject.sound.file.fileKey);
+		let imageConf = funcObject.image;
+		let soundConf = funcObject.sound;
+		let imageFileConf = imageConf.file;
+		let soundFileConf = soundConf.file;
+		let hasImage = this.assets.Images.hasKey(imageFileConf.fileKey);
+		let hasSound = this.assets.Sounds.hasKey(soundFileConf.fileKey);
 		
 		let imagePromise = hasImage ?
-			this.assets.getFileWeb(funcObject.image.file) :
+			this.assets.getFileWeb(imageFileConf) :
 			Promise.resolve();
 		
 		let soundPromise = hasSound ?
-			this.assets.getFileWeb(funcObject.sound.file) :
+			this.assets.getFileWeb(soundFileConf) :
 			Promise.resolve();
 		
 		if (hasImage || hasSound) {
@@ -38,11 +43,11 @@ class ImageCommands extends Module {
 			.then(function([imageFile, soundFile]) {
 				let parameters = {};
 				if (hasImage) {
-					parameters.image = _this._makeDisplayData(funcObject.image, imageFile); //Utils.objectWith(cmdObject.image, { url: imageFile.data });
+					parameters.image = imageConf.makeDisplayData(imageFile); //Utils.objectWith(cmdObject.image, { url: imageFile.data });
 				}
 				
 				if (hasSound) {
-					parameters.sound = _this._makeDisplayData(funcObject.sound, soundFile);
+					parameters.sound = soundConf._makeDisplayData(soundFile);
 				}
 				
 				_this.broadcastEvent('showImage', parameters);

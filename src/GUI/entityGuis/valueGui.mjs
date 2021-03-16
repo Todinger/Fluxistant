@@ -33,6 +33,7 @@ export default class ValueGui extends EntityGui {
 	
 	// Accept changes and remove change markers
 	finalizeChanges() {
+		super.finalizeChanges();
 		EntityGui.clearChangeIndicator(this.jInput);
 	}
 }

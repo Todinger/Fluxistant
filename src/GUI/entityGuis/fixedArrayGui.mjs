@@ -63,6 +63,7 @@ export default class FixedArrayGui extends EntityGui {
 	
 	// Accept changes and remove change markers
 	finalizeChanges() {
+		super.finalizeChanges();
 		for (let i = 0; i < this.entity.length; i++) {
 			EntityGui.clearChangeIndicator(this.elementRows[i].guiData.marker);
 			this.elementGUIs[i].finalizeChanges();

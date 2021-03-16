@@ -233,6 +233,7 @@ export default class MultiAssetGui extends AssetGui {
 	
 	// Accept changes and remove change markers
 	finalizeChanges() {
+		super.finalizeChanges();
 		Object.keys(this.fileGuiComponents).forEach(fileKey => {
 			this._clearItemStatusIndicators(fileKey);
 		});

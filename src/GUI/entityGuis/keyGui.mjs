@@ -109,6 +109,7 @@ export default class KeyGui extends EntityGui {
 	
 	// Accept changes and remove change markers
 	finalizeChanges() {
+		super.finalizeChanges();
 		EntityGui.clearChangeIndicator(this.keyLabel);
 	}
 	

@@ -9,6 +9,10 @@ class ImageEntity extends StaticObjectEntity {
 	static makeDisplayData(imageFileEntityConf, savedFile) {
 		let dd = _.omit(imageFileEntityConf, 'file');
 		dd.url = savedFile.data;
+		if (dd.duration) {
+			dd.duration *= 1000; // Milliseconds to seconds
+		}
+		
 		return dd;
 	}
 	
@@ -23,9 +27,9 @@ class ImageEntity extends StaticObjectEntity {
 		this.addNaturalNumber('height')
 			.setName('Height')
 			.setDescription('Display height on screen');
-		this.addNaturalNumber('duration')
+		this.addNonNegativeNumber('duration')
 			.setName('Duration')
-			.setDescription('Duration in milliseconds that the image will be displayed')
+			.setDescription('Duration in seconds that the image will be displayed')
 			.setAdvanced();
 		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
 			.setName('Effects')

@@ -17,8 +17,7 @@ export default class StringGui extends ValueGui {
 	_setupInput() {
 		this.jInput = this._makeInputField()
 			.attr('class', 'uk-input')
-			.val(this.entity.getValue() || '')
-			.attr('placeholder', 'Value...');
+			.val(this.entity.getValue() || '');
 		let description = this.entity.getDescription();
 		if (description && description !== '') {
 			this.jInput.attr('uk-tooltip', description);

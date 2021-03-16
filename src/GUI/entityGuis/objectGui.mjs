@@ -118,18 +118,27 @@ export default class ObjectGui extends EntityGui {
 		EntityGui.addChangeIndicator(this.mainGui.guiData.header);
 	}
 	
+	_clearChildChangeIndicators(childKey) {
+		EntityGui.clearChangeIndicator(this.childrenEntries[childKey].guiData.marker);
+		if (!this.childrenGUIs[childKey].isContainer) {
+			EntityGui.clearChangeIndicator(
+				this.childrenEntries[childKey].guiData.contents.guiData.label);
+		}
+	}
+	
+	_clearOwnChangeIndicators() {
+		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);
+	}
+	
 	// Accept changes and remove change markers
 	finalizeChanges() {
+		super.finalizeChanges();
 		Object.keys(this.childrenGUIs).forEach(key => {
 			this.childrenGUIs[key].finalizeChanges();
-			EntityGui.clearChangeIndicator(this.childrenEntries[key].guiData.marker);
-			if (!this.childrenGUIs[key].isContainer) {
-				EntityGui.clearChangeIndicator(
-					this.childrenEntries[key].guiData.contents.guiData.label);
-			}
+			this._clearChildChangeIndicators(key);
 		});
 		
-		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);
+		this._clearOwnChangeIndicators();
 		
 		this.updateName();
 	}
