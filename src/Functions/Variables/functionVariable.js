@@ -62,6 +62,7 @@ class Variable {
 		this.name = variableData.name;
 		this.description = variableData.description;
 		this.example = variableData.example;
+		this.condition = variableData.condition;
 	}
 	
 	getReplacementFor(replacementData) {
@@ -97,9 +98,15 @@ class Variable {
 	}
 	
 	toMarkdown() {
-		return `  - ${this.name}:
+		let markdown = `  - ${this.name}:
     - ${this.description}
     - Example: ${this.example}`;
+		if (this.condition) {
+			markdown = `${markdown}
+	- Condition: ${this.condition}`;
+		}
+		
+		return markdown;
 	}
 }
 

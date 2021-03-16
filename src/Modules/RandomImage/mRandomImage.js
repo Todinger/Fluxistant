@@ -1,10 +1,8 @@
 'use strict';
 
 const assert = require('assert').strict;
-const _ = require('lodash');
+const path = require('path');
 const Module = requireMain('module');
-
-const COMMAND_NAME = 'pixelate';
 
 class RandomImage extends Module {
 	constructor() {
@@ -16,13 +14,15 @@ class RandomImage extends Module {
 	}
 	
 	showRandomImage() {
-		this.assets.Images.selectFile()
+		let fileKey = this.assets.Images.selectFileKey();
+		if (!fileKey) {
+			this.say("Wait, oh no! The random image pool is empty! SOMEONE SEND HELP I'M NOT DROWNING!");
+			return false;
+		}
+		
+		let filename = this.assets.Images.getFilename(fileKey);
+		this.assets.Images.getFileWebByKey(fileKey)
 			.then(file => {
-				if (!file) {
-					this.say("Wait, oh no! The random image pool is empty! SOMEONE SEND HELP I'M NOT DROWNING!");
-					return;
-				}
-				
 				assert(
 					!this.config.images.files || !(this.fileKey in this.config.images.files),
 					'File missing from random image pool.');
@@ -30,12 +30,14 @@ class RandomImage extends Module {
 				let files = this.config.images.files || {};
 				let imageConf = files[file.fileKey];
 				let displayData = imageConf.makeDisplayData(file);
-				// let displayData = ImageFileEntity.makeDisplayData(imageConf, file);
-				this.say(`Showing: ${file.name}`);
 				this.broadcastEvent('showImage', {
 					image: displayData,
 				});
 			});
+		
+		return {
+			imageName: path.parse(filename).name,
+		};
 	}
 	
 	defineModData(modData) {
@@ -54,13 +56,29 @@ class RandomImage extends Module {
 		.setDescription('The collection of images that can show up');
 	}
 	
-	commands = {
-		[COMMAND_NAME]: {
+	functions = {
+		showImage: {
 			name: 'Show Image',
 			description: 'Shows a randomly selected picture from the image pool.',
-			callback: user => this.showRandomImage(user),
-			message: `${_.capitalize(COMMAND_NAME)} redeemed by $user for $pcost! One random drawing by Yecats coming up!`,
-			cost: 300,
+			action: data => this.showRandomImage(data.user),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'pixelate',
+					cost: 300,
+				})
+			],
+			variables: [
+				this.variable.out('imageName', {
+					name: 'Image Name (`$image`)',
+					description: 'The name of the file image that was chosen for display, without its extension',
+					example: '"Showing the beautiful `$image`!" ---When showing "Happy Face.png"---> "Showing the beautiful Happy Face!"',
+					expr: '$image',
+				}),
+			],
+			responses: [
+				this.response.chat('$cmdname redeemed by $user for $pcost! Showing "$image" by Yecats!'),
+			],
+			// message: `${_.capitalize(COMMAND_NAME)} redeemed by $user for $pcost! One random drawing by Yecats coming up!`,
 		},
 	}
 }

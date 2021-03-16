@@ -2,17 +2,17 @@ const Variable = require('./Variables/functionVariable');
 
 const GlobalVars = [
 	new Variable({
-		name: 'Username ($user)',
-		description: 'The name of the user who used the command.',
-		example: 'If `!hi` gives the text "Hello, `$user`!" then when a user called Arya types !hi in the chat, the bot will say: "Hello, Arya!"',
+		name: 'Username (`$user`)',
+		description: 'The name of the user who used the function.',
+		example: 'If `!hi` gives the text "Hello, `$user`!" then when a user called Arya types `!hi` in the chat, the bot will say: "Hello, Arya!"',
 		
 		expr: '$user',
 		replacement: data => data.context.user.displayName,
 	}),
 	
 	new Variable({
-		name: 'Command Argument ($1, $2, $3, ...)',
-		description: 'Returns one of the arguments used to invoke the command. Accepts any number as the index.',
+		name: 'Function Argument (`$1`, `$2`, `$3`, ...)',
+		description: 'Returns one of the arguments used to invoke the function. Accepts any number as the index.',
 		example: 'For `!somecommand` defined to say "`$1` is better than `$4`", writing "`!somecommand` Hello, how are you?" will produce: "Hello, is better than you?"',
 		
 		expr: /\$(\d+)/,
@@ -28,9 +28,9 @@ const GlobalVars = [
 	}),
 	
 	new Variable({
-		name: 'All Command Arguments ($all)',
-		description: 'Returns everything following the command name in the command invocation.',
-		example: 'For `!somecommand` defined to say "You said \'`$all"`\', writing "`!somecommand` Hello, how are you?" will produce: "You said \'Hello, is better than you?\'"',
+		name: 'All Function Arguments (`$all`)',
+		description: 'Returns all the arguments used in the function invocation.',
+		example: 'For `!somecommand` defined to say "You said \'`$all`\'", writing "`!somecommand` Hello, how are you?" will produce: "You said \'Hello, how are you?\'"',
 		
 		expr: '$all',
 		replacement: data => {

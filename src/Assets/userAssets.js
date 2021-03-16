@@ -188,6 +188,10 @@ class UserAssets {
 		return Promise.all(promises);
 	}
 	
+	getFilename(fileKey) {
+		return this.savedFiles[fileKey].name;
+	}
+	
 	// noinspection JSUnusedLocalSymbols
 	selectFileKey(params) {
 		Errors.abstract();

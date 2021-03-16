@@ -92,6 +92,10 @@ class Function {
 	getAllVariables() {
 		let vars = [...this.variables];
 		vars.push(...GlobalVariables);
+		vars.push(...this.triggers
+			.map(trigger => trigger.variables || [])
+			.reduce((arrSoFar, current) =>
+				arrSoFar.concat(current)));
 		return vars;
 	}
 	

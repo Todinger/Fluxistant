@@ -52,27 +52,30 @@ class CommandTrigger extends Trigger {
 	
 	variables = [
 		new Variable({
-			name: 'Command Name ($cmdname)',
+			name: 'Command Name (`$cmdname`)',
 			description: 'The name of the command trigger used to invoke the function.',
-			example: '"Did you enjoy that? Then do !$cmdname again!" -- for the command !hi --> "Did you enjoy that? Then do !hi again!"',
+			example: '"Did you enjoy that? Then do `!$cmdname` again!" -- for the command `!hi` --> "Did you enjoy that? Then do `!hi` again!"',
+			condition: 'Can only be used when activated by a chat command.',
 			
 			expr: '$cmdname',
 			replacement: data => data.context.params.trigger.cmdname,
 		}),
 		
 		new Variable({
-			name: 'Cost ($cost)',
+			name: 'Cost (`$cost`)',
 			description: 'The amount of StreamElements loyalty points that the user spent to use the command.',
-			example: 'For the message "Ha! You just wasted your $cost point(s)!" on a command that cost 30, the bot will say "Ha@ You just wasted you 30 point(s)!',
+			example: 'For the message "Ha! You just wasted your `$cost` point(s)!" on a command that costs 30, the bot will say "Ha! You just wasted your 30 point(s)!"',
+			condition: 'Can only be used when activated by a chat command.',
 			
 			expr: '$cost',
 			replacement: data => data.context.params.trigger.cost.toString(),
 		}),
 		
 		new Variable({
-			name: 'Cost in Points ($pcost)',
+			name: 'Cost in Points (`$pcost`)',
 			description: 'The amount of StreamElements loyalty points that the user spent to use the command, along with the name of the points, adjusted for amounts.',
-			example: 'For the message "Ha! You just wasted your $pcost!" on a command that cost 30, and assuming the name of your SE points is "pixels", the bot will say "Ha! You just wasted you 30 pixels!" If the cost is 1, it will say "Ha! You just wasted your 1 pixel!',
+			example: 'For the message "Ha! You just wasted your `$pcost`!" on a command that costs 30, and assuming the name of your SE points is "pixels", the bot will say "Ha! You just wasted your 30 pixels!" If the cost is 1, it will say "Ha! You just wasted your 1 pixel!"',
+			condition: 'Can only be used when activated by a chat command.',
 			
 			expr: '$pcost',
 			replacement: data => SEManager.pointsString(data.context.params.trigger.cost),
