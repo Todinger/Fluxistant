@@ -15,10 +15,12 @@ class ImageFileEntity extends AssetFileEntity {
 			.setDescription('Display height on screen');
 		this.addNaturalNumber('duration')
 			.setName('Duration')
-			.setDescription('Duration in milliseconds that the image will be displayed');
+			.setDescription('Duration in milliseconds that the image will be displayed')
+			.setAdvanced();
 		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
 			.setName('Effects')
-			.setDescription('Special effects to apply to the image');
+			.setDescription('Special effects to apply to the image')
+			.setAdvanced();
 	}
 	
 	// ---- Overrides ---- //

@@ -13,7 +13,7 @@ class FunctionEntity extends StaticObjectEntity {
 			.hide();
 		this.addString('name', data && data.name)
 			.setName('Name')
-			.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you")
+			.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you)")
 			.hide();
 		this.addBoolean('enabled', (data && data.enabled) !== false)
 			.setName('Enabled')

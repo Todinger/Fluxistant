@@ -18694,10 +18694,12 @@ class ImageFileEntity extends AssetFileEntity {
 			.setDescription('Display height on screen');
 		this.addNaturalNumber('duration')
 			.setName('Duration')
-			.setDescription('Duration in milliseconds that the image will be displayed');
+			.setDescription('Duration in milliseconds that the image will be displayed')
+			.setAdvanced();
 		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
 			.setName('Effects')
-			.setDescription('Special effects to apply to the image');
+			.setDescription('Special effects to apply to the image')
+			.setAdvanced();
 	}
 	
 	// ---- Overrides ---- //
@@ -19298,7 +19300,7 @@ class FunctionEntity extends StaticObjectEntity {
 			.hide();
 		this.addString('name', data && data.name)
 			.setName('Name')
-			.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you")
+			.setDescription("A name for you to recognize this function easily (it has no meaning other than organization for you)")
 			.hide();
 		this.addBoolean('enabled', (data && data.enabled) !== false)
 			.setName('Enabled')
@@ -20117,19 +20119,35 @@ class CandyFileEntity extends ImageFileEntity {
 		super(fileKey);
 		this.addNaturalNumber('weight')
 			.setName('Weight')
-			.setDescription('Relative chance for this candy to be selected');
+			.setDescription('Relative chance for this candy to be selected')
+			.setAdvanced();
 		this.addNumber('reward')
 			.setName('Reward')
-			.setDescription('Amount of points to give the user for getting this candy (can be negative, points will be deducted)');
+			.setDescription('Amount of points to give the user for getting this candy (can be negative, points will be deducted)')
+			.setAdvanced();
 		this.addBoolean('winning')
 			.setName('Winner')
 			.setDescription('Enable to make getting this candy win the game for the viewer');
 		this.addString('userBonus')
 			.setName('User Bonus')
-			.setDescription('This user will get bonus points for getting this candy');
+			.setDescription('This user will get bonus points for getting this candy')
+			.setAdvanced();
 		this.addNumber('userBonusAmount')
 			.setName('Bonus Amount')
-			.setDescription('The amount of bonus points for the specified user getting this candy (can be negative, points will be deducted)');
+			.setDescription('The amount of bonus points for the specified user getting this candy (can be negative, points will be deducted)')
+			.setAdvanced();
+		
+		this._defineChildrenOrder([
+			'winning',
+			'width',
+			'height',
+			'duration',
+			'weight',
+			'reward',
+			'userBonus',
+			'userBonusAmount',
+			'effects',
+		]);
 	}
 	
 	// ---- Overrides ---- //
@@ -21066,10 +21084,12 @@ class ImageEntity extends StaticObjectEntity {
 			.setDescription('Display height on screen');
 		this.addNaturalNumber('duration')
 			.setName('Duration')
-			.setDescription('Duration in milliseconds that the image will be displayed');
+			.setDescription('Duration in milliseconds that the image will be displayed')
+			.setAdvanced();
 		this.addChild('effects', new DynamicArrayEntity('ImageEffect'))
 			.setName('Effects')
-			.setDescription('Special effects to apply to the image');
+			.setDescription('Special effects to apply to the image')
+			.setAdvanced();
 	}
 	
 	getFile() {
