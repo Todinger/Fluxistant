@@ -204,6 +204,7 @@ class Configurator {
 			() => {
 				this.copyConfigs(this.activeConfigs, this.displayedConfig);
 				this.buildPage();
+				$(document).trigger('configReady');
 				this.showMain();
 			},
 			100);
