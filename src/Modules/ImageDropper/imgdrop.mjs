@@ -14,7 +14,7 @@ class ImageDropper extends ModuleClient {
 		super('Image Dropper');
 	}
 	
-	dropImage(image) {
+	launchImage(image, startPositionY, stepAction) {
 		// We use double this duration along with double the distance
 		// to avoid the slowing at the end of the default easing
 		let duration = randomInt(image.minDuration, image.maxDuration);
@@ -23,14 +23,14 @@ class ImageDropper extends ModuleClient {
 		.width(image.width).height(image.height)
 		.css({
 			position: "absolute",
-			marginLeft: 0, marginTop: 0,
+			marginLeft: 0, marginTop: startPositionY,
 		})
 		.css({
 			left: Math.floor(
 				Math.random() * (window.innerWidth - 2 * image.width))
 		})
 		.animate(
-			{ top: `+=${2 * (window.innerHeight + image.height)}px` },
+			{ top: `${stepAction}=${2 * (window.innerHeight + image.height)}px` },
 			duration * 2,
 			function() {
 				$(this).remove();
@@ -42,9 +42,23 @@ class ImageDropper extends ModuleClient {
 		}
 	}
 	
+	dropImage(image) {
+		this.launchImage(image, 0, '+');
+	}
+	
+	floatImage(image) {
+		this.launchImage(image, window.innerHeight + image.height, '-');
+	}
+	
 	dropImages(image) {
 		for (let i = 0; i < image.count; i++) {
 			this.dropImage(image);
+		}
+	}
+	
+	floatImages(image) {
+		for (let i = 0; i < image.count; i++) {
+			this.floatImage(image);
 		}
 	}
 	
@@ -52,6 +66,11 @@ class ImageDropper extends ModuleClient {
 		this.server.on('dropImage', image => {
 			applyDefaults(image, DEFAULTS);
 			this.dropImages(image);
+		});
+		
+		this.server.on('floatImage', image => {
+			applyDefaults(image, DEFAULTS);
+			this.floatImages(image);
 		});
 		
 		this.server.attachToTag('imgdrop');

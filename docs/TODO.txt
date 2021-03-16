@@ -5,8 +5,8 @@
   I'll link command registration to configuration loading.
 + UI for changing the configuration during runtime.
 + Configuration backup system
-- Add image floating (opposite of dropping), then add a random image pool to Catastrophe that floats up images randomly with keypresses and possible cooldown (e.g. no more than 1 image per 5 seconds).
-- Disable tab index on labels in GUI
++ Add image floating (opposite of dropping), then add a random image pool to Catastrophe that floats up images randomly with keypresses and possible cooldown (e.g. no more than 1 image per 5 seconds).
++ Disable tab index on labels in GUI
 - Support for user data files for modules (for large data that shouldn't
   be in the configurations themselves).
 - Switch to function-trigger based configuration form.
@@ -54,6 +54,7 @@
 - Make WebEntities generation clear the WebEntities dir before writing to it.
 - Generate commands information page to automatically be put online for viewers to see
 - ZIP configuration text files
+- Duration picker GUI for time-related values
 
 - NPM Uninstall image-size if I no longer use it
 - Mark library directories as excluded in IDE after comitting, see if it does what I think it does

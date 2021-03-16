@@ -21,6 +21,7 @@ class Catastrophe extends Module {
 	constructor() {
 		super({
 			name: 'Catastrophe',
+			tags: ['imgdrop'],
 		});
 		
 		this.ongoing = false;
@@ -72,7 +73,7 @@ class Catastrophe extends Module {
 			this.normalizeVolume(volume);
 	}
 	
-	playMeow() {
+	meow() {
 		if (this.ongoing) {
 			let soundFile = this.assets.Sounds.selectFileLocal();
 			if (soundFile) {
@@ -83,11 +84,21 @@ class Catastrophe extends Module {
 					path.resolve(soundFile.path),
 					this.calculateFinalVolume(soundConf.volume));
 			}
+			
+			this.assets.Images.selectFile()
+				.then(imageFile => {
+					let files = this.config.images.files || {};
+					let imageConf = files[imageFile.fileKey];
+					let displayData = imageConf.makeDisplayData(imageFile);
+					displayData.count = 1;
+					this.broadcastEvent('floatImage', displayData);
+				});
 		}
 	}
 	
 	defineModData(modData) {
 		modData.addUniformPool('Sounds');
+		modData.addUniformPool('Images');
 	}
 	
 	defineModConfig(modConfig) {
@@ -108,6 +119,17 @@ class Catastrophe extends Module {
 			})
 			.setName('Sounds')
 			.setDescription('The collection of cat sounds that can be played');
+		
+		modConfig.add(
+			'images',
+			'MultiAsset',
+			{
+				collection: 'Images',
+				dataType: 'IMAGE',
+				elementValueType: 'ImageFile',
+			})
+			.setName('Images')
+			.setDescription('The collection of cat images that can be float up when a meow is played');
 	}
 	
 	load() {
@@ -149,9 +171,14 @@ class Catastrophe extends Module {
 		play: {
 			name: 'Meow',
 			description: 'Plays a random Meow sound from the pool',
-			action: () => this.playMeow(),
+			action: () => this.meow(),
 			triggers: [
 				this.trigger.keyUp(),
+				this.trigger.keyDown({
+					cooldowns: {
+						global: 1,
+					}
+				}),
 			],
 		},
 	}
