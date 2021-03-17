@@ -3,11 +3,24 @@
 const _ = require('lodash');
 const Module = requireMain('module');
 
+const DESCRIPTION =
+`Allows you to define your own functions which show images and/or play sounds on the main overlay.
+
+Add a function for each image/sound you want, set its triggers (e.g. commands or keyboard shortcuts), and when these
+triggers are activated, the configured image and/or sound will be shown/played. It will wait until oen image/sound is
+done showing before showing another one, if activated rapidly.
+
+Main overlay address for browser sources: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
+
 class ImageCommands extends Module {
 	constructor() {
 		super({
 			name: 'Image Commands',
 			tags: ['imgdisp'],
+			description: DESCRIPTION,
 		});
 		
 		this.imageFunctions = {};

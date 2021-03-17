@@ -12,6 +12,17 @@ const USER_SECONDS = 1000;
 const CHANNEL_REWARD_NAME = 'Catastrophe';
 const DEFAULT_DURATION = 3 * MINUTES;
 
+const DESCRIPTION =
+`Activated by a channel point redemption and/or a command.
+
+For the duration of the effect, every key press plays a random sound from the
+preset sound pool and floats up a random image from the image pool on the main overlay.
+
+Main overlay address for browser sources: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
+
 // Catastrophe
 // -----------
 // Activated by a channel point redemption and/or a command.
@@ -22,6 +33,7 @@ class Catastrophe extends Module {
 		super({
 			name: 'Catastrophe',
 			tags: ['imgdrop'],
+			description: DESCRIPTION,
 		});
 		
 		this.ongoing = false;

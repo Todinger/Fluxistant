@@ -5,11 +5,25 @@ const Module = requireMain('module');
 
 const DEFAULT_GROUP_KEY = '[Defaults]';
 
+const DESCRIPTION =
+`When the main "Drop F Image" function is activated, showers down 'F' images from above on the main overlay.
+
+The 'F' image is selected at random from the default pool for most users, but you can set separate pools
+for specific users, and when they activate the function, it will select an image from their pool instead.
+
+(I called them 'F' images but they don't actually need to be images of the 'F' character.)
+
+Main overlay address for browser sources: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
+
 class FShower extends Module {
 	constructor() {
 		super({
 			name: 'F Shower',
-			tags: ['imgdrop'], 
+			tags: ['imgdrop'],
+			description: DESCRIPTION,
 		});
 		
 		this.userGroups = {};

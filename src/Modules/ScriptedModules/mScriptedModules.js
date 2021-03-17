@@ -6,6 +6,7 @@ class ScriptedModules extends Module {
 			name: 'ScriptedModules',
 			webname: 'ScriptedModules',
 			source: 'ScriptedModules.html',
+			configurable: false,
 		});
 		
 		// TODO: Make this configurable

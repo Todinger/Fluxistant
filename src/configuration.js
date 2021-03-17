@@ -139,6 +139,10 @@ class Configuration {
 		return this.configRoot.addKeyShortcuts(key);
 	}
 	
+	addTextDisplay(key, value) {
+		return this.configRoot.addTextDisplay(key, value);
+	}
+	
 	toConf() {
 		return this.configRoot.toConf();
 	}

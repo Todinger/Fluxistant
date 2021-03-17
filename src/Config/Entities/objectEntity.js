@@ -46,7 +46,7 @@ class ObjectEntity extends ConfigEntity {
 	
 	_fillChildName(key) {
 		let child = this.children[key];
-		if (!child.getName() || child.getName() === '') {
+		if (child.getName() === undefined || child.getName() === '') {
 			child.setName(_.upperFirst(key));
 		}
 	}
@@ -141,6 +141,10 @@ class ObjectEntity extends ConfigEntity {
 	
 	addKeyShortcuts(key) {
 		return this.add(key, 'KeyShortcuts');
+	}
+	
+	addTextDisplay(key, value) {
+		return this.add(key, 'TextDisplay', value);
 	}
 	
 	

@@ -53,7 +53,7 @@ class Module {
 	// the server is running, the URL of the Module's HTML file will be
 	// "/mod/webname/source" (e.g. http://localhost:3333/mod/hellow/world.html for
 	// webname = "hello" and source = "world.html").
-	constructor(description) {
+	constructor(settings) {
 		// if (description.enabled === false) {
 		// 	this.enabled = false;
 		// 	return;
@@ -61,13 +61,14 @@ class Module {
 		// 	this.enabled = true;
 		// }
 		
-		this.name = description.name;
-		this.webname = description.webname;
-		this.source = description.source;
-		this.zindex = description.zindex;
-		this.tags = description.tags;
-		this.webSounds = description.webSounds;
-		this.configurable = description.configurable !== false;
+		this.name = settings.name;
+		this.webname = settings.webname;
+		this.source = settings.source;
+		this.zindex = settings.zindex;
+		this.tags = settings.tags;
+		this.webSounds = settings.webSounds;
+		this.configurable = settings.configurable !== false;
+		this.description = settings.description;
 		
 		// Utility objects
 		this.moduleManager = null;
@@ -90,7 +91,7 @@ class Module {
 		// Configuration
 		if (this.configurable) {
 			this.config = {};
-			this.modConfig = new ModuleConfig(this.name, this.enabledByDefault !== false);
+			this.modConfig = new ModuleConfig(this.name, this.description, this.enabledByDefault !== false);
 		}
 		
 		// This is just to get the IDE to stop whining about things not being
@@ -104,7 +105,7 @@ class Module {
 		
 		// Loads the module in debug mode, replacing chat messages with
 		// console log printouts
-		if (description.debug) {
+		if (settings.debug) {
 			this.say = this.log;
 			this.tell = (user, msg) => {
 				this.say(`@${user.displayName} ${msg}`);

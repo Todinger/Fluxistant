@@ -4,12 +4,21 @@ const assert = require('assert').strict;
 const path = require('path');
 const Module = requireMain('module');
 
+const DESCRIPTION =
+`Adds a function for selecting a random image from a defined pool and showing it on the main overlay.
+
+Main overlay address for browser sources: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
+
 class RandomImage extends Module {
 	constructor() {
 		super({
 			name: 'Random Image',
 			tags: ['imgdisp'],
 			enabledByDefault: false,
+			description: DESCRIPTION,
 		});
 	}
 	

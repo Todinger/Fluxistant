@@ -6,6 +6,16 @@ const HOURS = 60 * MINUTES;
 
 const USER_SECONDS = 1000;
 
+const DESCRIPTION =
+`Creates a text overlay that you can put in your streaming program (e.g. OBS) that shows a countdown timer.
+
+You can set its initial value and change its current value via commands, keyboard shortcuts or any other type of trigger you want.
+
+To add the overlay to your stream, add a browser source and set it to:
+http://localhost:3333/mod/countdown/Countdown.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
 
 class Countdown extends Module {
 	constructor() {
@@ -13,6 +23,7 @@ class Countdown extends Module {
 			name: 'Countdown',
 			webname: 'countdown',
 			source: 'countdown.html',
+			description: DESCRIPTION,
 		});
 		
 		this.initialTime = 0;

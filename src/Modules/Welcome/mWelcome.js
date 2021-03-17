@@ -4,11 +4,23 @@ const assert = require('assert').strict;
 const Module = requireMain('module');
 const Utils = requireMain('utils');
 
+const DESCRIPTION =
+`If you add an entry for a user here (e.g. someuser) with messages, images
+and/or sounds, when that user first types something in the channel, a message,
+image or sound will be chosen from their respective pools and said/shown/played
+on the main overlay.
+
+Main overlay address for browser sources: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
+
 class WelcomeImage extends Module {
 	constructor() {
 		super({
 			name: 'Welcome',
 			tags: ['imgdisp'],
+			description: DESCRIPTION,
 		});
 		
 		this.lastMessageTimes = {};

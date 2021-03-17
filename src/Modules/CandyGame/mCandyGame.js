@@ -24,6 +24,44 @@ const INFLATIONS = {
 	exponential:	(base)   =>	(start, step) => start * (base ** step),
 }
 
+const DESCRIPTION =
+`Adds a "Candy Game" to the stream which can be started either freely by
+specific people or by anyone through a channel reward redemption.
+
+During the game, people can use the candy drop command, \`!gimme\`, to
+have the bot choose a random candy from the candy database and drop a shower
+of them on the main overlay.
+
+Using the command costs a small amount of points, and each candy has its own
+value of points it grants the player for getting it.
+
+Most candy have the same fixed, positive value, with three exceptions:
+1. A "bust" candy which deducts points instead of giving them.
+2. A personal user-specific candy which grants its "owner" extra points.
+3. The "winning" candy which grants a large amount of points and ends the game.
+
+When a player gets the winning candy, their name is displayed on the text
+display client web page with a Halloween-ish effect.
+The winning candy has a low chance of being found at first (well, the same
+chance as everything else, but there are a lot of candy options so it's a
+small chance), but every time someone drops a candy that chance increases.
+This is to ensure that the game becomes easy to end after a while.
+
+The chances are decided by a "weight" value given to each type of candy, and
+the weight of the winning candy is "inflated" based on the number of candies
+that have been dropped so far via an inflation function.
+
+Note: I've been saying "winning candy" in singular form until now, but in
+actuality there can be more than one winning candy.
+Check Winning in a candy's data to make it a winning one.
+All winning candy weights are inflated in the same way, but you can change
+their starting weights to be different.
+
+Main overlay address for browser sources: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
+
 // Candy Game
 // ----------
 // Adds a "Candy Game" to the stream which can be started either freely by
@@ -61,7 +99,8 @@ class CandyGame extends Module {
 	constructor() {
 		super({
 			name: 'Candy Game',
-			tags: ['imgdrop', 'textdisp'], 
+			tags: ['imgdrop', 'textdisp'],
+			description: DESCRIPTION,
 		});
 		
 		this.candyDefaults = {};

@@ -8,6 +8,23 @@ const Utils = requireMain('utils');
 
 const GHOST_DATA_FILE = 'ghostData.json';
 
+const DESCRIPTION =
+`Adds a widget that can be placed in the overlay for the Phasmophobia game.
+
+This widget can keep track of the evidence you collect, which possible evidence
+and ghost type remain, the ghost's name and the final ghost type.
+
+You add/remove evidence using the functions. These are set to some commands and
+keyboard shortcuts by default, but you can change those.
+
+Possible evidence names (which are used by the command and shortcuts) are: \`emf5\`, \`box\`, \`prints\`, \`orb\`, \`book\` and \`temps\`.
+
+To add the overlay to your stream, add a browser source and set it to:
+http://localhost:3333/mod/phasmophobia/phasmophobia.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
+
 class Phasmophobia extends Module {
 	constructor() {
 		super({
@@ -15,6 +32,7 @@ class Phasmophobia extends Module {
 			webname: 'phasmophobia',
 			source: 'phasmophobia.html',
 			tags: ['textdisp'],
+			description: DESCRIPTION,
 		});
 		
 		this.ghostData = {};

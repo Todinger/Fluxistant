@@ -2,8 +2,13 @@ const Configuration = requireMain('./configuration');
 const EntityFactory = require('./entityFactory');
 
 class ModuleConfig extends Configuration {
-	constructor(modName, enabledByDefault) {
+	constructor(modName, modDescription, enabledByDefault) {
 		super(`mod.${modName}`);
+		if (modDescription) {
+			this.addTextDisplay('moduleDescription', modDescription)
+				.setName(null);
+		}
+		
 		this.addBoolean('enabled', enabledByDefault)
 			.setDescription('Enables/disables this module (disabled modules will have no effect on anything)');
 	}

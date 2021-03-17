@@ -178,7 +178,7 @@ class ModuleManager {
 	// This creates its ModuleConfig with all its fields, using default values
 	// for everything, and registers the module in DataManager.
 	_defineConfigAndData(mod) {
-		let modData = DataManager.addModule(mod.name);
+		let modData = DataManager.addModule(mod.name, mod.description);
 		mod.defineData(modData);
 		
 		if (mod.configurable) {

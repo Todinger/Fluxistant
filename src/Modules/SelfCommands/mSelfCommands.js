@@ -6,11 +6,22 @@ const Module = requireMain('module');
 
 // const MINIMUM_SIZE = 300;
 
+const DESCRIPTION =
+`If you add an entry for a user here (e.g. someuser) with an image/sound,
+when that user types their own username as a command (e.g. \`!someuser\`),
+that image/sound will be shown on the main overlay.
+
+Main overlay address for browser sources: http://localhost:3333/mod/ScriptedModules/ScriptedModules.html
+
+(Note: the port 3333 is the default one, but if you change it in the main settings,
+you will need to adjust that address accordingly.`;
+
 class SelfCommands extends Module {
 	constructor() {
 		super({
 			name: 'Self-Commands',
 			tags: ['imgdisp'],
+			description: DESCRIPTION,
 		});
 		
 		this.userEntries = {};

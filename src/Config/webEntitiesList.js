@@ -12,6 +12,7 @@ const entities = {
 	ObjectEntity: require('./WebEntities/objectEntity.js'),
 	SimpleObjectEntity: require('./WebEntities/simpleObjectEntity.js'),
 	StaticObjectEntity: require('./WebEntities/staticObjectEntity.js'),
+	TextDisplayEntity: require('./WebEntities/textDisplayEntity.js'),
 	UserEntity: require('./WebEntities/userEntity.js'),
 	UserFilterEntity: require('./WebEntities/userFilterEntity.js'),
 	UserFilter_BaseEntity: require('./WebEntities/userFilter_BaseEntity.js'),

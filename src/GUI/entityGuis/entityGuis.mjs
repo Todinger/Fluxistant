@@ -20,6 +20,7 @@ import AssetGui				from "./assetGui.mjs";
 import SingleAssetGui		from "./singleAssetGui.mjs";
 import MultiAssetGui		from "./multiAssetGui.mjs";
 import KeyGui				from "./keyGui.mjs";
+import TextDisplayGui		from "./textDisplayGui.mjs";
 
 export default {
 	GuiRegistry,
@@ -44,5 +45,6 @@ export default {
 	SingleAsset: SingleAssetGui,
 	MultiAssetGui: MultiAssetGui,
 	KeyGui,
+	TextDisplayGui,
 };
 

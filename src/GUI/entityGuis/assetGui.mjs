@@ -62,16 +62,16 @@ export default class AssetGui extends EntityGui {
 		let text;
 		let uploadLink;
 		if (this.singleFile) {
-			text = $(`<span class="uk-text-middle">Upload ${this.entity.getDataType().toLowerCase()} by dropping it here or </span>`);
-			uploadLink = $('<span class="uk-link">selecting one</span>');
+			text = $(`<span class="uk-text-middle unselectable">Upload ${this.entity.getDataType().toLowerCase()} by dropping it here or </span>`);
+			uploadLink = $('<a class="uk-link" href="#">selecting one</a>');
 		} else {
-			text = $(`<span class="uk-text-middle">Upload ${this.entity.getDataType().toLowerCase()}s by dropping them here or </span>`);
-			uploadLink = $('<span class="uk-link">selecting some</span>');
+			text = $(`<span class="uk-text-middle unselectable">Upload ${this.entity.getDataType().toLowerCase()}s by dropping them here or </span>`);
+			uploadLink = $('<a class="uk-link" href="#">selecting some</a>');
 		}
 		
 		let uploadForm = $('<div uk-form-custom></div>');
 		let uploadInput = this._makeUploadInput();
-		uploadForm.append(uploadInput, uploadLink, '.'); // Include end-of-sentence period
+		uploadForm.append(uploadInput, uploadLink, '<span class="unselectable">.</span>'); // Include end-of-sentence period
 		this._createUploader(areaContainer);
 		
 		areaContainer.append(icon, text, uploadForm);

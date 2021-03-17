@@ -7,18 +7,18 @@
 + Configuration backup system
 + Add image floating (opposite of dropping), then add a random image pool to Catastrophe that floats up images randomly with keypresses and possible cooldown (e.g. no more than 1 image per 5 seconds).
 + Disable tab index on labels in GUI
-- Disable tab index on labels in modals
++ Disable tab index on labels in modals
 - Default sizes
-- Remove value placeholders
++ Remove value placeholders
 - Hand icon for "selecting one(s)"
 - Simpler mode
-- Duration still in milliseconds in image functions
++ Duration still in milliseconds in image functions
 - Module descriptions
-- Changes marked in previously-accepted modules on any change
++ Changes marked in previously-accepted modules on any change
 - GUI: Hitting Enter should switch to next field
 
 GUI User Feedback:
-- Lables should be unmarkable, cursor should stay a pointer
++ Lables should be unmarkable, cursor should stay a pointer
 - More text color to separate things from each other
 - Accordions should allow only one thing open at a time
 - Auto-complete user names from followers (fetch followers from Twitch)
