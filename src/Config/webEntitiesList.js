@@ -1,5 +1,7 @@
 const entities = {
 	ArrayEntity: require('./WebEntities/arrayEntity.js'),
+	ChannelRewardEntity: require('./WebEntities/channelRewardEntity.js'),
+	ChannelRewardSelectionEntity: require('./WebEntities/channelRewardSelectionEntity.js'),
 	ChoiceEntity: require('./WebEntities/choiceEntity.js'),
 	ChoiceValueEntity: require('./WebEntities/choiceValueEntity.js'),
 	CommandEntity: require('./WebEntities/commandEntity.js'),
@@ -8,6 +10,7 @@ const entities = {
 	DynamicArrayEntity: require('./WebEntities/dynamicArrayEntity.js'),
 	DynamicAssetArrayEntity: require('./WebEntities/dynamicAssetArrayEntity.js'),
 	DynamicObjectEntity: require('./WebEntities/dynamicObjectEntity.js'),
+	ExpandableTextDisplayEntity: require('./WebEntities/expandableTextDisplayEntity.js'),
 	FixedArrayEntity: require('./WebEntities/fixedArrayEntity.js'),
 	ObjectEntity: require('./WebEntities/objectEntity.js'),
 	SimpleObjectEntity: require('./WebEntities/simpleObjectEntity.js'),
@@ -41,6 +44,7 @@ const entities = {
 	Response_SEEntity: require('./WebEntities/Functions/Responses/response_SEEntity.js'),
 	TriggerChoiceEntity: require('./WebEntities/Functions/Triggers/triggerChoiceEntity.js'),
 	TriggerEntity: require('./WebEntities/Functions/Triggers/triggerEntity.js'),
+	Trigger_ChannelRewardEntity: require('./WebEntities/Functions/Triggers/trigger_ChannelRewardEntity.js'),
 	Trigger_CommandEntity: require('./WebEntities/Functions/Triggers/trigger_CommandEntity.js'),
 	Trigger_KeyDownEntity: require('./WebEntities/Functions/Triggers/trigger_KeyDownEntity.js'),
 	Trigger_KeyUpEntity: require('./WebEntities/Functions/Triggers/trigger_KeyUpEntity.js'),

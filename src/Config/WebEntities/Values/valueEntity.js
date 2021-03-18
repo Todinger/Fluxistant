@@ -10,7 +10,6 @@ class ValueEntity extends ConfigEntity {
 		return entity.type === ValueEntity.TYPE && entity.value === undefined;
 	}
 	
-	// constructor(valueType) {
 	constructor(value, javascriptValueType) {
 		super();
 		this.value = value;
@@ -29,6 +28,10 @@ class ValueEntity extends ConfigEntity {
 		}
 		
 		this.value = value;
+	}
+	
+	clearValue() {
+		this.value = undefined;
 	}
 	
 	isSet() {

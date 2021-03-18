@@ -12,6 +12,7 @@ class TriggerChoiceEntity extends ChoiceEntity {
 			["shortcut"]:	'Trigger_Shortcut',
 			["keyDown"]:	'Trigger_KeyDown',
 			["keyUp"]:		'Trigger_KeyUp',
+			["reward"]:		'Trigger_ChannelReward',
 		});
 	}
 }

@@ -97,6 +97,29 @@
 <!--	</div>-->
 <!--</div>-->
 
+<script type="text/javascript">
+	function ask() {
+		window.modal = UIkit.modal.confirm('UIkit confirm!').dialog;
+		$(modal.$el)
+				.find('div').addClass('uk-light uk-background-secondary')
+
+	}
+</script>
+
+<!-- Question Dialog --> <div class="uk-light uk-background-secondary">
+	<button class="uk-button uk-button-default uk-margin-small-right" type="button" onclick="ask()">Built-in Question</button>
+	<button class="uk-button uk-button-default uk-margin-small-right" type="button" uk-toggle="target: #modal-example">Question</button>
+	<!-- Question Box --> <div id="modal-example" uk-modal="esc-close: false; bg-close: false">
+		<div class="uk-modal-dialog uk-modal-body uk-light uk-background-secondary">
+			<h2 class="uk-modal-title">Question Title</h2>
+			<p>Can I ask you something?</p>
+			<p class="uk-text-center">
+				<button class="uk-button uk-button-primary uk-modal-close" type="button">Yes</button>
+				<button class="uk-button uk-button-default uk-modal-close" type="button">No</button>
+			</p>
+		</div>
+	</div>
+</div>
 
 
 <div class="uk-light uk-background-secondary uk-padding-small uk-height-viewport">

@@ -30,6 +30,10 @@ export default class BooleanGui extends ValueGui {
 			this.jInput.prop('checked', this.entity.getValue());
 		}
 	}
+	
+	refreshContents() {
+		this.jInput.prop('checked', this.entity.getValue());
+	}
 }
 
 GuiRegistry.register(BooleanGui);

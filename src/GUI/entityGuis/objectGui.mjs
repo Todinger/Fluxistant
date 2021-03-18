@@ -17,6 +17,10 @@ export default class ObjectGui extends EntityGui {
 		return true;
 	}
 	
+	getChildGui(key) {
+		return this.childrenGUIs[key];
+	}
+	
 	_contentsChanged() {
 		super._changed();
 		this._updateStatusIndicators(this.mainGui.guiData.header);
@@ -145,6 +149,10 @@ export default class ObjectGui extends EntityGui {
 	
 	updateName() {
 		this.mainGui.guiData.header.text(this.entity.getDisplayName());
+	}
+	
+	refreshContents() {
+		Object.values(this.childrenGUIs).forEach(gui => gui.refreshContents());
 	}
 }
 

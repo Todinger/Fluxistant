@@ -147,6 +147,14 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'TextDisplay', value);
 	}
 	
+	addExpandableTextDisplay(key, value) {
+		return this.add(key, 'ExpandableTextDisplay', value);
+	}
+	
+	addChannelRewardSelection(key, value) {
+		return this.add(key, 'ChannelRewardSelection', value);
+	}
+	
 	
 	// ---- Overrides ---- //
 	

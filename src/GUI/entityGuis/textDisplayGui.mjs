@@ -1,6 +1,5 @@
 import EntityGui from "./entityGui.mjs";
 import GuiRegistry from "./guiRegistry.mjs";
-import GuiElements from "./guiElements/guiElements.mjs";
 
 const markdownConverter = new showdown.Converter({simplifiedAutoLink: true});
 
@@ -10,27 +9,29 @@ export default class TextDisplayGui extends EntityGui {
 	
 	constructor(entity, guiID, modName) {
 		super(entity, guiID, modName);
-		this.mainGui = null;
+		this.textDisplay = null;
 	}
 	
 	_buildGUI() {
-		let textDisplay = $(`<span class="unselectable">${markdownConverter.makeHtml(this.entity.getValue())}</span>`);
-		this.mainGui = GuiElements.folder({
-			header: 'Module Description',
-			contents: textDisplay,
-		});
-		return this.mainGui;
+		this.textDisplay = $(`<span class="unselectable uk-margin-auto"></span>`);
+		this.refreshContents();
+		return this.textDisplay;
 	}
 	
 	// Visually marks that this value has been changed
 	activateChangedIndicators() {
-		EntityGui.addChangeIndicator(this.jInput);
+		EntityGui.addChangeIndicator(this.textDisplay);
 	}
 	
 	// Accept changes and remove change markers
 	finalizeChanges() {
 		super.finalizeChanges();
-		EntityGui.clearChangeIndicator(this.jInput);
+		EntityGui.clearChangeIndicator(this.textDisplay);
+	}
+	
+	refreshContents() {
+		this.textDisplay.html(markdownConverter.makeHtml(this.entity.getValue()));
+		this.textDisplay.find('p').addClass('uk-margin-remove');
 	}
 }
 

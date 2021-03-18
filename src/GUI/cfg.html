@@ -19,6 +19,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 	<!--suppress HtmlUnknownTarget -->
 	<script src="/socket.io/socket.io.js"></script>
 
@@ -43,6 +44,17 @@
 </head>
 <body>
 <!--<form class="uk-form-horizontal">-->
+
+<div id="question" uk-modal="esc-close: false; bg-close: false">
+	<div class="uk-modal-dialog uk-modal-body uk-light uk-background-secondary">
+		<h2 id="question-title" class="uk-modal-title">Question Title</h2>
+		<p id="question-body">Can I ask you something?</p>
+		<p id="question-buttons" class="uk-text-center">
+<!--			<button class="uk-button uk-button-primary uk-modal-close" type="button">Yes</button>-->
+<!--			<button class="uk-button uk-button-default uk-modal-close" type="button">No</button>-->
+		</p>
+	</div>
+</div>
 
 <div class="uk-light uk-background-secondary uk-padding-small uk-height-viewport">
 	<div class="uk-card uk-card-secondary uk-card-body uk-padding-remove" uk-sticky>

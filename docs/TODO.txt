@@ -13,9 +13,11 @@
 - Hand icon for "selecting one(s)"
 - Simpler mode
 + Duration still in milliseconds in image functions
-- Module descriptions
++ Module descriptions
 + Changes marked in previously-accepted modules on any change
 - GUI: Hitting Enter should switch to next field
+- Video assets
+- Meme command that shows a random meme
 
 GUI User Feedback:
 + Lables should be unmarkable, cursor should stay a pointer
@@ -34,20 +36,21 @@ GUI User Feedback:
 	- Keywords (+ filters, regex)
 	- Twitch events (message, action, etc.)
 	+ Key shortcut
-	- Key down/up
+	+ Key down/up
 	- Controller buttons
 	- Voice command
-	- Channel Reward
+	+ Channel Reward
 	- Window de/activation
 	- Window open/close
 	- CLI command
+	- Another function activating
 - Also add function responses.
   Response ideas:
-	- Chat message
+	+ Chat message
 	- Whisper
-	- Chat message from SE
+	+ Chat message from SE
 	- TTS
-	- Log
+	+ Log
 	- File?
 - Filter ideas:
 	+ Specific user

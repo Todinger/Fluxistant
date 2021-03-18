@@ -143,6 +143,14 @@ class Configuration {
 		return this.configRoot.addTextDisplay(key, value);
 	}
 	
+	addExpandableTextDisplay(key, value) {
+		return this.configRoot.addExpandableTextDisplay(key, value);
+	}
+	
+	addChannelRewardSelection(key, value) {
+		return this.configRoot.addChannelRewardSelection(key, value);
+	}
+	
 	toConf() {
 		return this.configRoot.toConf();
 	}

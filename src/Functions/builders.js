@@ -42,6 +42,7 @@ const TriggerBuilder = new Builder({
 	shortcut: require('./Triggers/shortcutTrigger'),
 	keyDown: require('./Triggers/keyDownTrigger'),
 	keyUp: require('./Triggers/keyUpTrigger'),
+	reward: require('./Triggers/channelRewardTrigger'),
 });
 
 const ResponseBuilder = new Builder({

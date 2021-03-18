@@ -385,6 +385,14 @@ class Utils {
 		}
 	}
 	
+	static splitIntoWords(text) {
+		// Remove multiple consecutive spaces
+		text = text.replace(/\s{2,}/g, ' ');
+		
+		// Split by the spaces that we just inserted
+		return text.split(' ');
+	}
+	
 	// Returns true iff every key in sub is also a key in obj
 	static isKeySubset(sub, obj) {
 		return Object.keys(sub).reduce(

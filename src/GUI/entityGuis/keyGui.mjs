@@ -113,29 +113,9 @@ export default class KeyGui extends EntityGui {
 		EntityGui.clearChangeIndicator(this.keyLabel);
 	}
 	
-	
-	/*
-	<div class="uk-child-width-expand uk-grid uk-margin-small-top uk-flex-nowrap" uk-tooltip="Key">
-		<h3 class="uk-width-1-6 uk-text-warning">Key</h3>
-		<div class="uk-width-expand">
-		
-			<div class="uk-button uk-button-default" onclick="listenForKey();">
-				<ul id="keyview" uk-switcher="toggle: > *" hidden>
-					<li></li>
-					<li></li>
-					<li></li>
-				</ul>
-				<ul id="keyview-vals" class="uk-switcher" uk-switcher="toggle: > *">
-					<li>Click to Set Key</li>
-					<li>Waiting for keypress...</li>
-					<li id="keyText" class="uk-label">F1</li>
-				</ul>
-			</div>
-			
-		</div>
-	</div>
-	*/
-	
+	refreshContents() {
+		this.keyLabel.text(this.entity.getKeyName());
+	}
 }
 
 KeyGui.activeListener = null;

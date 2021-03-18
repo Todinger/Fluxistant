@@ -148,6 +148,10 @@ export default class DynamicArrayGui extends EntityGui {
 		
 		EntityGui.clearChangeIndicator(this.mainGui.guiData.header);
 	}
+	
+	refreshContents() {
+		this.elementGUIs.forEach(gui => gui.refreshContents());
+	}
 }
 
 GuiRegistry.register(DynamicArrayGui);

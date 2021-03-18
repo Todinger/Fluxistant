@@ -1,5 +1,6 @@
 import GuiRegistry from "./entityGuis/guiRegistry.mjs";
 import EntityGui from "./entityGuis/entityGui.mjs";
+import MainManager from "./mainManager.mjs";
 
 function setStyleRule(sheetName, selector, property, value) {
 	let styleSheet = document.querySelector('link[href*=' + sheetName + ']')
@@ -38,12 +39,13 @@ class Configurator {
 		}
 		
 		this.error = false;
-		
-		this.loadingSwitcher = $('#loadingSwitcher');
-		this.loadingProgress = $('#loadingProgress');
 	}
 	
 	init() {
+		MainManager.init(this);
+		
+		this.loadingSwitcher = $('#loadingSwitcher');
+		this.loadingProgress = $('#loadingProgress');
 		$('#btn-apply').click(() => this.applyButtonClicked());
 		$('#btn-revert').click(() => this.revertButtonClicked());
 		$('#chk-advanced').change(function() {
@@ -57,6 +59,15 @@ class Configurator {
 		this.configViewSwitcher = $('#configViewSwitcher');
 		this.mainTabTitle = $('#mainTabTitle');
 		this.allModulesTabTitle = $('#modulesTabTitle');
+		
+		this.question = {
+			modal: $('#question'),
+			title: $('#question-title'),
+			body: $('#question-body'),
+			buttons: $('#question-buttons'),
+		};
+		
+		this.rewardsChangedHandler = () => this.rewardsChanged();
 	}
 	
 	disableButton(btn) {
@@ -127,8 +138,33 @@ class Configurator {
 		});
 	}
 	
+	showQuestion(details) {
+		this.question.title.text(details.title);
+		this.question.body.text(details.body);
+		this.question.buttons.empty();
+		UIkit.modal(this.question.modal).show();
+		return new Promise((resolve) => {
+			details.options.forEach(option => {
+				let optionText = option, buttonClass = 'uk-button-default';
+				if (typeof option === 'object') {
+					optionText = option.text;
+					buttonClass = option.cls;
+				}
+				
+				let optionButton = $(`<button class="uk-button ${buttonClass} uk-modal-close uk-margin-small-right uk-margin-small-left" type="button"></button>`)
+					.text(optionText)
+					.click(() => resolve(optionText));
+				this.question.buttons.append(optionButton);
+			});
+		});
+	}
+	
 	buildPage() {
 		UIkit.switcher(this.loadingSwitcher).show(0);
+		
+		if (this.guis.main) {
+			this.guis.main.getChildGui('channelRewards').removeChangedHandler(this.rewardsChangedHandler);
+		}
 		
 		let mainContainer = $('#main');
 		mainContainer.empty();
@@ -140,6 +176,7 @@ class Configurator {
 			this.showError(err.message || err);
 		});
 		this.guis.main = mainGUI;
+		this.guis.main.getChildGui('channelRewards').onChanged(this.rewardsChangedHandler);
 		
 		this.guis.modules = {};
 		this.guis.tabTitles = {};
@@ -281,10 +318,66 @@ class Configurator {
 		this.showError(errorMessage);
 	}
 	
+	listenForReward() {
+		this.socket.emit('listenForReward');
+	}
+	
+	stopListeningForReward() {
+		this.socket.emit('stopListeningForReward');
+	}
+	
+	rewardRedeemed(details) {
+		if (MainManager.isListeningForReward()) {
+			this.showQuestion({
+				title: 'Channel Reward Selection',
+				body: `A channel reward was just redeemed on your channel by ${details.user} with the message: "${details.message}" - is this the channel reward you wish to set?`,
+				options: [
+					{
+						text: 'Yes',
+						cls: 'uk-button-primary',
+					},
+					{
+						text: 'No',
+						cls: 'uk-button-secondary',
+					},
+					{
+						text: 'Cancel',
+						cls: 'uk-button-danger',
+					},
+				]
+			}).then(answer => {
+				if (answer === 'Yes') {
+					this.socket.emit('stopListeningForReward');
+					MainManager.rewardRedeemed(details.rewardID);
+				} else if (answer === 'Cancel') {
+					this.socket.emit('stopListeningForReward');
+					MainManager.stopListeningForReward();
+				}
+				// If they selected 'No' then we don't need to do anything - continue listening
+			});
+		}
+	}
+	
+	getRewardsList() {
+		if (this.displayedConfig.main) {
+			return this.displayedConfig.main
+				.getChild('channelRewards')
+				.getElements()
+				.map(el => el.toConf());
+		} else {
+			return [];
+		}
+	}
+	
+	rewardsChanged() {
+		MainManager.rewardsChanged();
+	}
+	
 	start() {
 		this.socket.on('loadConfig', data => this.loadConfigs(data));
 		this.socket.on('configSaved', () => this.configsSaved());
-		this.socket.on('configSaveError', (error) => this.saveError(error));
+		this.socket.on('configSaveError', error => this.saveError(error));
+		this.socket.on('rewardRedeemed', details => this.rewardRedeemed(details));
 		this.socket.emit('configRequest');
 	}
 }

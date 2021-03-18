@@ -52,6 +52,10 @@ You can find it on your [StreamElements account details page](https://streamelem
 			.setName('Points Name: Singular')
 			.setDescription('The name of the loyalty points you defined on StreamElements in singular form (e.g. "pixel")');
 		
+		this.addDynamicArray('channelRewards', 'ChannelReward')
+			.setName('Channel Rewards')
+			.setDescription("A list of all the channel point rewards that the bot can recognize on your channel");
+		
 		// let logs = this.addGroup('logs')
 		// 	.setName('Logs')
 		// 	.setDescription('Settings for information logging by the bot');
@@ -93,6 +97,16 @@ You can find it on your [StreamElements account details page](https://streamelem
 	// getLoggerParams() {
 	// 	return this.getGroupValues('logs');
 	// }
+	
+	getChannelRewards() {
+		let rewardsList = this.getChild('channelRewards').toConf();
+		let rewards = {};
+		rewardsList.forEach(reward => {
+			rewards[reward.rewardID] = reward.rewardName;
+		});
+		
+		return rewards;
+	}
 }
 
 module.exports = new MainConfig();

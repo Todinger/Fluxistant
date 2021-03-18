@@ -28,7 +28,15 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addDynamicArray('triggers', 'TriggerChoice')
 			.setName('Triggers')
 			.setDescription('Defines when this function will be invoked');
-		this.addDynamicArray('responses', 'ResponseChoice')
+		
+		if (data) {
+			this.responseHelpText = data.getAllVariables().map(variable => variable.toMarkdown()).join('\n');
+		}
+		this.addDynamicArray(
+				'responses',
+				'ResponseChoice',
+				undefined,
+				{ helpText: this.responseHelpText })
 			.setName('Responses')
 			.setDescription('Defines messages that will be sent after the function is done');
 		
@@ -62,26 +70,17 @@ class FunctionEntity extends StaticObjectEntity {
 	}
 	
 	addFilter(filter) {
-		// let filterChoiceEntity = this.getChild('filters').addElement(new FilterChoiceEntity());
-		// let selectedTrigger = filterChoiceEntity.select(filter.type);
-		// selectedTrigger.setData(filter);
 		this.addObject(filter, 'filters', FilterChoiceEntity);
 	}
 	
 	addTrigger(trigger) {
-		// let triggerChoiceEntity = this.getChild('triggers').addElement(new TriggerChoiceEntity());
-		// let selectedTrigger = triggerChoiceEntity.select(trigger.type);
-		// selectedTrigger.setData(trigger);
 		this.addObject(trigger, 'triggers', TriggerChoiceEntity);
 	}
 	
 	addResponse(data, response) {
-		// let responseChoiceEntity = this.getChild('responses').addElement(new ResponseChoiceEntity());
-		// let selectedResponse = responseChoiceEntity.select(response.type);
-		// selectedResponse.setData(response);
 		let responseData = {
 			response,
-			helpText: data.getAllVariables().map(variable => variable.toMarkdown()).join('\n'),
+			helpText: this.responseHelpText,
 		}
 		this.addObject(response, 'responses', ResponseChoiceEntity, responseData);
 	}
@@ -95,6 +94,12 @@ class FunctionEntity extends StaticObjectEntity {
 		}
 		
 		return displayName || super.getDisplayName();
+	}
+	
+	cloneImpl() {
+		let clone = super.cloneImpl();
+		clone.responseHelpText = this.responseHelpText;
+		return clone;
 	}
 }
 

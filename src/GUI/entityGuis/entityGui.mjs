@@ -106,6 +106,10 @@ export default class EntityGui extends EventNotifier {
 		this.onError(callback);
 	}
 	
+	removeChangedHandler(callback) {
+		this.removeCallback('changed', callback);
+	}
+	
 	// Visually marks that this value has been changed
 	activateChangedIndicators() {
 	}
@@ -125,6 +129,11 @@ export default class EntityGui extends EventNotifier {
 	
 	lostFocus() {
 		this.hideHelp();
+	}
+	
+	refreshContents() {
+		// Override in inheriting classes and reload data from entities (assume
+		// only values changed, not object keys or array indices)
 	}
 	
 	static updateStatusIndicator(jElement, changed, error) {

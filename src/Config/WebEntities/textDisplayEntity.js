@@ -28,7 +28,7 @@ class TextDisplayEntity extends ConfigEntity {
 	// ---- Overrides ---- //
 	
 	toConf() {
-		return undefined;
+		return this.getValue();
 	}
 	
 	importDesc(descriptor, lenient) {
@@ -47,6 +47,11 @@ class TextDisplayEntity extends ConfigEntity {
 	
 	buildFrom(descriptor) {
 		this.setValue(descriptor);
+	}
+	
+	_assignableFrom(type) {
+		return super._assignableFrom(type) ||
+			type === 'ExpandableTextDisplay';
 	}
 }
 

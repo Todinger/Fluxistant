@@ -32,6 +32,13 @@ export default class ChoiceGui extends EntityGui {
 		}
 	}
 	
+	switchTo(selectedOption) {
+		UIkit.switcher(this.switcher).show(this.optionIndices[selectedOption]);
+		let selection = this.entity.select(selectedOption);
+		this._setDescriptionTooltip(this.selector, selection.getDescription());
+		this._changed();
+	}
+	
 	_buildGUI() {
 		let container = $(`<div id="${this.guiID}"></div>`);
 		
@@ -60,11 +67,7 @@ export default class ChoiceGui extends EntityGui {
 		
 		let _this = this;
 		selector.change(function() {
-			let selectedOption = this.value;
-			UIkit.switcher(switcher).show(_this.optionIndices[selectedOption]);
-			let selection = _this.entity.select(selectedOption);
-			_this._setDescriptionTooltip(selector, selection.getDescription());
-			_this._changed();
+			_this.switchTo(this.value);
 		});
 		
 		let initialSelection = this.entity.getSelection();
@@ -85,6 +88,9 @@ export default class ChoiceGui extends EntityGui {
 			() => UIkit.switcher(switcher).show(this.optionIndices[this.entity.selectedOption]),
 			10);
 		
+		this.switcher = switcher;
+		this.selector = selector;
+		
 		container.append(selector);
 		container.append(switcher);
 		container.append(optionsContainer);
@@ -95,6 +101,11 @@ export default class ChoiceGui extends EntityGui {
 	finalizeChanges() {
 		super.finalizeChanges();
 		Object.values(this.optionGUIs).forEach(gui => gui.finalizeChanges());
+	}
+	
+	refreshContents() {
+		Object.values(this.optionGUIs).forEach(gui => gui.refreshContents());
+		this.switchTo(this.entity.selectedOption);
 	}
 }
 

@@ -5,14 +5,23 @@
 // inherited and used by the deriving class to notify about events without the
 // deriving class needing to deal with registration and invocation.
 export default class EventNotifier {
-	constructor() {
+	constructor(ignoreCase) {
 		// This is where we store the handlers (callbacks) of all the events
 		// we support
 		this._eventHandlers = {};
+		
+		// If enabled, makes all events case-insensitive
+		this._ignoreCase = ignoreCase;
 	}
 	
 	// Adds support for an event by the given name.
 	_addEvent(eventName) {
+		// If we ignore letter casing then we make everything lower-case
+		// internally
+		if (this._ignoreCase) {
+			eventName = eventName.toLowerCase();
+		}
+		
 		console.assert(!(eventName in this._eventHandlers),
 			`Multiple registrations of event '${eventName}'`);
 		
@@ -26,12 +35,31 @@ export default class EventNotifier {
 	
 	// Registers a callback to be invoked when an event occurs.
 	on(eventName, callback) {
+		// If we ignore letter casing then we make everything lower-case
+		// internally
+		if (this._ignoreCase) {
+			eventName = eventName.toLowerCase();
+		}
+		
 		if (!(eventName in this._eventHandlers)) {
 			this._eventHandlers[eventName] = [];
 		}
 		
 		this._eventHandlers[eventName].push(callback);
 		return this;
+	}
+	
+	// Removes a callback from the list for the given event
+	removeCallback(eventName, callback) {
+		if (this._ignoreCase) {
+			eventName = eventName.toLowerCase();
+		}
+		
+		if (eventName in this._eventHandlers) {
+			_.pull(this._eventHandlers[eventName], callback);
+		} else {
+			console.warn(`Cannot remove event handler for nonexistent event "${eventName}"`);
+		}
 	}
 	
 	// Invokes all the callbacks that registered for the specified event.
@@ -50,7 +78,15 @@ export default class EventNotifier {
 	// 		'helloWorld',
 	// 		() => console.log(`Someone said hello world!`));
 	_notify(eventName, ...args) {
-		console.assert(eventName in this._eventHandlers, `Unknown event: ${eventName}`);
+		// If we ignore letter casing then we make everything lower-case
+		// internally
+		if (this._ignoreCase) {
+			eventName = eventName.toLowerCase();
+		}
+		
+		if (!(eventName in this._eventHandlers)) {
+			this._eventHandlers[eventName] = [];
+		}
 		
 		this._eventHandlers[eventName].forEach(
 			callback => callback.apply(null, args));

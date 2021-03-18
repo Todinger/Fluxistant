@@ -36,4 +36,9 @@ export default class ValueGui extends EntityGui {
 		super.finalizeChanges();
 		EntityGui.clearChangeIndicator(this.jInput);
 	}
+	
+	refreshContents() {
+		super.refreshContents();
+		this.jInput.val(this.entity.getValue());
+	}
 }

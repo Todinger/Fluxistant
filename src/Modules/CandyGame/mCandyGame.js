@@ -295,18 +295,18 @@ class CandyGame extends Module {
 	}
 	
 	load() {
-		this.onChannelReward(
-			'Start a Candy Game',
-			user => {
-				if (this.enabled) {
-					if (!this.startGame(user)) {
-						this.tell(
-							user,
-							"Sorry, like the description says, we can't refund the points for this...");
-					}
-				}
-			}
-		);
+		// this.onChannelReward(
+		// 	'Start a Candy Game',
+		// 	user => {
+		// 		if (this.enabled) {
+		// 			if (!this.startGame(user)) {
+		// 				this.tell(
+		// 					user,
+		// 					"Sorry, like the description says, we can't refund the points for this...");
+		// 			}
+		// 		}
+		// 	}
+		// );
 	}
 	
 	// commands = {
@@ -348,6 +348,7 @@ class CandyGame extends Module {
 				this.trigger.command({
 					cmdname: 'trickortreat',
 				}),
+				this.trigger.reward(),
 			],
 		},
 		

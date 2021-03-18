@@ -15,8 +15,10 @@ class ResponseEntity extends ChoiceValueEntity {
 	setData(responseData) {
 		if (responseData) {
 			let response = responseData.response;
-			this.getChild('enabled').setValue(response.enabled);
-			this.getChild('message').setValue(response.message);
+			if (response) {
+				this.getChild('enabled').setValue(response.enabled);
+				this.getChild('message').setValue(response.message);
+			}
 			
 			this.getChild('message').setHelp(responseData.helpText);
 		}

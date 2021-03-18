@@ -8,8 +8,6 @@ const SECONDS = 1;
 const MINUTES = 60 * SECONDS;
 const USER_SECONDS = 1000;
 
-// TODO: Make channel rewards configurable and remove this
-const CHANNEL_REWARD_NAME = 'Catastrophe';
 const DEFAULT_DURATION = 3 * MINUTES;
 
 const DESCRIPTION =
@@ -99,11 +97,13 @@ class Catastrophe extends Module {
 			
 			this.assets.Images.selectFile()
 				.then(imageFile => {
-					let files = this.config.images.files || {};
-					let imageConf = files[imageFile.fileKey];
-					let displayData = imageConf.makeDisplayData(imageFile);
-					displayData.count = 1;
-					this.broadcastEvent('floatImage', displayData);
+					if (imageFile) {
+						let files = this.config.images.files || {};
+						let imageConf = files[imageFile.fileKey];
+						let displayData = imageConf.makeDisplayData(imageFile);
+						displayData.count = 1;
+						this.broadcastEvent('floatImage', displayData);
+					}
 				});
 		}
 	}
@@ -145,10 +145,10 @@ class Catastrophe extends Module {
 	}
 	
 	load() {
-		this.onChannelReward(
-			CHANNEL_REWARD_NAME,
-			() => this.start()
-		);
+		// this.onChannelReward(
+		// 	CHANNEL_REWARD_NAME,
+		// 	() => this.start()
+		// );
 	}
 	
 	functions = {

@@ -124,8 +124,8 @@ class FluxBot {
 	// NOTE: This needs to be done BEFORE anything registers to listen for reward
 	// redemptions, or an error will be thrown
 	setupChannelRewards() {
-		const RewardsManager = require('./rewardsManager');
-		RewardsManager.init();
+		this.rewardsManager = require('./rewardsManager');
+		this.rewardsManager.init();
 	}
 	
 	// Load all the modules we have
@@ -338,6 +338,7 @@ class FluxBot {
 				try {
 					this.configManager.importAll(config);
 					this.configManager.saveAll();
+					this.rewardsManager.setRewards(this.mainConfig.getChannelRewards());
 					await this.assetManager.commitChanges();
 					
 					this.handleMainConfigChange();
@@ -347,6 +348,20 @@ class FluxBot {
 					let message = err && err.message ? err.message : `${err}`;
 					socket.emit('configSaveError', { message });
 				}
+			});
+			
+			socket.on('listenForReward', () => {
+				this.rewardsManager.listenForReward((user, rewardID, msg) => {
+					socket.emit('rewardRedeemed', {
+						user: user.displayName,
+						rewardID,
+						message: msg,
+					});
+				});
+			});
+			
+			socket.on('stopListeningForReward', () => {
+				this.rewardsManager.stopListeningForReward();
 			});
 		});
 	}

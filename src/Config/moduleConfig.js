@@ -5,8 +5,8 @@ class ModuleConfig extends Configuration {
 	constructor(modName, modDescription, enabledByDefault) {
 		super(`mod.${modName}`);
 		if (modDescription) {
-			this.addTextDisplay('moduleDescription', modDescription)
-				.setName(null);
+			this.addExpandableTextDisplay('moduleDescription', modDescription)
+				.setName('Module Description');
 		}
 		
 		this.addBoolean('enabled', enabledByDefault)

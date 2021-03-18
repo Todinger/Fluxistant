@@ -18,5 +18,6 @@
     <orderEntry type="library" name="normalize" level="application" />
     <orderEntry type="library" name="phaser" level="application" />
     <orderEntry type="library" name="showdown" level="application" />
+    <orderEntry type="library" name="lodash" level="application" />
   </component>
 </module>
