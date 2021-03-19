@@ -9,6 +9,7 @@ class ArrayEntity extends ConfigEntity {
 		super();
 		this.elementType = elementType || null;
 		this.elements = [];
+		this._elementChanged = () => this.eChanged();
 	}
 	
 	validateIndex(index) {
@@ -30,20 +31,14 @@ class ArrayEntity extends ConfigEntity {
 		return this.elements[index];
 	}
 	
-	setElement(index, value) {
-		this.validateIndex(index);
-		this.validateType(value);
-		this.elements[index] = value;
-		this.extendID(index, value);
-		return value;
-	}
-	
 	addElement(value) {
 		this.validateType(value);
 		this.elements.push(value);
 		this.extendID(this.elements.length - 1, value);
-		
 		value.setDisplayName(`#${this.length}`);
+		value.eOnChanged(this._elementChanged);
+		
+		this.eChanged();
 		
 		return value;
 	}
@@ -59,10 +54,17 @@ class ArrayEntity extends ConfigEntity {
 	}
 	
 	removeElementAt(index) {
+		assert(
+			0 <= index && index < this.elements.length,
+			`Invalid Array Entity element index: ${index}`);
+		
+		this.elements[index].eOnChangedRemove(this._elementChanged);
 		this.elements.splice(index, 1);
 		for (; index < this.length; index++) {
 			this.extendID(index, this.elements[index]);
 		}
+		
+		this.eChanged();
 	}
 	
 	forEach(func) {
@@ -75,6 +77,7 @@ class ArrayEntity extends ConfigEntity {
 	
 	clear() {
 		this.elements = [];
+		this.eChanged();
 	}
 	
 	map(func) {

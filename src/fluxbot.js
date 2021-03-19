@@ -139,6 +139,12 @@ class FluxBot {
 			generationOutputDir);
 	}
 	
+	// Collect all Function-related help information for response variables
+	setupFunctionHelper() {
+		this.functionHelper = require('./Functions/functionHelper');
+		this.functionHelper.collectHelpData(this.moduleManager.getModules());
+	}
+	
 	// Load Twitch interaction
 	setupTwitch() {
 		this.twitchManager = require('./twitchManager');
@@ -363,6 +369,10 @@ class FluxBot {
 			socket.on('stopListeningForReward', () => {
 				this.rewardsManager.stopListeningForReward();
 			});
+			
+			socket.on('getHelpData', () => {
+				socket.emit('helpData', this.functionHelper.getHelpData());
+			})
 		});
 	}
 	
@@ -398,6 +408,7 @@ class FluxBot {
 		this.setupKeyboard();
 		this.setupChannelRewards();
 		this.setupModules();
+		this.setupFunctionHelper();
 		this.setupTwitch();
 		this.setupStreamElements();
 		this.saveData();

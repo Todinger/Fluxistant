@@ -10,6 +10,7 @@ class ChoiceEntity extends ConfigEntity {
 		super();
 		this.options = {};
 		this.selectedOption = null;
+		this._optionChanged = () => this.eChanged();
 	}
 	
 	getOptions() {
@@ -20,7 +21,9 @@ class ChoiceEntity extends ConfigEntity {
 		assert(!(option in this.options), `Duplicate option type: ${option}`);
 		this.options[option] = EntityFactory.build(type);
 		this.options[option].optionName = option;
+		this.options[option].eOnChanged(this._optionChanged);
 		this.extendID(option, this.options[option]);
+		this.eChanged();
 	}
 	
 	_addOptions(options) {
@@ -39,6 +42,7 @@ class ChoiceEntity extends ConfigEntity {
 	select(option) {
 		assert(option in this.options, `Invalid type for choice: ${option}`);
 		this.selectedOption = option;
+		this.eChanged();
 		return this.getSelection();
 	}
 	

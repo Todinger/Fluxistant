@@ -48,6 +48,10 @@ class ModuleManager {
 			(modName, modConfig) => this._onConfigLoaded(modName, modConfig));
 	}
 	
+	getModules() {
+		return this.modules;
+	}
+	
 	// For validation purposes and to prevent collisions
 	nameExists(name) {
 		return name in this.modules;

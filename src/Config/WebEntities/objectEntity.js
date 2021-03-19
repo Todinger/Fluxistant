@@ -10,7 +10,7 @@ class ObjectEntity extends ConfigEntity {
 	constructor() {
 		super();
 		this.children = {};
-		this.allowImportingNewChildren = false;
+		this._childChanged = () => this.eChanged();
 	}
 	
 	getChild(key) {
@@ -20,6 +20,7 @@ class ObjectEntity extends ConfigEntity {
 	
 	setChild(key, value) {
 		this.children[key] = value;
+		this.eChanged();
 		return this.children[key];
 	}
 	
@@ -30,8 +31,10 @@ class ObjectEntity extends ConfigEntity {
 	addChild(key, value) {
 		assert(!(this.hasChild(key)), `Duplicate key added: ${key}.`);
 		this.children[key] = value;
+		this.children[key].eOnChanged(this._childChanged);
 		this._fillChildName(key);
 		this.extendID(key, value);
+		this.eChanged();
 		return this.children[key];
 	}
 	
@@ -41,7 +44,9 @@ class ObjectEntity extends ConfigEntity {
 	
 	removeChild(key) {
 		assert(this.hasChild(key), `Key not found: ${key}.`);
+		this.children[key].eOnChangedRemove(this._childChanged);
 		delete this.children[key];
+		this.eChanged();
 	}
 	
 	_fillChildName(key) {

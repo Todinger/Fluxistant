@@ -378,6 +378,8 @@ class Configurator {
 		this.socket.on('configSaved', () => this.configsSaved());
 		this.socket.on('configSaveError', error => this.saveError(error));
 		this.socket.on('rewardRedeemed', details => this.rewardRedeemed(details));
+		this.socket.on('helpData', helpData => MainManager.setHelpData(helpData));
+		this.socket.emit('getHelpData');
 		this.socket.emit('configRequest');
 	}
 }

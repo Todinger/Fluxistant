@@ -2,6 +2,15 @@ import EventNotifier from "/common/eventNotifier.mjs";
 
 const markdownConverter = new showdown.Converter({simplifiedAutoLink: true});
 
+function insertAtIndex(jElement, i, contents) {
+	if(i === 0) {
+		jElement.prepend(contents);
+		return;
+	}
+	
+	jElement.find("> div:nth-child(" + (i) + ")").after(contents);
+}
+
 // This is how a EntityGui class should look (override all of these methods)
 export default class EntityGui extends EventNotifier {
 	// This needs to match the TYPE in the entity whose GUI the definer describes
@@ -19,7 +28,9 @@ export default class EntityGui extends EventNotifier {
 		this.modName = modName;
 		this.mainContainer = null;
 		this.gui = null;
+		this.helpTextContainer = null;
 		this.helpText = null;
+		this.hasHelp = false;
 		
 		this.changed = false;
 		this.error = false;
@@ -29,6 +40,40 @@ export default class EntityGui extends EventNotifier {
 		return false;
 	}
 	
+	addHelpTextGui() {
+		let parent = this.gui.parent();
+		let index = this.gui.index();
+		this.gui.detach();
+		
+		let newMainContainer = $(`<div id="${this.guiID}" class="uk-width-expand uk-flex uk-flex-center uk-flex-column"></div>`);
+		newMainContainer.append(this.gui);
+		
+		this.helpTextContainer = $(`<ul uk-accordion class="uk-margin-remove"></ul>`);
+		this.helpTextContentsWrapper = $(`<div class="help-text uk-accordion-content"></div>`);
+		this.setHelpText();
+		this.helpTextContainer.append($(`<li></li>`).append(this.helpTextContentsWrapper));
+		
+		newMainContainer.append(this.helpTextContainer);
+		if (this.entity.isAdvanced) {
+			newMainContainer.addClass('advanced');
+		}
+		
+		insertAtIndex(parent, index, newMainContainer);
+		
+		this.hasHelp = true;
+		
+		this.mainContainer = newMainContainer;
+	}
+	
+	setHelpText(helpText) {
+		if (!this.helpTextContentsWrapper) {
+			this.addHelpTextGui();
+		}
+		
+		this.helpTextContentsWrapper.html(
+			markdownConverter.makeHtml(helpText || this.entity.getHelp() || ''));
+	}
+	
 	// Returns the GUI element for editing the entity.
 	// If it hasn't been created yet, this builds it first.
 	getGUI() {
@@ -36,14 +81,16 @@ export default class EntityGui extends EventNotifier {
 			this.gui = this._buildGUI();
 			
 			if (this.entity.getHelp()) {
-				this.mainContainer = $(`<div id="${this.guiID}" class="uk-width-expand uk-flex uk-flex-center uk-flex-column"></div>`);
-				this.mainContainer.append(this.gui);
-				
-				this.helpText = $(`<ul uk-accordion class="uk-margin-remove"></ul>`);
-				let helpTextContents = $(`<li><div class="help-text uk-accordion-content">${markdownConverter.makeHtml(this.entity.getHelp() || '')}</div></li>`)
-				this.helpText.append(helpTextContents);
-				
-				this.mainContainer.append(this.helpText);
+				// this.mainContainer = $(`<div id="${this.guiID}" class="uk-width-expand uk-flex uk-flex-center uk-flex-column"></div>`);
+				// this.mainContainer.append(this.gui);
+				//
+				// this.helpTextContainer = $(`<ul uk-accordion class="uk-margin-remove"></ul>`);
+				// this.helpTextContentsWrapper = $(`<li><div class="help-text uk-accordion-content"></div></li>`);
+				// this.setHelpText();
+				// this.helpTextContainer.append(this.helpTextContentsWrapper);
+				//
+				// this.mainContainer.append(this.helpTextContainer);
+				this.addHelpTextGui();
 			} else {
 				this.mainContainer = this.gui;
 			}
@@ -62,14 +109,14 @@ export default class EntityGui extends EventNotifier {
 	}
 	
 	showHelp() {
-		if (this.entity.getHelp()) {
-			UIkit.accordion(this.helpText).toggle(0);
+		if (this.hasHelp) {
+			UIkit.accordion(this.helpTextContainer).toggle(0);
 		}
 	}
 	
 	hideHelp() {
-		if (this.entity.getHelp()) {
-			UIkit.accordion(this.helpText).toggle(0);
+		if (this.hasHelp) {
+			UIkit.accordion(this.helpTextContainer).toggle(0);
 		}
 	}
 	

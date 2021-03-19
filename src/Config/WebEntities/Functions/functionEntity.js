@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const StaticObjectEntity = require('../staticObjectEntity');
 const FilterChoiceEntity = require('./Filters/filterChoiceEntity');
 const TriggerChoiceEntity = require('./Triggers/triggerChoiceEntity');
@@ -5,6 +6,7 @@ const ResponseChoiceEntity = require('./Responses/responseChoiceEntity');
 
 class FunctionEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Function'; 							}
+	static get GUITYPE()	{ return 'Function'; 							}
 	static get BUILDER()	{ return (...p) => new FunctionEntity(...p); 	}
 	
 	constructor(data) {
@@ -28,15 +30,9 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addDynamicArray('triggers', 'TriggerChoice')
 			.setName('Triggers')
 			.setDescription('Defines when this function will be invoked');
+		// console.log(`Function Self: ${this.dbg} / Triggers: ${this.getChild('triggers').dbg}`);
 		
-		if (data) {
-			this.responseHelpText = data.getAllVariables().map(variable => variable.toMarkdown()).join('\n');
-		}
-		this.addDynamicArray(
-				'responses',
-				'ResponseChoice',
-				undefined,
-				{ helpText: this.responseHelpText })
+		this.addDynamicArray('responses', 'ResponseChoice')
 			.setName('Responses')
 			.setDescription('Defines messages that will be sent after the function is done');
 		
@@ -61,12 +57,35 @@ class FunctionEntity extends StaticObjectEntity {
 				data.responses.forEach(response => this.addResponse(data, response));
 			}
 		}
+		
+		// Events (these initializations are to make the IDE treat the
+		// variables as functions properly without giving warnings about types)
+		this.eOnTriggersChanged = (x) => x;
+		this.eTriggersChanged = (x) => x;
+		this.eOnTriggersChangedRemove = (x) => x;
+		[
+			this.eOnTriggersChanged,
+			this.eTriggersChanged,
+			this.eOnTriggersChangedRemove
+		] = this.event('triggersChanged');
+		
+		this._listenForTriggerChanges();
 	}
 	
-	addObject(object, childName, objectClass, data) {
+	_listenForTriggerChanges() {
+		// Notify trigger changes, as these can directly change
+		// help data for responses
+		this.getChild('triggers').eOnChanged(() => this.eTriggersChanged());
+	}
+	
+	getFuncID() {
+		return this.getChild('funcID').getValue();
+	}
+	
+	addObject(object, childName, objectClass) {
 		let choiceEntity = this.getChild(childName).addElement(new objectClass());
 		let selectedObject = choiceEntity.select(object.type);
-		selectedObject.setData(data || object);
+		selectedObject.setData(object);
 	}
 	
 	addFilter(filter) {
@@ -78,11 +97,14 @@ class FunctionEntity extends StaticObjectEntity {
 	}
 	
 	addResponse(data, response) {
-		let responseData = {
-			response,
-			helpText: this.responseHelpText,
-		}
-		this.addObject(response, 'responses', ResponseChoiceEntity, responseData);
+		this.addObject(response, 'responses', ResponseChoiceEntity);
+	}
+	
+	getTriggerTypes() {
+		return _.uniq(this
+			.getChild('triggers')
+			.getElements()
+			.map(triggerChoice => triggerChoice.selectedOption));
 	}
 	
 	// ---- Overrides ---- //
@@ -98,7 +120,8 @@ class FunctionEntity extends StaticObjectEntity {
 	
 	cloneImpl() {
 		let clone = super.cloneImpl();
-		clone.responseHelpText = this.responseHelpText;
+		// clone.triggers = clone.getChild('triggers');
+		clone._listenForTriggerChanges();
 		return clone;
 	}
 }

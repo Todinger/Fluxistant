@@ -18623,7 +18623,7 @@ class AssetEntity extends StaticObjectEntity {
 
 module.exports = AssetEntity;
 
-},{"../../../errors":97,"../staticObjectEntity":80,"assert":1}],9:[function(require,module,exports){
+},{"../../../errors":98,"../staticObjectEntity":80,"assert":1}],9:[function(require,module,exports){
 const _ = require('lodash');
 const StaticObjectEntity = require('../staticObjectEntity');
 
@@ -19013,15 +19013,10 @@ class ResponseEntity extends ChoiceValueEntity {
 			.setDescription('The message that will be sent by this response (variables are available)');
 	}
 	
-	setData(responseData) {
-		if (responseData) {
-			let response = responseData.response;
-			if (response) {
-				this.getChild('enabled').setValue(response.enabled);
-				this.getChild('message').setValue(response.message);
-			}
-			
-			this.getChild('message').setHelp(responseData.helpText);
+	setData(response) {
+		if (response) {
+			this.getChild('enabled').setValue(response.enabled);
+			this.getChild('message').setValue(response.message);
 		}
 	}
 }
@@ -19058,10 +19053,10 @@ class Response_ConsoleEntity extends ResponseEntity {
 			.setDescription('Level of the message in the chat (which messages show up depends on the active viewing level)');
 	}
 	
-	setData(responseData) {
-		super.setData(responseData);
-		if (responseData && responseData.response && responseData.response.level) {
-			this.getChild('level').select(responseData.response.level);
+	setData(response) {
+		super.setData(response);
+		if (response && response.level) {
+			this.getChild('level').select(response.level);
 		}
 	}
 }
@@ -19315,6 +19310,7 @@ class Trigger_ShortcutEntity extends TriggerEntity {
 module.exports = Trigger_ShortcutEntity;
 
 },{"./triggerEntity":26}],32:[function(require,module,exports){
+const _ = require('lodash');
 const StaticObjectEntity = require('../staticObjectEntity');
 const FilterChoiceEntity = require('./Filters/filterChoiceEntity');
 const TriggerChoiceEntity = require('./Triggers/triggerChoiceEntity');
@@ -19322,6 +19318,7 @@ const ResponseChoiceEntity = require('./Responses/responseChoiceEntity');
 
 class FunctionEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Function'; 							}
+	static get GUITYPE()	{ return 'Function'; 							}
 	static get BUILDER()	{ return (...p) => new FunctionEntity(...p); 	}
 	
 	constructor(data) {
@@ -19345,15 +19342,9 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addDynamicArray('triggers', 'TriggerChoice')
 			.setName('Triggers')
 			.setDescription('Defines when this function will be invoked');
+		// console.log(`Function Self: ${this.dbg} / Triggers: ${this.getChild('triggers').dbg}`);
 		
-		if (data) {
-			this.responseHelpText = data.getAllVariables().map(variable => variable.toMarkdown()).join('\n');
-		}
-		this.addDynamicArray(
-				'responses',
-				'ResponseChoice',
-				undefined,
-				{ helpText: this.responseHelpText })
+		this.addDynamicArray('responses', 'ResponseChoice')
 			.setName('Responses')
 			.setDescription('Defines messages that will be sent after the function is done');
 		
@@ -19378,12 +19369,35 @@ class FunctionEntity extends StaticObjectEntity {
 				data.responses.forEach(response => this.addResponse(data, response));
 			}
 		}
+		
+		// Events (these initializations are to make the IDE treat the
+		// variables as functions properly without giving warnings about types)
+		this.eOnTriggersChanged = (x) => x;
+		this.eTriggersChanged = (x) => x;
+		this.eOnTriggersChangedRemove = (x) => x;
+		[
+			this.eOnTriggersChanged,
+			this.eTriggersChanged,
+			this.eOnTriggersChangedRemove
+		] = this.event('triggersChanged');
+		
+		this._listenForTriggerChanges();
 	}
 	
-	addObject(object, childName, objectClass, data) {
+	_listenForTriggerChanges() {
+		// Notify trigger changes, as these can directly change
+		// help data for responses
+		this.getChild('triggers').eOnChanged(() => this.eTriggersChanged());
+	}
+	
+	getFuncID() {
+		return this.getChild('funcID').getValue();
+	}
+	
+	addObject(object, childName, objectClass) {
 		let choiceEntity = this.getChild(childName).addElement(new objectClass());
 		let selectedObject = choiceEntity.select(object.type);
-		selectedObject.setData(data || object);
+		selectedObject.setData(object);
 	}
 	
 	addFilter(filter) {
@@ -19395,11 +19409,14 @@ class FunctionEntity extends StaticObjectEntity {
 	}
 	
 	addResponse(data, response) {
-		let responseData = {
-			response,
-			helpText: this.responseHelpText,
-		}
-		this.addObject(response, 'responses', ResponseChoiceEntity, responseData);
+		this.addObject(response, 'responses', ResponseChoiceEntity);
+	}
+	
+	getTriggerTypes() {
+		return _.uniq(this
+			.getChild('triggers')
+			.getElements()
+			.map(triggerChoice => triggerChoice.selectedOption));
 	}
 	
 	// ---- Overrides ---- //
@@ -19415,14 +19432,15 @@ class FunctionEntity extends StaticObjectEntity {
 	
 	cloneImpl() {
 		let clone = super.cloneImpl();
-		clone.responseHelpText = this.responseHelpText;
+		// clone.triggers = clone.getChild('triggers');
+		clone._listenForTriggerChanges();
 		return clone;
 	}
 }
 
 module.exports = FunctionEntity;
 
-},{"../staticObjectEntity":80,"./Filters/filterChoiceEntity":14,"./Responses/responseChoiceEntity":20,"./Triggers/triggerChoiceEntity":25}],33:[function(require,module,exports){
+},{"../staticObjectEntity":80,"./Filters/filterChoiceEntity":14,"./Responses/responseChoiceEntity":20,"./Triggers/triggerChoiceEntity":25,"lodash":7}],33:[function(require,module,exports){
 const ChoiceEntity = require('../choiceEntity');
 
 class ImageEffectEntity extends ChoiceEntity {
@@ -19569,7 +19587,7 @@ class KeyEntity extends ValueEntity {
 
 module.exports = KeyEntity;
 
-},{"../../../Enums":95,"../Values/valueEntity":54,"assert":1}],38:[function(require,module,exports){
+},{"../../../Enums":96,"../Values/valueEntity":54,"assert":1}],38:[function(require,module,exports){
 const assert = require('assert').strict;
 const DynamicArrayEntity = require('../dynamicArrayEntity');
 const Enums = require('../../../Enums');
@@ -19624,7 +19642,7 @@ class KeyShortcutEntity extends DynamicArrayEntity {
 
 module.exports = KeyShortcutEntity;
 
-},{"../../../Enums":95,"../dynamicArrayEntity":69,"assert":1}],39:[function(require,module,exports){
+},{"../../../Enums":96,"../dynamicArrayEntity":69,"assert":1}],39:[function(require,module,exports){
 const StaticObjectEntity = require('../staticObjectEntity');
 
 class KeyShortcutsEntity extends StaticObjectEntity {
@@ -19967,10 +19985,12 @@ class ValueEntity extends ConfigEntity {
 		}
 		
 		this.value = value;
+		this.eChanged();
 	}
 	
 	clearValue() {
 		this.value = undefined;
+		this.eChanged();
 	}
 	
 	isSet() {
@@ -20017,6 +20037,7 @@ class ArrayEntity extends ConfigEntity {
 		super();
 		this.elementType = elementType || null;
 		this.elements = [];
+		this._elementChanged = () => this.eChanged();
 	}
 	
 	validateIndex(index) {
@@ -20038,20 +20059,14 @@ class ArrayEntity extends ConfigEntity {
 		return this.elements[index];
 	}
 	
-	setElement(index, value) {
-		this.validateIndex(index);
-		this.validateType(value);
-		this.elements[index] = value;
-		this.extendID(index, value);
-		return value;
-	}
-	
 	addElement(value) {
 		this.validateType(value);
 		this.elements.push(value);
 		this.extendID(this.elements.length - 1, value);
-		
 		value.setDisplayName(`#${this.length}`);
+		value.eOnChanged(this._elementChanged);
+		
+		this.eChanged();
 		
 		return value;
 	}
@@ -20067,10 +20082,17 @@ class ArrayEntity extends ConfigEntity {
 	}
 	
 	removeElementAt(index) {
+		assert(
+			0 <= index && index < this.elements.length,
+			`Invalid Array Entity element index: ${index}`);
+		
+		this.elements[index].eOnChangedRemove(this._elementChanged);
 		this.elements.splice(index, 1);
 		for (; index < this.length; index++) {
 			this.extendID(index, this.elements[index]);
 		}
+		
+		this.eChanged();
 	}
 	
 	forEach(func) {
@@ -20083,6 +20105,7 @@ class ArrayEntity extends ConfigEntity {
 	
 	clear() {
 		this.elements = [];
+		this.eChanged();
 	}
 	
 	map(func) {
@@ -20385,6 +20408,7 @@ class ChoiceEntity extends ConfigEntity {
 		super();
 		this.options = {};
 		this.selectedOption = null;
+		this._optionChanged = () => this.eChanged();
 	}
 	
 	getOptions() {
@@ -20395,7 +20419,9 @@ class ChoiceEntity extends ConfigEntity {
 		assert(!(option in this.options), `Duplicate option type: ${option}`);
 		this.options[option] = EntityFactory.build(type);
 		this.options[option].optionName = option;
+		this.options[option].eOnChanged(this._optionChanged);
 		this.extendID(option, this.options[option]);
+		this.eChanged();
 	}
 	
 	_addOptions(options) {
@@ -20414,6 +20440,7 @@ class ChoiceEntity extends ConfigEntity {
 	select(option) {
 		assert(option in this.options, `Invalid type for choice: ${option}`);
 		this.selectedOption = option;
+		this.eChanged();
 		return this.getSelection();
 	}
 	
@@ -20534,10 +20561,8 @@ class ChoiceValueEntity extends StaticObjectEntity {
 	static get TYPE()		{ return null;			}	// Avoid construction (abstract type)
 	static get GUITYPE()	{ return 'RawObject';	}
 	
-	// constructor(type, optionName) {
 	constructor(displayText) {
 		super();
-		// this.optionName = optionName;
 		this.displayText = displayText;
 	}
 	
@@ -20552,13 +20577,6 @@ class ChoiceValueEntity extends StaticObjectEntity {
 		conf.type = this.optionName;
 		return conf;
 	}
-	
-	// Inject our 'type' field into the data
-	// export() {
-	// 	let descriptor = super.export();
-	// 	descriptor.type = this.type;
-	// 	return descriptor;
-	// }
 }
 
 module.exports = ChoiceValueEntity;
@@ -20576,7 +20594,7 @@ class CommandEntity extends StaticObjectEntity {
 	static get TYPE()		{ return 'Command'; 				    	}
 	static get GUITYPE()	{ return 'Command'; 				    	}
 	static get BUILDER()	{ return data => new CommandEntity(data); 	}
-	c
+	
 	constructor(data) {
 		super();
 		this.addChild('cmdid', new StringEntity(data && data.cmdid || '')) // Identifies the command for functional purposes
@@ -20682,15 +20700,22 @@ class CommandEntity extends StaticObjectEntity {
 
 module.exports = CommandEntity;
 
-},{"../../errors":97,"./Values/naturalNumberEntity":49,"./Values/stringEntity":53,"./cooldownEntity":68,"./dynamicArrayEntity":69,"./staticObjectEntity":80,"./userFilterEntity":83}],67:[function(require,module,exports){
+},{"../../errors":98,"./Values/naturalNumberEntity":49,"./Values/stringEntity":53,"./cooldownEntity":68,"./dynamicArrayEntity":69,"./staticObjectEntity":80,"./userFilterEntity":83}],67:[function(require,module,exports){
+const MiniEventNotifier = require('../miniEventNotifier');
 const Errors = require('../../errors');
 const EntityFactory = require('../entityFactory');
 
-class ConfigEntity {
+class ConfigEntity extends MiniEventNotifier {
 	static get TYPE()       { return null; }	// Avoid construction (abstract type)
 	static get GUITYPE()    { return null; }    // Specifies which GUI class to use to edit entities of this type
 	
 	constructor() {
+		super();
+		
+		if (ConfigEntity.debug) {
+			this.dbg = `${ConfigEntity.dbgNext++}`;
+		}
+		
 		this.type = this.constructor.TYPE;
 		this.name = undefined;
 		this.description = undefined;
@@ -20702,6 +20727,13 @@ class ConfigEntity {
 		this.displayName = null;
 		this.displayIndex = undefined;
 		this.advanced = false; // Any entity with this set to true will only show up in "Advanced Mode"
+		
+		// Events (these initializations are to make the IDE treat the
+		// variables as functions properly without giving warnings about types)
+		this.eOnChanged = (x) => x;
+		this.eChanged = (x) => x;
+		this.eOnChangedRemove = (x) => x;
+		[this.eOnChanged, this.eChanged, this.eOnChangedRemove] = this.event('changed');
 	}
 	
 	hasName() {
@@ -20714,6 +20746,7 @@ class ConfigEntity {
 	
 	setName(name) {
 		this.name = name;
+		this.eChanged();
 		return this;
 	}
 	
@@ -20724,6 +20757,7 @@ class ConfigEntity {
 	
 	setDescription(description) {
 		this.description = description;
+		this.eChanged();
 		return this;
 	}
 	
@@ -20734,6 +20768,7 @@ class ConfigEntity {
 	
 	setHelp(helpText) {
 		this.helpText = helpText;
+		this.eChanged();
 		return this;
 	}
 	
@@ -20771,6 +20806,13 @@ class ConfigEntity {
 	
 	setID(id) {
 		this.id = id;
+		
+		// if (ConfigEntity.debug) {
+		// 	if (id === 'mod.Candy Game.functions.0.triggers') {
+		// 		console.log(`Triggers self: ${this.dbg}`);
+		// 	}
+		// }
+		
 		return this;
 	}
 	
@@ -20801,6 +20843,12 @@ class ConfigEntity {
 	
 	extendID(addendum, childEntity) {
 		childEntity.setID(`${this.id}.${this._escapeID(addendum)}`);
+		
+		// if (ConfigEntity.debug) {
+		// 	if (childEntity.id === 'mod.Candy Game.functions.0.triggers') {
+		// 		console.log(`Self: ${this.dbg} / Triggers: ${childEntity.dbg}`);
+		// 	}
+		// }
 	}
 	
 	// Returns the contents of this entity as a module-ready configuration for
@@ -20815,6 +20863,10 @@ class ConfigEntity {
 	}
 	
 	import(entityInfo, lenient) {
+		if (ConfigEntity.debug) {
+			this.dbg = `${this.dbg} / import`;
+		}
+		
 		if (!lenient && entityInfo.type !== this.type) {
 			throw `Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`;
 		} else if (lenient && !this._assignableFrom(entityInfo.type)) {
@@ -20871,11 +20923,19 @@ class ConfigEntity {
 	// Creates a copy of this entity with all of its contents.
 	clone() {
 		let copy = this.cloneImpl();
+		
+		if (ConfigEntity.debug) {
+			copy.dbg = `${copy.dbg} / clone`;
+			// if (this.id === 'mod.Candy Game.functions.0.triggers') {
+			// 	console.log(`Trigger <${this.dbg}> copied to <${copy.dbg}>`);
+			// }
+		}
+		
 		copy.setName(this.getName());
 		copy.setDescription(this.getDescription());
 		copy.setHelp(this.getHelp());
+		copy.setID(this.id);
 		copy.hidden = this.hidden;
-		copy.id = this.id;
 		copy.displayName = this.displayName;
 		copy.displayIndex = this.displayIndex;
 		copy.advanced = this.advanced;
@@ -20907,6 +20967,11 @@ class ConfigEntity {
 	static buildEntity(entityObject, id) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
+		
+		if (ConfigEntity.debug) {
+			instance.dbg = `${instance.dbg} / build`;
+		}
+		
 		instance.buildFrom(entityObject.descriptor);
 		instance.setID(id);
 		instance.setName(entityObject.name);
@@ -20919,15 +20984,23 @@ class ConfigEntity {
 	static readEntity(entityObject, lenient) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
+		
+		if (ConfigEntity.debug) {
+			instance.dbg = `${instance.dbg} / read`;
+		}
+		
 		instance.import(entityObject, lenient);
 		instance.validate();
 		return instance;
 	}
 }
 
+ConfigEntity.dbgNext = 0;
+ConfigEntity.debug = false;
+
 module.exports = ConfigEntity;
 
-},{"../../errors":97,"../entityFactory":93}],68:[function(require,module,exports){
+},{"../../errors":98,"../entityFactory":93,"../miniEventNotifier":94}],68:[function(require,module,exports){
 const StaticObjectEntity = require('./staticObjectEntity');
 
 class CooldownEntity extends StaticObjectEntity {
@@ -21267,7 +21340,7 @@ class ObjectEntity extends ConfigEntity {
 	constructor() {
 		super();
 		this.children = {};
-		this.allowImportingNewChildren = false;
+		this._childChanged = () => this.eChanged();
 	}
 	
 	getChild(key) {
@@ -21277,6 +21350,7 @@ class ObjectEntity extends ConfigEntity {
 	
 	setChild(key, value) {
 		this.children[key] = value;
+		this.eChanged();
 		return this.children[key];
 	}
 	
@@ -21287,8 +21361,10 @@ class ObjectEntity extends ConfigEntity {
 	addChild(key, value) {
 		assert(!(this.hasChild(key)), `Duplicate key added: ${key}.`);
 		this.children[key] = value;
+		this.children[key].eOnChanged(this._childChanged);
 		this._fillChildName(key);
 		this.extendID(key, value);
+		this.eChanged();
 		return this.children[key];
 	}
 	
@@ -21298,7 +21374,9 @@ class ObjectEntity extends ConfigEntity {
 	
 	removeChild(key) {
 		assert(this.hasChild(key), `Key not found: ${key}.`);
+		this.children[key].eOnChangedRemove(this._childChanged);
 		delete this.children[key];
+		this.eChanged();
 	}
 	
 	_fillChildName(key) {
@@ -21598,6 +21676,7 @@ class TextDisplayEntity extends ConfigEntity {
 			`Illegal value: expected string, got ${value}`);
 		
 		this.value = value;
+		this.eChanged();
 	}
 	
 	// ---- Overrides ---- //
@@ -21666,12 +21745,6 @@ class UserEntity extends StaticObjectEntity {
 			(isNonEmptyString(displayName) && displayName) ||
 			undefined;
 	}
-	
-	// export() {
-	// 	let conf = super.export();
-	// 	conf.username = conf.username.toLowerCase();
-	// 	return conf;
-	// }
 }
 
 module.exports = UserEntity;
@@ -21931,6 +22004,80 @@ class EntityFactory {
 module.exports = new EntityFactory();
 
 },{"assert":1}],94:[function(require,module,exports){
+const _ = require('lodash');
+
+class MiniEventNotifier {
+	constructor() {
+		// This is where we store the handlers (callbacks) of all the events
+		// we support
+		this._eventHandlers = {};
+	}
+	
+	_ensurePresence(eventName) {
+		if (!(eventName in this._eventHandlers)) {
+			this._eventHandlers[eventName] = [];
+		}
+	}
+	
+	// Registers a callback to be invoked when an event occurs.
+	on(eventName, callback) {
+		eventName = eventName.toLowerCase();
+		
+		this._ensurePresence(eventName);
+		
+		this._eventHandlers[eventName].push(callback);
+		return this;
+	}
+	
+	// Removes a callback from the list for the given event
+	removeCallback(eventName, callback) {
+		eventName = eventName.toLowerCase();
+		
+		if (eventName in this._eventHandlers) {
+			_.pull(this._eventHandlers[eventName], callback);
+		}
+	}
+	
+	// Invokes all the callbacks that registered for the specified event.
+	// If the event has arguments, simply list them after the event name when
+	// invoking this function.
+	// E.g.:
+	// 	this._notify('helloWorld', 'Hello', 'world!');
+	// Correspondingly, all the callbacks registering to the same event should
+	// accept these arguments, e.g.:
+	// 	somethingThatDerivesFromEventNotifier.on(
+	// 		'helloWorld',
+	// 		(hello, world) => console.log(`${hello} ${world}`));
+	// Of course, if you don't care about the arguments you don't need to use
+	// them. This would work fine too:
+	// 	somethingThatDerivesFromEventNotifier.on(
+	// 		'helloWorld',
+	// 		() => console.log(`Someone said hello world!`));
+	notify(eventName, ...args) {
+		eventName = eventName.toLowerCase();
+		
+		this._ensurePresence(eventName);
+		
+		this._eventHandlers[eventName].forEach(
+			callback => callback(...args));
+	}
+	
+	event(eventName) {
+		this._ensurePresence(eventName);
+		let onEvent = (callback) => this.on(eventName, callback);
+		let notifyEvent = (...p) => this.notify(eventName, ...p);
+		let unregister = (callback) => this.removeCallback(eventName, callback);
+		return [
+			onEvent,
+			notifyEvent,
+			unregister,
+		];
+	}
+}
+
+module.exports = MiniEventNotifier;
+
+},{"lodash":7}],95:[function(require,module,exports){
 const entities = {
 	ArrayEntity: require('./WebEntities/arrayEntity.js'),
 	ChannelRewardEntity: require('./WebEntities/channelRewardEntity.js'),
@@ -22034,7 +22181,7 @@ module.exports = {
 	RegisterAll: registerAll,
 	Enums: enums,
 }
-},{"../enums":96,"./WebEntities/Assets/assetEntity.js":8,"./WebEntities/Assets/assetFileEntity.js":9,"./WebEntities/Assets/imageFileEntity.js":10,"./WebEntities/Assets/multiAssetEntity.js":11,"./WebEntities/Assets/singleAssetEntity.js":12,"./WebEntities/Assets/soundFileEntity.js":13,"./WebEntities/Functions/Filters/filterChoiceEntity.js":14,"./WebEntities/Functions/Filters/filterEntity.js":15,"./WebEntities/Functions/Filters/filter_IsModEntity.js":16,"./WebEntities/Functions/Filters/filter_IsSubEntity.js":17,"./WebEntities/Functions/Filters/filter_OneOfUsersEntity.js":18,"./WebEntities/Functions/Filters/filter_SpecificUserEntity.js":19,"./WebEntities/Functions/Responses/responseChoiceEntity.js":20,"./WebEntities/Functions/Responses/responseEntity.js":21,"./WebEntities/Functions/Responses/response_ChatEntity.js":22,"./WebEntities/Functions/Responses/response_ConsoleEntity.js":23,"./WebEntities/Functions/Responses/response_SEEntity.js":24,"./WebEntities/Functions/Triggers/triggerChoiceEntity.js":25,"./WebEntities/Functions/Triggers/triggerEntity.js":26,"./WebEntities/Functions/Triggers/trigger_ChannelRewardEntity.js":27,"./WebEntities/Functions/Triggers/trigger_CommandEntity.js":28,"./WebEntities/Functions/Triggers/trigger_KeyDownEntity.js":29,"./WebEntities/Functions/Triggers/trigger_KeyUpEntity.js":30,"./WebEntities/Functions/Triggers/trigger_ShortcutEntity.js":31,"./WebEntities/Functions/functionEntity.js":32,"./WebEntities/ImageEffects/imageEffectEntity.js":33,"./WebEntities/ImageEffects/imageEffect_DunDunDunEntity.js":34,"./WebEntities/ImageEffects/imageEffect_GlowEntity.js":35,"./WebEntities/ImageEffects/imageEffect_ShadowEntity.js":36,"./WebEntities/Keys/keyEntity.js":37,"./WebEntities/Keys/keyShortcutEntity.js":38,"./WebEntities/Keys/keyShortcutsEntity.js":39,"./WebEntities/LogLevel/logLevelEntity.js":40,"./WebEntities/LogLevel/logLevel_BaseEntity.js":41,"./WebEntities/LogLevel/logLevel_DebugEntity.js":42,"./WebEntities/LogLevel/logLevel_ErrorEntity.js":43,"./WebEntities/LogLevel/logLevel_InfoEntity.js":44,"./WebEntities/LogLevel/logLevel_WarnEntity.js":45,"./WebEntities/Values/booleanEntity.js":46,"./WebEntities/Values/hiddenStringEntity.js":47,"./WebEntities/Values/integerEntity.js":48,"./WebEntities/Values/naturalNumberEntity.js":49,"./WebEntities/Values/nonNegativeNumberEntity.js":50,"./WebEntities/Values/numberEntity.js":51,"./WebEntities/Values/positiveNumberEntity.js":52,"./WebEntities/Values/stringEntity.js":53,"./WebEntities/Values/valueEntity.js":54,"./WebEntities/arrayEntity.js":55,"./WebEntities/candyFileEntity.js":56,"./WebEntities/candyInflationEntity.js":57,"./WebEntities/candyInflation_BaseEntity.js":58,"./WebEntities/candyInflation_ExponentialEntity.js":59,"./WebEntities/candyInflation_LinearEntity.js":60,"./WebEntities/candyInflation_NoneEntity.js":61,"./WebEntities/channelRewardEntity.js":62,"./WebEntities/channelRewardSelectionEntity.js":63,"./WebEntities/choiceEntity.js":64,"./WebEntities/choiceValueEntity.js":65,"./WebEntities/commandEntity.js":66,"./WebEntities/configEntity.js":67,"./WebEntities/cooldownEntity.js":68,"./WebEntities/dynamicArrayEntity.js":69,"./WebEntities/dynamicAssetArrayEntity.js":70,"./WebEntities/dynamicObjectEntity.js":71,"./WebEntities/expandableTextDisplayEntity.js":72,"./WebEntities/fixedArrayEntity.js":73,"./WebEntities/imageCommandEntity.js":74,"./WebEntities/imageEntity.js":75,"./WebEntities/imageFunctionEntity.js":76,"./WebEntities/objectEntity.js":77,"./WebEntities/simpleObjectEntity.js":78,"./WebEntities/soundEntity.js":79,"./WebEntities/staticObjectEntity.js":80,"./WebEntities/textDisplayEntity.js":81,"./WebEntities/userEntity.js":82,"./WebEntities/userFilterEntity.js":83,"./WebEntities/userFilter_BaseEntity.js":84,"./WebEntities/userFilter_IsAtLeastModEntity.js":85,"./WebEntities/userFilter_IsModEntity.js":86,"./WebEntities/userFilter_IsOneOfEntity.js":87,"./WebEntities/userFilter_IsSubEntity.js":88,"./WebEntities/userFilter_IsUserEntity.js":89,"./WebEntities/userGroupEntity.js":90,"./WebEntities/userMediaEntity.js":91,"./WebEntities/welcomeEntity.js":92,"./entityFactory":93}],95:[function(require,module,exports){
+},{"../enums":97,"./WebEntities/Assets/assetEntity.js":8,"./WebEntities/Assets/assetFileEntity.js":9,"./WebEntities/Assets/imageFileEntity.js":10,"./WebEntities/Assets/multiAssetEntity.js":11,"./WebEntities/Assets/singleAssetEntity.js":12,"./WebEntities/Assets/soundFileEntity.js":13,"./WebEntities/Functions/Filters/filterChoiceEntity.js":14,"./WebEntities/Functions/Filters/filterEntity.js":15,"./WebEntities/Functions/Filters/filter_IsModEntity.js":16,"./WebEntities/Functions/Filters/filter_IsSubEntity.js":17,"./WebEntities/Functions/Filters/filter_OneOfUsersEntity.js":18,"./WebEntities/Functions/Filters/filter_SpecificUserEntity.js":19,"./WebEntities/Functions/Responses/responseChoiceEntity.js":20,"./WebEntities/Functions/Responses/responseEntity.js":21,"./WebEntities/Functions/Responses/response_ChatEntity.js":22,"./WebEntities/Functions/Responses/response_ConsoleEntity.js":23,"./WebEntities/Functions/Responses/response_SEEntity.js":24,"./WebEntities/Functions/Triggers/triggerChoiceEntity.js":25,"./WebEntities/Functions/Triggers/triggerEntity.js":26,"./WebEntities/Functions/Triggers/trigger_ChannelRewardEntity.js":27,"./WebEntities/Functions/Triggers/trigger_CommandEntity.js":28,"./WebEntities/Functions/Triggers/trigger_KeyDownEntity.js":29,"./WebEntities/Functions/Triggers/trigger_KeyUpEntity.js":30,"./WebEntities/Functions/Triggers/trigger_ShortcutEntity.js":31,"./WebEntities/Functions/functionEntity.js":32,"./WebEntities/ImageEffects/imageEffectEntity.js":33,"./WebEntities/ImageEffects/imageEffect_DunDunDunEntity.js":34,"./WebEntities/ImageEffects/imageEffect_GlowEntity.js":35,"./WebEntities/ImageEffects/imageEffect_ShadowEntity.js":36,"./WebEntities/Keys/keyEntity.js":37,"./WebEntities/Keys/keyShortcutEntity.js":38,"./WebEntities/Keys/keyShortcutsEntity.js":39,"./WebEntities/LogLevel/logLevelEntity.js":40,"./WebEntities/LogLevel/logLevel_BaseEntity.js":41,"./WebEntities/LogLevel/logLevel_DebugEntity.js":42,"./WebEntities/LogLevel/logLevel_ErrorEntity.js":43,"./WebEntities/LogLevel/logLevel_InfoEntity.js":44,"./WebEntities/LogLevel/logLevel_WarnEntity.js":45,"./WebEntities/Values/booleanEntity.js":46,"./WebEntities/Values/hiddenStringEntity.js":47,"./WebEntities/Values/integerEntity.js":48,"./WebEntities/Values/naturalNumberEntity.js":49,"./WebEntities/Values/nonNegativeNumberEntity.js":50,"./WebEntities/Values/numberEntity.js":51,"./WebEntities/Values/positiveNumberEntity.js":52,"./WebEntities/Values/stringEntity.js":53,"./WebEntities/Values/valueEntity.js":54,"./WebEntities/arrayEntity.js":55,"./WebEntities/candyFileEntity.js":56,"./WebEntities/candyInflationEntity.js":57,"./WebEntities/candyInflation_BaseEntity.js":58,"./WebEntities/candyInflation_ExponentialEntity.js":59,"./WebEntities/candyInflation_LinearEntity.js":60,"./WebEntities/candyInflation_NoneEntity.js":61,"./WebEntities/channelRewardEntity.js":62,"./WebEntities/channelRewardSelectionEntity.js":63,"./WebEntities/choiceEntity.js":64,"./WebEntities/choiceValueEntity.js":65,"./WebEntities/commandEntity.js":66,"./WebEntities/configEntity.js":67,"./WebEntities/cooldownEntity.js":68,"./WebEntities/dynamicArrayEntity.js":69,"./WebEntities/dynamicAssetArrayEntity.js":70,"./WebEntities/dynamicObjectEntity.js":71,"./WebEntities/expandableTextDisplayEntity.js":72,"./WebEntities/fixedArrayEntity.js":73,"./WebEntities/imageCommandEntity.js":74,"./WebEntities/imageEntity.js":75,"./WebEntities/imageFunctionEntity.js":76,"./WebEntities/objectEntity.js":77,"./WebEntities/simpleObjectEntity.js":78,"./WebEntities/soundEntity.js":79,"./WebEntities/staticObjectEntity.js":80,"./WebEntities/textDisplayEntity.js":81,"./WebEntities/userEntity.js":82,"./WebEntities/userFilterEntity.js":83,"./WebEntities/userFilter_BaseEntity.js":84,"./WebEntities/userFilter_IsAtLeastModEntity.js":85,"./WebEntities/userFilter_IsModEntity.js":86,"./WebEntities/userFilter_IsOneOfEntity.js":87,"./WebEntities/userFilter_IsSubEntity.js":88,"./WebEntities/userFilter_IsUserEntity.js":89,"./WebEntities/userGroupEntity.js":90,"./WebEntities/userMediaEntity.js":91,"./WebEntities/welcomeEntity.js":92,"./entityFactory":93}],96:[function(require,module,exports){
 const Enums = {};   
 
 // Keyboard keycodes, used to register key shortcuts and events in
@@ -22313,9 +22460,9 @@ Enums.withNumLock = (htmlCode, numpadOn) => {
 
 module.exports = Enums;
 
-},{}],96:[function(require,module,exports){
-arguments[4][95][0].apply(exports,arguments)
-},{"dup":95}],97:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
+arguments[4][96][0].apply(exports,arguments)
+},{"dup":96}],98:[function(require,module,exports){
 const assert = require('assert').strict;
 
 function _getStack() {
@@ -22367,5 +22514,5 @@ class Errors {
 
 module.exports = new Errors();
 
-},{"assert":1}]},{},[94])(94)
+},{"assert":1}]},{},[95])(95)
 });

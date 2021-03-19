@@ -1,11 +1,18 @@
+const MiniEventNotifier = require('../miniEventNotifier');
 const Errors = require('../../errors');
 const EntityFactory = require('../entityFactory');
 
-class ConfigEntity {
+class ConfigEntity extends MiniEventNotifier {
 	static get TYPE()       { return null; }	// Avoid construction (abstract type)
 	static get GUITYPE()    { return null; }    // Specifies which GUI class to use to edit entities of this type
 	
 	constructor() {
+		super();
+		
+		if (ConfigEntity.debug) {
+			this.dbg = `${ConfigEntity.dbgNext++}`;
+		}
+		
 		this.type = this.constructor.TYPE;
 		this.name = undefined;
 		this.description = undefined;
@@ -17,6 +24,13 @@ class ConfigEntity {
 		this.displayName = null;
 		this.displayIndex = undefined;
 		this.advanced = false; // Any entity with this set to true will only show up in "Advanced Mode"
+		
+		// Events (these initializations are to make the IDE treat the
+		// variables as functions properly without giving warnings about types)
+		this.eOnChanged = (x) => x;
+		this.eChanged = (x) => x;
+		this.eOnChangedRemove = (x) => x;
+		[this.eOnChanged, this.eChanged, this.eOnChangedRemove] = this.event('changed');
 	}
 	
 	hasName() {
@@ -29,6 +43,7 @@ class ConfigEntity {
 	
 	setName(name) {
 		this.name = name;
+		this.eChanged();
 		return this;
 	}
 	
@@ -39,6 +54,7 @@ class ConfigEntity {
 	
 	setDescription(description) {
 		this.description = description;
+		this.eChanged();
 		return this;
 	}
 	
@@ -49,6 +65,7 @@ class ConfigEntity {
 	
 	setHelp(helpText) {
 		this.helpText = helpText;
+		this.eChanged();
 		return this;
 	}
 	
@@ -86,6 +103,13 @@ class ConfigEntity {
 	
 	setID(id) {
 		this.id = id;
+		
+		// if (ConfigEntity.debug) {
+		// 	if (id === 'mod.Candy Game.functions.0.triggers') {
+		// 		console.log(`Triggers self: ${this.dbg}`);
+		// 	}
+		// }
+		
 		return this;
 	}
 	
@@ -116,6 +140,12 @@ class ConfigEntity {
 	
 	extendID(addendum, childEntity) {
 		childEntity.setID(`${this.id}.${this._escapeID(addendum)}`);
+		
+		// if (ConfigEntity.debug) {
+		// 	if (childEntity.id === 'mod.Candy Game.functions.0.triggers') {
+		// 		console.log(`Self: ${this.dbg} / Triggers: ${childEntity.dbg}`);
+		// 	}
+		// }
 	}
 	
 	// Returns the contents of this entity as a module-ready configuration for
@@ -130,6 +160,10 @@ class ConfigEntity {
 	}
 	
 	import(entityInfo, lenient) {
+		if (ConfigEntity.debug) {
+			this.dbg = `${this.dbg} / import`;
+		}
+		
 		if (!lenient && entityInfo.type !== this.type) {
 			throw `Wrong entity type: expected '${this.type}', got '${entityInfo.type}'.`;
 		} else if (lenient && !this._assignableFrom(entityInfo.type)) {
@@ -186,11 +220,19 @@ class ConfigEntity {
 	// Creates a copy of this entity with all of its contents.
 	clone() {
 		let copy = this.cloneImpl();
+		
+		if (ConfigEntity.debug) {
+			copy.dbg = `${copy.dbg} / clone`;
+			// if (this.id === 'mod.Candy Game.functions.0.triggers') {
+			// 	console.log(`Trigger <${this.dbg}> copied to <${copy.dbg}>`);
+			// }
+		}
+		
 		copy.setName(this.getName());
 		copy.setDescription(this.getDescription());
 		copy.setHelp(this.getHelp());
+		copy.setID(this.id);
 		copy.hidden = this.hidden;
-		copy.id = this.id;
 		copy.displayName = this.displayName;
 		copy.displayIndex = this.displayIndex;
 		copy.advanced = this.advanced;
@@ -222,6 +264,11 @@ class ConfigEntity {
 	static buildEntity(entityObject, id) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
+		
+		if (ConfigEntity.debug) {
+			instance.dbg = `${instance.dbg} / build`;
+		}
+		
 		instance.buildFrom(entityObject.descriptor);
 		instance.setID(id);
 		instance.setName(entityObject.name);
@@ -234,10 +281,18 @@ class ConfigEntity {
 	static readEntity(entityObject, lenient) {
 		let type = entityObject.type;
 		let instance = EntityFactory.build(type);
+		
+		if (ConfigEntity.debug) {
+			instance.dbg = `${instance.dbg} / read`;
+		}
+		
 		instance.import(entityObject, lenient);
 		instance.validate();
 		return instance;
 	}
 }
+
+ConfigEntity.dbgNext = 0;
+ConfigEntity.debug = false;
 
 module.exports = ConfigEntity;

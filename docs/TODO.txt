@@ -18,6 +18,7 @@
 - GUI: Hitting Enter should switch to next field
 - Video assets
 - Meme command that shows a random meme
+- Testing =\
 
 GUI User Feedback:
 + Lables should be unmarkable, cursor should stay a pointer

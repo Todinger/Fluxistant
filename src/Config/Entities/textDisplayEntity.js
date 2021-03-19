@@ -23,6 +23,7 @@ class TextDisplayEntity extends ConfigEntity {
 			`Illegal value: expected string, got ${value}`);
 		
 		this.value = value;
+		this.eChanged();
 	}
 	
 	// ---- Overrides ---- //

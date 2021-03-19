@@ -7,10 +7,10 @@ class CommandTrigger extends Trigger {
 	constructor(settings) {
 		super(settings);
 		this.cmdid = this.commandID;
-		this.cmdname = settings.cmdname;
+		this.cmdname = settings && settings.cmdname;
 		this.callback = (...params) => this._invoked(...params);
-		this.cost = settings.cost || 0;
-		this.aliases = settings.aliases || [];
+		this.cost = settings && settings.cost || 0;
+		this.aliases = settings && settings.aliases || [];
 		
 		this.command = {
 			id: this.cmdid,

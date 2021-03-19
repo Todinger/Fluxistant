@@ -28,10 +28,12 @@ class ValueEntity extends ConfigEntity {
 		}
 		
 		this.value = value;
+		this.eChanged();
 	}
 	
 	clearValue() {
 		this.value = undefined;
+		this.eChanged();
 	}
 	
 	isSet() {
