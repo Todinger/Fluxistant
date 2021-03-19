@@ -19,6 +19,7 @@
 - Video assets
 - Meme command that shows a random meme
 - Testing =\
+- Revamp configs to lessen descriptor count =\
 
 GUI User Feedback:
 + Lables should be unmarkable, cursor should stay a pointer

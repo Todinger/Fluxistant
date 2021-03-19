@@ -219,24 +219,25 @@ class ConfigEntity extends MiniEventNotifier {
 	
 	// Creates a copy of this entity with all of its contents.
 	clone() {
-		let copy = this.cloneImpl();
-		
-		if (ConfigEntity.debug) {
-			copy.dbg = `${copy.dbg} / clone`;
-			// if (this.id === 'mod.Candy Game.functions.0.triggers') {
-			// 	console.log(`Trigger <${this.dbg}> copied to <${copy.dbg}>`);
-			// }
-		}
-		
-		copy.setName(this.getName());
-		copy.setDescription(this.getDescription());
-		copy.setHelp(this.getHelp());
-		copy.setID(this.id);
-		copy.hidden = this.hidden;
-		copy.displayName = this.displayName;
-		copy.displayIndex = this.displayIndex;
-		copy.advanced = this.advanced;
-		return copy;
+		return ConfigEntity.buildEntity(this.export(), this.id);
+		// let copy = this.cloneImpl();
+		//
+		// if (ConfigEntity.debug) {
+		// 	copy.dbg = `${copy.dbg} / clone`;
+		// 	// if (this.id === 'mod.Candy Game.functions.0.triggers') {
+		// 	// 	console.log(`Trigger <${this.dbg}> copied to <${copy.dbg}>`);
+		// 	// }
+		// }
+		//
+		// copy.setName(this.getName());
+		// copy.setDescription(this.getDescription());
+		// copy.setHelp(this.getHelp());
+		// copy.setID(this.id);
+		// copy.hidden = this.hidden;
+		// copy.displayName = this.displayName;
+		// copy.displayIndex = this.displayIndex;
+		// copy.advanced = this.advanced;
+		// return copy;
 	}
 	
 	cloneImpl() {
@@ -293,6 +294,6 @@ class ConfigEntity extends MiniEventNotifier {
 }
 
 ConfigEntity.dbgNext = 0;
-ConfigEntity.debug = false;
+ConfigEntity.debug = true;
 
 module.exports = ConfigEntity;

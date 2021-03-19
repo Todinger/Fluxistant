@@ -105,6 +105,9 @@ class ConfigManager extends EventNotifier {
 	
 	saveModule(moduleName) {
 		this.moduleConfigs[moduleName].save(this._getModConfigPath(moduleName));
+		this.moduleConfigs[moduleName].saveConf(path.join(
+			this._getModBasePath(moduleName),
+			moduleName + ".conf" + CONFIG_EXTENSION));
 	}
 	
 	saveModules() {

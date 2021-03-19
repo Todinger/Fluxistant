@@ -218,6 +218,19 @@ class Configuration {
 		);
 	}
 	
+	// Saves the current configuration to the given config file.
+	saveConf(filename) {
+		let conf = this.toConf();
+		fs.writeFile(
+			filename,
+			JSON.stringify(conf, null, '\t'),
+			err => {
+				if (err) throw err;
+				Logger.info(`[Configs] Configuration file saved to: ${filename}`);
+			}
+		);
+	}
+	
 	getGroupValues(groupKey) {
 		let values = {};
 		
