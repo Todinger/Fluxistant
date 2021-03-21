@@ -75,7 +75,7 @@ class MainManager extends EventNotifier {
 			let modData = modules[modName];
 			
 			let funcID = func.getFuncID();
-			if (funcID in modData.functions) {
+			if (funcID && modData.functions && (funcID in modData.functions)) {
 				vars.push(...modData.functions[funcID]);
 			}
 			

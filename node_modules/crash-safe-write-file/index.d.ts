@@ -1,0 +1,1 @@
+export declare function writeFile(filename: string, data: string, callback: (err: NodeJS.ErrnoException, data: string) => void): void;

@@ -60,7 +60,7 @@ class ImageCommands extends Module {
 				}
 				
 				if (hasSound) {
-					parameters.sound = soundConf._makeDisplayData(soundFile);
+					parameters.sound = soundConf.makeDisplayData(soundFile);
 				}
 				
 				_this.broadcastEvent('showImage', parameters);

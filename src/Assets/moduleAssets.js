@@ -3,6 +3,7 @@
 const assert = require('assert').strict;
 const fs = require('fs');
 const path = require('path');
+const safeWriteFile = require('crash-safe-write-file').writeFile;
 const _ = require('lodash');
 const cli = require('../cliManager');
 const Errors = require('../errors');
@@ -150,7 +151,7 @@ class ModuleAssets {
 		
 		let exportedAssets = this.export();
 		let exportedAssetsString = JSON.stringify(exportedAssets, null, '\t');
-		fs.writeFile(this._saveFilePath(), exportedAssetsString, (err) => {
+		safeWriteFile(this._saveFilePath(), exportedAssetsString, (err) => {
 			if (err) {
 				cli.error(`Failed to write assets of '${this.modName}' module to file: ${err}`);
 			}
