@@ -191,38 +191,39 @@ class Adventure extends Module {
 	// starting another adventure might mess things up.
 	// Just... don't do this while an adventure is ongoing; that'd be best. <_<
 	loadData() {
-		this.categories = {};
-		this.adventureCache = [];
-		
-		// If we can't load any data, that's ok, we just won't have any adventures
-		try {
-			// Load each file
-			let advFiles = Utils.getFiles(path.join(this.workdir, ADVENTURES_DIR));
-			advFiles.forEach(filename => {
-				let parsed = path.parse(filename);
-				let adventureFile = this.readJSON(path.join(ADVENTURES_DIR, filename));
-				this.loadAdventureFile(parsed.name, adventureFile);
-			});
-			
-			// Create a cache of adventures out of all of the active
-			// files and adventures
-			// This is so we can choose a random one later and have equal odds
-			// for each adventure to be chosen, rather than choosing a category
-			// at random which makes adventures in categories that have many have
-			// lower odds of being selected than ones in categories that have few
-			Object.keys(this.categories).forEach(category => {
-				Object.keys(this.categories[category].adventures).forEach(adv => {
-					this.adventureCache.push({
-						category: category,
-						name: adv,
-					});
-				});
-			});
-			
-			this.log('Adventures loaded, yay!');
-		} catch (err) {
-			this.warn(`Failed to load adventures: ${err}`);
-		}
+		// TODO: Uncomment once this is taken from configuration
+		// this.categories = {};
+		// this.adventureCache = [];
+		//
+		// // If we can't load any data, that's ok, we just won't have any adventures
+		// try {
+		// 	// Load each file
+		// 	let advFiles = Utils.getFiles(path.join(this.workdir, ADVENTURES_DIR));
+		// 	advFiles.forEach(filename => {
+		// 		let parsed = path.parse(filename);
+		// 		let adventureFile = this.readJSON(path.join(ADVENTURES_DIR, filename));
+		// 		this.loadAdventureFile(parsed.name, adventureFile);
+		// 	});
+		//
+		// 	// Create a cache of adventures out of all of the active
+		// 	// files and adventures
+		// 	// This is so we can choose a random one later and have equal odds
+		// 	// for each adventure to be chosen, rather than choosing a category
+		// 	// at random which makes adventures in categories that have many have
+		// 	// lower odds of being selected than ones in categories that have few
+		// 	Object.keys(this.categories).forEach(category => {
+		// 		Object.keys(this.categories[category].adventures).forEach(adv => {
+		// 			this.adventureCache.push({
+		// 				category: category,
+		// 				name: adv,
+		// 			});
+		// 		});
+		// 	});
+		//
+		// 	this.log('Adventures loaded, yay!');
+		// } catch (err) {
+		// 	this.warn(`Failed to load adventures: ${err}`);
+		// }
 	}
 	
 	// Replaces all the placeholders we know in the given text with their

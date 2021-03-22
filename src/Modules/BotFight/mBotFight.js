@@ -256,13 +256,14 @@ class BotFight extends Module {
 	// Final result:
 	// this.conversations = <Conversations Collection>
 	loadData() {
-		try {
-			let data = this.readJSON(CONVERSATIONS_FILE);
-			this.conversations = this.loadConversations(data.conversations);
-			this.log('Conversations loaded.');
-		} catch (err) {
-			this.warn(`Failed to load bot fight data: ${err}`);
-		}
+		// TODO: Uncomment once this is taken from configuration
+		// try {
+		// 	let data = this.readJSON(CONVERSATIONS_FILE);
+		// 	this.conversations = this.loadConversations(data.conversations);
+		// 	this.log('Conversations loaded.');
+		// } catch (err) {
+		// 	this.warn(`Failed to load bot fight data: ${err}`);
+		// }
 	}
 	
 	// Loads the conversations from direct file data.
