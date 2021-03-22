@@ -12,6 +12,8 @@ class FilterChoiceEntity extends ChoiceEntity {
 			["oneOfUsers"]:		'Filter_OneOfUsers',
 			["isMod"]:			'Filter_IsMod',
 			["isSub"]:			'Filter_IsSub',
+			["windowActive"]:	'Filter_WindowActive',
+			["windowRunning"]:	'Filter_WindowRunning',
 		});
 	}
 }

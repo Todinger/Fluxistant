@@ -207,24 +207,20 @@ class ConfigManager extends EventNotifier {
 	
 	createBackupAt(targetPath) {
 		Utils.ensureDirExists(targetPath);
-		let mainPromise = fse.copy(this._getMainConfigPath(), path.join(targetPath, MAIN_CONFIG));
-		let modulesPromise = fse.copy(this._getModulesDirPath(), path.join(targetPath, MODULES_SUBDIR));
-		return Promise.all([mainPromise, modulesPromise])
-			.then(() => {
-				Logger.info(`Config backup successfully created at: ${targetPath}`);
-			})
-			.catch(err => {
-				Logger.error(`Failed to create config backup at "${targetPath}": ${err}`);
-			});
+		fse.copySync(this._getMainConfigPath(), path.join(targetPath, MAIN_CONFIG));
+		fse.copySync(this._getModulesDirPath(), path.join(targetPath, MODULES_SUBDIR));
 	}
 	
 	createNewBackup() {
 		let targetPath = path.join(
 			this._getBackupsDirPath(),
 			Utils.formatDate(new Date(), 'YYYY.MM.DD-HH.mm.ss'));
-		this.createBackupAt(targetPath)
-			.then(() => this.deleteOldBackups())
-			.catch(err => Logger.error(`Failed to create a new backup: ${err}`));
+		try {
+			this.createBackupAt(targetPath);
+			this.deleteOldBackups();
+		} catch (err) {
+			Logger.error(`Failed to create a new backup: ${err}`);
+		}
 	}
 	
 	deleteBackup(targetPath) {

@@ -220,6 +220,8 @@ class Function {
 			}
 		};
 		
+		invocationData.firstParam = invocationData.getParam(0);
+		
 		let results = this.action(invocationData);
 		
 		let context = {

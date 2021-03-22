@@ -56,7 +56,7 @@ class CliManager extends EventNotifier {
 			// listening for it, which makes it an unknown command
 			if (this._isEvent(cmdname)) {
 				// For a command line "a bcd e f g", this will notify all
-				// listeners that the event "a" happend with the parameter
+				// listeners that the event "a" happened with the parameter
 				// "bcd e f g"
 				this._notify(cmdname, line);
 			} else {

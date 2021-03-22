@@ -37,6 +37,8 @@ const entities = {
 	Filter_IsSubEntity: require('./WebEntities/Functions/Filters/filter_IsSubEntity.js'),
 	Filter_OneOfUsersEntity: require('./WebEntities/Functions/Filters/filter_OneOfUsersEntity.js'),
 	Filter_SpecificUserEntity: require('./WebEntities/Functions/Filters/filter_SpecificUserEntity.js'),
+	Filter_WindowActiveEntity: require('./WebEntities/Functions/Filters/filter_WindowActiveEntity.js'),
+	Filter_WindowRunningEntity: require('./WebEntities/Functions/Filters/filter_WindowRunningEntity.js'),
 	ResponseChoiceEntity: require('./WebEntities/Functions/Responses/responseChoiceEntity.js'),
 	ResponseEntity: require('./WebEntities/Functions/Responses/responseEntity.js'),
 	Response_ChatEntity: require('./WebEntities/Functions/Responses/response_ChatEntity.js'),

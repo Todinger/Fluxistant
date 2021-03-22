@@ -342,8 +342,13 @@ class FluxBot {
 				}
 				
 				try {
+					// Apply the configuration (also makes sure it's valid)
 					this.configManager.importAll(config);
+					
+					// Create a backup of the current configuration, and then save the new one
+					this.configManager.createNewBackup();
 					this.configManager.saveAll();
+					
 					this.rewardsManager.setRewards(this.mainConfig.getChannelRewards());
 					await this.assetManager.commitChanges();
 					
@@ -388,7 +393,6 @@ class FluxBot {
 		this.twitchManager.connect(this.mainConfig.getTwitchParams());
 		this.seManager.connect(this.mainConfig.getStreamElementsParams());
 		// this.logger.init(this.mainConfig.getLoggerParams());
-		this.configManager.createNewBackup();
 	}
 	
 	deleteOldBackups() {

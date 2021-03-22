@@ -417,6 +417,14 @@ class Utils {
 		return result;
 	}
 	
+	static getDefaultProperty(obj, propertyName) {
+		if (typeof obj === 'object') {
+			return obj[propertyName];
+		} else {
+			return obj;
+		}
+	}
+	
 	static isNonEmptyString(obj) {
 		return (typeof obj == 'string') && (obj.length > 0);
 	}

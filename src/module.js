@@ -723,17 +723,24 @@ class Module {
 	}
 	
 	// [For use by inheriting classes]
-	// Same as above, only prefixed with "@username" directed at the user
-	// specified.
+	// Sends the given message to the Twitch channel (the bot will say it),
+	// prefixed with "@username" directed at the user specified.
 	tell(user, msg) {
 		TwitchManager.tell(user, msg);
 	}
 	
 	// [For use by inheriting classes]
-	// Same as above, only addressed to the streamer using the name they
+	// Sends the given message to the Twitch channel (the bot will say it),
+	// addressed (with an @ tag) to the streamer, using the name they
 	// configured in the main configuration.
 	tellStreamer(msg) {
-		TwitchManager.say(`@${MainConfig.getStreamerName()} ${msg}`);
+		TwitchManager.say(`@${this.getStreamerName()} ${msg}`);
+	}
+	
+	// [For use by inheriting classes]
+	// Gets the streamer's name that they configured in the main configuration.
+	getStreamerName() {
+		return MainConfig.getStreamerName();
 	}
 	
 	// [For use by inheriting classes]
@@ -810,7 +817,7 @@ class Module {
 		SEManager.addUserPoints(
 			user.name,
 			amount,
-			null,
+			(newAmount) => this.log(`${this.pointsString(amount)} added to ${user.displayName}. New amount: ${newAmount}`),
 			(err) => this.error(`Failed to add points to ${user.name}: ${err}`));
 	}
 	

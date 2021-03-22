@@ -18,6 +18,8 @@ const FilterBuilder = new Builder({
 	and: require('./Filters/andFilter'),
 	or: require('./Filters/orFilter'),
 	not: require('./Filters/notFilter'),
+	windowActive: require('./Filters/windowActiveFilter'),
+	windowRunning: require('./Filters/windowRunningFilter'),
 });
 
 function combineFilters(filters) {

@@ -7,6 +7,15 @@ const Process = requireMain('process');
 const Utils = requireMain('utils');
 
 const GHOST_DATA_FILE = 'ghostData.json';
+const GAME_TITLE = 'Phasmophobia';
+
+const MAX_WINNERS_IN_MESSAGE = 5;
+
+const CONFIG_DEFAULTS = {
+	correctionFactor: 0.5,
+	reward: 5000,
+	delayBeforeResults: 5000, // 5 seconds
+};
 
 const DESCRIPTION =
 `Adds a widget that can be placed in the overlay for the Phasmophobia game.
@@ -49,9 +58,20 @@ class Phasmophobia extends Module {
 		this.levelData = {};
 		this.clearEvidence();
 		
+		// Viewer guessing games data
+		this.guesses = {};
+		
 		this.game = new Process('Phasmophobia');
 		this.game.onStarted(() => this.gameStarted());
 		this.game.onExited(() => this.gameEnded());
+	}
+	
+	get levelFinished() {
+		return this.levelData.list.length === 3;
+	}
+	
+	get badEvidence() {
+		return this.levelData.possibleGhosts.length === 0;
 	}
 	
 	get evidenceList() {
@@ -74,24 +94,45 @@ class Phasmophobia extends Module {
 		let chatMessages = modConfig.addGroup('chat')
 			.setName('Chat Messages')
 			.setDescription('Settings for which messages will be sent to the chat');
-		chatMessages.addBoolean('evidence', false)
+		chatMessages.addBoolean('evidence', true)
 			.setName('Evidence')
 			.setDescription('Makes the bot send information to the chat every time a piece of evidence is found');
-		chatMessages.addBoolean('ghost', false)
+		chatMessages.addBoolean('ghost', true)
 			.setName('Final Ghost')
 			.setDescription('Makes the bot send a message to the chat when the ghost is found saying what it is');
-		chatMessages.addBoolean('newLevel', false)
+		chatMessages.addBoolean('newLevel', true)
 			.setName('New Level')
 			.setDescription('Makes the bot send a message to the chat when a new level is started');
-		chatMessages.addBoolean('evidenceLeft', false)
+		chatMessages.addBoolean('evidenceLeft', true)
 			.setName('Evidence Left')
 			.setDescription('Makes the bot say which types of evidence are still possible once two pieces have been acquired');
-		chatMessages.addBoolean('badEvidence', false)
+		chatMessages.addBoolean('badEvidence', true)
 			.setName('Bad Evidence Warning')
 			.setDescription('Makes the bot tag the streamer in a message if the evidence is faulty (i.e. if there are no possible ghosts for it)');
+		
+		let guessingGame = modConfig.addGroup('guessingGame')
+			.setName('Guessing Game')
+			.setDescription('Parameters for the interactive viewer Guess-the-Ghost game');
+		// guessingGame.addNaturalNumber('cost')
+		// 	.setName('Participation Cost')
+		// 	.setDescription('How many points a user needs to spend to participate');
+		guessingGame.addNaturalNumber('reward', CONFIG_DEFAULTS.reward)
+			.setName('Reward')
+			.setDescription('How many points a user wins if correct - this is multiplied by the correction factor for late guesses');
+		guessingGame.addNonNegativeNumber('correctionFactor', CONFIG_DEFAULTS.correctionFactor)
+			.setName('Correction Factor')
+			.setDescription('How much the reward is multiplied by if some evidence is already present when guessing (squared for 2 pieces)')
+			.setHelp(`This should be a number between 0-1 (not forced, but recommended).
+Its purpose is to reduce the winning prize when guessing once some pieces of evidence are found.
+For example, if set to 0.5, then if a player guesses the ghost correctly before any evidence is collected, they'll get 100% of the prize. If they guessed when one piece of evidence had already been found, they'd get 50% of the prize. If two pieces had been found, they'd get 25% of the prize.
+If this is set to 1 then reward amounts will not be affected by the amount of evidence present when making the guess.`);
+		guessingGame.addNonNegativeNumber('delayBeforeResults', CONFIG_DEFAULTS.delayBeforeResults)
+			.setName('Delay Before Results')
+			.setDescription('How many seconds the bot should wait between announcing the ghost type and announcing the winners (this is to keep from flooding the chat)');
 	}
 	
 	loadModConfig(conf) {
+		Utils.applyDefaults(conf, CONFIG_DEFAULTS);
 	}
 	
 	validateData(ghostData) {
@@ -106,6 +147,19 @@ class Phasmophobia extends Module {
 		let ghostData = this.readJSON(GHOST_DATA_FILE);
 		this.validateData(ghostData);
 		this.ghostData = ghostData;
+	}
+	
+	findGhost(ghostName) {
+		if (ghostName) {
+			ghostName = ghostName.trim().toLowerCase();
+			for (let ghost in this.ghostData) {
+				if (ghostName === ghost.trim().toLowerCase()) {
+					return ghost;
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	buildEvidenceState() {
@@ -179,8 +233,13 @@ class Phasmophobia extends Module {
 		}
 	}
 	
+	clearGuesses() {
+		this.guesses = {};
+	}
+	
 	newLevel() {
 		this.clearEvidence();
+		this.clearGuesses();
 		this.updateClient();
 		this.say('New level, people!');
 	}
@@ -197,6 +256,12 @@ class Phasmophobia extends Module {
 		if (this.config.chat.ghost) {
 			this.say(`We've got it! The ghost must be ${Utils.definiteSingularFor(ghost)}!`);
 		}
+		
+		// Announce the victors in the guessing game after a bit of delay to
+		// keep from flooding the chat with messages
+		setTimeout(
+			() => this.finishGuessingGame(),
+			this.config.guessingGame.delayBeforeResults);
 	}
 	
 	sayState() {
@@ -263,7 +328,19 @@ class Phasmophobia extends Module {
 			_.union(this.levelData.list, this.levelData.possibleEvidenceLeft));
 		// Once two pieces of evidence are acquired we may want to announce this information
 		if (this.levelData.list.length === 2 && this.config.chat.evidenceLeft) {
-			this.say(`Possible evidence left: ${Utils.makeEnglishAndList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft))} (no ${Utils.makeEnglishOrList(this.toEvidenceNames(this.levelData.impossibleEvidence))}).`);
+			// I split this to multiple lines even though it's just message
+			// because the line was way too long otherwise
+			let statusMessage = '';
+			statusMessage += 'Possible evidence left: ';
+			statusMessage += Utils.makeEnglishAndList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft));
+			statusMessage += ' (no ';
+			statusMessage += Utils.makeEnglishOrList(this.toEvidenceNames(this.levelData.impossibleEvidence));
+			statusMessage += ').';
+			statusMessage += ' Ghost type: ';
+			statusMessage += Utils.makeEnglishOrList(this.levelData.possibleGhosts);
+			statusMessage += '.';
+			this.say(statusMessage);
+			// this.say(`Possible evidence left: ${Utils.makeEnglishAndList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft))} (no ${Utils.makeEnglishOrList(this.toEvidenceNames(this.levelData.impossibleEvidence))}).`);
 		}
 		
 		let options = this.levelData.possibleGhosts;
@@ -311,11 +388,92 @@ class Phasmophobia extends Module {
 	}
 	
 	guessGhost(user, ghost) {
+		if (this.levelFinished) {
+			this.tell(user, "It's too late to enter a guess now - we already know what the ghost is!");
+		} else if (this.badEvidence) {
+			this.tell(user, `Maybe wait with that until ${this.getStreamerName()} fixes the evidence, since it doesn't fit any ghost right now...`);
+		} else {
+			if (!ghost) {
+				if (user.name in this.guesses) {
+					this.tell(user, `You guessed that the ghost would be ${Utils.definiteSingularFor(this.guesses[user.name].ghost)}.`);
+				} else {
+					this.tell(user, 'Please also enter a ghost type to make your guess.');
+				}
+				
+				return;
+			}
+			
+			if (user.name in this.guesses) {
+				this.tell(
+					user,
+					`You've already entered a guess for this level (${this.guesses[user.name].ghost}).`);
+				return;
+			}
+			
+			ghost = this.findGhost(ghost);
+			if (!ghost) {
+				this.tell(
+					user,
+					`Unknown ghost type. Please enter one of the following: ${this.levelData.possibleGhosts.join(', ')}`);
+				return;
+			}
+			
+			if (!this.levelData.possibleGhosts.includes(ghost)) {
+				this.tell(
+					user,
+					`It can't be ${Utils.definiteSingularFor(ghost)}! These are the current options: ${Utils.makeEnglishOrList(this.levelData.possibleGhosts)}`);
+				return;
+			}
+			
+			this.guesses[user.name] = {
+				user,
+				ghost,
+				numEvidencePresent: this.levelData.list.length,
+			};
+			
+			let addendum = '';
+			let factor = this.config.guessingGame.correctionFactor;
+			if (this.levelData.list.length === 1) {
+				factor = Math.round(factor * 100);
+				addendum = ` with one piece of evidence present (${factor}% payout)`;
+			} else if(this.levelData.list.length === 2) {
+				factor = Math.round(factor * factor * 100);
+				addendum = ` with two pieces of evidence present (${factor}% payout)`;
+			}
+			
+			this.tell(user, `Entered guess for ${ghost}${addendum}.`)
+		}
+	}
 	
+	finishGuessingGame() {
+		let finalGhost = this.levelData.possibleGhosts[0];
+		let winners = Object.keys(this.guesses).filter(
+			username => this.guesses[username].ghost === finalGhost);
+		
+		let winnerNum = 0;
+		let winMessages = [];
+		winners.forEach(username => {
+			let guessData = this.guesses[username];
+			let amountFactor = Math.pow(
+				this.config.guessingGame.correctionFactor,
+				guessData.numEvidencePresent);
+			let winAmount = Math.round(this.config.guessingGame.reward * amountFactor);
+			this.modifyUserPoints(guessData.user, winAmount);
+			
+			if (winnerNum++ < MAX_WINNERS_IN_MESSAGE) {
+				winMessages.push(`${guessData.user.displayName} (${this.pointsString(winAmount)})`);
+			}
+		});
+		
+		if (winMessages.length > 0) {
+			this.say(`Winners: ${winMessages.join(', ')}`);
+		} else if (Object.keys(this.guesses).length > 0) {
+			this.say('Sorry, no correct guesses for this one. Butter luck next time!');
+		}
 	}
 	
 	load() {
-		this.imageDirURL = this.registerAssetDir('Images', 'images');
+		this.registerAssetDir('Images', 'images');
 		this.onClientAttached(socket => {
 			let clientState = this.makeClientState();
 			socket.emit('state', clientState);
@@ -333,16 +491,17 @@ class Phasmophobia extends Module {
 				this.trigger.command({
 					cmdname: 'name',
 					aliases: ['ghostname', 'gname'],
+					filters: [this.filter.isMod()],
 				}),
 			],
-			filters: [this.filter.isMod()],
 			parameters: [
 				{
 					name: 'Ghost Name',
 					takeAll: true,
 				},
 			],
-			action: this.ifRunning(data => this.ghostNameCommand(data.user, data.getParam(0))),
+			filters: [this.filter.windowRunning(GAME_TITLE)],
+			action: data => this.ghostNameCommand(data.user, data.firstParam),
 		},
 		
 		evidence: {
@@ -354,7 +513,10 @@ class Phasmophobia extends Module {
 					aliases: ['ghosts', 'ghost'],
 				}),
 			],
-			action: this.ifRunning(() => this.sayState()),
+			filters: [this.filter.windowRunning({
+				title: GAME_TITLE
+			})],
+			action: () => this.sayState(),
 		},
 		
 		addEvidence: {
@@ -364,34 +526,41 @@ class Phasmophobia extends Module {
 				this.trigger.command({
 					cmdname: 'addevidence',
 					aliases: ['addev', 'evidence+', 'ev+', '+ev', '+evidence'],
+					filters: [this.filter.isMod()],
 				}),
 				this.trigger.shortcut({
 					keys: [['1']],
 					paramValues: ['emf5'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['2']],
 					paramValues: ['box'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['3']],
 					paramValues: ['prints'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['4']],
 					paramValues: ['orb'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['5']],
 					paramValues: ['book'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['6']],
 					paramValues: ['temps'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 			],
-			filters: [this.filter.isMod()],
-			action: this.ifActive(data => this.addEvidence(data.getParam(0))),
+			filters: [this.filter.windowRunning(GAME_TITLE)],
+			action: data => this.addEvidence(data.firstParam),
 		},
 		
 		removeEvidence: {
@@ -401,40 +570,54 @@ class Phasmophobia extends Module {
 				this.trigger.command({
 					cmdname: 'removeevidence',
 					aliases: ['removeev', 'evidence-', 'ev-', '-ev', '-evidence'],
+					filters: [this.filter.isMod()],
 				}),
 				this.trigger.shortcut({
 					keys: [['SHIFT_L', '1']],
 					paramValues: ['emf5'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['SHIFT_L', '2']],
 					paramValues: ['box'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['SHIFT_L', '3']],
 					paramValues: ['prints'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['SHIFT_L', '4']],
 					paramValues: ['orb'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['SHIFT_L', '5']],
 					paramValues: ['book'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 				this.trigger.shortcut({
 					keys: [['SHIFT_L', '6']],
 					paramValues: ['temps'],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				}),
 			],
-			filters: [this.filter.isMod()],
-			action: this.ifActive(this.ifRunning(data => this.removeEvidence(data.getParam(0)))),
+			filters: [this.filter.windowRunning(GAME_TITLE)],
+			action: this.ifRunning(data => this.removeEvidence(data.firstParam)),
 		},
-		// guess: {
-		// 	name: 'Guess',
-		// 	description: 'Guess what the ghost is going to be',
-		// 	action: (user, ghost) => this.ifRunning(this.guessGhost(user, ghost)),
-		// },
+		
+		guess: {
+			name: 'Guess',
+			description: 'Guess what the ghost is going to be',
+			triggers: [
+				this.trigger.command({
+					cmdname: 'guess',
+				}),
+			],
+			filters: [this.filter.windowRunning(GAME_TITLE)],
+			action: data => this.guessGhost(data.user, data.firstParam),
+		},
 		
 		newLevel: {
 			name: 'New Level',
@@ -444,15 +627,17 @@ class Phasmophobia extends Module {
 					keys: [
 						['BACKSPACE'], // The backspace key on the keyboard
 					],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				})
 			],
-			action: this.ifActive(() => this.newLevel()),
+			action: () => this.newLevel(),
 		},
 		
 		showInfo: {
 			name: 'Show Information',
 			description: 'Invokes the evidence message to the chat (same as using the !evidence command)',
-			action: this.ifActive(() => this.sayState()),
+			filters: [this.filter.windowRunning(GAME_TITLE)],
+			action: () => this.sayState(),
 		},
 		
 		showConciseInfo: {
@@ -463,9 +648,10 @@ class Phasmophobia extends Module {
 					keys: [
 						['BACKQUOTE'], // The backspace key on the keyboard
 					],
+					filters: [this.filter.windowActive(GAME_TITLE)],
 				})
 			],
-			action: this.ifActive(() => this.sayConciseState()),
+			action: () => this.sayConciseState(),
 		},
 /*
 		

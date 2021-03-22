@@ -15,7 +15,7 @@ const user32 = new ffi.Library('user32', {
 class Process extends EventNotifier {
 	static get DEFAULT_RUN_TEST_INTERVAL() { return 5000; }
 	
-	constructor(windowTitle) {
+	constructor(windowTitle, testInterval) {
 		super();
 		this._addEvent('started');
 		this._addEvent('exited');
@@ -24,9 +24,18 @@ class Process extends EventNotifier {
 		this.nameBuffer = Buffer.alloc(windowTitle.length + 2);
 		
 		this.processRunning = false;
+		
+		if (testInterval === undefined) {
+			testInterval = Process.DEFAULT_RUN_TEST_INTERVAL;
+		}
+		
 		this.monitorTimer = Timers.repeating(
 			() => this._refreshRunning(),
-			Process.DEFAULT_RUN_TEST_INTERVAL);
+			testInterval);
+	}
+	
+	setWindowTitle(windowTitle) {
+		this.windowTitle = windowTitle;
 	}
 	
 	isRunning() {
