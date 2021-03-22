@@ -1,5 +1,8 @@
 import { ModuleClient } from "/common/moduleClient.mjs";
 
+const IMAGE_DIR = 'images/';
+const GHOSTS_DIR = IMAGE_DIR + 'Ghosts/';
+
 class PhasmophobiaClient extends ModuleClient {
 	constructor() {
 		super('Phasmophobia');
@@ -16,10 +19,28 @@ class PhasmophobiaClient extends ModuleClient {
 		};
 		
 		this.stateImages = {
-			off: 'images/Off.png',
-			on: 'images/On.png',
-			invalid: 'images/Invalid.png',
+			off: IMAGE_DIR + 'Off.png',
+			on: IMAGE_DIR + 'On.png',
+			invalid: IMAGE_DIR + 'Invalid.png',
 		};
+		
+		this.ghosts = {
+			banshee: GHOSTS_DIR + "Banshee.png",
+			demon: GHOSTS_DIR + "Demon.png",
+			jinn: GHOSTS_DIR + "Jinn.png",
+			mare: GHOSTS_DIR + "Mare.png",
+			oni: GHOSTS_DIR + "Oni.png",
+			phantom: GHOSTS_DIR + "Phantom.png",
+			poltergeist: GHOSTS_DIR + "Poltergeist.png",
+			revenant: GHOSTS_DIR + "Revenant.png",
+			shade: GHOSTS_DIR + "Shade.png",
+			spirit: GHOSTS_DIR + "Spirit.png",
+			wraith: GHOSTS_DIR + "Wraith.png",
+			yurei: GHOSTS_DIR + "Yurei.png",
+		}
+		
+		this.ghostImage = $('#ghost');
+		this.ghostContainer = $('#ghostContainer');
 		
 		this.createAll();
 	}
@@ -43,6 +64,10 @@ class PhasmophobiaClient extends ModuleClient {
 		Object.keys(this.images).forEach(ev => {
 			evContainer.append(this.createEvidence(ev));
 		});
+		
+		// Move the ghost type display to the end so that it
+		// shows on top of the evidence
+		evContainer.append(this.ghostContainer);
 	}
 	
 	hide() {
@@ -58,12 +83,23 @@ class PhasmophobiaClient extends ModuleClient {
 	}
 	
 	showName(name) {
-		$('#ghostName').text(name);
-		$('#ghostNameContainer').css('opacity', 1);
+		$('#name').text(name);
+		$('#nameContainer').css('opacity', 1);
 	}
 	
 	hideName() {
-		$('#ghostNameContainer').css('opacity', 0);
+		$('#nameContainer').css('opacity', 0);
+	}
+	
+	showGhost(ghost) {
+		this.ghostImage.attr('src', '');
+		this.ghostImage.attr('src', this.ghosts[ghost]);
+		this.ghostImage.show();
+	}
+	
+	hideGhost() {
+		this.ghostImage.hide();
+		this.ghostImage.attr('src', '');
 	}
 	
 	start() {
@@ -71,10 +107,16 @@ class PhasmophobiaClient extends ModuleClient {
 		this.server.on('show', () => this.show());
 		
 		this.server.on('state', state => {
-			if (state.ghostName) {
-				this.showName(state.ghostName);
+			if (state.name) {
+				this.showName(state.name);
 			} else {
 				this.hideName();
+			}
+			
+			if (state.ghost) {
+				this.showGhost(state.ghost.toLowerCase());
+			} else {
+				this.hideGhost();
 			}
 			
 			Object.keys(state.evidence).forEach(ev => {

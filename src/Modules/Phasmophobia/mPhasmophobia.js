@@ -179,9 +179,10 @@ If this is set to 1 then reward amounts will not be affected by the amount of ev
 	
 	makeClientState() {
 		return {
-			ghostName: this.levelData.ghostName,
+			name: this.levelData.ghostName,
 			evidence: this.buildEvidenceState(),
 			possibleGhosts: this.levelData.possibleGhosts,
+			ghost: this.levelFinished ? this.levelData.possibleGhosts[0] : undefined,
 		};
 	}
 	
