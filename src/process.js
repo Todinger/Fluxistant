@@ -12,11 +12,29 @@ const user32 = new ffi.Library('user32', {
 	'FindWindowA': ['int', ['string', 'string']],
 });
 
+const DEFAULT_MAX_TITLE_LENGTH = 256;
+const defaultBuffer = Buffer.alloc(DEFAULT_MAX_TITLE_LENGTH);
+
 class Process extends EventNotifier {
 	static get DEFAULT_RUN_TEST_INTERVAL() { return 5000; }
 	
+	static isWindowRunning(windowTitle) {
+		return user32.FindWindowA(null, windowTitle) !== 0;
+	}
+	
+	static isWindowActive(windowTitle, windowTitleBuffer) {
+		windowTitleBuffer = windowTitleBuffer || defaultBuffer;
+		let activeWindow = user32.GetForegroundWindow();
+		user32.GetWindowTextA(
+			activeWindow,
+			windowTitleBuffer,
+			windowTitleBuffer.length);
+		let activeWindowTitle = ref.readCString(windowTitleBuffer, 0);
+		return activeWindowTitle === windowTitle;
+	}
+	
 	constructor(windowTitle, testInterval) {
-		super();
+		super(true);
 		this._addEvent('started');
 		this._addEvent('exited');
 		
@@ -24,14 +42,16 @@ class Process extends EventNotifier {
 		this.nameBuffer = Buffer.alloc(windowTitle.length + 2);
 		
 		this.processRunning = false;
+		this.processActive = false;
 		
 		if (testInterval === undefined) {
 			testInterval = Process.DEFAULT_RUN_TEST_INTERVAL;
 		}
 		
+		this.testInterval = testInterval;
 		this.monitorTimer = Timers.repeating(
-			() => this._refreshRunning(),
-			testInterval);
+			() => this._refreshStatus(),
+			this.testInterval);
 	}
 	
 	setWindowTitle(windowTitle) {
@@ -39,32 +59,33 @@ class Process extends EventNotifier {
 	}
 	
 	isRunning() {
-		return user32.FindWindowA(null, this.windowTitle) !== 0;
+		return Process.isWindowRunning(this.windowTitle);
 	}
 	
 	isActive() {
-		let activeWindow = user32.GetForegroundWindow();
-		user32.GetWindowTextA(
-			activeWindow,
-			this.nameBuffer,
-			this.nameBuffer.length);
-		let activeWindowTitle = ref.readCString(this.nameBuffer, 0);
-		return activeWindowTitle === this.windowTitle;
+		return Process.isWindowActive(this.windowTitle, this.nameBuffer);
 	}
 	
-	_refreshRunning() {
+	_refreshStatus() {
 		let running = this.isRunning();
 		if (running && !this.processRunning) {
 			this._notify('started');
 		} else if (!running && this.processRunning) {
 			this._notify('exited');
 		}
-		
 		this.processRunning = running;
+		
+		let active = this.isActive();
+		if (active && !this.processActive) {
+			this._notify('activated');
+		} else if (!active && this.processActive) {
+			this._notify('deactivated');
+		}
+		this.processActive = active;
 	}
 	
 	startMonitoring(interval) {
-		this.monitorTimer.set(interval || Process.DEFAULT_RUN_TEST_INTERVAL);
+		this.monitorTimer.set(interval || this.testInterval || Process.DEFAULT_RUN_TEST_INTERVAL);
 	}
 	
 	stopMonitoring() {
@@ -78,6 +99,14 @@ class Process extends EventNotifier {
 	
 	onExited(callback) {
 		this.on('exited', callback);
+	}
+	
+	onActivated(callback) {
+		this.on('activated', callback);
+	}
+	
+	onDeactivated(callback) {
+		this.on('deactivated', callback);
 	}
 }
 

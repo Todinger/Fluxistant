@@ -6,11 +6,7 @@ class WindowActiveFilter extends FunctionFilter {
 	constructor(settings) {
 		super(settings);
 		
-		this.process = null;
 		this.title = Utils.getDefaultProperty(settings, 'title');
-		if (this.title) {
-			this.process = new Process(this.title);
-		}
 	}
 	
 	get type() {
@@ -18,7 +14,7 @@ class WindowActiveFilter extends FunctionFilter {
 	}
 	
 	test(context) {
-		return !this.process || this.process.isActive();
+		return this.title && Process.isWindowActive(this.title);
 	}
 }
 

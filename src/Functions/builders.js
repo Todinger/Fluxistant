@@ -11,15 +11,38 @@ class Builder {
 }
 
 const FilterBuilder = new Builder({
-	specificUser: require('./Filters/specificUserFilter'),
-	oneOfUsers: require('./Filters/oneOfUsersFilter'),
-	isMod: require('./Filters/isModFilter'),
-	isSub: require('./Filters/isSubFilter'),
-	and: require('./Filters/andFilter'),
-	or: require('./Filters/orFilter'),
-	not: require('./Filters/notFilter'),
-	windowActive: require('./Filters/windowActiveFilter'),
-	windowRunning: require('./Filters/windowRunningFilter'),
+	specificUser:	require('./Filters/specificUserFilter'),
+	oneOfUsers:		require('./Filters/oneOfUsersFilter'),
+	isMod:			require('./Filters/isModFilter'),
+	isSub:			require('./Filters/isSubFilter'),
+	and:			require('./Filters/andFilter'),
+	or:				require('./Filters/orFilter'),
+	not:			require('./Filters/notFilter'),
+	windowActive:	require('./Filters/windowActiveFilter'),
+	windowRunning:	require('./Filters/windowRunningFilter'),
+});
+
+const VariableBuilder = new Builder({
+	custom:	require('./Variables/functionVariable'),
+	out:	require('./Variables/outputVariable'),
+});
+
+const TriggerBuilder = new Builder({
+	command:			require('./Triggers/commandTrigger'),
+	shortcut:			require('./Triggers/shortcutTrigger'),
+	keyDown:			require('./Triggers/keyDownTrigger'),
+	keyUp:				require('./Triggers/keyUpTrigger'),
+	reward:				require('./Triggers/channelRewardTrigger'),
+	windowActivated:	require('./Triggers/windowActivatedTrigger'),
+	windowDeactivated:	require('./Triggers/windowDeactivatedTrigger'),
+	windowStarted:		require('./Triggers/windowStartedTrigger'),
+	windowExited:		require('./Triggers/windowExitedTrigger'),
+});
+
+const ResponseBuilder = new Builder({
+	console:	require('./Responses/consoleResponse'),
+	chat:		require('./Responses/chatResponse'),
+	se:			require('./Responses/seResponse'),
 });
 
 function combineFilters(filters) {
@@ -34,30 +57,11 @@ function combineFilters(filters) {
 	return FilterBuilder.builders.or({ filters: filterObjects });
 }
 
-const VariableBuilder = new Builder({
-	custom: require('./Variables/functionVariable'),
-	out: require('./Variables/outputVariable'),
-});
-
-const TriggerBuilder = new Builder({
-	command: require('./Triggers/commandTrigger'),
-	shortcut: require('./Triggers/shortcutTrigger'),
-	keyDown: require('./Triggers/keyDownTrigger'),
-	keyUp: require('./Triggers/keyUpTrigger'),
-	reward: require('./Triggers/channelRewardTrigger'),
-});
-
-const ResponseBuilder = new Builder({
-	console: require('./Responses/consoleResponse'),
-	chat: require('./Responses/chatResponse'),
-	se: require('./Responses/seResponse'),
-});
-
 let builders = {
-	Filters: FilterBuilder.builders,
-	Variables: VariableBuilder.builders,
-	Triggers: TriggerBuilder.builders,
-	Responses: ResponseBuilder.builders,
+	Filters:	FilterBuilder.builders,
+	Variables:	VariableBuilder.builders,
+	Triggers:	TriggerBuilder.builders,
+	Responses:	ResponseBuilder.builders,
 	
 	combineFilters,
 }

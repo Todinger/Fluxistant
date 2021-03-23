@@ -9,6 +9,7 @@ class Timer {
 	constructor(callback, duration) {
 		this.handle = null;
 		this.callback = callback || null;
+		this.duration = duration;
 		if (callback && duration) {
 			this.set(duration, callback);
 		}
@@ -42,6 +43,7 @@ class Timer {
 		
 		this.handle = this._setImpl(duration, callback);
 		this.callback = callback;
+		this.duration = duration;
 	}
 	
 	// Changes an active timer to activate in <duration> milliseconds
@@ -53,6 +55,8 @@ class Timer {
 			callback = callback || this.callback;
 			this.set(duration, callback);
 		}
+		
+		this.duration = duration;
 	}
 }
 

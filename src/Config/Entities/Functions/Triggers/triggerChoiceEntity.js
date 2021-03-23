@@ -8,11 +8,15 @@ class TriggerChoiceEntity extends ChoiceEntity {
 	constructor() {
 		super();
 		this._addOptions({
-			["command"]:	'Trigger_Command',
-			["shortcut"]:	'Trigger_Shortcut',
-			["keyDown"]:	'Trigger_KeyDown',
-			["keyUp"]:		'Trigger_KeyUp',
-			["reward"]:		'Trigger_ChannelReward',
+			["command"]:			'Trigger_Command',
+			["shortcut"]:			'Trigger_Shortcut',
+			["keyDown"]:			'Trigger_KeyDown',
+			["keyUp"]:				'Trigger_KeyUp',
+			["reward"]:				'Trigger_ChannelReward',
+			["windowActivated"]:	'Trigger_WindowActivated',
+			["windowDeactivated"]:	'Trigger_WindowDeactivated',
+			["windowStarted"]:		'Trigger_WindowStarted',
+			["windowExited"]:		'Trigger_WindowExited',
 		});
 	}
 }

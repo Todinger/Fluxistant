@@ -15,6 +15,7 @@ class Filter_WindowActiveEntity extends FilterEntity {
 	}
 	
 	setData(data) {
+		super.setData(data);
 		if (data && data.title) {
 			this.getChild('title').setValue(data.title);
 		}

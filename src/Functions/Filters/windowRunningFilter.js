@@ -6,11 +6,7 @@ class WindowRunningFilter extends FunctionFilter {
 	constructor(settings) {
 		super(settings);
 		
-		this.process = null;
 		this.title = Utils.getDefaultProperty(settings, 'title');
-		if (this.title) {
-			this.process = new Process(this.title);
-		}
 	}
 	
 	get type() {
@@ -18,7 +14,7 @@ class WindowRunningFilter extends FunctionFilter {
 	}
 	
 	test(context) {
-		return !this.process || this.process.isRunning();
+		return this.title && Process.isWindowRunning(this.title);
 	}
 }
 
