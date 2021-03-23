@@ -209,6 +209,7 @@ class ConfigManager extends EventNotifier {
 		Utils.ensureDirExists(targetPath);
 		fse.copySync(this._getMainConfigPath(), path.join(targetPath, MAIN_CONFIG));
 		fse.copySync(this._getModulesDirPath(), path.join(targetPath, MODULES_SUBDIR));
+		Logger.info(`Config backup "${targetPath}" created.`);
 	}
 	
 	createNewBackup() {
