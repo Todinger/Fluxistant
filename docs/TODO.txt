@@ -73,6 +73,7 @@ GUI User Feedback:
 	- Complex
 	- Temporary window "switch"? (something switches it on - allowed, something switches it off - disallowed)
 - Trigger variants
+- Trigger export for modules (i.e. having the module adds triggers which the module itself would be responsible of triggering)
 - "Not user" filter
 - Fix: single-time GIFs not starting over when shown again
 - User data editor: raw (use shell to open Notepad for data files).
@@ -80,9 +81,8 @@ GUI User Feedback:
   editing of the data (each module will need to define these editors for
   itself).
 - Persistent data for modules
-- OBS Websocket module
-- Voice activation mechanism (in addition to commands and shortcut keys)
-- Make WebEntities generation clear the WebEntities dir before writing to it.
++ OBS Websocket module
+X Make WebEntities generation clear the WebEntities dir before writing to it.
 - Generate commands information page to automatically be put online for viewers to see
 - ZIP configuration text files
 - Duration picker GUI for time-related values

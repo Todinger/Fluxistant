@@ -4,6 +4,7 @@ class ObsFunctionFactory {
 	constructor() {
 		this.classes = {
 			setCurrentScene: require('./setCurrentScene'),
+			switchToPreviousScene: require('./switchToPreviousScene'),
 		};
 	}
 	

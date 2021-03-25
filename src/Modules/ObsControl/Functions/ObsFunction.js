@@ -1,8 +1,9 @@
 const Errors = requireMain('errors');
 
 class ObsFunction {
-	constructor(obsSocket) {
-		this.obs = obsSocket;
+	constructor(obsControl) {
+		this.obsControl = obsControl;
+		this.obs = obsControl.obs;
 	}
 	
 	invoke() {
