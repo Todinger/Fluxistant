@@ -42,9 +42,15 @@ class ObsControl extends Module {
 		
 		this.obsFunctions = {};
 		this.scenes = [];
+		this.previousScene = null;
 		this.currentScene = null;
 		
 		this._registerForEvents();
+	}
+	
+	_setCurrentScene(sceneName) {
+		this.previousScene = this.currentScene;
+		this.currentScene = sceneName;
 	}
 	
 	_connect() {
@@ -92,7 +98,7 @@ class ObsControl extends Module {
 		return this.obs.send('GetSceneList')
 			.then(data => {
 				this.scenes = data.scenes;
-				this.currentScene = data.currentScene;
+				this._setCurrentScene(data.currentScene);
 				ConfigSourceManager.setSourceOptions(
 					SCENES_SOURCE_NAME,
 					data.scenes.map(scene => scene.name))
@@ -106,11 +112,18 @@ class ObsControl extends Module {
 		this.obs.on(
 			'ScenesChanged',
 			(...p) => this._scenesChanged(...p));
+		this.obs.on(
+			'SwitchScenes',
+			(...p) => this._sceneSwitched(...p));
 	}
 	
 	_scenesChanged() {
 		this._loadScenes()
 			.then();
+	}
+	
+	_sceneSwitched(data) {
+		this._setCurrentScene(data.sceneName);
 	}
 	
 	_functionActivated(funcObject) {
@@ -136,7 +149,7 @@ class ObsControl extends Module {
 				
 				funcObject.obsFunction = ObsFunctionFactory.build(
 					func.details.type,
-					this.obs,
+					this,
 					func.details);
 				
 				funcObject.details = func.details;
