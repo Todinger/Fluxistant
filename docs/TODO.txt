@@ -49,8 +49,8 @@ GUI User Feedback:
 	- Controller buttons
 	- Voice command
 	+ Channel Reward
-	- Window de/activation
-	- Window open/close
+	+ Window de/activation
+	+ Window open/close
 	- CLI command
 	- Another function activating
 - Also add function responses.
@@ -68,8 +68,8 @@ GUI User Feedback:
 	+ Is sub
 	+ And
 	+ Or
-	- Window running
-	- Window active
+	+ Window running
+	+ Window active
 	- Complex
 	- Temporary window "switch"? (something switches it on - allowed, something switches it off - disallowed)
 - Trigger variants

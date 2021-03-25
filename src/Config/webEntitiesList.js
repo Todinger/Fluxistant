@@ -7,6 +7,7 @@ const entities = {
 	CommandEntity: require('./WebEntities/commandEntity.js'),
 	ConfigEntity: require('./WebEntities/configEntity.js'),
 	CooldownEntity: require('./WebEntities/cooldownEntity.js'),
+	CustomChoiceEntity: require('./WebEntities/customChoiceEntity.js'),
 	DynamicArrayEntity: require('./WebEntities/dynamicArrayEntity.js'),
 	DynamicAssetArrayEntity: require('./WebEntities/dynamicAssetArrayEntity.js'),
 	DynamicObjectEntity: require('./WebEntities/dynamicObjectEntity.js'),
@@ -89,6 +90,10 @@ const entities = {
 	ImageFunctionEntity: require('./WebEntities/imageFunctionEntity.js'),
 	ImageEntity: require('./WebEntities/imageEntity.js'),
 	SoundEntity: require('./WebEntities/soundEntity.js'),
+	ObsFunctionDetailsEntity: require('./WebEntities/obsFunctionDetailsEntity.js'),
+	ObsFunctionDetails_BaseEntity: require('./WebEntities/obsFunctionDetails_BaseEntity.js'),
+	ObsFunctionDetails_SetCurrentSceneEntity: require('./WebEntities/obsFunctionDetails_SetCurrentSceneEntity.js'),
+	ObsFunctionEntity: require('./WebEntities/obsFunctionEntity.js'),
 	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),
 	WelcomeEntity: require('./WebEntities/welcomeEntity.js'),
 };

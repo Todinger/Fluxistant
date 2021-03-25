@@ -25,6 +25,7 @@ import TextDisplayGui				from "./textDisplayGui.mjs";
 import ChannelRewardGui				from "./channelRewardGui.mjs";
 import ChannelRewardSelectionGui	from "./channelRewardSelectionGui.mjs";
 import FunctionGui					from "./functionGui.mjs";
+import CustomChoiceGui				from "./customChoiceGui.mjs";
 
 export default {
 	GuiRegistry,
@@ -54,4 +55,5 @@ export default {
 	ChannelRewardGui,
 	ChannelRewardSelectionGui,
 	FunctionGui,
+	CustomChoiceGui,
 };

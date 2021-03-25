@@ -47,6 +47,14 @@ class FluxBot {
 		Utils.ensureDirExists(DATA_DIR_TEMP);
 	}
 	
+	setupConfigSources() {
+		this.configSourceManager = require('./configSourceManager');
+		this.configSourceManager.onAny(data => {
+			this.io.emit('sourceChanged', data);
+		});
+	}
+	
+	
 	// Read configuration entities and generate web client files if prompted to
 	readConfigEntities(generationOutputDir) {
 		this.entityFileManager = require('./entityFileManager');
@@ -377,7 +385,11 @@ class FluxBot {
 			
 			socket.on('getHelpData', () => {
 				socket.emit('helpData', this.functionHelper.getHelpData());
-			})
+			});
+			
+			socket.on('getSources', () => {
+				socket.emit('allSources', this.configSourceManager.getAllSources());
+			});
 		});
 	}
 	
@@ -401,6 +413,7 @@ class FluxBot {
 	
 	setupAllAndStart() {
 		this.prepareDirectories();
+		this.setupConfigSources();
 		this.readConfigEntities();
 		this.loadConfig();
 		this.emptyDataTempDir();

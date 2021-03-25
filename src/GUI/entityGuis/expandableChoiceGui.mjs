@@ -12,6 +12,10 @@ export default class ExpandableChoiceGui extends ChoiceGui {
 		this.mainGui = null;
 	}
 	
+	get isContainer() {
+		return true;
+	}
+	
 	_changed() {
 		super._changed();
 		this._updateName();

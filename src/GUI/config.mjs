@@ -1,6 +1,7 @@
 import GuiRegistry from "./entityGuis/guiRegistry.mjs";
 import EntityGui from "./entityGuis/entityGui.mjs";
 import MainManager from "./mainManager.mjs";
+import SourceManager from "./sourceManager.mjs";
 
 function setStyleRule(sheetName, selector, property, value) {
 	let styleSheet = document.querySelector('link[href*=' + sheetName + ']')
@@ -379,7 +380,11 @@ class Configurator {
 		this.socket.on('configSaveError', error => this.saveError(error));
 		this.socket.on('rewardRedeemed', details => this.rewardRedeemed(details));
 		this.socket.on('helpData', helpData => MainManager.setHelpData(helpData));
+		this.socket.on('sourceChanged', data => SourceManager.setSourceOptions(data.source, data.options));
+		this.socket.on('allSources', sources => SourceManager.setSources(sources));
+		
 		this.socket.emit('getHelpData');
+		this.socket.emit('getSources');
 		this.socket.emit('configRequest');
 	}
 }

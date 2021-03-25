@@ -84,6 +84,7 @@ class ImageCommands extends Module {
 	
 	loadModConfig(conf) {
 		this.deactivateFunctions(this.imageFunctions || {});
+		
 		this.imageFunctions = {};
 		if (conf.imageFunctions) {
 			for (let i = 0; i < conf.imageFunctions.length; i++) {

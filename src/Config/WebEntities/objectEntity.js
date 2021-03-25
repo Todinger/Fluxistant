@@ -160,6 +160,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'ChannelRewardSelection', value);
 	}
 	
+	addCustomChoice(key, data) {
+		return this.add(key, 'CustomChoice', data);
+	}
+	
 	
 	// ---- Overrides ---- //
 	

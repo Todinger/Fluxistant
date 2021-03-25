@@ -151,6 +151,10 @@ class Configuration {
 		return this.configRoot.addChannelRewardSelection(key, value);
 	}
 	
+	addCustomChoice(key, data) {
+		return this.configRoot.addCustomChoice(key, data);
+	}
+	
 	toConf() {
 		return this.configRoot.toConf();
 	}

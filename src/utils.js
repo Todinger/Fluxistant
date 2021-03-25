@@ -399,6 +399,12 @@ class Utils {
 			(soFar, key) => soFar && (key in obj), true);
 	}
 	
+	// Returns true iff every key in sub is also a key in obj
+	static isKeyAndValueSubset(sub, obj) {
+		return Object.keys(sub).reduce(
+			(soFar, key) => soFar && (key in obj) && sub[key] === obj[key], true);
+	}
+	
 	// Returns true iff every element in sub is also an element in arr
 	static isArraySubset(sub, arr) {
 		return sub.reduce(
