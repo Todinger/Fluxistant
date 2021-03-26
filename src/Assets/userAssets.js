@@ -39,7 +39,7 @@ class UserAssets {
 	
 	_addFile(file) {
 		let fileKey = uuidv4();
-		Logger.info(`[UserAssets] _addFile(): ${fileKey}`);
+		Logger.info(`[UserAssets] <${this.assetsDirPath}> _addFile(): ${fileKey}`);
 		let readPromise = this._readFile(file.tempFilePath, file.name)
 			.then(savedFile => {
 				savedFile.fileKey = fileKey;
@@ -54,7 +54,7 @@ class UserAssets {
 	}
 	
 	_unAddFile(fileKey) {
-		Logger.info(`[UserAssets] _unaddFile(): ${fileKey}`);
+		Logger.info(`[UserAssets] <${this.assetsDirPath}> _unaddFile(): ${fileKey}`);
 		return this.filesToAdd[fileKey].readPromise
 			.then(() => {
 				let file = this.filesToAdd[fileKey].file;
@@ -64,7 +64,7 @@ class UserAssets {
 	}
 	
 	_deleteFile(fileKey) {
-		Logger.info(`[UserAssets] _deleteFile(): ${fileKey}`);
+		Logger.info(`[UserAssets] <${this.assetsDirPath}> _deleteFile(): ${fileKey}`);
 		let filename = this.savedFiles[fileKey].path;
 		return fsPromise.unlink(filename)
 			.then(() => {
@@ -86,7 +86,7 @@ class UserAssets {
 	}
 	
 	delete(params) {
-		Logger.info(`[UserAssets] delete(): ${params.fileKey}`);
+		Logger.info(`[UserAssets] <${this.assetsDirPath}> delete(): ${params.fileKey}`);
 		if (params.fileKey in this.filesToAdd) {
 			return this._unAddFile(params.fileKey);
 		} else if ((params.fileKey in this.savedFiles) &&
@@ -98,7 +98,7 @@ class UserAssets {
 	}
 	
 	commitChanges() {
-		Logger.info(`[UserAssets] commit(): Started`);
+		Logger.info(`[UserAssets] <${this.assetsDirPath}> commit(): Started`);
 		// First remove everything marked for removal
 		let deletePromises = this.filesToDelete.map(
 			fileKey => this._deleteFile(fileKey));
@@ -107,7 +107,7 @@ class UserAssets {
 		// if we remove and add something with the same name - i.e.
 		// replace it - then it'll work properly
 		return Promise.all(deletePromises).catch().then(deletedKeys => {
-			Logger.info(`[UserAssets] commit(): Delete finished`);
+			Logger.info(`[UserAssets] <${this.assetsDirPath}> commit(): Delete finished`);
 			Utils.ensureDirExists(this.assetsDirPath);
 			_.pullAll(this.filesToDelete, deletedKeys);
 			let movePromises = [];
@@ -116,7 +116,7 @@ class UserAssets {
 				let filePath = this._pathForKey(fileKey, file.name);
 				let promise = file.mv(filePath)
 					.then(() => {
-						Logger.info(`[UserAssets] _addFile(): Add finished`);
+						Logger.info(`[UserAssets] <${this.assetsDirPath}> _addFile(): Add finished`);
 						this.savedFiles[fileKey] = {
 							name: file.name,
 							path: filePath,
@@ -131,7 +131,7 @@ class UserAssets {
 	}
 	
 	dropChanges() {
-		Logger.info(`[UserAssets] dropChanges()`);
+		Logger.info(`[UserAssets] <${this.assetsDirPath}> dropChanges()`);
 		this.filesToDelete = [];
 		
 		let promises = [];
@@ -216,7 +216,7 @@ class UserAssets {
 	}
 	
 	import(exportedAssets) {
-		Logger.info(`[UserAssets] import()`);
+		Logger.info(`[UserAssets] <${this.assetsDirPath}> import()`);
 		assert(
 			exportedAssets && exportedAssets.files,
 			`Invalid exported file assets given for import: ${exportedAssets}`);

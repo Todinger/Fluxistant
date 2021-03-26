@@ -36,6 +36,10 @@ class FluxBot {
 		this.io = require('socket.io')(this.server);
 	}
 	
+	debug(msg) {
+		this.cli.debug(`[Main] ${msg}`);
+	}
+	
 	log(msg) {
 		this.cli.log(`[Main] ${msg}`);
 	}
@@ -335,7 +339,7 @@ class FluxBot {
 			});
 			
 			socket.on('saveConfig', async config => {
-				this.log('Received configuration for saving.');
+				this.debug('Received configuration for saving.');
 				try {
 					this.configManager.validateAll(config);
 				} catch (err) {

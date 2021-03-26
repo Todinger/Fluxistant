@@ -212,7 +212,7 @@ class Configuration {
 			JSON.stringify(descriptor, null, '\t'),
 			err => {
 				if (err) throw err;
-				Logger.info(`[Configs] Configuration file saved to: ${filename}`);
+				Logger.debug(`[Configs] Configuration file saved to: ${filename}`);
 			}
 		);
 	}
@@ -225,7 +225,7 @@ class Configuration {
 			JSON.stringify(conf, null, '\t'),
 			err => {
 				if (err) throw err;
-				Logger.info(`[Configs] Configuration file saved to: ${filename}`);
+				Logger.debug(`[Configs] Conf file saved to: ${filename}`);
 			}
 		);
 	}
