@@ -21,6 +21,7 @@
 - Testing =\
 - Revamp configs to lessen descriptor count =\
 - Remake configuration GUI x_x
+- "status" CLI command that shows current connection status to everything
 
 GUI User Feedback:
 + Lables should be unmarkable, cursor should stay a pointer

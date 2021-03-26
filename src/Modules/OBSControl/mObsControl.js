@@ -3,10 +3,12 @@ const OBSWebSocket = require('obs-websocket-js');
 const Module = requireMain('./module');
 const ObsFunctionFactory = require('./Functions/ObsFunctionFactory');
 const ConfigSourceManager = requireMain('./configSourceManager');
+const Timers = requireMain('./timers');
 const Utils = requireMain('./utils');
 
 const DEFAULT_ADDRESS = 'localhost';
 const DEFAULT_PORT = 4444;
+const CONNECT_ATTEMPT_INTERVAL = 5000; // 5 seconds
 
 const SCENES_SOURCE_NAME = 'obsScenes';
 
@@ -34,6 +36,7 @@ class ObsControl extends Module {
 		this.obs = new OBSWebSocket();
 		this.connected = false;
 		this.attemptingConnection = false;
+		this.connectAttemptTimer = Timers.repeating();
 		this.connectionSettings = {
 			address: undefined,
 			port: undefined,
@@ -48,9 +51,28 @@ class ObsControl extends Module {
 		this._registerForEvents();
 	}
 	
+	_errMessage(err) {
+		return err.message || err.description || err.error || err;
+	}
+	
 	_setCurrentScene(sceneName) {
 		this.previousScene = this.currentScene;
 		this.currentScene = sceneName;
+	}
+	
+	_attemptToConnect(settings) {
+		this.obs.connect(settings)
+			.then(() => {
+				this.info('Connected to OBS.');
+				this.connected = true;
+				this.attemptingConnection = false;
+				this.connectAttemptTimer.clear();
+				
+				return this._loadScenes();
+			})
+			.catch(err => {
+				this.debug(`Failed to connect to OBS: ${this._errMessage(err)}`);
+			});
 	}
 	
 	_connect() {
@@ -67,18 +89,9 @@ class ObsControl extends Module {
 				settings.password = this.connectionSettings.password;
 			}
 			
-			this.obs.connect(settings)
-				.then(() => {
-					this.debug('Connected to OBS.');
-					this.connected = true;
-					this.attemptingConnection = false;
-					
-					return this._loadScenes();
-				})
-				.catch(err => {
-					this.attemptingConnection = false;
-					this.error(err);
-				});
+			this.connectAttemptTimer.set(
+				CONNECT_ATTEMPT_INTERVAL,
+				() => this._attemptToConnect(settings));
 		}
 	}
 	
@@ -86,6 +99,9 @@ class ObsControl extends Module {
 		if (this.connected) {
 			this.obs.disconnect();
 			this.connected = false;
+		} else if (this.attemptingConnection) {
+			this.connectAttemptTimer.clear();
+			this.attemptingConnection = false;
 		}
 	}
 	
@@ -104,7 +120,7 @@ class ObsControl extends Module {
 					data.scenes.map(scene => scene.name))
 			})
 			.catch(err => {
-				this.error(`Failed to load scenese from OBS: ${err.message}`);
+				this.error(`Failed to load scenese from OBS: ${this._errMessage(err)}`);
 			});
 	}
 	
@@ -129,7 +145,7 @@ class ObsControl extends Module {
 	_functionActivated(funcObject) {
 		funcObject.obsFunction.invoke()
 			.catch(err => {
-				this.error(err.message || `${err}`);
+				this.error(this._errMessage(err));
 			});
 	}
 	
@@ -196,6 +212,11 @@ class ObsControl extends Module {
 	
 	loadModConfig(conf) {
 		if (!Utils.isKeyAndValueSubset(this.connectionSettings, conf)) {
+			this.connectionSettings = {
+				address: conf.address,
+				port: conf.port,
+				password: conf.password,
+			};
 			this._reconnect();
 		}
 		
