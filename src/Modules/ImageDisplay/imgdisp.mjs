@@ -7,6 +7,8 @@ const DEFAULT_SHOW_DURATION = 5000;
 const jImageHolder = $('#imageholder');
 const jImage = $('#actualimg');
 
+const TRANSPARENT_PIXEL_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 class ImageDisplay extends ModuleClient {
 	constructor() {
 		super('Image Display');
@@ -66,6 +68,7 @@ class ImageDisplay extends ModuleClient {
 	}
 	
 	imageDone(imageParameters) {
+		jImage.attr('src', TRANSPARENT_PIXEL_IMAGE);
 		if (imageParameters.effects) {
 			this.clearImageEffects(imageParameters.effects);
 		}
