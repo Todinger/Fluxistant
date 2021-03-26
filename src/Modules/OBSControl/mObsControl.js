@@ -72,6 +72,9 @@ class ObsControl extends Module {
 			})
 			.catch(err => {
 				this.debug(`Failed to connect to OBS: ${this._errMessage(err)}`);
+				if (err.error === 'Authentication Failed.') {
+					this.error('Failed to authenticate with OBS. Are you sure you set the right password in the configuration?');
+				}
 			});
 	}
 	
@@ -120,7 +123,7 @@ class ObsControl extends Module {
 					data.scenes.map(scene => scene.name))
 			})
 			.catch(err => {
-				this.error(`Failed to load scenese from OBS: ${this._errMessage(err)}`);
+				this.error(`Failed to load scenes from OBS: ${this._errMessage(err)}`);
 			});
 	}
 	
@@ -189,7 +192,7 @@ class ObsControl extends Module {
 	}
 	
 	defineModConfig(modConfig) {
-		modConfig.addString('address', 'localhost')
+		modConfig.addString('address')
 			.setName('WebSocket Address')
 			.setDescription('Address of the OBS WebSocket on the network (defaults to "localhost")')
 			.setAdvanced();
