@@ -113,7 +113,7 @@ class CandyGame extends Module {
 		this.candyCount = 0;
 	}
 	
-	defineModData(modData) {
+	defineModAssets(modData) {
 		modData.addWeightedPool('Images');
 	}
 	

@@ -7,7 +7,7 @@ const KEYCODES = require('./enums').KEYCODES;
 const KeyboardManager = require('./keyboardManager');
 const ConfigManager = require('./configManager');
 const EntityFileManager = require('./entityFileManager');
-const DataManager = require('./assetManager');
+const AssetManager = require('./assetManager');
 const Utils = require('./utils');
 
 // Every Module needs to have a file by this name in its root directory
@@ -185,16 +185,16 @@ class ModuleManager {
 	// Calls all the modules' configuration definition methods, effectively
 	// creating their default configurations, ready to be filled with actual
 	// values during _loadConfigs().
-	_defineConfigAndDataAll() {
-		Object.values(this.modules).forEach(mod => this._defineConfigAndData(mod));
+	_defineConfigAndAssetsAll() {
+		Object.values(this.modules).forEach(mod => this._defineConfigAndAssets(mod));
 	}
 	
 	// Calls the module's configuration and asset definition methods.
 	// This creates its ModuleConfig with all its fields, using default values
-	// for everything, and registers the module in DataManager.
-	_defineConfigAndData(mod) {
-		let modData = DataManager.addModule(mod.name, mod.description);
-		mod.defineData(modData);
+	// for everything, and registers the module in AssetManager.
+	_defineConfigAndAssets(mod) {
+		let modAssets = AssetManager.addModule(mod.name, mod.description);
+		mod.defineAssets(modAssets);
 		
 		if (mod.configurable) {
 			mod.defineConfig(mod.modConfig);
@@ -203,8 +203,8 @@ class ModuleManager {
 	}
 	
 	// Loads all the modules' configurations and assets from disk.
-	_loadConfigAndDataAll() {
-		DataManager.loadAll();
+	_loadConfigAndAssetsAll() {
+		AssetManager.loadAll();
 		ConfigManager.loadModules();
 	}
 	
@@ -255,8 +255,8 @@ class ModuleManager {
 		if (generationDir) return;
 		
 		this._defineDependenciesAll();
-		this._defineConfigAndDataAll();
-		this._loadConfigAndDataAll();
+		this._defineConfigAndAssetsAll();
+		this._loadConfigAndAssetsAll();
 		this._loadAll();
 		this._postloadAll();
 	}

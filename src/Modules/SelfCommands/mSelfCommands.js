@@ -66,7 +66,7 @@ class SelfCommands extends Module {
 		return false;
 	}
 	
-	defineModData(modData) {
+	defineModAssets(modData) {
 		modData.addNamedCollection('Images');
 		modData.addNamedCollection('Sounds');
 	}

@@ -75,7 +75,7 @@ class WelcomeImage extends Module {
 		}
 	}
 	
-	defineModData(modData) {
+	defineModAssets(modData) {
 		modData.addUniformGroupsPool('Images');
 		modData.addUniformGroupsPool('Sounds');
 	}

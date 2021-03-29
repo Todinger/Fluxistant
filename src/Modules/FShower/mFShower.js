@@ -60,7 +60,7 @@ class FShower extends Module {
 		this.imgdrop = this.use('Image Dropper');
 	}
 	
-	defineModData(modData) {
+	defineModAssets(modData) {
 		modData.addUniformGroupsPool('Images');
 	}
 

@@ -108,7 +108,7 @@ class Catastrophe extends Module {
 		}
 	}
 	
-	defineModData(modData) {
+	defineModAssets(modData) {
 		modData.addUniformPool('Sounds');
 		modData.addUniformPool('Images');
 	}

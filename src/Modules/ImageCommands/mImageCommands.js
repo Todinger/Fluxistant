@@ -67,8 +67,8 @@ class ImageCommands extends Module {
 			});
 		}
 	}
-
-	defineModData(modData) {
+	
+	defineModAssets(modData) {
 		modData.addNamedCollection('Images');
 		modData.addNamedCollection('Sounds');
 	}

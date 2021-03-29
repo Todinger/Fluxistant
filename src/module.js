@@ -102,7 +102,7 @@ class Module {
 		this._connectedClients = {};
 		
 		// Assets
-		this.assets = null; // Filled during defineData
+		this.assets = null; // Filled during defineAssets
 		
 		// Configuration
 		if (this.configurable) {
@@ -407,9 +407,9 @@ class Module {
 	// Invoked during initialization (before defineConfig).
 	// Lets the concrete module define the asset files it's going to use and saves
 	// a reference to the module's asset manager.
-	defineData(modData) {
+	defineAssets(modData) {
 		this.assets = modData;
-		this.defineModData(modData);
+		this.defineModAssets(modData);
 	}
 	
 	// [For override by inheriting classes]
@@ -417,7 +417,7 @@ class Module {
 	// This can mean multiple collections or just a single file.
 	// In order for asset files and collections to be configurable, they need to
 	// be added to the configuration as well in defineModConfig.
-	defineModData(modData) {
+	defineModAssets(modData) {
 		// Do nothing by default (for overriding where needed)
 	}
 	

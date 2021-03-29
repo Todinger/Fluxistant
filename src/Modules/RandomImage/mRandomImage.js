@@ -49,7 +49,7 @@ class RandomImage extends Module {
 		};
 	}
 	
-	defineModData(modData) {
+	defineModAssets(modData) {
 		modData.addUniformPool('Images');
 	}
 	
