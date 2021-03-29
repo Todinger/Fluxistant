@@ -11,21 +11,63 @@ export default class CustomChoiceGui extends EntityGui {
 		super(entity, guiID, modName);
 	}
 	
+	_buildOptionsList(options, parent) {
+		options.forEach(option => {
+			let selectorOption = $(`<option value="${option}">${option}</option>`);
+			parent.append(selectorOption);
+		});
+	}
+	
+	_buildOptionCategories(categories, parent) {
+		Object.keys(categories).forEach(category => {
+			let optionCategory = $(`<optgroup label="${category}"></optgroup>`);
+			this._buildOptionsList(categories[category], optionCategory);
+			parent.append(optionCategory);
+		});
+	}
+	
+	_hasOption(options, option) {
+		if (Array.isArray(options)) {
+			return options.includes(option);
+		} else {
+			return Object.values(options).reduce(
+				(soFar, current) => soFar || current.includes(option));
+		}
+	}
+	
+	_getSomeOption(options) {
+		if (Array.isArray(options) && options.length > 0) {
+			return options[0];
+		} else {
+			for (const catOptions of Object.values(options)) {
+				if (catOptions && catOptions.length > 0) {
+					return catOptions[0];
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 	_buildOptions(options) {
 		this.selector.empty();
 		
-		options.forEach(option => {
-			let selectorOption = $(`<option value="${option}">${option}</option>`);
-			this.selector.append(selectorOption);
-		});
+		if (Array.isArray(options)) {
+			this._buildOptionsList(options, this.selector);
+		} else {
+			this._buildOptionCategories(options, this.selector);
+		}
 		
 		// Set initial selection
 		let currentValue = this.entity.getValue();
-		if (currentValue && options.includes(currentValue)) {
+		if (currentValue && this._hasOption(options, currentValue)) {
 			this.selector.val(currentValue);
-		} else if (options.length > 0) {
-			this.selector.val(options[0]);
-			this.entity.setValue(options[0]);
+		} else {
+			let someOption = this._getSomeOption(options);
+			if (someOption) {
+				this.selector.val(someOption);
+				this.entity.setValue(someOption);
+			}
 		}
 	}
 	
