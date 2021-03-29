@@ -27,6 +27,22 @@ const FunctionBuilders = require('./Functions/builders');
 // this file is, add a "module.js" file in it, require this file and inherit
 // this class.
 class Module {
+	static Interface = class ModuleInterface {
+		constructor(inst) {
+			this.inst = inst;
+			this.methods = this.defineMethods();
+		}
+		
+		defineDependencyConfig(modConfigGroup) {
+			// Do nothing by default
+		}
+		
+		defineMethods() {
+			// No methods by default
+			return {};
+		}
+	};
+	
 	// Pass an object in the super() call in the concrete Module's constructor
 	// to configure the module.
 	// The properties of the description object are as follows:
@@ -112,6 +128,14 @@ class Module {
 			}
 		}
 		
+		// Initialize module interface for use in other modules, if we have one
+		if (this.constructor.Interface !== Module.Interface) {
+			this.interface = new this.constructor.Interface(this);
+		}
+		
+		// Dependencies that use the above interface in other modules
+		this.dependencies = {};
+		
 		// This is set to true once the configuration has been loaded for
 		// the first time - it's used to invoke the enabled() function
 		// on startup, in case we don't switch from enabled=false to
@@ -122,6 +146,65 @@ class Module {
 	get enabled() {
 		return this.config && this.config.enabled;
 	}
+	
+	getModule(modName) {
+		return this.moduleManager.getModule(modName);
+	}
+	
+	
+	// ---------- START OF MODULE DEPENDENCIES ---------- //
+	
+	// Don't use this key for other configuration entities
+	static dependencyConfigKey(modName) {
+		return `<Interface> ${modName}`;
+	}
+	
+	dependencyConfig(modName) {
+		return this.config[Module.dependencyConfigKey(modName)];
+	}
+	
+	use(modName) {
+		if (!(modName in this.dependencies)) {
+			let mod = this.moduleManager.getModule(modName);
+			assert(mod, `Unknown module name: ${modName}`);
+			assert(mod.interface, `Module ${modName} does not support dependencies.`);
+			let localModInterface = {};
+			Object.keys(mod.interface.methods).forEach(methodName => {
+				localModInterface[methodName] =
+					(...p) => mod.interface.methods[methodName](
+						this.dependencyConfig(modName),
+						...p);
+			});
+			
+			this.dependencies[modName] = {
+				modInterface: mod.interface,
+				localInterface: localModInterface,
+			};
+		}
+		
+		return this.dependencies[modName].localInterface;
+	}
+	
+	// [For override by inheriting classes]
+	// This is where the concrete module defines its dependencies on other modules.
+	defineModDependencies() {
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	defineDependencyConfigs(modConfig) {
+		Object.keys(this.dependencies).forEach(modName => {
+			let dependencyConfigGroup = modConfig.addGroup(Module.dependencyConfigKey(modName));
+			this.dependencies[modName].modInterface.defineDependencyConfig(dependencyConfigGroup);
+		});
+	}
+	
+	// ----------- END OF MODULE DEPENDENCIES ----------- //
+	
+	
+	
+	
+	
+	
 	
 	// ----------- START OF FUNCTION FEATURES ----------- //
 	
@@ -346,6 +429,9 @@ class Module {
 		if (!this.configurable) {
 			return;
 		}
+		
+		// Start with dependency configurations
+		this.defineDependencyConfigs(modConfig);
 		
 		this._addCommonCommands();
 		this.defineModConfig(modConfig); // Common commands may be overridden here - that's fine

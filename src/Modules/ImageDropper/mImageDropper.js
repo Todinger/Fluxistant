@@ -1,8 +1,31 @@
 'use strict';
 
 const Module = requireMain('module');
+const Utils = requireMain('utils');
 
 class ImageDropper extends Module {
+	static Interface = class ImageDropperInterface extends Module.Interface {
+		constructor(inst) {
+			super(inst);
+		}
+		
+		defineDependencyConfig(dependencyConfigGroup) {
+			dependencyConfigGroup
+				.setName('Default Image Size')
+				.setDescription('Size to set an image to unless overridden by specific image settings');
+			dependencyConfigGroup.addNaturalNumber('width')
+				.setDescription('Width in pixels');
+			dependencyConfigGroup.addNaturalNumber('height')
+				.setDescription('Height in pixels');
+		}
+		
+		defineMethods() {
+			return {
+				dropImage: (conf, displayData) => this.inst.dropImage(displayData, conf),
+			};
+		}
+	};
+	
 	constructor() {
 		super({
 			name: 'Image Dropper',
@@ -10,6 +33,14 @@ class ImageDropper extends Module {
 			source: 'imgdrop.html',
 			configurable: false,
 		});
+	}
+	
+	dropImage(displayData, defaults) {
+		if (defaults) {
+			Utils.applyDefaults(displayData, defaults);
+		}
+		
+		this.broadcastEvent('dropImage', displayData);
 	}
 }
 

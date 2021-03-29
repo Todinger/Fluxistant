@@ -20,6 +20,12 @@ class ChoiceValueEntity extends StaticObjectEntity {
 		conf.type = this.optionName;
 		return conf;
 	}
+	
+	cloneImpl() {
+		let copy = super.cloneImpl();
+		copy.optionName = this.optionName;
+		return copy;
+	}
 }
 
 module.exports = ChoiceValueEntity;

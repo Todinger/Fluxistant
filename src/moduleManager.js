@@ -48,6 +48,10 @@ class ModuleManager {
 			(modName, modConfig) => this._onConfigLoaded(modName, modConfig));
 	}
 	
+	getModule(modName) {
+		return this.modules[modName];
+	}
+	
 	getModules() {
 		return this.modules;
 	}
@@ -171,6 +175,13 @@ class ModuleManager {
 		});
 	}
 	
+	// Calls all the modules' dependency definition methods.
+	// This needs to be done before defining the configurations, since
+	// some dependencies may add configuration fields.
+	_defineDependenciesAll() {
+		Object.values(this.modules).forEach(mod => mod.defineModDependencies());
+	}
+	
 	// Calls all the modules' configuration definition methods, effectively
 	// creating their default configurations, ready to be filled with actual
 	// values during _loadConfigs().
@@ -243,6 +254,7 @@ class ModuleManager {
 		this._readAll(webPrefix, modulesDir, app, express, generationDir);
 		if (generationDir) return;
 		
+		this._defineDependenciesAll();
 		this._defineConfigAndDataAll();
 		this._loadConfigAndDataAll();
 		this._loadAll();

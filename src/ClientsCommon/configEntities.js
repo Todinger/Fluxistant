@@ -20733,6 +20733,12 @@ class ChoiceValueEntity extends StaticObjectEntity {
 		conf.type = this.optionName;
 		return conf;
 	}
+	
+	cloneImpl() {
+		let copy = super.cloneImpl();
+		copy.optionName = this.optionName;
+		return copy;
+	}
 }
 
 module.exports = ChoiceValueEntity;
@@ -21637,8 +21643,8 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'Boolean', defaultValue);
 	}
 	
-	addDynamicArray(key, valueType, values, ...itemConstructionOptions) {
-		let array = this.add(key, 'DynamicArray', valueType, ...itemConstructionOptions);
+	addArray(key, type, valueType, values, ...itemConstructionOptions) {
+		let array = this.add(key, type, valueType, ...itemConstructionOptions);
 		if (values) {
 			values.forEach(value => {
 				array.addElement(EntityFactory.build(valueType, value));
@@ -21646,6 +21652,14 @@ class ObjectEntity extends ConfigEntity {
 		}
 		
 		return array;
+	}
+	
+	addFixedArray(key, valueType, values, ...itemConstructionOptions) {
+		return this.addArray(key, 'FixedArray', valueType, values, ...itemConstructionOptions);
+	}
+	
+	addDynamicArray(key, valueType, values, ...itemConstructionOptions) {
+		return this.addArray(key, 'DynamicArray', valueType, values, ...itemConstructionOptions);
 	}
 	
 	addDynamicAssetArray(key, collection, dataType, values) {

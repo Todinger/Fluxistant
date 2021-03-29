@@ -15,7 +15,7 @@ class ModuleConfig extends Configuration {
 	
 	addFunction(key, data) {
 		if (!this.configRoot.hasChild('functions')) {
-			this.configRoot.addDynamicArray('functions', 'Function')
+			this.configRoot.addFixedArray('functions', 'Function')
 				.setName('Functions')
 				.setDescription('All the things this module can do');
 		}

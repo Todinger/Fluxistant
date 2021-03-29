@@ -26,6 +26,7 @@ class FShower extends Module {
 			description: DESCRIPTION,
 		});
 		
+		this.imgdrop = null;
 		this.userGroups = {};
 	}
 	
@@ -50,8 +51,13 @@ class FShower extends Module {
 				let files = group.files;
 				let imageConf = files[file.fileKey];
 				let displayData = imageConf.makeDisplayData(file);
-				this.broadcastEvent('dropImage', displayData);
+				// this.broadcastEvent('dropImage', displayData);
+				this.imgdrop.dropImage(displayData);
 			});
+	}
+	
+	defineModDependencies() {
+		this.imgdrop = this.use('Image Dropper');
 	}
 	
 	defineModData(modData) {
@@ -59,6 +65,14 @@ class FShower extends Module {
 	}
 
 	defineModConfig(modConfig) {
+		// let defaultSize = modConfig.addGroup('defaultSize')
+		// 	.setName('Default Image Size')
+		// 	.setDescription('Size to set an image to unless overridden by specific image settings');
+		// defaultSize.addNaturalNumber('width')
+		// 	.setDescription('Width in pixels');
+		// defaultSize.addNaturalNumber('height')
+		// 	.setDescription('Height in pixels');
+		
 		modConfig.add(
 			'defaultImages',
 			'MultiAsset',

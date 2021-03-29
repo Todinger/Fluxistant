@@ -35,7 +35,7 @@ class Configuration {
 	// 	argument	Filter-specific data (e.g. username for the isUser filter).
 	addCommand(data) {
 		if (!this.configRoot.hasChild('commands')) {
-			this.configRoot.add('commands', 'FixedArray', 'Command')
+			this.configRoot.addFixedArray('commands', 'Command')
 				.setDescription('Commands associated with this module');
 		}
 		
@@ -113,6 +113,10 @@ class Configuration {
 	
 	addBoolean(key, defaultValue) {
 		return this.configRoot.addBoolean(key, defaultValue);
+	}
+	
+	addFixedArray(key, valueType, values) {
+		return this.configRoot.addFixedArray(key, valueType, values);
 	}
 	
 	addDynamicArray(key, valueType, values) {

@@ -73,6 +73,7 @@ class ImageDropper extends ModuleClient {
 			this.floatImages(image);
 		});
 		
+		this.server.attach();
 		this.server.attachToTag('imgdrop');
 	}
 }
