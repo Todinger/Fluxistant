@@ -36,6 +36,7 @@ class ObsControl extends Module {
 		this.obs = new OBSWebSocket();
 		this.connected = false;
 		this.attemptingConnection = false;
+		this.authErrorMessageShown = false;
 		this.connectAttemptTimer = Timers.repeating();
 		this.connectionSettings = {
 			address: undefined,
@@ -63,7 +64,7 @@ class ObsControl extends Module {
 	_attemptToConnect(settings) {
 		this.obs.connect(settings)
 			.then(() => {
-				this.info('Connected to OBS.');
+				this.log('Connected to OBS.');
 				this.connected = true;
 				this.attemptingConnection = false;
 				this.connectAttemptTimer.clear();
@@ -72,8 +73,9 @@ class ObsControl extends Module {
 			})
 			.catch(err => {
 				this.debug(`Failed to connect to OBS: ${this._errMessage(err)}`);
-				if (err.error === 'Authentication Failed.') {
+				if (err.error === 'Authentication Failed.' && !this.authErrorMessageShown) {
 					this.error('Failed to authenticate with OBS. Are you sure you set the right password in the configuration?');
+					this.authErrorMessageShown = true;
 				}
 			});
 	}
