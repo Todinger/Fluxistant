@@ -25,7 +25,6 @@
 	- Element-ui / Buefy
 - "status" CLI command that shows current connection status to everything
 - Send keys to windows
-- seManager.js:75 - typo ("eventns")
 
 GUI Library: Buefy
 Twitch library: https://www.npmjs.com/package/twitch
@@ -41,10 +40,10 @@ GUI User Feedback:
 
 - Phasmophobia:
 	- Guessing game:
-		- !guess / !ghost for ghost type guess
+		+ !guess / !ghost for ghost type guess
 		- !room for room guess
 		- !ev / !guessev for guessing evidence
-	- When found, the ghost type should show up as a stamp over the evidence (+ error stamp for bad evidence?)
+	+ When found, the ghost type should show up as a stamp over the evidence (+ error stamp for bad evidence?)
 
 - Support for user data files for modules (for large data that shouldn't
   be in the configurations themselves).
@@ -86,7 +85,7 @@ GUI User Feedback:
 - Trigger variants
 - Trigger export for modules (i.e. having the module adds triggers which the module itself would be responsible of triggering)
 - "Not user" filter
-- Fix: single-time GIFs not starting over when shown again
++ Fix: single-time GIFs not starting over when shown again
 - User data editor: raw (use shell to open Notepad for data files).
 - User data editor: built-in, data-specific interface that allows visual
   editing of the data (each module will need to define these editors for
@@ -108,7 +107,7 @@ IDEAS!
 
 Next:
 + Filters
-- Variables, help display, auto-complete variable names
++ Variables, help display, auto-complete variable names
 	+ Make help text not close if focusing on that
 + Fix replacement with escaping so that using input text (written in a Twitch message by someone) on text replacements doesn't register as text to replace
 - Switch everything to work with functions

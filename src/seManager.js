@@ -72,7 +72,7 @@ class SEManager extends EventNotifier {
 	constructor() {
 		super(true);
 		
-		// The data given in each of these eventns is the .data value supplied
+		// The data given in each of these events is the .data value supplied
 		// in the event message from StreamElements
 		// See StreamElements.websocket.schema.json for a description of
 		// the details object received in each request (its .data property
