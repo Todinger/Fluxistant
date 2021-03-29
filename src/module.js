@@ -754,21 +754,25 @@ class Module {
 	// Logs a message to the log, marked as coming from this Module.
 	log(message) {
 		Logger.info(this._printForm(message));
-		// cli.log(this._printForm(message));
 	}
 	
+	
+	// [For use by inheriting classes]
+	// Logs a message to the log, marked as coming from this Module.
+	// Synonymous to Module.log().
+	info(message) {
+		this.log(message);
+	}
 	// [For use by inheriting classes]
 	// Logs a warning message to the log, marked as coming from this Module.
 	warn(message) {
 		Logger.warn(this._printForm(message));
-		// cli.warn(this._printForm(message));
 	}
 	
 	// [For use by inheriting classes]
 	// Log an error message to the log, marked as coming from this Module.
 	error(message) {
 		Logger.error(this._printForm(message));
-		// cli.error(this._printForm(message));
 	}
 	
 	// [For use by inheriting classes]
