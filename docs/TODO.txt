@@ -21,7 +21,15 @@
 - Testing =\
 - Revamp configs to lessen descriptor count =\
 - Remake configuration GUI x_x
+	- Vue.js
+	- Element-ui / Buefy
 - "status" CLI command that shows current connection status to everything
+- Send keys to windows
+- seManager.js:75 - typo ("eventns")
+
+GUI Library: Buefy
+Twitch library: https://www.npmjs.com/package/twitch
+
 
 GUI User Feedback:
 + Lables should be unmarkable, cursor should stay a pointer
@@ -49,6 +57,8 @@ GUI User Feedback:
 	+ Key down/up
 	- Controller buttons
 	- Voice command
+		- Microsoft STT
+		- https://voiceattack.com/
 	+ Channel Reward
 	+ Window de/activation
 	+ Window open/close
