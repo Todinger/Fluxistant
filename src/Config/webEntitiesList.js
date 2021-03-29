@@ -96,6 +96,7 @@ const entities = {
 	ObsFunctionDetails_SwitchToPreviousSceneEntity: require('./WebEntities/obsFunctionDetails_SwitchToPreviousSceneEntity.js'),
 	ObsFunctionEntity: require('./WebEntities/obsFunctionEntity.js'),
 	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),
+	TextFunctionEntity: require('./WebEntities/textFunctionEntity.js'),
 	WelcomeEntity: require('./WebEntities/welcomeEntity.js'),
 };
 
