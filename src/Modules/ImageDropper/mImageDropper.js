@@ -22,6 +22,7 @@ class ImageDropper extends Module {
 		defineMethods() {
 			return {
 				dropImage: (conf, displayData) => this.inst.dropImage(displayData, conf),
+				floatImage: (conf, displayData) => this.inst.floatImage(displayData, conf),
 			};
 		}
 	};
@@ -35,12 +36,20 @@ class ImageDropper extends Module {
 		});
 	}
 	
-	dropImage(displayData, defaults) {
+	sendImage(eventName, displayData, defaults) {
 		if (defaults) {
 			Utils.applyDefaults(displayData, defaults);
 		}
 		
-		this.broadcastEvent('dropImage', displayData);
+		this.broadcastEvent(eventName, displayData);
+	}
+	
+	dropImage(displayData, defaults) {
+		this.sendImage('dropImage', displayData, defaults);
+	}
+	
+	floatImage(displayData, defaults) {
+		this.sendImage('floatImage', displayData, defaults);
 	}
 }
 

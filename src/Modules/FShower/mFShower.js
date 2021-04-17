@@ -22,7 +22,6 @@ class FShower extends Module {
 	constructor() {
 		super({
 			name: 'F Shower',
-			tags: ['imgdrop'],
 			description: DESCRIPTION,
 		});
 		

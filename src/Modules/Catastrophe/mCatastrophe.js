@@ -30,7 +30,6 @@ class Catastrophe extends Module {
 	constructor() {
 		super({
 			name: 'Catastrophe',
-			tags: ['imgdrop'],
 			description: DESCRIPTION,
 		});
 		
@@ -102,10 +101,15 @@ class Catastrophe extends Module {
 						let imageConf = files[imageFile.fileKey];
 						let displayData = imageConf.makeDisplayData(imageFile);
 						displayData.count = 1;
-						this.broadcastEvent('floatImage', displayData);
+						this.imgdrop.floatImage(displayData);
+						// this.broadcastEvent('floatImage', displayData);
 					}
 				});
 		}
+	}
+	
+	defineModDependencies() {
+		this.imgdrop = this.use('Image Dropper');
 	}
 	
 	defineModAssets(modData) {
