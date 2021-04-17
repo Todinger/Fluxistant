@@ -60,11 +60,21 @@ class ImageDisplay extends ModuleClient {
 	}
 	
 	playSound(soundParameters) {
-		// let sound = new Audio(url);
-		// $(sound).on('ended', () => this.soundDone());
-		// sound.play().catch(() => this.soundDone());
 		let markDone = () => this.soundDone();
-		this.sounds.playOneShot(soundParameters.url, markDone, markDone);
+		
+		let sound = new Audio(soundParameters.url);
+		if (Number.isNaN(soundParameters.volume)) {
+			soundParameters.volume = 1.0;
+		}
+		
+		sound.volume = soundParameters.volume;
+		// sound.addEventListener('ended', markDone);
+		// sound.addEventListener('error', markDone);
+		sound.play()
+			.then(markDone)
+			.catch(markDone);
+		
+		// this.sounds.playOneShot(soundParameters.url, soundParameters.volume, markDone, markDone);
 	}
 	
 	imageDone(imageParameters) {
@@ -87,6 +97,10 @@ class ImageDisplay extends ModuleClient {
 		}
 		
 		if (parameters.sound) {
+			if (!Number.isNaN(parameters.sound.volume)) {
+				parameters.sound.volume = parameters.sound.volume / 100;
+			}
+			
 			this.playSound(parameters.sound);
 		}
 	}

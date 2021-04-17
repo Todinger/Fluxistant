@@ -102,7 +102,12 @@ class ObsControl extends Module {
 	
 	_disconnect() {
 		if (this.connected) {
-			this.obs.disconnect();
+			// Ignore errors in disconnections since they mean we're not
+			// connected and that's what we want
+			try {
+				this.obs.disconnect();
+			} catch (err) {}
+			
 			this.connected = false;
 		} else if (this.attemptingConnection) {
 			this.connectAttemptTimer.clear();
@@ -148,10 +153,17 @@ class ObsControl extends Module {
 	}
 	
 	_functionActivated(funcObject) {
-		funcObject.obsFunction.invoke()
-			.catch(err => {
-				this.error(this._errMessage(err));
-			});
+		if (this.connected) {
+			funcObject.obsFunction.invoke()
+				.catch(err => {
+					if (err.code === 'NOT_CONNECTED') {
+						this._reconnect();
+						this.info('Disconnected from OBS.');
+					} else {
+						this.error(this._errMessage(err));
+					}
+				});
+		}
 	}
 	
 	_remakeFunctions(conf) {

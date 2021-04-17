@@ -293,12 +293,19 @@ If this is set to 1 then reward amounts will not be affected by the amount of ev
 			messageParts.push(this.levelData.ghostName);
 		}
 		
-		if (Utils.inRange(1, this.levelData.possibleEvidenceLeft.length, 3)) {
-			messageParts.push(Utils.makeEnglishOrList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft)));
-		}
-		
-		if (this.levelData.possibleGhosts.length <= 3) {
-			messageParts.push(Utils.makeEnglishOrList(this.levelData.possibleGhosts));
+		if (this.badEvidence) {
+			messageParts.push(`BAD EVIDENCE: ${this.toEvidenceNames(this.levelData.list)}`)
+		} else if (this.levelFinished) {
+			messageParts.push(
+				`${this.toEvidenceNames(this.levelData.list).join(' + ')} = ${this.levelData.possibleGhosts[0]}`);
+		} else {
+			if (this.levelData.possibleEvidenceLeft.length <= 3) {
+				messageParts.push(Utils.makeEnglishOrList(this.toEvidenceNames(this.levelData.possibleEvidenceLeft)));
+			}
+			
+			if (this.levelData.possibleGhosts.length <= 3) {
+				messageParts.push(Utils.makeEnglishOrList(this.levelData.possibleGhosts));
+			}
 		}
 		
 		if (messageParts.length > 0) {
@@ -358,7 +365,7 @@ If this is set to 1 then reward amounts will not be affected by the amount of ev
 		if (!this.levelData.flags[evidence]) {
 			this.levelData.flags[evidence] = true;
 			if (this.config.chat.evidence) {
-				this.say(`${this.evidenceNames[evidence]} added as evidence! Use !evidence which ghosts it can be.`);
+				this.say(`${this.evidenceNames[evidence]} added as evidence! Use !evidence to see which ghosts it can be.`);
 			}
 			this.evidenceChanged();
 		}
@@ -368,7 +375,7 @@ If this is set to 1 then reward amounts will not be affected by the amount of ev
 		if (this.levelData.flags[evidence]) {
 			this.levelData.flags[evidence] = false;
 			if (this.config.chat.evidence) {
-				this.say(`${this.evidenceNames[evidence]} removed as evidence! Use !evidence which ghosts it can be.`);
+				this.say(`${this.evidenceNames[evidence]} removed as evidence! Use !evidence to see which ghosts it can be.`);
 			}
 			this.evidenceChanged();
 		}
@@ -389,16 +396,16 @@ If this is set to 1 then reward amounts will not be affected by the amount of ev
 	}
 	
 	guessGhost(user, ghost) {
-		if (this.levelFinished) {
-			this.tell(user, "It's too late to enter a guess now - we already know what the ghost is!");
-		} else if (this.badEvidence) {
+		if (this.badEvidence) {
 			this.tell(user, `Maybe wait with that until ${this.getStreamerName()} fixes the evidence, since it doesn't fit any ghost right now...`);
+		} else if (this.levelFinished) {
+			this.tell(user, "It's too late to enter a guess now - we already know what the ghost is!");
 		} else {
 			if (!ghost) {
 				if (user.name in this.guesses) {
 					this.tell(user, `You guessed that the ghost would be ${Utils.definiteSingularFor(this.guesses[user.name].ghost)}.`);
 				} else {
-					this.tell(user, 'Please also enter a ghost type to make your guess.');
+					this.tell(user, `Please also enter a ghost type to make your guess. The options are: ${this.levelData.possibleGhosts.join(', ')}`);
 				}
 				
 				return;

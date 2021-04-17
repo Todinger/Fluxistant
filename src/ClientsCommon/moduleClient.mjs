@@ -266,9 +266,13 @@ class SoundManager {
 	// Loads the given sound file, plays it and then unloads it.
 	// The URL is used as the name if none is given.
 	// 
-	playOneShot(url, onDone, onError, name) {
+	playOneShot(url, volume, onDone, onError, name) {
 		if (!name) {
 			name = SoundManager.getNextTempName();
+		}
+		
+		if (Number.isNaN(volume)) {
+			volume = 1.0;
 		}
 		
 		this.loadSound(
@@ -276,6 +280,7 @@ class SoundManager {
 			url,
 			false,
 			() => {
+				this._sounds[name].volume(volume);
 				this.play(
 					name,
 					() => {

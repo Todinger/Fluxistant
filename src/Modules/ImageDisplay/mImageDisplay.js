@@ -7,7 +7,7 @@ class ImageDisplay extends Module {
 			webname: 'imgdisp',
 			source: 'imgdisp.html',
 			webSounds: true,
-			configurable: false,
+			// configurable: false,
 		});
 	}
 }

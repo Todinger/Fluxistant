@@ -25,6 +25,14 @@
 	- Element-ui / Buefy
 - "status" CLI command that shows current connection status to everything
 - Send keys to windows
+X Function (probably triggered with key press) that switches a game source to use the window whose title matches the active window's title
+- Volume for image display
+
+Module ideas:
+- !random N => random number in [1, N]
+- Trivia
+	- Exact match
+	- Show letters: 
 
 GUI Library: Buefy
 Twitch library: https://www.npmjs.com/package/twitch
@@ -63,6 +71,7 @@ GUI User Feedback:
 	+ Window open/close
 	- CLI command
 	- Another function activating
+	- Timer (random interval in range)
 - Also add function responses.
   Response ideas:
 	+ Chat message
