@@ -15,8 +15,11 @@ const SEManager = require('./seManager');
 const RewardsManager = require('./rewardsManager');
 const Logger = require('./logger');
 const ModuleConfig = require('./Config/moduleConfig');
+const PersistentData = require('./persistentData');
+const Globals = require('./globals');
 const Command = require('./command');
 const MainConfig = require('./mainConfig');
+const Utils = require('./utils');
 
 const Function = require('./Functions/function');
 const FunctionBuilders = require('./Functions/builders');
@@ -135,6 +138,10 @@ class Module {
 		
 		// Dependencies that use the above interface in other modules
 		this.dependencies = {};
+		
+		// Persistent data
+		this.persistentData = new PersistentData(path.join(Globals.getModuleUserDir(this.name), 'data.json'));
+		this.data = this.persistentData.get();
 		
 		// This is set to true once the configuration has been loaded for
 		// the first time - it's used to invoke the enabled() function
@@ -517,7 +524,7 @@ class Module {
 			// Module activation - happens when switching 'enabled' value
 			// for the module from false to true, and when the configuration
 			// is loaded for the first time, if the module is enabled then
-			this.enable();
+			this._enableSelf();
 		}
 		
 		// Save the new configuration
@@ -538,6 +545,27 @@ class Module {
 	// This is here for convenience, so that mods than only care about
 	// enabling/disabling can use this instead of loadConfig().
 	disable() {
+		// Do nothing by default (for overriding where needed)
+	}
+	
+	// Invoked by this class to perform the "enable" functionality.
+	// Should not be overridden!
+	_enableSelf() {
+		this.loadPersistentData();
+		this.enable();
+	}
+	
+	// [NOT for override by inheriting classes!]
+	// Loads the persistent data from disk and notifies the module about it
+	loadPersistentData() {
+		this.persistentData.load();
+		this.data = this.persistentData.get();
+		this.persistentDataLoaded();
+	}
+	
+	// [For override by inheriting classes]
+	// This is called when the persistent data of the module is loaded
+	persistentDataLoaded() {
 		// Do nothing by default (for overriding where needed)
 	}
 	
@@ -830,6 +858,12 @@ class Module {
 	}
 	
 	// [For use by inheriting classes]
+	// Saves the module's persistent data in its current state.
+	saveData() {
+		this.persistentData.save();
+	}
+	
+	// [For use by inheriting classes]
 	// Marks a message so it's clear it relates to this Module.
 	// Useful when printing to the console.
 	_printForm(message) {
@@ -858,7 +892,7 @@ class Module {
 	// [For use by inheriting classes]
 	// Log an error message to the log, marked as coming from this Module.
 	error(message) {
-		Logger.error(this._printForm(message));
+		Logger.error(this._printForm(Utils.errMessage(message)));
 	}
 	
 	// [For use by inheriting classes]

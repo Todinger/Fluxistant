@@ -52,10 +52,6 @@ class ObsControl extends Module {
 		this._registerForEvents();
 	}
 	
-	_errMessage(err) {
-		return err.message || err.description || err.error || err;
-	}
-	
 	_setCurrentScene(sceneName) {
 		this.previousScene = this.currentScene;
 		this.currentScene = sceneName;
@@ -72,7 +68,7 @@ class ObsControl extends Module {
 				return this._loadScenes();
 			})
 			.catch(err => {
-				this.debug(`Failed to connect to OBS: ${this._errMessage(err)}`);
+				this.debug(`Failed to connect to OBS: ${Utils.errMessage(err)}`);
 				if (err.error === 'Authentication Failed.' && !this.authErrorMessageShown) {
 					this.error('Failed to authenticate with OBS. Are you sure you set the right password in the configuration?');
 					this.authErrorMessageShown = true;
@@ -130,7 +126,7 @@ class ObsControl extends Module {
 					data.scenes.map(scene => scene.name))
 			})
 			.catch(err => {
-				this.error(`Failed to load scenes from OBS: ${this._errMessage(err)}`);
+				this.error(`Failed to load scenes from OBS: ${Utils.errMessage(err)}`);
 			});
 	}
 	
@@ -160,7 +156,7 @@ class ObsControl extends Module {
 						this._reconnect();
 						this.info('Disconnected from OBS.');
 					} else {
-						this.error(this._errMessage(err));
+						this.error(Utils.errMessage(err));
 					}
 				});
 		}

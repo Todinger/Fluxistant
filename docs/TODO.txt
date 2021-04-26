@@ -8,7 +8,7 @@
 + Add image floating (opposite of dropping), then add a random image pool to Catastrophe that floats up images randomly with keypresses and possible cooldown (e.g. no more than 1 image per 5 seconds).
 + Disable tab index on labels in GUI
 + Disable tab index on labels in modals
-- Default sizes for floating images (Catastrophe)
++ Default sizes for floating images (Catastrophe)
 + Remove value placeholders
 - Hand icon for "selecting one(s)"
 - Simpler mode
@@ -21,18 +21,49 @@
 - Testing =\
 - Revamp configs to lessen descriptor count =\
 - Remake configuration GUI x_x
-	- Vue.js
-	- Element-ui / Buefy
+	- Option 1:
+		- Vue.js
+		- Element-ui / Buefy
+	- Option 2:
+		- Vuetify
+		- https://www.youtube.com/watch?v=nyJSd6V2DRI&list=PL55RiY5tL51p-YU-Uw90qQH419BM4Iz07
+		- https://www.youtube.com/watch?v=2CSr2vBApSI&list=PL55RiY5tL51pT0DNJraU93FhMzhXxtDAo
+		- https://www.youtube.com/watch?v=2uZYKcKHgU0&list=PL4cUxeGkcC9g0MQZfHwKcuB0Yswgb3gA5
 - "status" CLI command that shows current connection status to everything
 - Send keys to windows
 X Function (probably triggered with key press) that switches a game source to use the window whose title matches the active window's title
-- Volume for image display
++ Volume for image display
+- Switch all duration configuration values from whatever number-type entity they are to DurationEntity
 
 Module ideas:
 - !random N => random number in [1, N]
 - Trivia
 	- Exact match
-	- Show letters: 
+	- Show letters: _ _ _ _   _ _ for example
+- Welcome: recognize person when raided/hosted by them.
+- Death counters
+- Send keys
+	- Specify which keys, allow intervals between them
+	- Each function should have filters for when it sends the keys (namely if a specific window is active, probably)
+	- Common use case: timer trigger for a specified duration
+		- E.g.: on Channel Point redemption, start sending the "T" key on random intervals if Phasmophobia is active
+- Wheel
+	- Multiple wheels
+	- Define options
+	- Title
+	- Description:
+		- Streamer uses command to show the wheel
+			- Different command for each type of wheel
+			- Parameter for the user the spin is for
+		- Wheel image: tire on the outside, actual wheel inside it
+			-> Background image behind the wheel, spin along with the wheel itself
+		- Show animation when the wheel shows up
+		- User uses command to spin the wheel at a random speed
+		- Optional: Show text of selected prize when the wheel stops
+		- Function for making the wheel disappear
+		- Fade out on disappear?
+	- Only one wheel active at a time
+		- Using a command for a different wheel type overrides the current one
 
 GUI Library: Buefy
 Twitch library: https://www.npmjs.com/package/twitch
@@ -72,14 +103,25 @@ GUI User Feedback:
 	- CLI command
 	- Another function activating
 	- Timer (random interval in range)
+		- Start trigger (full Trigger option)
+		- Two types: active for a duration and active until turned off
+			- Duration:
+				- Field for how long it is
+				- When the start trigger is activated, adds the duration towards the time left
+				- Possibly add an "Extendable" boolean option which allows the timer to be extended like that
+			- Until turned off:
+				- Trigger for turning it off
 - Also add function responses.
-  Response ideas:
+  Response targets:
 	+ Chat message
 	- Whisper
 	+ Chat message from SE
 	- TTS
 	+ Log
 	- File?
+  Response types:
+	- Fixed text
+	- Random from options
 - Filter ideas:
 	+ Specific user
 	+ One of specific users
@@ -351,3 +393,29 @@ Potential functions module setup example (NOTE: all trigger variables are availa
 			],
 		},
 	}
+
+
+
+
+
+
+
+GUI Design
+- Groups in tabs
+- Make unwanted modules disappear (filtering: name / enabled)
+- Compact view:
+	- Show basic details
+	- Show extra details iff they have data
+	- Button to add extra detail (which currently has no data)
+- Image Functions:
+	- For an image command, show the command and the image
+	- For functions with other triggers, specialized views for single-trigger functions that show the trigger and image
+	- If multiple triggers are present, use the first one as the primary type
+
+
+
+
+
+
+
+

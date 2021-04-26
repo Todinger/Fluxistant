@@ -1,3 +1,4 @@
+const path = require('path');
 
 const DEFAULTS = {
 	cli: console,
@@ -14,9 +15,14 @@ class Globals {
 		Object.keys(DEFAULTS).forEach(key => this[key] = DEFAULTS[key]);
 		
 		this.userDir = null;
+		this.userModulesDir = null;
 		this.Logger = null;
 		this.StreamerUser = null;
 		this.functionBuilders = null;
+	}
+	
+	getModuleUserDir(moduleName) {
+		return path.join(this.userModulesDir, moduleName);
 	}
 }
 

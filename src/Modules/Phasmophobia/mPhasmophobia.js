@@ -362,6 +362,11 @@ If this is set to 1 then reward amounts will not be affected by the amount of ev
 	}
 	
 	addEvidence(evidence) {
+		if (!(evidence in this.levelData.flags)) {
+			this.say(`Unknown evidence ID. Please enter one of the following: ${Object.keys(this.levelData.flags).join(', ')}`);
+			return;
+		}
+		
 		if (!this.levelData.flags[evidence]) {
 			this.levelData.flags[evidence] = true;
 			if (this.config.chat.evidence) {
@@ -372,6 +377,11 @@ If this is set to 1 then reward amounts will not be affected by the amount of ev
 	}
 	
 	removeEvidence(evidence) {
+		if (!(evidence in this.levelData.flags)) {
+			this.say(`Unknown evidence ID. Please enter one of the following: ${Object.keys(this.levelData.flags).join(', ')}`);
+			return;
+		}
+		
 		if (this.levelData.flags[evidence]) {
 			this.levelData.flags[evidence] = false;
 			if (this.config.chat.evidence) {

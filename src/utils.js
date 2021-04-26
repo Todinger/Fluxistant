@@ -7,6 +7,10 @@ const _ = require('lodash');
 // A general-purpose "static" class with various paraphernalia functions useful
 // for all sorts of things.
 class Utils {
+	static errMessage(err) {
+		return err.message || err.description || err.error || err;
+	}
+	
 	static now() {
 		return new Date().getTime();
 	}

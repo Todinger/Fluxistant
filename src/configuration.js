@@ -111,6 +111,10 @@ class Configuration {
 		return this.configRoot.addNonNegativeNumber(key, defaultValue);
 	}
 	
+	addDuration(key, defaultValue) {
+		return this.configRoot.addDuration(key, defaultValue);
+	}
+	
 	addBoolean(key, defaultValue) {
 		return this.configRoot.addBoolean(key, defaultValue);
 	}

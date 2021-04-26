@@ -14,7 +14,8 @@ class NumberEntity extends ValueEntity {
 			type === 'Number' ||
 			type === 'Integer' ||
 			type === 'NonNegativeNumber' ||
-			type === 'PositiveNumber';
+			type === 'PositiveNumber' ||
+			type === 'Duration';
 	}
 }
 

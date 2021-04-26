@@ -98,6 +98,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'NonNegativeNumber', defaultValue);
 	}
 	
+	addDuration(key, defaultValue) {
+		return this.add(key, 'Duration', defaultValue);
+	}
+	
 	addBoolean(key, defaultValue) {
 		return this.add(key, 'Boolean', defaultValue);
 	}

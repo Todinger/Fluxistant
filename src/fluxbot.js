@@ -21,6 +21,7 @@ const GUI_DIR_WEB = '/gui/';
 // Globals object, used to work around circular dependencies
 const Globals = require('./globals');
 Globals.userDir = APP_DATA_DIR;
+Globals.userModulesDir = DATA_DIR_MODULES;
 const Utils = require('./utils');
 
 

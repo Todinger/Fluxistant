@@ -71,6 +71,7 @@ const entities = {
 	LogLevel_InfoEntity: require('./WebEntities/LogLevel/logLevel_InfoEntity.js'),
 	LogLevel_WarnEntity: require('./WebEntities/LogLevel/logLevel_WarnEntity.js'),
 	BooleanEntity: require('./WebEntities/Values/booleanEntity.js'),
+	DurationEntity: require('./WebEntities/Values/durationEntity.js'),
 	HiddenStringEntity: require('./WebEntities/Values/hiddenStringEntity.js'),
 	IntegerEntity: require('./WebEntities/Values/integerEntity.js'),
 	NaturalNumberEntity: require('./WebEntities/Values/naturalNumberEntity.js'),
@@ -97,6 +98,10 @@ const entities = {
 	ObsFunctionEntity: require('./WebEntities/obsFunctionEntity.js'),
 	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),
 	TextFunctionEntity: require('./WebEntities/textFunctionEntity.js'),
+	TriviaGameTypeEntity: require('./WebEntities/triviaGameTypeEntity.js'),
+	TriviaGameType_BaseEntity: require('./WebEntities/triviaGameType_BaseEntity.js'),
+	TriviaGameType_LettersEntity: require('./WebEntities/triviaGameType_LettersEntity.js'),
+	TriviaGameType_MultipleChoiceEntity: require('./WebEntities/triviaGameType_MultipleChoiceEntity.js'),
 	WelcomeEntity: require('./WebEntities/welcomeEntity.js'),
 };
 
