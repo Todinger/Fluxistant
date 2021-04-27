@@ -502,7 +502,7 @@ class Trivia extends Module {
 			this.say('Please specify only one difficulty level.');
 			return null;
 		} else if (selectedDifficulties.length === 0) {
-			roundSettings.difficulty = 'Any';
+			roundSettings.difficulty = this.config.defaultDifficulty;
 		} else {
 			roundSettings.difficulty = selectedDifficulties[0];
 		}
@@ -513,7 +513,7 @@ class Trivia extends Module {
 			this.say('Please specify only one question category.');
 			return null;
 		} else if (selectedCategories.length === 0) {
-			roundSettings.category = 'Any';
+			roundSettings.category = this.config.defaultCategory;
 		} else {
 			roundSettings.category = selectedCategories[0];
 		}
