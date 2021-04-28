@@ -31,6 +31,7 @@ const entities = {
 	MultiAssetEntity: require('./WebEntities/Assets/multiAssetEntity.js'),
 	SingleAssetEntity: require('./WebEntities/Assets/singleAssetEntity.js'),
 	SoundFileEntity: require('./WebEntities/Assets/soundFileEntity.js'),
+	VideoEntity: require('./WebEntities/Assets/videoEntity.js'),
 	FunctionEntity: require('./WebEntities/Functions/functionEntity.js'),
 	FilterChoiceEntity: require('./WebEntities/Functions/Filters/filterChoiceEntity.js'),
 	FilterEntity: require('./WebEntities/Functions/Filters/filterEntity.js'),

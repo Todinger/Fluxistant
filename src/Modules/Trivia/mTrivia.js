@@ -122,6 +122,10 @@ class Game {
 		this.lastShownQuestionIndex = -1;
 	}
 	
+	get type() {
+		Errors.abstract();
+	}
+	
 	get currentQuestion() {
 		return this.currentQuestionIndex >= 0 && this.questions[this.currentQuestionIndex];
 	}
@@ -205,6 +209,10 @@ class MultipleChoiceGame extends Game {
 	
 	constructor(module) {
 		super(module);
+	}
+	
+	get type() {
+		return "multipleChoice";
 	}
 	
 	makeQuestion(questionData, index, total) {
@@ -311,6 +319,10 @@ class LetterRevealGame extends Game {
 		this.revealTimer = Timers.repeating(() => this.revealLetter());
 	}
 	
+	get type() {
+		return "letters";
+	}
+	
 	makeQuestion(questionData, index, total) {
 		return new LetterRevealGame.Question(questionData, index, total);
 	}
@@ -368,7 +380,7 @@ class Trivia extends Module {
 	}
 	
 	say(msg) {
-		super.say(`[Trivia] ${msg}`);
+		super.say(`/me [Trivia] ${msg}`);
 	}
 	
 	defineModConfig(modConfig) {
@@ -422,8 +434,10 @@ class Trivia extends Module {
 	}
 	
 	loadModConfig(conf) {
-		this.end();
-		this.game = new GAME_TYPES[conf.gameSettings.type](this);
+		if (!this.game || this.game.type !== conf.gameSettings.type) {
+			this.end();
+			this.game = new GAME_TYPES[conf.gameSettings.type](this);
+		}
 	}
 	
 	load() {

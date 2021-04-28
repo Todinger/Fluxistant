@@ -38,10 +38,13 @@ class ImageCommands extends Module {
 		
 		let imageConf = funcObject.image;
 		let soundConf = funcObject.sound;
+		let videoConf = funcObject.video;
 		let imageFileConf = imageConf.file;
 		let soundFileConf = soundConf.file;
+		let videoFileConf = videoConf.file;
 		let hasImage = this.assets.Images.hasKey(imageFileConf.fileKey);
 		let hasSound = this.assets.Sounds.hasKey(soundFileConf.fileKey);
+		let hasVideo = this.assets.Videos.hasKey(videoFileConf.fileKey);
 		
 		let imagePromise = hasImage ?
 			this.assets.getFileWeb(imageFileConf) :
@@ -51,9 +54,13 @@ class ImageCommands extends Module {
 			this.assets.getFileWeb(soundFileConf) :
 			Promise.resolve();
 		
-		if (hasImage || hasSound) {
-			Promise.all([imagePromise, soundPromise])
-			.then(function([imageFile, soundFile]) {
+		let videoPromise = hasVideo ?
+			this.assets.getFileWeb(videoFileConf) :
+			Promise.resolve();
+		
+		if (hasImage || hasSound || hasVideo) {
+			Promise.all([imagePromise, soundPromise, videoPromise])
+			.then(function([imageFile, soundFile, videoFile]) {
 				let parameters = {};
 				if (hasImage) {
 					parameters.image = imageConf.makeDisplayData(imageFile); //Utils.objectWith(cmdObject.image, { url: imageFile.data });
@@ -61,6 +68,10 @@ class ImageCommands extends Module {
 				
 				if (hasSound) {
 					parameters.sound = soundConf.makeDisplayData(soundFile);
+				}
+				
+				if (hasVideo) {
+					parameters.video = videoConf.makeDisplayData(videoFile);
 				}
 				
 				_this.broadcastEvent('showImage', parameters);
@@ -71,6 +82,7 @@ class ImageCommands extends Module {
 	defineModAssets(modData) {
 		modData.addNamedCollection('Images');
 		modData.addNamedCollection('Sounds');
+		modData.addNamedCollection('Videos');
 	}
 	
 	defineModConfig(modConfig) {
@@ -97,6 +109,7 @@ class ImageCommands extends Module {
 				
 				funcObject.image = func.image;
 				funcObject.sound = func.sound;
+				funcObject.video = func.video;
 				funcObject.action = () => {
 					this._sendToDisplay(funcObject);
 				};

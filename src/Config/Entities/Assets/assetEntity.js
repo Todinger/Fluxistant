@@ -9,6 +9,7 @@ class AssetEntity extends StaticObjectEntity {
 		return [
 			'IMAGE',
 			'SOUND',
+			'VIDEO',
 		];
 	}
 	

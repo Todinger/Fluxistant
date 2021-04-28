@@ -1,6 +1,5 @@
 'use strict';
 
-const assert = require('assert').strict;
 const fsPromise = require('fs/promises');
 const path = require('path');
 const { Base64 } = require('js-base64');
@@ -217,14 +216,11 @@ class UserAssets {
 	
 	import(exportedAssets) {
 		Logger.info(`[UserAssets] <${this.assetsDirPath}> import()`);
-		assert(
-			exportedAssets && exportedAssets.files,
-			`Invalid exported file assets given for import: ${exportedAssets}`);
 		
 		// Added the '|| {}' part to shut the IDE up about it might being
 		// null or undefined (despite our test above to make sure it isn't...)
 		// let files = exportedAssets.files || {};
-		this.savedFiles = exportedAssets.files || {};
+		this.savedFiles = exportedAssets && exportedAssets.files || {};
 	}
 	
 	export() {

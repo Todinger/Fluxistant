@@ -6,7 +6,6 @@ const path = require('path');
 const safeWriteFile = require('crash-safe-write-file').writeFile;
 const _ = require('lodash');
 const cli = require('../cliManager');
-const Errors = require('../errors');
 const SingleFile = require('./singleFile');
 const UniformPool = require('./uniformPool');
 const WeightedPool = require('./weightedPool');
@@ -119,12 +118,6 @@ class ModuleAssets {
 	}
 	
 	import(exportedAssets) {
-		// Make sure that
-		Errors.ensureKeysMatch(
-			exportedAssets,
-			this.collections,
-			`Exported assets don't match the module configuration for ${this.modName}.`);
-		
 		Object.keys(this.collections).forEach(collectionID => {
 			this.collections[collectionID].import(exportedAssets[collectionID]);
 		});
