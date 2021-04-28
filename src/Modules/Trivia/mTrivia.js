@@ -375,18 +375,26 @@ class Trivia extends Module {
 		modConfig.addNaturalNumber('defaultAmount', 10)
 			.setName('Default Amount')
 			.setDescription('How many questions a round should have by default');
-		
 		modConfig.addCustomChoice('defaultDifficulty', {
 				source: DIFFICULTIES_SOURCE_NAME,
 			})
 			.setName('Default Difficulty')
 			.setDescription('How difficult the questions should be by default');
-		
 		modConfig.addCustomChoice('defaultCategory', {
 				source: CATEGORIES_SOURCE_NAME,
 			})
 			.setName('Default Category')
 			.setDescription('Which category the questions should be in by default');
+		
+		modConfig.addBoolean('allowAmountChoice', true)
+			.setName('Allow Amount Selection')
+			.setDescription('Specifies whether a number can be given to the command to choose how many questions the round will have');
+		modConfig.addBoolean('allowDifficultyChoice', true)
+			.setName('Allow Difficulty Selection')
+			.setDescription('Specifies whether a difficulty can be specified for the round when starting one');
+		modConfig.addBoolean('allowCategoryChoice', true)
+			.setName('Allow Category Selection')
+			.setDescription('Specifies whether a question category can be specified through the command');
 		
 		modConfig.addDuration('questionDuration', 60)
 			.setName('Question Duration')
@@ -485,37 +493,49 @@ class Trivia extends Module {
 		let paramsString = ' ' + params.join(' ') + ' ';
 		let roundSettings = {};
 		
-		// Find a number which specifies how many questions we should have
-		let amountMatches = paramsString.match(/[\s,;:/\\]\d+[\s,;:/\\]/g);
-		if (!amountMatches) {
+		// If allowed, find a number which specifies how many questions we should have
+		if (this.config.allowAmountChoice) {
+			let amountMatches = paramsString.match(/[\s,;:/\\]\d+[\s,;:/\\]/g);
+			if (!amountMatches) {
+				roundSettings.amount = this.config.defaultAmount;
+			} else if (amountMatches.length > 1) {
+				this.say('Please specify only one amount of questions.');
+				return null;
+			} else {
+				roundSettings.amount = Number(amountMatches[0]);
+			}
+		} else {
 			roundSettings.amount = this.config.defaultAmount;
-		} else if (amountMatches.length > 1) {
-			this.say('Please specify only one amount of questions.');
-			return null;
-		} else {
-			roundSettings.amount = Number(amountMatches[0]);
 		}
 		
-		// Find a difficulty setting
-		let selectedDifficulties = this.findDataInString(DIFFICULTY_DATA, paramsString);
-		if (selectedDifficulties.length > 1) {
-			this.say('Please specify only one difficulty level.');
-			return null;
-		} else if (selectedDifficulties.length === 0) {
+		// If allowed, find a difficulty setting
+		if (this.config.allowDifficultyChoice) {
+			let selectedDifficulties = this.findDataInString(DIFFICULTY_DATA, paramsString);
+			if (selectedDifficulties.length > 1) {
+				this.say('Please specify only one difficulty level.');
+				return null;
+			} else if (selectedDifficulties.length === 0) {
+				roundSettings.difficulty = this.config.defaultDifficulty;
+			} else {
+				roundSettings.difficulty = selectedDifficulties[0];
+			}
+		} else {
 			roundSettings.difficulty = this.config.defaultDifficulty;
-		} else {
-			roundSettings.difficulty = selectedDifficulties[0];
 		}
 		
-		// Find a category setting
-		let selectedCategories = this.findDataInString(CATEGORY_DATA, paramsString);
-		if (selectedCategories.length > 1) {
-			this.say('Please specify only one question category.');
-			return null;
-		} else if (selectedCategories.length === 0) {
-			roundSettings.category = this.config.defaultCategory;
+		// If allowed, find a category setting
+		if (this.config.allowCategoryChoice) {
+			let selectedCategories = this.findDataInString(CATEGORY_DATA, paramsString);
+			if (selectedCategories.length > 1) {
+				this.say('Please specify only one question category.');
+				return null;
+			} else if (selectedCategories.length === 0) {
+				roundSettings.category = this.config.defaultCategory;
+			} else {
+				roundSettings.category = selectedCategories[0];
+			}
 		} else {
-			roundSettings.category = selectedCategories[0];
+			roundSettings.category = this.config.defaultCategory;
 		}
 		
 		return roundSettings;
@@ -829,6 +849,15 @@ class Trivia extends Module {
 		}
 	}
 	
+	showWins(data) {
+		if (data.user.name in this.data.userStats) {
+			let stats = this.data.userStats[data.user.name];
+			this.tell(data.user, `You've gotten ${stats.correctAnswers} answers right and have won ${stats.wins} games so far. Keep it up!`);
+		} else {
+			this.tell(data.user, "You haven't gotten any answers right yet. You can do it! I believe in you.");
+		}
+	}
+	
 	functions = {
 		start: {
 			name: 'Start Round',
@@ -905,6 +934,17 @@ class Trivia extends Module {
 			],
 			filters: [
 				this.filter.isMod(),
+			],
+		},
+		
+		showWins: {
+			name: 'Show Wins',
+			description: "Shows the user's correct answers and win statistics",
+			action: data => this.showWins(data),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'triviawins',
+				}),
 			],
 		},
 	}

@@ -38,8 +38,8 @@ X Function (probably triggered with key press) that switches a game source to us
 Module ideas:
 - !random N => random number in [1, N]
 - Trivia
-	- Exact match
-	- Show letters: _ _ _ _   _ _ for example
+	+ Exact match
+	+ Show letters: _ _ _ _   _ _ for example
 - Welcome: recognize person when raided/hosted by them.
 - Death counters
 - Send keys
