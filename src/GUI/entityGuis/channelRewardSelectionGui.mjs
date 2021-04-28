@@ -17,12 +17,17 @@ export default class ChannelRewardSelectionGui extends EntityGui {
 		this.activateChangedIndicators();
 	}
 	
+	_addOption(value, text) {
+		let option = $(`<option value="${value}">${text}</option>`);
+		this.selector.append(option);
+	}
+	
 	_buildOptions(rewardsList) {
 		this.selector.empty();
+		this._addOption('', '');
 		let selectionPresent = false;
 		rewardsList.forEach(reward => {
-			let option = $(`<option value="${reward.rewardID}">${reward.rewardName}</option>`);
-			this.selector.append(option);
+			this._addOption(reward.rewardID, reward.rewardName);
 			if (this.entity.getValue() === reward.rewardName) {
 				selectionPresent = true;
 			}
