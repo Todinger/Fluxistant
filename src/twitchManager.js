@@ -48,8 +48,8 @@ class TwitchManager extends EventNotifier {
 			'follow',				// (SEData)
 			'cheer',				// 
 			'tip',					// (SEData)
-			'host',					// 
-			'raid',					// 
+			'host',					// (username, viewers, autohost)
+			'raid',					// (username, viewers)
 			'channelReward',		// (user, rewardID, msg)
 			'userJoined',			// (username)
 			'userLeft',				// (username)
@@ -230,6 +230,16 @@ class TwitchManager extends EventNotifier {
 		// some time to happen)
 		this.client.on('part', (channel, username, self) => {
 			if (!self) this._notify('userLeft', username);
+		});
+		
+		// Called when someone hosts our channel
+		this.client.on('hosted', (channel, username, viewers, autohost) => {
+			this._notify('host', username, viewers, autohost);
+		});
+		
+		// Called when someone raids our channel
+		this.client.on('raided', (channel, username, viewers) => {
+			this._notify('raid', username, viewers === true ? 1 : viewers);
 		});
 	}
 	

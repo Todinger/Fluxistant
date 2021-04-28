@@ -14,8 +14,8 @@ class TextFunctions extends Module {
 			'textFunctions',
 			'DynamicArray',
 			'TextFunction')
-			.setName('Image Functions')
-			.setDescription('Functions for showing images and/or playing sounds');
+			.setName('Text Functions')
+			.setDescription('Functions for writing text responses');
 	}
 	
 	loadModConfig(conf) {

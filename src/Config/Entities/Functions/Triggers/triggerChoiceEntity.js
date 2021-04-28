@@ -17,6 +17,8 @@ class TriggerChoiceEntity extends ChoiceEntity {
 			["windowDeactivated"]:	'Trigger_WindowDeactivated',
 			["windowStarted"]:		'Trigger_WindowStarted',
 			["windowExited"]:		'Trigger_WindowExited',
+			["host"]:				'Trigger_Host',
+			["raid"]:				'Trigger_Raid',
 		});
 	}
 }

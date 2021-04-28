@@ -37,6 +37,8 @@ const TriggerBuilder = new Builder({
 	windowDeactivated:	require('./Triggers/windowDeactivatedTrigger'),
 	windowStarted:		require('./Triggers/windowStartedTrigger'),
 	windowExited:		require('./Triggers/windowExitedTrigger'),
+	host:       		require('./Triggers/hostTrigger'),
+	raid:       		require('./Triggers/raidTrigger'),
 });
 
 const ResponseBuilder = new Builder({

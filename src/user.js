@@ -20,6 +20,13 @@ class User {
 	get isAtLeastMod() {
 		return this.isMod || this.isBroadcaster;
 	}
+	
+	static fromUsername(username) {
+		return new User({
+			username,
+			['display-name']: username,
+		});
+	}
 }
 
 function MakeBroadcasterUser(username) {

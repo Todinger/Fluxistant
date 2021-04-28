@@ -99,7 +99,7 @@ class WelcomeImage extends Module {
 				
 				this.welcomeData[username] = {
 					username: username,
-					messages: entry.messages,
+					messages: entry.messages.filter(msg => Utils.isNonEmptyString(msg)),
 					images: entry.images.files,
 					sounds: entry.sounds.files,
 				};
