@@ -2,6 +2,7 @@ import GuiRegistry					from "./guiRegistry.mjs";
 import EntityGui					from "./entityGui.mjs";
 import ValueGui						from "./valueGui.mjs";
 import BooleanGui					from "./booleanGui.mjs";
+import ColorGui						from "./colorGui.mjs";
 import NumberGui					from "./numberGui.mjs";
 import IntegerGui					from "./integerGui.mjs";
 import NaturalNumberGui				from "./naturalNumberGui.mjs";
@@ -26,12 +27,14 @@ import ChannelRewardGui				from "./channelRewardGui.mjs";
 import ChannelRewardSelectionGui	from "./channelRewardSelectionGui.mjs";
 import FunctionGui					from "./functionGui.mjs";
 import CustomChoiceGui				from "./customChoiceGui.mjs";
+import WheelSegmentGui				from "./wheelSegmentGui.mjs";
 
 export default {
 	GuiRegistry,
 	EntityGui,
 	ValueGui,
 	BooleanGui,
+	ColorGui,
 	NumberGui,
 	IntegerGui,
 	NaturalNumberGui,
@@ -56,4 +59,5 @@ export default {
 	ChannelRewardSelectionGui,
 	FunctionGui,
 	CustomChoiceGui,
+	WheelSegmentGui,
 };

@@ -15,6 +15,10 @@ class Utils {
 		return new Date().getTime();
 	}
 	
+	static clamp(min, val, max) {
+		return Math.max(min, Math.min(val, max));
+	}
+	
 	static formatDate(date, format) {
 		let z = {
 			M: date.getMonth() + 1,

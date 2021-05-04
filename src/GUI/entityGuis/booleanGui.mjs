@@ -10,7 +10,7 @@ export default class BooleanGui extends ValueGui {
 	}
 	
 	_setupInput() {
-		this.jInput = $(`<input id="${this.guiID}-input" class="uk-checkbox uk-height-1-1 uk-margin-auto-top" type="checkbox" placeholder="Value...">`);
+		this.jInput = $(`<input id="${this.guiID}-input" class="uk-checkbox uk-height-1-1 uk-margin-auto-top" type="checkbox">`);
 		this.jInput.prop('checked', !!this.entity.getValue());
 		let description = this.entity.getDescription();
 		if (description && description !== '') {

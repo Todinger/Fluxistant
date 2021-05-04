@@ -54,6 +54,10 @@ function isNonEmptyString(obj) {
 	return (typeof obj == 'string') && (obj.length > 0);
 }
 
+function clamp(min, val, max) {
+	return Math.max(min, Math.min(val, max));
+}
+
 export {
 	now,
 	randomRange,
@@ -64,4 +68,5 @@ export {
 	applyDefaults,
 	upperFirst,
 	isNonEmptyString,
+	clamp,
 };

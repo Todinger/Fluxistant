@@ -119,6 +119,10 @@ class Configuration {
 		return this.configRoot.addBoolean(key, defaultValue);
 	}
 	
+	addColor(key, defaultValue) {
+		return this.configRoot.addColor(key, defaultValue);
+	}
+	
 	addFixedArray(key, valueType, values) {
 		return this.configRoot.addFixedArray(key, valueType, values);
 	}

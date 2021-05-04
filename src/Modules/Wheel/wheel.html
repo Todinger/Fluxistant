@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+    <title>Code Wheel</title>
+    <!--suppress HtmlUnknownTarget -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    <script src='Winwheel.js'></script>
+    <link rel="stylesheet" type="text/css" href="wheel.css">
+    <link rel="stylesheet" type="text/css" href="neon.css">
+</head>
+<body>
+
+<div>
+    <video id="video" class="centered" src="">
+    </video>
+</div>
+
+<canvas id="canvas">
+    Canvas not supported, use another browser.
+</canvas>
+
+<!--<div>-->
+<!--    <div id="result" class="title"></div>-->
+<!--</div>-->
+
+<div id="result" class="bordered title" style="display: none">
+    <div class="padder">
+        <div class="text-effect">
+            <h1 id="resultText" class="neon" data-text=""></h1>
+            <div class="gradient"></div>
+            <div class="spotlight"></div>
+        </div>
+    </div>
+</div>
+
+<!--<script>-->
+<!--	let theWheel = new Winwheel({-->
+<!--		'numSegments'  : 8,         // Number of segments-->
+<!--		'outerRadius'  : 212,       // The size of the wheel.-->
+<!--		'centerX'      : 217,       // Used to position on the background correctly.-->
+<!--		'centerY'      : 219,-->
+<!--		'textFontSize' : 28,        // Font size.-->
+<!--		'segments'     :            // Definition of all the segments.-->
+<!--			[-->
+<!--				{'fillStyle' : '#eae56f', 'text' : 'Prize 1'},-->
+<!--				{'fillStyle' : '#89f26e', 'text' : 'Prize 2'},-->
+<!--				{'fillStyle' : '#7de6ef', 'text' : 'Prize 3'},-->
+<!--				{'fillStyle' : '#e7706f', 'text' : 'Prize 4'},-->
+<!--				{'fillStyle' : '#eae56f', 'text' : 'Prize 5'},-->
+<!--				{'fillStyle' : '#89f26e', 'text' : 'Prize 6'},-->
+<!--				{'fillStyle' : '#7de6ef', 'text' : 'Prize 7'},-->
+<!--				{'fillStyle' : '#e7706f', 'text' : 'Prize 8'}-->
+<!--			],-->
+<!--		'animation' :               // Definition of the animation-->
+<!--			{-->
+<!--				'type'     : 'spinToStop',-->
+<!--				'duration' : 5,-->
+<!--				'spins'    : 8,-->
+<!--				'callbackFinished' : alertPrize-->
+<!--			}-->
+<!--	});-->
+
+<!--	// Called when the animation has finished.-->
+<!--	function alertPrize(indicatedSegment)-->
+<!--	{-->
+<!--		// Do basic alert of the segment text.-->
+<!--		alert("You have won " + indicatedSegment.text);-->
+<!--	}-->
+<!--</script>-->
+
+<script type="module" src="./wheel.mjs"></script>
+</body>
+</html>

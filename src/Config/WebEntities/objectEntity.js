@@ -106,6 +106,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'Boolean', defaultValue);
 	}
 	
+	addColor(key, defaultValue) {
+		return this.add(key, 'Color', defaultValue);
+	}
+	
 	addArray(key, type, valueType, values, ...itemConstructionOptions) {
 		let array = this.add(key, type, valueType, ...itemConstructionOptions);
 		if (values) {

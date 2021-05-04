@@ -7,6 +7,7 @@ const { User, UserFilters } = require('./user');
 const ModuleManager = require('./moduleManager');
 const SEManager = require('./seManager');
 const Utils = require('./utils');
+const Globals = require('./globals');
 
 // All commands written by users need to start with this prefix, but when
 // registering commands in the system you should NOT include it
@@ -197,12 +198,19 @@ class TwitchManager extends EventNotifier {
 		this._processMessage(userstate, message, false);
 	}
 	
+	_simulateBroadcasterMessage(message) {
+		let userstate = _.cloneDeep(Globals.StreamerUser.userstate);
+		userstate['message-type'] = 'chat';
+		
+		this._processMessage(userstate, message, false);
+	}
+	
 	// Registers to commands given through the command-line interface
 	_registerToCliEvents() {
 		// Message simulation CLI commands
 		cli.on(['m', 'msg', 'message'], message => {
 			// Pretend user, completely bogus, no such person ever existed
-			this._simulateUserMessage('fluxistence', message);
+			this._simulateBroadcasterMessage(message);
 		});
 		cli.on(['u', 'usermsg', 'usermessage'], cmdline => {
 			// First parameter is the username, and the rest is the message

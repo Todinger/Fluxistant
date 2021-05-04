@@ -27,6 +27,29 @@ class User {
 			['display-name']: username,
 		});
 	}
+	
+	static toUsername(text) {
+		if (text) {
+			text = text.trim().toLowerCase();
+			if (text.startsWith('@')) {
+				text = text.substr(1);
+			}
+			
+			// Twitch usernames can't start with an underscore, can contain only
+			// letters, numbers and underscores, and are between 3-25 characters
+			// long (4-25 officially, but apparently some 3-letter Twitch usernames
+			// were prizes for some Twitch contests/events in the past.
+			// Sources:
+			//   https://discuss.dev.twitch.tv/t/username-regex-for-api/1177
+			//   https://discuss.dev.twitch.tv/t/twitch-channel-name-regex/3855/4
+			//   https://stackoverflow.com/questions/35372320/youtube-and-twitch-channel-name-maximum-character-limit
+			if (/^[a-zA-Z0-9][\w]{2,24}$/.test(text)) {
+				return text;
+			}
+		}
+		
+		return undefined;
+	}
 }
 
 function MakeBroadcasterUser(username) {

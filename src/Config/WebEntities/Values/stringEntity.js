@@ -11,7 +11,8 @@ class StringEntity extends ValueEntity {
 	
 	_assignableFrom(type) {
 		return super._assignableFrom(type) ||
-			type === 'HiddenString';
+			type === 'HiddenString' ||
+			type === 'Color';
 	}
 }
 

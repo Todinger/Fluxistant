@@ -1,0 +1,56 @@
+* { margin:0; padding:0; } /* to remove the top and left whitespace */
+
+html, body, .fullscreen {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    /*  display: flex;*/
+    /*  min-height: 100vh;*/
+    /*  justify-content: center;*/
+    /*  align-content: center;*/
+    /*  align-items: center;*/
+} /* just to be sure these are full screen*/
+
+canvas { display:block; } /* To remove the scrollbars */
+
+.centered {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+/*noinspection CssUnusedSymbol*/
+.positioned {
+    position: absolute;
+    z-index: 1;
+}
+
+.title {
+    position: absolute;
+    top: 20%;
+
+    /*width: 50%;*/
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-block;
+    z-index: 2;
+    background: black;
+    /*padding: 10px;*/
+}
+
+.bordered {
+    border-style: solid;
+    border-image-source: url('./Border.png');
+    border-image-slice: 480 479 480 479;
+    border-image-width: auto;
+    border-image-repeat: repeat;
+    border-width: 20px;
+}
+
+.padder {
+    padding: 10px;
+    background: black;
+}

@@ -50,8 +50,10 @@ const entities = {
 	TriggerEntity: require('./WebEntities/Functions/Triggers/triggerEntity.js'),
 	Trigger_ChannelRewardEntity: require('./WebEntities/Functions/Triggers/trigger_ChannelRewardEntity.js'),
 	Trigger_CommandEntity: require('./WebEntities/Functions/Triggers/trigger_CommandEntity.js'),
+	Trigger_HostEntity: require('./WebEntities/Functions/Triggers/trigger_HostEntity.js'),
 	Trigger_KeyDownEntity: require('./WebEntities/Functions/Triggers/trigger_KeyDownEntity.js'),
 	Trigger_KeyUpEntity: require('./WebEntities/Functions/Triggers/trigger_KeyUpEntity.js'),
+	Trigger_RaidEntity: require('./WebEntities/Functions/Triggers/trigger_RaidEntity.js'),
 	Trigger_ShortcutEntity: require('./WebEntities/Functions/Triggers/trigger_ShortcutEntity.js'),
 	Trigger_WindowActivatedEntity: require('./WebEntities/Functions/Triggers/trigger_WindowActivatedEntity.js'),
 	Trigger_WindowDeactivatedEntity: require('./WebEntities/Functions/Triggers/trigger_WindowDeactivatedEntity.js'),
@@ -72,6 +74,7 @@ const entities = {
 	LogLevel_InfoEntity: require('./WebEntities/LogLevel/logLevel_InfoEntity.js'),
 	LogLevel_WarnEntity: require('./WebEntities/LogLevel/logLevel_WarnEntity.js'),
 	BooleanEntity: require('./WebEntities/Values/booleanEntity.js'),
+	ColorEntity: require('./WebEntities/Values/colorEntity.js'),
 	DurationEntity: require('./WebEntities/Values/durationEntity.js'),
 	HiddenStringEntity: require('./WebEntities/Values/hiddenStringEntity.js'),
 	IntegerEntity: require('./WebEntities/Values/integerEntity.js'),
@@ -104,6 +107,8 @@ const entities = {
 	TriviaGameType_LettersEntity: require('./WebEntities/triviaGameType_LettersEntity.js'),
 	TriviaGameType_MultipleChoiceEntity: require('./WebEntities/triviaGameType_MultipleChoiceEntity.js'),
 	WelcomeEntity: require('./WebEntities/welcomeEntity.js'),
+	WheelEntity: require('./WebEntities/wheelEntity.js'),
+	WheelSegmentEntity: require('./WebEntities/wheelSegmentEntity.js'),
 };
 
 const factory = require('./entityFactory');
