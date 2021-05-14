@@ -19,7 +19,6 @@ canvas { display:block; } /* To remove the scrollbars */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1;
 }
 
 /*noinspection CssUnusedSymbol*/
@@ -53,4 +52,12 @@ canvas { display:block; } /* To remove the scrollbars */
 .padder {
     padding: 10px;
     background: black;
+}
+
+.front {
+    z-index: 1;
+}
+
+.back {
+    z-index: -1;
 }

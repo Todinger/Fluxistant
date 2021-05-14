@@ -25,6 +25,12 @@ class WheelEntity extends StaticObjectEntity {
 		wheelData.addNaturalNumber('textFontSize', 28)
 			.setName('Text Size')
 			.setDescription('Font size for the text on the wheel');
+		wheelData.add('bgImage', 'Image')
+			.setName('Background Image')
+			.setDescription('Image to display behind the wheel');
+		wheelData.add('marker', 'Image')
+			.setName('Marker Image')
+			.setDescription('Image to show at the top of the wheel to mark the winning spot');
 		
 		this.add('video', 'Video')
 			.setName('Starting Video')

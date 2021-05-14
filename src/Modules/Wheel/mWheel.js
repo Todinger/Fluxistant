@@ -2,8 +2,13 @@ const Module = requireMain('module');
 const Utils = requireMain('utils');
 const User = requireMain('user').User;
 
-const MIN_POWER = 1;
-const MAX_POWER = 100;
+// These should be a bit beyond the min/max in wheel.mjs, so that when
+// adding the random flux after clamping, the result will still be
+// within the range accepted by the client - this is to avoid a
+// situation where the viewers can force a specific number by going
+// to extremes
+const MIN_POWER = 5;
+const MAX_POWER = 50;
 
 class WheelModule extends Module {
 	constructor() {
@@ -20,6 +25,7 @@ class WheelModule extends Module {
 	}
 	
 	defineModAssets(modData) {
+		modData.addNamedCollection('Images');
 		modData.addNamedCollection('Videos');
 	}
 	
@@ -65,6 +71,18 @@ class WheelModule extends Module {
 			.catch(err => this.error(err));
 	}
 	
+	async getAsset(conf, assetCollection) {
+		// let conf = wheel.video;
+		let fileConf = conf.file;
+		let hasAsset = assetCollection.hasKey(fileConf.fileKey);
+		if (hasAsset) {
+			let file = await this.assets.getFileWeb(fileConf);
+			return conf.makeDisplayData(file);
+		} else {
+			return undefined;
+		}
+	}
+	
 	async makeWheelInfo(wheel) {
 		let wheelInfo = {
 			wheelData: wheel.wheelData,
@@ -74,13 +92,17 @@ class WheelModule extends Module {
 			},
 		};
 		
-		let videoConf = wheel.video;
-		let videoFileConf = videoConf.file;
-		let hasVideo = this.assets.Videos.hasKey(videoFileConf.fileKey);
-		if (hasVideo) {
-			let videoFile = await this.assets.getFileWeb(videoFileConf);
-			wheelInfo.extras.video = videoConf.makeDisplayData(videoFile);
-		}
+		// let videoConf = wheel.video;
+		// let videoFileConf = videoConf.file;
+		// let hasVideo = this.assets.Videos.hasKey(videoFileConf.fileKey);
+		// if (hasVideo) {
+		// 	let videoFile = await this.assets.getFileWeb(videoFileConf);
+		// 	wheelInfo.extras.video = videoConf.makeDisplayData(videoFile);
+		// }
+		
+		wheelInfo.extras.video = await this.getAsset(wheel.video, this.assets.Videos);
+		wheelInfo.extras.bgImage = await this.getAsset(wheel.wheelData.bgImage, this.assets.Images);
+		wheelInfo.extras.marker = await this.getAsset(wheel.wheelData.marker, this.assets.Images);
 		
 		return wheelInfo;
 	}
@@ -114,7 +136,7 @@ class WheelModule extends Module {
 			
 			socket.on('result', result => {
 				if (this.currentSpin) {
-					this.currentSpin = null;
+					this.currentSpin.finished = true;
 					// Consider doing something with the result
 				}
 			});
@@ -132,6 +154,7 @@ class WheelModule extends Module {
 			wheel,
 			forUser: User.toUsername(data.firstParam),
 			ready: false,
+			finished: false,
 		}
 		
 		this.broadcastEvent('show', wheel.index);
@@ -143,7 +166,7 @@ class WheelModule extends Module {
 	}
 	
 	spin(data) {
-		if (!this.currentSpin || !this.currentSpin.ready) {
+		if (!this.currentSpin || !this.currentSpin.ready || this.currentSpin.finished) {
 			return;
 		}
 		
@@ -157,10 +180,17 @@ class WheelModule extends Module {
 			power = this.config.defaultPower;
 		}
 		
-		power = Utils.randomInRadius(power, this.config.powerFlux);
 		power = Utils.clamp(MIN_POWER, power, MAX_POWER);
+		power = Utils.randomInRadius(power, this.config.powerFlux);
 		
 		this.broadcastEvent('spin', { power });
+	}
+	
+	respin(data) {
+		if (this.currentSpin && this.currentSpin.finished && data.user.isAtLeastMod) {
+			this.currentSpin.finished = false;
+			this.spin(data);
+		}
 	}
 	
 	functions = {
@@ -185,6 +215,17 @@ class WheelModule extends Module {
 			triggers: [
 				this.trigger.command({
 					cmdname: 'spin',
+				}),
+			],
+		},
+		
+		respin: {
+			name: 'Re-spin Wheel',
+			description: 'Spins this wheel again (if it is showing), hiding the previous win',
+			action: data => this.respin(data),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'respin',
 				}),
 			],
 		},

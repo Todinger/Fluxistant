@@ -1,4 +1,5 @@
 import { ModuleClient } from '/common/moduleClient.mjs';
+import { setOrClear } from '/common/clientUtils.mjs';
 
 const FADE_DURATION = 250;
 const DEFAULT_SHOW_DURATION = 5000;
@@ -32,14 +33,6 @@ class ImageDisplay extends ModuleClient {
 		return !this.soundPlaying && !this.videoPlaying;
 	}
 	
-	setOrClear(jTarget, attr, value) {
-		if (value) {
-			jTarget[attr](value);
-		} else {
-			jTarget.css(attr, 'auto');
-		}
-	}
-	
 	applyImageEffects(imageEffects) {
 		imageEffects.forEach(effectData => {
 			let name = effectData.type.trim().toLowerCase();
@@ -63,8 +56,8 @@ class ImageDisplay extends ModuleClient {
 		showDuration -= 2 * FADE_DURATION;
 		
 		jImage.attr('src', imageParameters.url);
-		this.setOrClear(jImage, 'width', imageParameters.width);
-		this.setOrClear(jImage, 'height', imageParameters.height);
+		setOrClear(jImage, 'width', imageParameters.width);
+		setOrClear(jImage, 'height', imageParameters.height);
 		
 		jImageHolder
 		.fadeIn(FADE_DURATION)
@@ -97,8 +90,8 @@ class ImageDisplay extends ModuleClient {
 	
 	playVideo(videoParameters) {
 		jVideoSource.attr('src', videoParameters.url);
-		this.setOrClear(jVideo, 'width', videoParameters.width);
-		this.setOrClear(jVideo, 'height', videoParameters.height);
+		setOrClear(jVideo, 'width', videoParameters.width);
+		setOrClear(jVideo, 'height', videoParameters.height);
 		jVideoHolder.css('visibility', '');
 		let video = jVideo.get(0);
 		video.volume = videoParameters.volume;

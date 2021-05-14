@@ -98,6 +98,7 @@ const entities = {
 	ObsFunctionDetailsEntity: require('./WebEntities/obsFunctionDetailsEntity.js'),
 	ObsFunctionDetails_BaseEntity: require('./WebEntities/obsFunctionDetails_BaseEntity.js'),
 	ObsFunctionDetails_SetCurrentSceneEntity: require('./WebEntities/obsFunctionDetails_SetCurrentSceneEntity.js'),
+	ObsFunctionDetails_SetSourceVisibilityEntity: require('./WebEntities/obsFunctionDetails_SetSourceVisibilityEntity.js'),
 	ObsFunctionDetails_SwitchToPreviousSceneEntity: require('./WebEntities/obsFunctionDetails_SwitchToPreviousSceneEntity.js'),
 	ObsFunctionEntity: require('./WebEntities/obsFunctionEntity.js'),
 	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),

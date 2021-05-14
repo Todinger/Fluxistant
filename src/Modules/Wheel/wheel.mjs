@@ -1,5 +1,5 @@
 import { ModuleClient } from "/common/moduleClient.mjs";
-import { clamp, applyDefaults } from "/common/clientUtils.mjs";
+import { clamp, applyDefaults, setOrClear } from "/common/clientUtils.mjs";
 
 const WHEEL_DEFAULTS = {
 	offsetX: 0,
@@ -10,7 +10,7 @@ const WHEEL_DEFAULTS = {
 const DEFAULT_DURATION = 5000;
 const FADE_DURATION = 250;
 const MIN_POWER = 2;
-const MAX_POWER = 50;
+const MAX_POWER = 60;
 
 const NO_WHEEL = -1;
 
@@ -26,11 +26,21 @@ class WheelClient extends ModuleClient {
 		this.jCanvas = $('#canvas');
 		this.jResult = $('#result');
 		this.jResultText = $('#resultText');
+		this.jBgImage = $('#bgImage');
+		this.jMarker = $('#marker');
 		
 		this.wheels = [];
 		this.selectedWheelIndex = NO_WHEEL;
 		this.spinning = false;
 		this.resultShowing = false;
+	}
+	
+	get selectedWheel() {
+		if (this.selectedWheelIndex !== NO_WHEEL) {
+			return this.wheels[this.selectedWheelIndex];
+		} else {
+			return null;
+		}
 	}
 	
 	show(index) {
@@ -49,6 +59,23 @@ class WheelClient extends ModuleClient {
 		}
 		
 		this.selectedWheelIndex = index;
+		
+		let bgImage = this.selectedWheel.extras.bgImage;
+		this.jBgImage.attr('src', bgImage.url);
+		setOrClear(this.jBgImage, 'width', bgImage.width);
+		setOrClear(this.jBgImage, 'height', bgImage.height);
+		
+		let marker = this.selectedWheel.extras.marker;
+		let winWheel = this.selectedWheel.winWheel;
+		this.jMarker.attr('src', marker.url);
+		setOrClear(this.jMarker, 'width', marker.width);
+		setOrClear(this.jMarker, 'height', marker.height);
+		this.jMarker.css('margin-bottom', 2 * (winWheel.offsetY + winWheel.outerRadius));
+/*
+	offsetX: 0,
+	offsetY: 0,
+	outerRadius: 200,
+*/
 		this.playVideo(index);
 	}
 	
@@ -79,10 +106,16 @@ class WheelClient extends ModuleClient {
 	videoDone() {
 		this.drawWheel();
 		this.jCanvas.show();
+		this.jBgImage.show();
+		this.jMarker.show();
 		this.server.emit('ready');
 	}
 	
 	hide() {
+		this.jBgImage.hide();
+		this.jBgImage.attr('src', '');
+		this.setBgImageRotation(0);
+		this.jMarker.hide();
 		this.jCanvas.hide();
 		this.clearWheel();
 		this.jVideo.hide();
@@ -92,11 +125,21 @@ class WheelClient extends ModuleClient {
 	
 	spin(params) {
 		if (!this.spinning) {
+			this.hideResult();
+			this.resetWheel();
 			let power = clamp(MIN_POWER, params.power, MAX_POWER);
 			this.log(`Sping power: ${power}`);
-			let wheel = this.wheels[this.selectedWheelIndex].winWheel;
+			let wheel = this.selectedWheel.winWheel;
 			wheel.animation.spins = power;
 			wheel.startAnimation();
+		}
+	}
+	
+	resetWheel() {
+		if (this.selectedWheelIndex !== NO_WHEEL) {
+			let winWheel = this.selectedWheel.winWheel;
+			winWheel.stopAnimation(false);
+			winWheel.rotationAngle = 0;
 		}
 	}
 	
@@ -161,7 +204,10 @@ class WheelClient extends ModuleClient {
 				type: 'spinToStop',
 				duration: (data.duration || DEFAULT_DURATION) / 1000,
 				callbackFinished : (...p) => this.wheelStopped(wheel, ...p),
+				callbackBefore: () => this.wheelRotationUpdated(),
 			};
+			
+			data.wheels[i].extras.bgImage = data.wheels[i].extras['bgImage'] || { url: '' };
 			
 			let winWheel = new Winwheel(wheel);
 			this.wheels.push({
@@ -199,13 +245,13 @@ class WheelClient extends ModuleClient {
 	
 	clearWheel() {
 		if (this.selectedWheelIndex !== NO_WHEEL) {
-			this.wheels[this.selectedWheelIndex].winWheel.clearCanvas();
+			this.selectedWheel.winWheel.clearCanvas();
 		}
 	}
 	
 	drawWheel() {
 		if (this.selectedWheelIndex !== NO_WHEEL) {
-			this.wheels[this.selectedWheelIndex].winWheel.draw(true);
+			this.selectedWheel.winWheel.draw(true);
 		}
 	}
 	
@@ -228,6 +274,21 @@ class WheelClient extends ModuleClient {
 		window.addEventListener('resize', () => this.resizeCanvas(), false);
 		
 		this.resizeCanvas();
+	}
+	
+	setBgImageRotation(angle) {
+		let rotateStyle = `rotate(${angle}deg)`;
+		this.jBgImage.css({
+			'-webkit-transform': rotateStyle,
+			'-moz-transform': rotateStyle,
+			'-o-transform': rotateStyle,
+			'-ms-transform': rotateStyle,
+			'transform': `translate(-50%, -50%) ${rotateStyle}`
+		});
+	}
+	
+	wheelRotationUpdated() {
+		this.setBgImageRotation(this.selectedWheel.winWheel.rotationAngle);
 	}
 	
 	start() {

@@ -1,7 +1,7 @@
 const OBSWebSocket = require('obs-websocket-js');
 
 const Module = requireMain('./module');
-const ObsFunctionFactory = require('./Functions/ObsFunctionFactory');
+const ObsFunctionFactory = require('./Functions/obsFunctionFactory');
 const ConfigSourceManager = requireMain('./configSourceManager');
 const Timers = requireMain('./timers');
 const Utils = requireMain('./utils');

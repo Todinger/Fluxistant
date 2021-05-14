@@ -1,4 +1,4 @@
-const ObsFunction = require('./ObsFunction');
+const ObsFunction = require('./obsFunction');
 const Utils = requireMain('./utils');
 
 class SwitchToPreviousScene extends ObsFunction {

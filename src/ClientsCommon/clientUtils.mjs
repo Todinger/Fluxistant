@@ -58,6 +58,14 @@ function clamp(min, val, max) {
 	return Math.max(min, Math.min(val, max));
 }
 
+function setOrClear(jTarget, attr, value) {
+	if (value) {
+		jTarget[attr](value);
+	} else {
+		jTarget.css(attr, 'auto');
+	}
+}
+
 export {
 	now,
 	randomRange,
@@ -69,4 +77,5 @@ export {
 	upperFirst,
 	isNonEmptyString,
 	clamp,
+	setOrClear,
 };

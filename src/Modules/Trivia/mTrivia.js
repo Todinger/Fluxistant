@@ -95,7 +95,7 @@ class Question {
 		this.category = he.unescape(questionData["category"]);
 		this.type = he.unescape(questionData["type"]);
 		this.difficulty = he.unescape(questionData["difficulty"]);
-		this.text = he.unescape(questionData["question"]);
+		this.text = he.unescape(questionData["question"]).trim();
 		this.answer = he.unescape(questionData["correct_answer"]);
 		
 		this.index = index;
