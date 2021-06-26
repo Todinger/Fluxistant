@@ -144,12 +144,14 @@ class WheelClient extends ModuleClient {
 	}
 	
 	showResult(resultValue) {
-		if (!this.resultShowing) {
-			this.jResultText.text(resultValue);
-			this.jResultText.attr('data-text', resultValue);
-			this.jResult.fadeIn(FADE_DURATION);
-			this.resultShowing = true;
-		}
+		// Removed because Yecats decided she doesn't like how the prize titles look
+		//
+		// if (!this.resultShowing) {
+		// 	this.jResultText.text(resultValue);
+		// 	this.jResultText.attr('data-text', resultValue);
+		// 	this.jResult.fadeIn(FADE_DURATION);
+		// 	this.resultShowing = true;
+		// }
 	}
 	
 	hideResult() {
@@ -207,7 +209,9 @@ class WheelClient extends ModuleClient {
 				callbackBefore: () => this.wheelRotationUpdated(),
 			};
 			
+			data.wheels[i].extras = data.wheels[i].extras || {};
 			data.wheels[i].extras.bgImage = data.wheels[i].extras['bgImage'] || { url: '' };
+			data.wheels[i].extras.marker = data.wheels[i].extras['marker'] || { url: '' };
 			
 			let winWheel = new Winwheel(wheel);
 			this.wheels.push({

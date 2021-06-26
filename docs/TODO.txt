@@ -16,7 +16,7 @@
 + Module descriptions
 + Changes marked in previously-accepted modules on any change
 - GUI: Hitting Enter should switch to next field
-- Video assets
++ Video assets
 - Meme command that shows a random meme
 - Testing =\
 - Revamp configs to lessen descriptor count =\
@@ -34,6 +34,7 @@
 X Function (probably triggered with key press) that switches a game source to use the window whose title matches the active window's title
 + Volume for image display
 - Switch all duration configuration values from whatever number-type entity they are to DurationEntity
+- Focus view: Transparent always-on-top window that only shows messages I'm tagged in. Possibly TTS for those as well, and/or sound alerts.
 
 Module ideas:
 - !random N => random number in [1, N]
@@ -48,22 +49,34 @@ Module ideas:
 	- Common use case: timer trigger for a specified duration
 		- E.g.: on Channel Point redemption, start sending the "T" key on random intervals if Phasmophobia is active
 - Wheel
-	- Multiple wheels
-	- Define options
+	+ Multiple wheels
+	+ Define options
 	- Title
 	- Description:
-		- Streamer uses command to show the wheel
-			- Different command for each type of wheel
-			- Parameter for the user the spin is for
-		- Wheel image: tire on the outside, actual wheel inside it
+		+ Streamer uses command to show the wheel
+			+ Different command for each type of wheel
+			+ Parameter for the user the spin is for
+		+ Wheel image: tire on the outside, actual wheel inside it
 			-> Background image behind the wheel, spin along with the wheel itself
-		- Show animation when the wheel shows up
-		- User uses command to spin the wheel at a random speed
-		- Optional: Show text of selected prize when the wheel stops
-		- Function for making the wheel disappear
-		- Fade out on disappear?
-	- Only one wheel active at a time
+		+ Show animation when the wheel shows up
+		+ User uses command to spin the wheel at a random speed
+		+ Optional: Show text of selected prize when the wheel stops
+		+ Function for making the wheel disappear
+		+ Fade out on disappear?
+	+ Only one wheel active at a time
 		- Using a command for a different wheel type overrides the current one
+- Google Translate auto-mangle
+	- Take the given sentence and run it through a chain of translations, then translate back to the original language and show that
+	- Alternativel, translate each word separately like so ^
+- Key cache + raffle
+	- Allow for a multi-raffle, with an option for allowing repeating wins or not (different commands for it?)
+	- Auto-replacement of duplicates
+	- Manual gifting: random and specific
+	- Whisper keys automatically on wins (OPTIONAL)
+	- Announce the names of the keys people win
+	- Modes:
+		- Automatic random key
+		- Randomize index order then get an index to the randomized list from the winner
 
 GUI Library: Buefy
 Twitch library: https://www.npmjs.com/package/twitch

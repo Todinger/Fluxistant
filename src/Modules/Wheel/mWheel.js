@@ -48,6 +48,10 @@ class WheelModule extends Module {
 	
 	loadModConfig(conf) {
 		this.deactivateFunctions(this.showFunctionObjects);
+		if (!conf.enabled) {
+			return;
+		}
+		
 		this.wheels = conf.wheels;
 		
 		this.showFunctionObjects = {};
