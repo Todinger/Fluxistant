@@ -236,9 +236,11 @@ class Module {
 	}
 	
 	activateFunctions(funcObjects) {
-		funcObjects = funcObjects || this.funcObjects;
-		if (funcObjects) {
-			Object.values(funcObjects).forEach(func => func.activate());
+		if (this.enabled) {
+			funcObjects = funcObjects || this.funcObjects;
+			if (funcObjects) {
+				Object.values(funcObjects).forEach(func => func.activate());
+			}
 		}
 	}
 	

@@ -166,7 +166,7 @@ class ObsControl extends Module {
 		this.deactivateFunctions(this.obsFunctions || {});
 		
 		this.obsFunctions = {};
-		if (conf.obsFunctions) {
+		if (conf.enabled && conf.obsFunctions) {
 			for (let i = 0; i < conf.obsFunctions.length; i++) {
 				let func = conf.obsFunctions[i];
 				let funcObject = this.createFunctionObject(func);
