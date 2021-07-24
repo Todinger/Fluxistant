@@ -337,7 +337,12 @@ class TwitchManager extends EventNotifier {
 		}
 		
 		// This is to make all commands case-insensitive
-		cmd.cmdname = cmd.cmdname.toLowerCase();
+		cmd.cmdname = cmd.cmdname.toLowerCase().trim();
+		
+		if (cmd.cmdname === '') {
+			cli.warn(`Ignoring command ID ${cmd.id}: Empty command name.`);
+			return;
+		}
 		
 		// Each filter can either be a function or a description for a user filter,
 		// which is an object that has a .type and an optional .argument parameters
