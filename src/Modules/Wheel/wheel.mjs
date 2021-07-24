@@ -292,7 +292,10 @@ class WheelClient extends ModuleClient {
 	}
 	
 	wheelRotationUpdated() {
-		this.setBgImageRotation(this.selectedWheel.winWheel.rotationAngle);
+		let wheel = this.selectedWheel;
+		if (wheel) {
+			this.setBgImageRotation(this.selectedWheel.winWheel.rotationAngle);
+		}
 	}
 	
 	start() {
