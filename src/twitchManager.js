@@ -6,6 +6,7 @@ const cli = require('./cliManager');
 const { User, UserFilters } = require('./user');
 const ModuleManager = require('./moduleManager');
 const SEManager = require('./seManager');
+const MainConfig = require('./mainConfig');
 const Utils = require('./utils');
 const Globals = require('./globals');
 
@@ -282,6 +283,24 @@ class TwitchManager extends EventNotifier {
 	// 	msg		The message to send.
 	tell(user, msg) {
 		this.say(`@${user.displayName} ${msg}`);
+	}
+	
+	// Makes our bot say an error on the channel chat to the given user.
+	// Basically it just adds "@username" and the configured error prefix
+	// at the beginning.
+	//
+	// Parameters:
+	// 	user	User object representing the user we wish to address.
+	// 	msg		The message to send.
+	tellError(user, msg) {
+		let errorPrefix = MainConfig.getErrorPrefix();
+		if (errorPrefix && errorPrefix.length > 0) {
+			errorPrefix += ' ';
+		} else {
+			errorPrefix = '';
+		}
+		
+		this.say(`${errorPrefix}@${user.displayName} ${msg}`);
 	}
 	
 	// Registers a user command.

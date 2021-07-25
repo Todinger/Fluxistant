@@ -846,6 +846,13 @@ class Module {
 	}
 	
 	// [For use by inheriting classes]
+	// Sends the given error message to the Twitch channel (the bot will say it),
+	// prefixed with "@username" directed at the user specified.
+	tellError(user, msg) {
+		TwitchManager.tellError(user, msg);
+	}
+	
+	// [For use by inheriting classes]
 	// Sends the given message to the Twitch channel (the bot will say it),
 	// addressed (with an @ tag) to the streamer, using the name they
 	// configured in the main configuration.

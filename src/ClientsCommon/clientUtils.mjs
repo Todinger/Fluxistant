@@ -58,6 +58,10 @@ function clamp(min, val, max) {
 	return Math.max(min, Math.min(val, max));
 }
 
+function inRange(min, val, max) {
+	return min <= val && val <= max;
+}
+
 function setOrClear(jTarget, attr, value) {
 	if (value) {
 		jTarget[attr](value);
@@ -78,4 +82,5 @@ export {
 	isNonEmptyString,
 	clamp,
 	setOrClear,
+	inRange,
 };

@@ -32,6 +32,9 @@ class MainConfig extends Configuration {
 It's sensitive information, so do not share it with others!
 You can get it by logging into Twitch with your bot's account and then visiting https://twitchapps.com/tmi/.
 Protip: If you don't want to log out of Twitch on your browser, use its incognito mode. You should be logged out there.`);
+		twitch.addString('errorPrefix')
+			.setName('Error Prefix')
+			.setDescription('Text to add to the beginning of error messages (e.g. an error emote on the channel)');
 		
 		let se = this.addGroup('streamElements')
 			.setName('Stream Elements')
@@ -106,6 +109,10 @@ You can find it on your [StreamElements account details page](https://streamelem
 		});
 		
 		return rewards;
+	}
+	
+	getErrorPrefix() {
+		return this.getChild('twitch').getChild('errorPrefix').getValue();
 	}
 }
 

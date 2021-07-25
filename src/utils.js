@@ -168,6 +168,10 @@ class Utils {
 		return typeof val === 'object' && val !== null;
 	}
 	
+	static isNaturalNumberString(str) {
+		return /^\d+$/.test(str);
+	}
+	
 	// Copies properties from the given defaults object (defs) to the given
 	// object if they are not already present in the given object.
 	// Works recursively, so that you can include defaults for sub-objects, but
@@ -421,6 +425,21 @@ class Utils {
 	
 	static arraysHaveSameValues(arr1, arr2) {
 		return _.isEqual([...arr1].sort(), [...arr2].sort());
+	}
+	
+	// Creates a multi-dimensional array using given parameters for its dimensions
+	// Taken from:
+	// https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript/966938#966938
+	static createArray(length) {
+		let arr = new Array(length || 0),
+			i = length;
+		
+		if (arguments.length > 1) {
+			let args = Array.prototype.slice.call(arguments, 1);
+			while(i--) arr[length-1 - i] = Utils.createArray.apply(this, args);
+		}
+		
+		return arr;
 	}
 	
 	static objectMap(obj, func) {
