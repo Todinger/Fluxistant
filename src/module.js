@@ -129,6 +129,7 @@ class Module {
 			this.tell = (user, msg) => {
 				this.say(`@${user.displayName} ${msg}`);
 			}
+			this.tellError = (user, msg) => this.tell(user, `<ErrorPrefix> ${msg}`);
 		}
 		
 		// Initialize module interface for use in other modules, if we have one
