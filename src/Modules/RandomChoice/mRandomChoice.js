@@ -6,7 +6,6 @@ class RandomChoice extends Module {
 	constructor() {
 		super({
 			name: 'Random Choice',
-			debug: true,
 		});
 		
 		this.textEntries = {};
