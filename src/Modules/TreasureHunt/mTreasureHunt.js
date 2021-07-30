@@ -48,6 +48,7 @@ class TreasureHunt extends Module {
 			return;
 		}
 		
+		this.endGame();
 		this.size = {height, width};
 		this.initializeBoard();
 		this.placeTreasure();
