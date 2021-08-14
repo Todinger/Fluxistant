@@ -124,6 +124,7 @@ GUI User Feedback:
 				- Possibly add an "Extendable" boolean option which allows the timer to be extended like that
 			- Until turned off:
 				- Trigger for turning it off
+	- First / any message by user
 - Also add function responses.
   Response targets:
 	+ Chat message

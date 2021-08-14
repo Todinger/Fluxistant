@@ -3,16 +3,16 @@ import { inRange } from "/common/clientUtils.mjs";
 
 const IMAGE_DIR = 'images/';
 
-const TITLE = `<div id="nameContainer" class="grid-header">What's in the Box?</div>`;
+// const TITLE = `<div id="nameContainer" class="grid-header">What's in the Box?</div>`;
 
 class TreasureHuntClient extends ModuleClient {
 	constructor() {
 		super('Treasure Hunt');
 		
 		this.stateImages = {
-			empty: IMAGE_DIR + 'Empty.png',
-			miss: IMAGE_DIR + 'Cross.png',
-			hit: IMAGE_DIR + 'Treasure.png',
+			empty: IMAGE_DIR + 'Closed.png',
+			miss: IMAGE_DIR + 'Miss.png',
+			hit: IMAGE_DIR + 'Hit.png',
 		};
 		
 		this.cells = [];
@@ -40,14 +40,14 @@ class TreasureHuntClient extends ModuleClient {
 		// Set the grid CSS properties to support the number of columns we want
 		let styleString = '';
 		styleString += `grid-template-columns: ${'auto '.repeat(width)}; `;
-		styleString += `grid-template-rows: auto ${'1fr '.repeat(height)}; `;
-		styleString += `grid-template-areas: '${"header ".repeat(width)}' ${`'${"main ".repeat(width)}'`.repeat(height)}; `;
+		styleString += `grid-template-rows: ${'1fr '.repeat(height)}; `;
+		styleString += `grid-template-areas: ${`'${"main ".repeat(width)}'`.repeat(height)}; `;
 		evContainer[0].style = styleString;
 		// evContainer.css('grid-template-columns', 'auto '.repeat(width));
 		// evContainer.css('grid-template-rows', 'auto ' + '1fr '.repeat(height));
 		// evContainer.css('grid-template-areas', `'${'header '.repeat(width)}' ${`'${'main'.repeat(width)}'`.repeat(height)}`);
 		
-		evContainer.append($(TITLE));
+		// evContainer.append($(TITLE));
 		
 		this.cells = [];
 		for (let row = 0; row < height; row++) {
@@ -60,6 +60,8 @@ class TreasureHuntClient extends ModuleClient {
 			
 			this.cells.push(rowCells);
 		}
+		
+		this.hide();
 	}
 	
 	hide() {
@@ -92,7 +94,8 @@ class TreasureHuntClient extends ModuleClient {
 			return false;
 		}
 		
-		this.initGame(data.height, data.width)
+		this.initGame(data.height, data.width);
+		this.show();
 		return true;
 	}
 	

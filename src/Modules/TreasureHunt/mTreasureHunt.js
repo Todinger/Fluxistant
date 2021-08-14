@@ -69,8 +69,8 @@ class TreasureHunt extends Module {
 	
 	placeTreasure() {
 		this.treasureLocation = {
-			row: Utils.randomInt(1, this.size.height),
-			col: Utils.randomInt(1, this.size.width),
+			row: Utils.randomInt(1, this.size.height + 1),
+			col: Utils.randomInt(1, this.size.width + 1),
 		};
 	}
 	
@@ -145,8 +145,29 @@ class TreasureHunt extends Module {
 		this.broadcastEvent('setState', {
 			row: guess.row,
 			col: guess.col,
-			state: cellState
+			state: cellState,
 		});
+	}
+	
+	reveal() {
+		if (!this.running) {
+			return;
+		}
+		
+		this.endGame();
+		this.broadcastEvent('setState', {
+			row: this.treasureLocation.row,
+			col: this.treasureLocation.col,
+			state: 'hit',
+		});
+	}
+	
+	hide() {
+		if (this.running) {
+			this.endGame();
+		}
+		
+		this.broadcastEvent('hide');
 	}
 	
 	makeStatesArray() {
@@ -209,6 +230,29 @@ class TreasureHunt extends Module {
 				}),
 			],
 			action: data => this.guess(data),
+		},
+		reveal: {
+			name: 'Reveal',
+			description: 'Ends the game and shows the treasure',
+			triggers: [
+				this.trigger.command({
+					cmdname: 'reveal',
+				}),
+			],
+			filters: [
+				this.filter.isMod(),
+			],
+			action: () => this.reveal(),
+		},
+		end: {
+			name: 'End Game',
+			description: 'Ends the treasure hunt game and hides it',
+			triggers: [
+				this.trigger.command({
+					cmdname: 'endtreasure',
+				}),
+			],
+			action: () => this.hide(),
 		},
 	}
 }
