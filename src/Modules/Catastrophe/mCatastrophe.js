@@ -82,8 +82,8 @@ class Catastrophe extends Module {
 			this.normalizeVolume(volume);
 	}
 	
-	meow() {
-		if (this.ongoing) {
+	meow(force) {
+		if (force || this.ongoing) {
 			let soundFile = this.assets.Sounds.selectFileLocal();
 			if (soundFile) {
 				let files = this.config.sounds.files || {};
@@ -186,7 +186,7 @@ class Catastrophe extends Module {
 		
 		play: {
 			name: 'Meow',
-			description: 'Plays a random Meow sound from the pool',
+			description: 'Plays a random Meow sound from the pool (only works while Catastrophe is active)',
 			action: () => this.meow(),
 			triggers: [
 				this.trigger.keyUp(),
@@ -194,6 +194,17 @@ class Catastrophe extends Module {
 					cooldowns: {
 						global: 1,
 					}
+				}),
+			],
+		},
+		
+		forcePlay: {
+			name: 'Force Meow',
+			description: "Plays a random Meow sound from the pool (works even if Catastrophe isn't active)",
+			action: () => this.meow(true),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'meow',
 				}),
 			],
 		},
