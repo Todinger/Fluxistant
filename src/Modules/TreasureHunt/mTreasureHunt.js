@@ -12,6 +12,11 @@ const BOARD_SIZE_BOUNDS = {
 	},
 };
 
+const DEFAULT_BOARD_SIZE = {
+	width: 3,
+	height: 3,
+}
+
 const DEFAULT_START_MESSAGE = '';
 const WIN_MESSAGE_USER_PLACEHOLDER = '$winner';
 const WIN_MESSAGE_REWARD_PLACEHOLDER = '$reward';
@@ -49,23 +54,22 @@ class TreasureHunt extends Module {
 	}
 	
 	startGame(data) {
-		if (data.params.length < 2) {
-			this.tellError(data.user, "Please specify both height and width for the treasure hunt.");
-			return;
-		}
-		
-		let heightStr = data.params[0];
-		let widthStr = data.params[1];
-		if (!(Utils.isNaturalNumberString(heightStr) && Utils.isNaturalNumberString(widthStr))) {
-			this.tellError(data.user, "Please enter positive integers for the board size.");
-			return;
-		}
-		
-		let height = Number(heightStr);
-		let width = Number(widthStr);
-		if (!this.boardSizeInBounds(height, width)) {
-			this.tellError(data.user, `Board size must be in the range [${BOARD_SIZE_BOUNDS.height.min} - ${BOARD_SIZE_BOUNDS.height.max}] x [${BOARD_SIZE_BOUNDS.width.min} - ${BOARD_SIZE_BOUNDS.width.max}].`);
-			return;
+		let width = DEFAULT_BOARD_SIZE.width;
+		let height = DEFAULT_BOARD_SIZE.height;
+		if (data.params.length >= 2) {
+			let heightStr = data.params[0];
+			let widthStr = data.params[1];
+			if (!(Utils.isNaturalNumberString(heightStr) && Utils.isNaturalNumberString(widthStr))) {
+				this.tellError(data.user, "Please enter positive integers for the board size.");
+				return;
+			}
+			
+			height = Number(heightStr);
+			width = Number(widthStr);
+			if (!this.boardSizeInBounds(height, width)) {
+				this.tellError(data.user, `Board size must be in the range [${BOARD_SIZE_BOUNDS.height.min} - ${BOARD_SIZE_BOUNDS.height.max}] x [${BOARD_SIZE_BOUNDS.width.min} - ${BOARD_SIZE_BOUNDS.width.max}].`);
+				return;
+			}
 		}
 		
 		this.endGame();
