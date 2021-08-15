@@ -12,7 +12,7 @@ const BOARD_SIZE_BOUNDS = {
 	},
 };
 
-const DEFAULT_START_MESSAGE = 'A treasure hunt game has just begun! Type !dig to guess where the treasure is!';
+const DEFAULT_START_MESSAGE = '';
 const WIN_MESSAGE_USER_PLACEHOLDER = '$winner';
 const WIN_MESSAGE_REWARD_PLACEHOLDER = '$reward';
 const DEFAULT_WIN_MESSAGE = `Well done! ${WIN_MESSAGE_USER_PLACEHOLDER} has found it and been awarded ${WIN_MESSAGE_REWARD_PLACEHOLDER}!`;
