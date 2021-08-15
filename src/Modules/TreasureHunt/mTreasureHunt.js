@@ -12,6 +12,10 @@ const BOARD_SIZE_BOUNDS = {
 	},
 };
 
+const WIN_MESSAGE_USER_PLACEHOLDER = '$winner';
+const WIN_MESSAGE_REWARD_PLACEHOLDER = '$reward';
+const DEFAULT_WIN_MESSAGE = `Well done! ${WIN_MESSAGE_USER_PLACEHOLDER} has found it and been awarded ${WIN_MESSAGE_REWARD_PLACEHOLDER}!`;
+
 class TreasureHunt extends Module {
 	constructor() {
 		super({
@@ -27,9 +31,12 @@ class TreasureHunt extends Module {
 		modConfig.addNaturalNumber('reward', 1000)
 			.setName('Reward')
 			.setDescription('Amount of SE points to award the winner');
-		modConfig.addBoolean('winChatMessage', true)
-			.setName('Win Message')
+		modConfig.addBoolean('enableWinChatMessage', true)
+			.setName('Enable Win Message')
 			.setDescription('Show a message in the chat announcing the winner');
+		modConfig.addString('winChatMessage', DEFAULT_WIN_MESSAGE)
+			.setName('Win Message')
+			.setDescription(`The message to show in chat when someone wins the game (use ${WIN_MESSAGE_USER_PLACEHOLDER} for the winner's name and ${WIN_MESSAGE_REWARD_PLACEHOLDER} for the amount of points)`);
 	}
 	
 	boardSizeInBounds(height, width) {
@@ -138,8 +145,11 @@ class TreasureHunt extends Module {
 	
 	processWin(user) {
 		this.modifyUserPoints(user, this.config.reward);
-		if (this.config.winChatMessage) {
-			this.say(`Well done! ${user.displayName} has found it and been awarded ${this.pointsString(this.config.reward)}!`);
+		if (this.config.enableWinChatMessage) {
+			let message = this.config.winChatMessage;
+			message = message.replace(WIN_MESSAGE_USER_PLACEHOLDER, user.displayName);
+			message = message.replace(WIN_MESSAGE_REWARD_PLACEHOLDER, this.pointsString(this.config.reward));
+			this.say(message);
 		}
 	}
 	
