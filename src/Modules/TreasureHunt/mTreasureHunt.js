@@ -23,6 +23,15 @@ class TreasureHunt extends Module {
 		this.endGame();
 	}
 	
+	defineModConfig(modConfig) {
+		modConfig.addNaturalNumber('reward', 1000)
+			.setName('Reward')
+			.setDescription('Amount of SE points to award the winner');
+		modConfig.addBoolean('winChatMessage', true)
+			.setName('Win Message')
+			.setDescription('Show a message in the chat announcing the winner');
+	}
+	
 	boardSizeInBounds(height, width) {
 		return Utils.inRange(BOARD_SIZE_BOUNDS.height.min, height, BOARD_SIZE_BOUNDS.height.max) &&
 			Utils.inRange(BOARD_SIZE_BOUNDS.width.min, width, BOARD_SIZE_BOUNDS.width.max);
@@ -127,6 +136,13 @@ class TreasureHunt extends Module {
 			   this.treasureLocation.col === col;
 	}
 	
+	processWin(user) {
+		this.modifyUserPoints(user, this.config.reward);
+		if (this.config.winChatMessage) {
+			this.say(`Well done! ${user.displayName} has found it and been awarded ${this.pointsString(this.config.reward)}!`);
+		}
+	}
+	
 	guess(data) {
 		let guess = this.parseGuess(data);
 		if (!guess) {
@@ -137,6 +153,7 @@ class TreasureHunt extends Module {
 		let cellState = 'miss';
 		if (this.isTreasure(guess.row, guess.col)) {
 			cellState = 'hit';
+			this.processWin(data.user);
 			this.endGame();
 		} else {
 			this.usersWhoGuessed.push(data.user.name);
