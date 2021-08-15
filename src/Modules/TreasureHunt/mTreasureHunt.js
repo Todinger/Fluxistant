@@ -12,6 +12,7 @@ const BOARD_SIZE_BOUNDS = {
 	},
 };
 
+const DEFAULT_START_MESSAGE = 'A treasure hunt game has just begun! Type !dig to guess where the treasure is!';
 const WIN_MESSAGE_USER_PLACEHOLDER = '$winner';
 const WIN_MESSAGE_REWARD_PLACEHOLDER = '$reward';
 const DEFAULT_WIN_MESSAGE = `Well done! ${WIN_MESSAGE_USER_PLACEHOLDER} has found it and been awarded ${WIN_MESSAGE_REWARD_PLACEHOLDER}!`;
@@ -31,6 +32,9 @@ class TreasureHunt extends Module {
 		modConfig.addNaturalNumber('reward', 1000)
 			.setName('Reward')
 			.setDescription('Amount of SE points to award the winner');
+		modConfig.addString('startMessage', DEFAULT_START_MESSAGE)
+			.setName('Start Message')
+			.setDescription(`The message to show in chat when the game starts`);
 		modConfig.addBoolean('enableWinChatMessage', true)
 			.setName('Enable Win Message')
 			.setDescription('Show a message in the chat announcing the winner');
@@ -70,6 +74,11 @@ class TreasureHunt extends Module {
 		this.placeTreasure();
 		
 		this.broadcastEvent('initGame', this.size);
+		
+		let startMessage = this.config.startMessage.trim();
+		if (startMessage.length > 0) {
+			this.say(startMessage);
+		}
 		
 		this.running = true;
 	}
