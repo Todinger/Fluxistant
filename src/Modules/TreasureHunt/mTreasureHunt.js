@@ -292,6 +292,9 @@ class TreasureHunt extends Module {
 					cmdname: 'endtreasure',
 				}),
 			],
+			filters: [
+				this.filter.isMod(),
+			],
 			action: () => this.hide(),
 		},
 	}
