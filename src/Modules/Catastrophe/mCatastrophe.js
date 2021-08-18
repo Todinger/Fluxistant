@@ -1,8 +1,8 @@
 'use strict';
 
 const path = require('path');
-const sound = require("sound-play");
 const Module = requireMain('module');
+const SoundPlayer = requireMain('externals').SoundPlayer;
 
 const SECONDS = 1;
 const MINUTES = 60 * SECONDS;
@@ -89,7 +89,7 @@ class Catastrophe extends Module {
 				let files = this.config.sounds.files || {};
 				let soundConf = files[soundFile.fileKey];
 				
-				sound.play(
+				SoundPlayer.play(
 					path.resolve(soundFile.path),
 					this.calculateFinalVolume(soundConf.volume));
 			}
