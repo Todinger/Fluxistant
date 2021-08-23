@@ -77,6 +77,9 @@ Module ideas:
 	- Modes:
 		- Automatic random key
 		- Randomize index order then get an index to the randomized list from the winner
+- Directed replies: specific messages directed at the bot can have a specified response, e.g.:
+	* Fluxistence: "@Fluxistant Shut up."
+	* Fluxistant: "@Fluxistence You shut up." / "@Fluxistence Make me." (chosen randomly)
 
 GUI Library: Buefy
 Twitch library: https://www.npmjs.com/package/twitch
