@@ -39,6 +39,7 @@ const TriggerBuilder = new Builder({
 	windowExited:		require('./Triggers/windowExitedTrigger'),
 	host:       		require('./Triggers/hostTrigger'),
 	raid:       		require('./Triggers/raidTrigger'),
+	time:       		require('./Triggers/timeTrigger'),
 });
 
 const ResponseBuilder = new Builder({

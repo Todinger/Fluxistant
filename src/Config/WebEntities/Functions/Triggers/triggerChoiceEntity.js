@@ -19,6 +19,7 @@ class TriggerChoiceEntity extends ChoiceEntity {
 			["windowExited"]:		'Trigger_WindowExited',
 			["host"]:				'Trigger_Host',
 			["raid"]:				'Trigger_Raid',
+			["time"]:				'Trigger_Time',
 		});
 	}
 }

@@ -10,6 +10,7 @@ const jImage = $('#actualimg');
 const jVideoHolder = $('#videoholder');
 const jVideo = $('#actualvideo');
 const jVideoSource = $('#videosource');
+const jNamed = $('#named');
 
 const TRANSPARENT_PIXEL_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
@@ -23,6 +24,8 @@ class ImageDisplay extends ModuleClient {
 		let markVideoDone = () => this.videoDone();
 		jVideo[0].onended = markVideoDone;
 		jVideo[0].onerror = markVideoDone;
+		
+		this.namedElements = {};
 	}
 	
 	get imageDisplayDone() {
@@ -42,11 +45,12 @@ class ImageDisplay extends ModuleClient {
 		});
 	}
 	
-	clearImageEffects(imageEffects) {
+	clearImageEffects(imageEffects, jElement) {
+		jElement = jElement || jImage;
 		Object.keys(imageEffects).forEach(effectName => {
 			let name = effectName.trim().toLowerCase();
 			if (name in ImageEffects) {
-				ImageEffects[name].clear(jImage);
+				ImageEffects[name].clear(jElement);
 			}
 		});
 	}
@@ -74,11 +78,8 @@ class ImageDisplay extends ModuleClient {
 		let markDone = () => this.soundDone();
 		
 		let sound = new Audio(soundParameters.url);
-		if (Number.isNaN(soundParameters.volume)) {
-			soundParameters.volume = 1.0;
-		}
 		
-		sound.volume = soundParameters.volume;
+		sound.volume = this.normalizeVolume(soundParameters.volume);
 		// sound.addEventListener('ended', markDone);
 		// sound.addEventListener('error', markDone);
 		sound.play()
@@ -88,13 +89,17 @@ class ImageDisplay extends ModuleClient {
 		// this.sounds.playOneShot(soundParameters.url, soundParameters.volume, markDone, markDone);
 	}
 	
-	playVideo(videoParameters) {
-		jVideoSource.attr('src', videoParameters.url);
-		setOrClear(jVideo, 'width', videoParameters.width);
-		setOrClear(jVideo, 'height', videoParameters.height);
-		jVideoHolder.css('visibility', '');
-		let video = jVideo.get(0);
-		video.volume = videoParameters.volume;
+	playVideo(videoParameters, jElement, jElementSource, jElementHolder) {
+		jElement = jElement || jVideo;
+		jElementSource = jElementSource || jVideoSource;
+		jElementHolder = jElementHolder || jVideoHolder;
+		
+		jElementSource.attr('src', videoParameters.url);
+		setOrClear(jElement, 'width', videoParameters.width);
+		setOrClear(jElement, 'height', videoParameters.height);
+		jElementHolder.css('visibility', '');
+		let video = jElement.get(0);
+		video.volume = this.normalizeVolume(videoParameters.volume);
 		video.load();
 		video.play();
 	}
@@ -138,6 +143,105 @@ class ImageDisplay extends ModuleClient {
 		}
 	}
 	
+	normalizeVolume(volume) {
+		if (volume === undefined) {
+			volume = 100;
+		}
+		if (!Number.isNaN(volume)) {
+			volume = volume / 100;
+		}
+		
+		return volume;
+	}
+	
+	showNamed(parameters) {
+		this.namedElements[parameters.name] = {};
+		
+		if (parameters.image) {
+			this.showNamedImage(parameters.image, parameters.name);
+		}
+		
+		if (parameters.sound) {
+			this.showNamedSound(parameters.sound);
+		}
+		
+		if (parameters.video) {
+			this.showNamedVideo(parameters.video, parameters.name);
+		}
+	}
+	
+	showNamedImage(imageParameters, name) {
+		let jContainer = $(`<div class='inner'></div>`);
+		let jElement = $(`<img id='actualimg' class='shadowfilter' src="" alt="">`);
+		jContainer.append(jElement);
+		
+		jElement.hide();
+		jElement.attr('src', imageParameters.url);
+		setOrClear(jImage, 'width', imageParameters.width);
+		setOrClear(jImage, 'height', imageParameters.height);
+		
+		jElement.fadeIn(FADE_DURATION);
+		
+		if (imageParameters.effects) {
+			jElement.applyImageEffects(imageParameters.effects);
+		}
+		
+		this.namedElements[name].image = { jContainer, jElement, imageParameters };
+		jNamed.append(jContainer);
+	}
+	
+	hideNamedImage(name) {
+		let jContainer = this.namedElements[name].image.jContainer;
+		// elements.jElement.attr('src', TRANSPARENT_PIXEL_IMAGE);
+		// if (elements.imageParameters.effects) {
+		// 	this.clearImageEffects(elements.imageParameters.effects, elements.jElement);
+		// }
+		
+		jContainer.fadeOut(FADE_DURATION, () => jContainer.remove());
+	}
+	
+	showNamedSound(soundParameters) {
+		let sound = new Audio(soundParameters.url);
+		sound.volume = this.normalizeVolume(soundParameters.volume);
+		sound.play().then().catch();
+	}
+	
+	showNamedVideo(videoParameters, name) {
+		let jElement = $(`<video class="inner" loop></video>`);
+		let jElementSource = $(`<source src="">`);
+		jElement.append(jElementSource);
+		
+		this.playVideo(videoParameters, jElement, jElementSource, jElement);
+		this.namedElements[name].video = { jElement };
+		
+		jNamed.append(jElement);
+	}
+	
+	hideNamedVideo(name) {
+		let jElement = this.namedElements[name].video.jElement;
+		jElement.fadeOut(FADE_DURATION, () => jElement.remove());
+	}
+	
+	hideNamed(name) {
+		let elements = this.namedElements[name];
+		if (elements.image) {
+			this.hideNamedImage(name);
+		}
+		if (elements.video) {
+			this.hideNamedVideo(name);
+		}
+		
+		delete this.namedElements[name];
+	}
+	
+	toggleNamed(parameters) {
+		if (parameters.name in this.namedElements) {
+			this.hideNamed(parameters.name);
+		} else {
+			this.showNamed(parameters);
+		}
+	}
+	
 	processRequest(parameters) {
 		if (parameters.image) {
 			this.imageShowing = true;
@@ -146,29 +250,11 @@ class ImageDisplay extends ModuleClient {
 		
 		if (parameters.sound) {
 			this.soundPlaying = true;
-			
-			let volume = parameters.sound.volume;
-			if (volume === undefined) {
-				volume = 100;
-			}
-			if (!Number.isNaN(volume)) {
-				parameters.sound.volume = volume / 100;
-			}
-			
 			this.playSound(parameters.sound);
 		}
 		
 		if (parameters.video) {
 			this.videoPlaying = true;
-			
-			let volume = parameters.video.volume;
-			if (volume === undefined) {
-				volume = 100;
-			}
-			if (!Number.isNaN(volume)) {
-				parameters.video.volume = volume / 100;
-			}
-			
 			this.playVideo(parameters.video);
 		}
 	}
@@ -194,6 +280,10 @@ class ImageDisplay extends ModuleClient {
 				blockingEvents,
 				() => this.processRequest(parameters));
 		});
+		
+		this.server.on('showNamed', parameters => this.showNamed(parameters));
+		this.server.on('hideNamed', parameters => this.hideNamed(parameters));
+		this.server.on('toggleNamed', parameters => this.toggleNamed(parameters));
 		
 		this.server.attachToTag('imgdisp');
 	}

@@ -33,9 +33,7 @@ class ImageCommands extends Module {
 		return dd;
 	}
 	
-	_sendToDisplay(funcObject) {
-		let _this = this;
-		
+	_sendToDisplay(funcObject, displaySendFunc) {
 		let imageConf = funcObject.image;
 		let soundConf = funcObject.sound;
 		let videoConf = funcObject.video;
@@ -74,7 +72,7 @@ class ImageCommands extends Module {
 					parameters.video = videoConf.makeDisplayData(videoFile);
 				}
 				
-				_this.broadcastEvent('showImage', parameters);
+				displaySendFunc(parameters);
 			});
 		}
 	}
@@ -92,6 +90,28 @@ class ImageCommands extends Module {
 			'ImageFunction')
 		.setName('Image Functions')
 		.setDescription('Functions for showing images and/or playing sounds');
+		
+		modConfig.add(
+			'toggleFunctions',
+			'DynamicArray',
+			'ImageFunction')
+		.setName('Image Toggle Functions')
+		.setDescription('Functions for showing media without durations (toggle on/off)');
+	}
+	
+	makeImageFunction(func, id, action) {
+		let funcObject = this.createFunctionObject(func);
+		
+		if (!funcObject.funcID) {
+			funcObject.funcID = id;
+		}
+		
+		funcObject.image = func.image;
+		funcObject.sound = func.sound;
+		funcObject.video = func.video;
+		funcObject.action = () => action(funcObject);
+		
+		return funcObject;
 	}
 	
 	loadModConfig(conf) {
@@ -101,18 +121,29 @@ class ImageCommands extends Module {
 		if (conf.imageFunctions) {
 			for (let i = 0; i < conf.imageFunctions.length; i++) {
 				let func = conf.imageFunctions[i];
-				let funcObject = this.createFunctionObject(func);
-				
-				if (!funcObject.funcID) {
-					funcObject.funcID = `ImageFunc[${i}]`;
-				}
-				
-				funcObject.image = func.image;
-				funcObject.sound = func.sound;
-				funcObject.video = func.video;
-				funcObject.action = () => {
-					this._sendToDisplay(funcObject);
-				};
+				let funcObject = this.makeImageFunction(
+					func,
+					`ImageFunc[${i}]`,
+						fo => this._sendToDisplay(
+							fo,
+							parameters => this.broadcastEvent('showImage', parameters)));
+				this.imageFunctions[funcObject.funcID] = funcObject;
+			}
+		}
+		
+		if (conf.toggleFunctions) {
+			for (let i = 0; i < conf.toggleFunctions.length; i++) {
+				let func = conf.toggleFunctions[i];
+				let id = `ImageToggleFunc[${i}]`;
+				let funcObject = this.makeImageFunction(
+					func,
+					id,
+					fo => this._sendToDisplay(
+						fo,
+						parameters => {
+							parameters.name = `${id}: ${func.name}`;
+							this.broadcastEvent('toggleNamed', parameters);
+						}));
 				this.imageFunctions[funcObject.funcID] = funcObject;
 			}
 		}

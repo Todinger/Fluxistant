@@ -41,7 +41,9 @@ Module ideas:
 - Trivia
 	+ Exact match
 	+ Show letters: _ _ _ _   _ _ for example
-- Welcome: recognize person when raided/hosted by them.
+- Welcome:
+	- Recognize person when raided/hosted by them
+	- Allow placeholder for the user's name in the messages (so that if they change their name, you'd only need to change it in the user name and the rest would update on its own)
 - Death counters
 - Send keys
 	- Specify which keys, allow intervals between them

@@ -23,7 +23,7 @@ class DurationEntity extends NumberEntity {
 	}
 	
 	toConf() {
-		return this.getValue() * USER_SECONDS;
+		return Math.round(this.getValue() * USER_SECONDS);
 	}
 }
 
