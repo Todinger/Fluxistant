@@ -144,7 +144,7 @@ class TreasureHunt extends Module {
 		}
 		
 		if (this.cellsGuessed[row - 1][col - 1]) {
-			this.tellError(data.user, `That location has already been dug up - try somewhere else! =)`);
+			this.tellError(data.user, `That location has already been checked - try somewhere else! =)`);
 			return false;
 		}
 		
