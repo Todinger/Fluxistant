@@ -82,6 +82,7 @@ Module ideas:
 - Directed replies: specific messages directed at the bot can have a specified response, e.g.:
 	* Fluxistence: "@Fluxistant Shut up."
 	* Fluxistant: "@Fluxistence You shut up." / "@Fluxistence Make me." (chosen randomly)
+- Regex-based auto-bans
 
 GUI Library: Buefy
 Twitch library: https://www.npmjs.com/package/twitch
@@ -166,6 +167,7 @@ X Make WebEntities generation clear the WebEntities dir before writing to it.
 - Generate commands information page to automatically be put online for viewers to see
 - ZIP configuration text files
 - Duration picker GUI for time-related values
+- Make it possible for the bot to recognize gift subs to itself (and/or StreamElements, or actually to any specific user) and react to it
 
 - NPM Uninstall image-size if I no longer use it
 + Mark library directories as excluded in IDE after comitting, see if it does what I think it does

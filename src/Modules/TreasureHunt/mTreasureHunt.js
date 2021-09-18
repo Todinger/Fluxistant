@@ -21,6 +21,7 @@ const DEFAULT_START_MESSAGE = '';
 const WIN_MESSAGE_USER_PLACEHOLDER = '$winner';
 const WIN_MESSAGE_REWARD_PLACEHOLDER = '$reward';
 const DEFAULT_WIN_MESSAGE = `Well done! ${WIN_MESSAGE_USER_PLACEHOLDER} has found it and been awarded ${WIN_MESSAGE_REWARD_PLACEHOLDER}!`;
+const DEFAULT_RESET_MESSAGE = "Doesn't anybody else want to take a shot? Alright then, guesses are reset! Try again!";
 
 class TreasureHunt extends Module {
 	constructor() {
@@ -30,16 +31,38 @@ class TreasureHunt extends Module {
 			source: 'treasure.html',
 		});
 		
-		this.endGame();
+		this.initializeGame();
+	}
+	
+	initializeGame() {
+		this.size = {
+			height: 0,
+			width: 0,
+		}
+		
+		this.usersWhoGuessed = [];
+		
+		if (this.resetTask !== null) {
+			clearTimeout(this.resetTask);
+		}
+		this.resetTask = null;
+		
+		this.running = false;
 	}
 	
 	defineModConfig(modConfig) {
 		modConfig.addNaturalNumber('reward', 1000)
 			.setName('Reward')
 			.setDescription('Amount of SE points to award the winner');
+		modConfig.addDuration('guessesResetTime', 30)
+			.setName('Guesses Reset Time')
+			.setDescription('Number of seconds without guesses until viewers can enter another guess');
 		modConfig.addString('startMessage', DEFAULT_START_MESSAGE)
 			.setName('Start Message')
 			.setDescription(`The message to show in chat when the game starts`);
+		modConfig.addString('resetMessage', DEFAULT_RESET_MESSAGE)
+			.setName('Reset Message')
+			.setDescription(`The message to show in chat when the guesses are reset and users can guess again`);
 		modConfig.addBoolean('enableWinChatMessage', true)
 			.setName('Enable Win Message')
 			.setDescription('Show a message in the chat announcing the winner');
@@ -104,14 +127,7 @@ class TreasureHunt extends Module {
 	}
 	
 	endGame() {
-		this.size = {
-			height: 0,
-			width: 0,
-		}
-		
-		this.usersWhoGuessed = [];
-		
-		this.running = false;
+		this.initializeGame();
 	}
 	
 	cellInBoard(row, col) {
@@ -166,6 +182,11 @@ class TreasureHunt extends Module {
 		}
 	}
 	
+	resetGuesses() {
+		this.usersWhoGuessed = [];
+		this.say(this.config.resetMessage);
+	}
+	
 	guess(data) {
 		let guess = this.parseGuess(data);
 		if (!guess) {
@@ -180,6 +201,11 @@ class TreasureHunt extends Module {
 			this.endGame();
 		} else {
 			this.usersWhoGuessed.push(data.user.name);
+			if (this.resetTask !== null) {
+				clearTimeout(this.resetTask);
+			}
+			
+			this.resetTask = setTimeout(() => this.resetGuesses(), this.config.guessesResetTime);
 		}
 		
 		this.broadcastEvent('setState', {
