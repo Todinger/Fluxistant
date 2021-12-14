@@ -16,6 +16,10 @@ class Trigger_CommandEntity extends TriggerEntity {
 			.setAdvanced();
 		this.addNaturalNumber('cost', data && data.cost || 0)
 			.setDescription('Cost in StreamElements loyalty points');
+		this.addDynamicArray('requiredParams', 'String')
+			.setName('Required Parameters')
+			.setDescription('Required command parameters to have for this trigger to activate')
+			.setAdvanced();
 		
 		this.setData(data);
 		

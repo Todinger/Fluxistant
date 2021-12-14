@@ -11,6 +11,7 @@ class CommandTrigger extends Trigger {
 		this.callback = (...params) => this._invoked(...params);
 		this.cost = settings && settings.cost || 0;
 		this.aliases = settings && settings.aliases || [];
+		this.requiredParams = settings && settings.requiredParams && settings.requiredParams.map(param => param.trim().toLowerCase()) || [];
 		
 		this.command = {
 			id: this.cmdid,
@@ -40,6 +41,16 @@ class CommandTrigger extends Trigger {
 	}
 	
 	_invoked(user, ...args) {
+		if (args.length < this.requiredParams.length) {
+			return;
+		}
+		
+		for (let i = 0; i < this.requiredParams.length; i++) {
+			if (args[i].trim().toLowerCase() !== this.requiredParams[i]) {
+				return;
+			}
+		}
+		
 		this._trigger({
 			user: user,
 			params: [...args],

@@ -83,6 +83,8 @@ Module ideas:
 	* Fluxistence: "@Fluxistant Shut up."
 	* Fluxistant: "@Fluxistence You shut up." / "@Fluxistence Make me." (chosen randomly)
 - Regex-based auto-bans
+- Guest Star system that shows an image for them (well, fills in images and texts in general)
+	- Default with Polly
 
 GUI Library: Buefy
 Twitch library: https://www.npmjs.com/package/twitch
