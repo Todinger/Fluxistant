@@ -89,6 +89,9 @@ const CATEGORY_DATA = {
 	keywords: CATEGORY_KEYWORDS,
 };
 
+const HIDDEN_LETTER_REGEX = /[a-zA-Z0-9 ]/;
+const OPEN_LETTER_REGEX = /[^a-zA-Z0-9 ]/;
+
 
 class Question {
 	constructor(questionData, index, total) {
@@ -133,7 +136,9 @@ class Game {
 	start(questionsData) {
 		this.questions = [];
 		for (let i = 0; i < questionsData.length; i++) {
-			this.questions.push(this.makeQuestion(questionsData[i], i, questionsData.length));
+			try {
+				this.questions.push(this.makeQuestion(questionsData[i], i, questionsData.length));
+			} catch {}
 		}
 		
 		this.currentQuestionIndex = -1;
@@ -141,6 +146,7 @@ class Game {
 	
 	makeQuestion(questionData, index, total) {
 		Errors.abstract();
+		return null;
 	}
 	
 	showQuestion() {
@@ -242,12 +248,24 @@ class LetterRevealGame extends Game {
 			for (let i = 0; i < questionWords.length; i++) {
 				questionLetters[i] = {};
 				hiddenLetters[i] = {};
+				let wordLetters = {};
 				for (let j = 0; j < questionWords[i].length; j++) {
-					questionLetters[i][j] = questionWords[i][j];
-					hiddenLetters[i][j] = '_';
+					if (HIDDEN_LETTER_REGEX.test(questionWords[i][j])) {
+						wordLetters[j] = questionWords[i][j];
+						hiddenLetters[i][j] = '_';
+						totalLetterCount++;
+					} else {
+						hiddenLetters[i][j] = questionWords[i][j];
+					}
 				}
 				
-				totalLetterCount += questionWords[i].length;
+				if (!_.isEmpty(wordLetters)) {
+					questionLetters[i] = wordLetters;
+				}
+			}
+			
+			if (totalLetterCount === 0) {
+				throw 'Bad question: no letters/numbers.';
 			}
 			
 			this.questionLetters = questionLetters;
@@ -306,9 +324,16 @@ class LetterRevealGame extends Game {
 			module.say(`Hint: ${hint}`);
 		}
 		
+		toUniformAnswerFormat(answer) {
+			return answer
+				.toLowerCase()
+				.replace(OPEN_LETTER_REGEX, '')
+				.replace(/\s+/g, ' ')
+				.trim();
+		}
+		
 		checkAnswer(answerText) {
-			let answer = answerText.trim().toLowerCase().replace(/\s+/g, ' ');
-			return answer === this.answer.toLowerCase();
+			return this.toUniformAnswerFormat(answerText) === this.toUniformAnswerFormat(this.answer);
 		}
 	}
 	
@@ -823,7 +848,7 @@ class Trivia extends Module {
 				if (!bans.includes(questionText)) {
 					bans.push(questionText);
 					this.saveData();
-					this.say('Question banned. It will not show up again.');
+					this.say(`Question banned. It will not show up again. The answer was: ${this.game.currentQuestion.answer}`);
 				}
 			}
 			
@@ -870,6 +895,12 @@ class Trivia extends Module {
 		} else {
 			this.tell(data.user, "You haven't gotten any answers right yet. You can do it! I believe in you.");
 		}
+	}
+	
+	showCategories() {
+		let cats = Object.keys(CATEGORY_KEYWORDS).map(cat => CATEGORY_KEYWORDS[cat][0]);
+		let catString = `Available categories: ${cats.join(', ')}`;
+		this.say(catString);
 	}
 	
 	functions = {
@@ -958,6 +989,18 @@ class Trivia extends Module {
 			triggers: [
 				this.trigger.command({
 					cmdname: 'triviawins',
+				}),
+			],
+		},
+		
+		showCategories: {
+			name: 'Show Categories',
+			description: "Shows the available categories to choose from",
+			action: () => this.showCategories(),
+			triggers: [
+				this.trigger.command({
+					cmdname: 'triviacats',
+					aliases: ['triviacategories'],
 				}),
 			],
 		},
