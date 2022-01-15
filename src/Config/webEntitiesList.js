@@ -54,6 +54,7 @@ const entities = {
 	Trigger_HostEntity: require('./WebEntities/Functions/Triggers/trigger_HostEntity.js'),
 	Trigger_KeyDownEntity: require('./WebEntities/Functions/Triggers/trigger_KeyDownEntity.js'),
 	Trigger_KeyUpEntity: require('./WebEntities/Functions/Triggers/trigger_KeyUpEntity.js'),
+	Trigger_MessageEntity: require('./WebEntities/Functions/Triggers/trigger_MessageEntity.js'),
 	Trigger_RaidEntity: require('./WebEntities/Functions/Triggers/trigger_RaidEntity.js'),
 	Trigger_ShortcutEntity: require('./WebEntities/Functions/Triggers/trigger_ShortcutEntity.js'),
 	Trigger_TimeEntity: require('./WebEntities/Functions/Triggers/trigger_TimeEntity.js'),

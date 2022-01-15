@@ -9,6 +9,7 @@ class TriggerChoiceEntity extends ChoiceEntity {
 		super();
 		this._addOptions({
 			["command"]:			'Trigger_Command',
+			["message"]:			'Trigger_Message',
 			["shortcut"]:			'Trigger_Shortcut',
 			["keyDown"]:			'Trigger_KeyDown',
 			["keyUp"]:				'Trigger_KeyUp',

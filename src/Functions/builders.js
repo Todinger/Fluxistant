@@ -29,6 +29,7 @@ const VariableBuilder = new Builder({
 
 const TriggerBuilder = new Builder({
 	command:			require('./Triggers/commandTrigger'),
+	message:			require('./Triggers/messageTrigger'),
 	shortcut:			require('./Triggers/shortcutTrigger'),
 	keyDown:			require('./Triggers/keyDownTrigger'),
 	keyUp:				require('./Triggers/keyUpTrigger'),
