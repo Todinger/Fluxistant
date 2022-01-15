@@ -20,6 +20,10 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addBoolean('enabled', (data && data.enabled) !== false)
 			.setName('Enabled')
 			.setDescription('Enables/disables this function');
+		this.addDuration('responseDelay', (data && data.responseDelay) || 0)
+			.setName('Response Delay')
+			.setDescription('Sets a delay between each two responses sent')
+			.setAdvanced();
 		this.addCooldowns('cooldowns')
 			.setDescription('Function-wide cooldowns (work in addition to trigger-specific cooldowns)')
 			.setAdvanced();

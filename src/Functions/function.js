@@ -26,6 +26,7 @@ class Function {
 		this.cooldowns = settings.cooldowns;
 		this.triggers = this._makeTriggers(settings.triggers);
 		this.responses = this._makeResponses(settings.responses);
+		this.responseDelay = settings.responseDelay || 0;
 		this.triggerHandler = (triggerData) => this.invoke(triggerData);
 		this._registerTriggers();
 		
@@ -155,7 +156,14 @@ class Function {
 	}
 	
 	_sendResponses(context) {
-		this.responses.forEach(response => response.send(context));
+		if (this.responseDelay > 0 && this.responses.length > 0) {
+			this.responses[0].send(context);
+			for (let i = 1; i < this.responses.length; i++) {
+				setTimeout(() => this.responses[i].send(context), i * this.responseDelay);
+			}
+		} else {
+			this.responses.forEach(response => response.send(context));
+		}
 	}
 	
 	_applyDefaultParamValues(invocationData) {
