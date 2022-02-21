@@ -17,6 +17,11 @@ const DEFAULT_BOARD_SIZE = {
 	height: 3,
 }
 
+const COORDINATE_TYPES = {
+	ROW_COL: 1,
+	XY: 2,
+}
+
 const DEFAULT_START_MESSAGE = '';
 const WIN_MESSAGE_USER_PLACEHOLDER = '$winner';
 const WIN_MESSAGE_REWARD_PLACEHOLDER = '$reward';
@@ -135,27 +140,101 @@ class TreasureHunt extends Module {
 			   Utils.inRange(1, col, this.size.width);
 	}
 	
-	parseGuess(data) {
+	tellGuessUsage(user, type) {
+		try {
+			let lastCell = this.size.width * this.size.height;
+			if (type === COORDINATE_TYPES.XY) {
+				let cmdname = this.funcObjects.guessxy.triggers[0].cmdname;
+				this.tell(user, `Usage: "!${cmdname} x y" ([1 - ${this.size.width}], [1 - ${this.size.height}])`);
+			} else {
+				let cmdname = this.funcObjects.guess.triggers[0].cmdname;
+				this.tell(user, `Usage: "!${cmdname} CellNum" (1 - ${lastCell}) || or || "!${cmdname} row col" ([1 - ${this.size.height}], [1 - ${this.size.width}])`);
+			}
+		} catch {} // If we don't have a command trigger, show nothing
+	}
+	
+	getGuessParameter(paramString, minLimit, maxLimit, limitErrorMessage) {
+		if (!Utils.isNaturalNumberString(paramString)) {
+			throw "Please enter positive integers for the cell selection.";
+		}
+		
+		let param = Number(paramString);
+		if (param < minLimit || maxLimit < param) {
+			throw limitErrorMessage;
+		}
+		
+		return param;
+	}
+	
+	getGuessCellNumber(paramString) {
+		let lastCell = this.size.width * this.size.height;
+		return this.getGuessParameter(paramString, 1, lastCell, `That's outside the board! Please enter a number between 1 - ${lastCell}.`)
+	}
+	
+	getGuessRowColCoordinate(paramString, minLimit, maxLimit) {
+		return this.getGuessParameter(paramString, minLimit, maxLimit, `That's outside the board! Please enter a location inside [1 - ${this.size.height}], [1 - ${this.size.width}].`);
+	}
+	
+	getGuessRowCoordinate(paramString) {
+		return this.getGuessRowColCoordinate(paramString, 1, this.size.height);
+	}
+	
+	getGuessColCoordinate(paramString) {
+		return this.getGuessRowColCoordinate(paramString, 1, this.size.width);
+	}
+	
+	getGuessXYCoordinate(paramString, minLimit, maxLimit) {
+		return this.getGuessParameter(paramString, minLimit, maxLimit, `That's outside the board! Please enter a location inside [1 - ${this.size.width}], [1 - ${this.size.height}].`);
+	}
+	
+	getGuessXCoordinate(paramString) {
+		return this.getGuessRowColCoordinate(paramString, 1, this.size.height);
+	}
+	
+	getGuessYCoordinate(paramString) {
+		return this.getGuessRowColCoordinate(paramString, 1, this.size.width);
+	}
+	
+	parseGuess(data, type) {
 		if (!this.running) {
 			return false;
 		}
 		
 		if (this.usersWhoGuessed.includes(data.user.name)) {
-			this.tellError(data.user, "Sorry, you've already guessed once this game.");
+			this.tellError(data.user, "Sorry, you've already guessed once this phase.");
 			return false;
 		}
 		
-		let rowStr = data.params[0];
-		let colStr = data.params[1];
-		if (!(Utils.isNaturalNumberString(rowStr) && Utils.isNaturalNumberString(colStr))) {
-			this.tellError(data.user, "Please enter positive integers for the cell location.");
-			return false;
-		}
+		// Remove commas and x's in coordinate form
+		let allParams = data.params.join(' ').replace(/[.,x]/g, ' ').replace(/[()]/g, '');
+		let splitParams = allParams.split(/\s+/).filter(paramString => paramString !== "");
 		
-		let row = Number(rowStr);
-		let col = Number(colStr);
-		if (!this.cellInBoard(row, col)) {
-			this.tellError(data.user, `That's outside the board! Please enter a location inside [1 - ${this.size.height}], [1 - ${this.size.width}].`);
+		let row = 0, col = 0;
+		
+		try {
+			if (splitParams.length === 0) {
+				this.tellGuessUsage(data.user, type);
+				return false;
+			} else if (splitParams.length === 1) {
+				if (type === COORDINATE_TYPES.XY) {
+					this.tellGuessUsage(data.user, type);
+					return false;
+				}
+				
+				let num = this.getGuessCellNumber(splitParams[0]) - 1;
+				row = Math.floor(num / this.size.width) + 1;
+				col = num % this.size.width + 1;
+			} else {
+				if (type === COORDINATE_TYPES.XY) {
+					col = this.getGuessXCoordinate(splitParams[0]);
+					row = this.size.height + 1 - this.getGuessYCoordinate(splitParams[1]);
+				} else {    // Defaults to COORDINATE_TYPES.ROW_COL
+					row = this.getGuessRowCoordinate(splitParams[0]);
+					col = this.getGuessColCoordinate(splitParams[1]);
+				}
+			}
+		} catch (msg) {
+			this.tellError(data.user, msg);
 			return false;
 		}
 		
@@ -187,8 +266,8 @@ class TreasureHunt extends Module {
 		this.say(this.config.resetMessage);
 	}
 	
-	guess(data) {
-		let guess = this.parseGuess(data);
+	guess(data, type) {
+		let guess = this.parseGuess(data, type);
 		if (!guess) {
 			return;
 		}
@@ -292,10 +371,20 @@ class TreasureHunt extends Module {
 			description: 'Searches for the treasure at the given location',
 			triggers: [
 				this.trigger.command({
-					cmdname: 'dig',
+					cmdname: 'peek',
 				}),
 			],
-			action: data => this.guess(data),
+			action: data => this.guess(data, COORDINATE_TYPES.ROW_COL),
+		},
+		guessxy: {
+			name: 'Guess Location: X, Y',
+			description: 'Searches for the treasure at the given mathematical coordinate',
+			triggers: [
+				this.trigger.command({
+					cmdname: 'peekxy',
+				}),
+			],
+			action: data => this.guess(data, COORDINATE_TYPES.XY),
 		},
 		reveal: {
 			name: 'Reveal',
