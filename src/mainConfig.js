@@ -32,6 +32,13 @@ class MainConfig extends Configuration {
 It's sensitive information, so do not share it with others!
 You can get it by logging into Twitch with your bot's account and then visiting https://twitchapps.com/tmi/.
 Protip: If you don't want to log out of Twitch on your browser, use its incognito mode. You should be logged out there.`);
+		twitch.addHiddenString('oAuthStreamer')
+			.setName('Streamer oAuth Token')
+			.setDescription("Twitch oAuth token for the streamer (you) - ABSOLUTELY DO NOT SHARE it with people!")
+			.setHelp(`This gives the bot authority over your own account and is used only to read chat messages in order to detect hosts.
+Hosts with a small amount of people are only shown to the streamer account which is why we need this.
+You can get it by logging into Twitch with your account and then visiting https://twitchapps.com/tmi/.
+If you don't want to set up any triggers for when your channel is hosted by a few people, you can leave this blank.`);
 		twitch.addString('errorPrefix')
 			.setName('Error Prefix')
 			.setDescription('Text to add to the beginning of error messages (e.g. an error emote on the channel)');

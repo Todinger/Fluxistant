@@ -72,8 +72,9 @@ class TwitchManager extends EventNotifier {
 		this._commandHandlerIDs = {};	// Maps ID to cmdname name
 		this._cooldownData = {};		// Information we need to support cooldowns
 		
-		// The tmi.js client we use to implement the Twitch events and actions
+		// The tmi.js clients we use to implement the Twitch events and actions
 		this.client = null;
+		this.streamerClient = null; // The streamer's own account - used for detecting small hosts
 		
 		// Set this to true if you want to see the custom reward IDs of all the
 		// rewards that have text messages that are redeemed in the channel
@@ -106,7 +107,8 @@ class TwitchManager extends EventNotifier {
 	_paramsAreTheSame(params) {
 		return this.params.channel.toLowerCase() === params.channel.toLowerCase() &&
 			this.params.botname.toLowerCase() === params.botname.toLowerCase() &&
-			this.params.oAuth === params.oAuth;
+			this.params.oAuth === params.oAuth &&
+			this.params.oAuthStreamer === params.oAuthStreamer;
 	}
 	
 	// Starts... everything.
@@ -130,12 +132,18 @@ class TwitchManager extends EventNotifier {
 		// Disconnect if necessary
 		if (this.client) {
 			this.client.disconnect();
+			this.client = null;
+		}
+		if (this.streamerClient) {
+			this.streamerClient.disconnect();
+			this.streamerClient = null;
 		}
 		
 		this.params = {
 			channel: params.channel.toLowerCase(),
 			botname: params.botname.toLowerCase(),
 			oAuth: params.oAuth,
+			oAuthStreamer: params.oAuthStreamer,
 		};
 		
 		this.client = new tmi.Client({
@@ -155,22 +163,56 @@ class TwitchManager extends EventNotifier {
 		// Connect to Twitch via tmi.js
 		cli.log(`[Twitch] Connecting to channel: ${this.params.channel}`);
 		this.client.connect()
-			.catch(err => {
-				cli.error(`[Twitch] Connection failed: ${err}`);
-				this.params = null;
-				this.client = null;
+		.catch(err => {
+			cli.error(`[Twitch] Connection failed: ${err}`);
+			// this.params = null;
+			this.client = null;
+		});
+		
+		if (Utils.isNonEmptyString(this.params.oAuthStreamer)) {
+			this.streamerClient = new tmi.Client({
+				// Turn on if you want to see channel messages and debug info
+				// options: { debug: true },
+				connection: {
+					reconnect: true,
+					secure:    true,
+				},
+				identity:   {
+					username: this.params.channel,
+					password: this.params.oAuthStreamer,
+				},
+				channels:   [this.params.channel],
 			});
+			
+			this.streamerClient.connect()
+			.catch(err => {
+				cli.error(`[Twitch] Streamer connection failed: ${err}`);
+				this.streamerClient = null;
+			});
+		}
 		
 		// Register to all the tmi.js and SE events that we want to know about
 		this._registerToTwitchEvents();
 	}
 	
 	disconnect() {
+		let disconnectionPerformed = false;
+		let channel = this.params.channel;
+		
 		if (this.client) {
 			this.client.disconnect();
 			this.client = null;
-			cli.log(`[Twitch] Disconnected from channel: ${this.params.channel}`);
-			this.params = null;
+			disconnectionPerformed = true;
+		}
+		if (this.streamerClient) {
+			this.streamerClient.disconnect();
+			this.streamerClient = null;
+			disconnectionPerformed = true;
+		}
+		
+		this.params = null;
+		if (disconnectionPerformed) {
+			cli.log(`[Twitch] Disconnected from channel: ${channel}`);
 		}
 	}
 	
@@ -242,7 +284,9 @@ class TwitchManager extends EventNotifier {
 		});
 		
 		// Called when someone hosts our channel
-		this.client.on('hosted', (channel, username, viewers, autohost) => {
+		// Use the streamer's account for this if we have it
+		let hostClient = this.streamerClient !== null ? this.streamerClient : this.client;
+		hostClient.on('hosted', (channel, username, viewers, autohost) => {
 			this._notify('host', username, viewers, autohost);
 		});
 		
