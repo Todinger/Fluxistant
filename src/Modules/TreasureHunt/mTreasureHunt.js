@@ -148,7 +148,7 @@ class TreasureHunt extends Module {
 				this.tell(user, `Usage: "!${cmdname} x y" ([1 - ${this.size.width}], [1 - ${this.size.height}])`);
 			} else {
 				let cmdname = this.funcObjects.guess.triggers[0].cmdname;
-				this.tell(user, `Usage: "!${cmdname} CellNum" (1 - ${lastCell}) || or || "!${cmdname} row col" ([1 - ${this.size.height}], [1 - ${this.size.width}])`);
+				this.tell(user, `Usage: "!${cmdname} CellNum" (1 - ${lastCell}) OR "!${cmdname} row col" ([1 - ${this.size.height}], [1 - ${this.size.width}])`);
 			}
 		} catch {} // If we don't have a command trigger, show nothing
 	}
