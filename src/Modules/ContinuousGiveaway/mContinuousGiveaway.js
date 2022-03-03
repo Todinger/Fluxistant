@@ -14,7 +14,7 @@ class ContinuousGiveaway extends Module {
 	
 	start(data) {
 		if (this.ongoing) {
-			// this.tellError(data.user, "A giveaway is already underway!");
+			this.tellError(data.user, "A giveaway is already underway!");
 			return;
 		}
 		
@@ -27,19 +27,19 @@ class ContinuousGiveaway extends Module {
 	
 	resume(data) {
 		if (this.ongoing) {
-			// this.tellError(data.user, "A giveaway is already underway!");
+			this.tellError(data.user, "A giveaway is already underway!");
 			return;
 		}
 		
 		this.ongoing = true;
 	}
 	
-	end(data) {
+	end() {
 		if (!this.ongoing) {
 			return;
 		}
 		
-		// this.say("The giveaway has ended.");
+		this.say("The giveaway has ended.");
 		this.ongoing = false;
 	}
 	
@@ -52,8 +52,9 @@ class ContinuousGiveaway extends Module {
 			return;
 		}
 		
-		this.data.entrees[data.user.name] = false; // false = hasn't won yet
+		this.data.entrees[data.user.displayName] = false; // false = hasn't won yet
 		this.saveData();
+		this.log(`${data.user.displayName} entered.`);
 	}
 	
 	draw(data) {
@@ -63,15 +64,13 @@ class ContinuousGiveaway extends Module {
 		
 		let options = Object.keys(this.data.entrees).filter(entree => !this.data.entrees[entree]);
 		if (options.length === 0) {
-			this.warn("No viable entrees to draw from.");
-			// this.tellError(data.user, "There are no entrees viable for winning at this time.")
+			this.tellError(data.user, "There are no entrees viable for winning at this time.")
 			return;
 		}
 		
 		let winner = Utils.randomElement(options);
 		this.data.entrees[winner] = true;
 		this.saveData();
-		// this.sendSEMessage(`${winner} has won the giveaway!`);
 		this.say(`${winner} has won the giveaway!`);
 	}
 	
@@ -113,7 +112,7 @@ class ContinuousGiveaway extends Module {
 			filters: [
 				this.filter.specificUser("fluxistence"),
 			],
-			action: data => this.end(data),
+			action: () => this.end(),
 		},
 		join: {
 			name: 'Join Giveaway',
