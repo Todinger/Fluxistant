@@ -209,6 +209,7 @@ class ConfigEntity extends MiniEventNotifier {
 	
 	exportDesc() {
 		Errors.abstract();
+		return null;
 	}
 	
 	// For overriding in inheriting classes, should be used to check the
@@ -241,6 +242,7 @@ class ConfigEntity extends MiniEventNotifier {
 	
 	cloneImpl() {
 		Errors.abstract();
+		return null;
 	}
 	
 	// noinspection JSUnusedLocalSymbols

@@ -1,6 +1,7 @@
 const Trigger = require('./functionTrigger');
 const Variable = require('../Variables/functionVariable');
 const TwitchManager = requireMain('./twitchManager');
+const Utils = requireMain('./utils');
 
 class MessageTrigger extends Trigger {
 	constructor(settings) {
@@ -9,6 +10,7 @@ class MessageTrigger extends Trigger {
 		this.text = this.text.toLowerCase();
 		this.exact = !!(settings && settings.exact);
 		this.regex = !!(settings && settings.regex);
+		this.groupFilters = settings && settings.groupFilters || [];
 		this.callback = (...params) => this._onMessage(...params);
 		
 		// If this is supposed to be a regex that matches the string exactly
@@ -39,11 +41,22 @@ class MessageTrigger extends Trigger {
 		if (this.regex) {
 			let matches = this.regexText.exec(message);
 			if (matches) {
+				trigger = true;
+				
 				triggerParams = {
 					groups: matches,
 				};
 				
-				trigger = true;
+				if (this.groupFilters) {
+					let filteredGroupCount = Math.min(this.groupFilters.length, matches.length);
+					for (let i = 0; i < filteredGroupCount; i++) {
+						let matchFilter = this.groupFilters[i];
+						if (Utils.isNonEmptyString(matchFilter) && matches[i].toLowerCase() !== matchFilter.toLowerCase()) {
+							trigger = false;
+							break;
+						}
+					}
+				}
 			}
 		} else {
 			message = message.toLowerCase();

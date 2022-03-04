@@ -19485,6 +19485,10 @@ class Trigger_MessageEntity extends TriggerEntity {
 			.setDescription('The text must match the message exactly, rather than show up anywhere.');
 		this.addBoolean('regex', !!(data && data.regex)) // true if data.regex is set to true; false otherwise
 			.setDescription('Specifies that the given text is a regular expression.');
+		this.addDynamicArray('groupFilters', 'String')
+			.setName('Regex Group Filters')
+			.setDescription('Filter by specific regex group values (starts with group #0 which is the entire match)')
+			.setAdvanced();
 		
 		this.setData(data);
 		
@@ -21370,6 +21374,7 @@ class ConfigEntity extends MiniEventNotifier {
 	
 	exportDesc() {
 		Errors.abstract();
+		return null;
 	}
 	
 	// For overriding in inheriting classes, should be used to check the
@@ -21402,6 +21407,7 @@ class ConfigEntity extends MiniEventNotifier {
 	
 	cloneImpl() {
 		Errors.abstract();
+		return null;
 	}
 	
 	// noinspection JSUnusedLocalSymbols

@@ -797,12 +797,12 @@ class TwitchManager extends EventNotifier {
 			
 			// noinspection FallThroughInSwitchStatementJS
 			switch(userstate['message-type']) {
+				default:
+					cli.warn("[Twitch] Unknown message type received.");
+					break;
 				// This is what we get when someone types "/me <message>"
 				case 'action':
 					this._notify('action', user, message);
-					break;
-				default:
-					cli.warn("[Twitch] Unknown message type received; treating as regular message.");
 				case 'whisper':
 				case 'chat':
 					// We want to let various message type handlers all examine
