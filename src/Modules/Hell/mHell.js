@@ -58,6 +58,11 @@ class Hell extends Module {
 		this.print(report);
 	}
 	
+	resetSouls() {
+		this.data.souls = {};
+		this.saveData();
+	}
+	
 	load() {
 		CLI.on(['souls'], () => this.soulReport());
 	}
@@ -84,6 +89,20 @@ class Hell extends Module {
 				this.filter.isMod(),
 			],
 			action: () => this.soulReport(),
+		},
+		
+		resetSouls: {
+			name: 'Reset Souls',
+			description: "Reset the record of sold souls",
+			triggers: [
+				this.trigger.command({
+					cmdname: 'resetsouls',
+				}),
+			],
+			filters: [
+				this.filter.specificUser('yecatsmailbox'),
+			],
+			action: () => this.resetSouls(),
 		},
 	}
 	
