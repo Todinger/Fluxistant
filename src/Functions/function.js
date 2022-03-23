@@ -27,6 +27,7 @@ class Function {
 		this.cooldowns = settings.cooldowns;
 		this.triggers = this._makeTriggers(settings.triggers);
 		this.responses = this._makeResponses(settings.responses);
+		this.failResponses = this._makeResponses(settings.failResponses);
 		this.responseDelay = settings.responseDelay || 0;
 		this.triggerHandler = (triggerData) => this.invoke(triggerData);
 		this._registerTriggers();
@@ -117,6 +118,7 @@ class Function {
 		this._registerTriggers();
 		
 		this.responses = this._makeResponses(settings.responses);
+		this.failResponses = this._makeResponses(settings.failResponses);
 	}
 	
 	activate() {
@@ -156,15 +158,23 @@ class Function {
 			trigger.onTriggered(this.triggerHandler));
 	}
 	
-	_sendResponses(context) {
-		if (this.responseDelay > 0 && this.responses.length > 0) {
-			this.responses[0].send(context);
-			for (let i = 1; i < this.responses.length; i++) {
-				setTimeout(() => this.responses[i].send(context), i * this.responseDelay);
+	_sendResponses(responses, context) {
+		if (this.responseDelay > 0 && responses.length > 0) {
+			responses.send(context);
+			for (let i = 1; i < responses.length; i++) {
+				setTimeout(() => responses[i].send(context), i * this.responseDelay);
 			}
 		} else {
-			this.responses.forEach(response => response.send(context));
+			responses.forEach(response => response.send(context));
 		}
+	}
+	
+	_sendSuccessResponses(context) {
+		this._sendResponses(this.responses, context);
+	}
+	
+	_sendFailureResponses(context) {
+		this._sendResponses(this.failResponses, context);
 	}
 	
 	_applyDefaultParamValues(invocationData) {
@@ -239,12 +249,16 @@ class Function {
 			variables: invocationData.triggerVariables.concat(this.variables),
 			params: {
 				in: invocationData.params,
-				out: results,
 				trigger: invocationData.triggerParams,
 			},
 		};
 		
-		this._sendResponses(context);
+		if (results === false) {
+			this._sendFailureResponses(context);
+		} else {
+			context.params.out = results;
+			this._sendSuccessResponses(context);
+		}
 	}
 }
 

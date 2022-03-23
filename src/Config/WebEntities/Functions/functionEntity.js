@@ -39,6 +39,9 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addDynamicArray('responses', 'ResponseChoice')
 			.setName('Responses')
 			.setDescription('Defines messages that will be sent after the function is done');
+		this.addDynamicArray('failResponses', 'ResponseChoice')
+			.setName('Failure Responses')
+			.setDescription('Defines messages that will be sent if the function fails');
 		
 		if (data) {
 			if (data.name) {
@@ -59,6 +62,10 @@ class FunctionEntity extends StaticObjectEntity {
 			
 			if (data.responses) {
 				data.responses.forEach(response => this.addResponse(data, response));
+			}
+			
+			if (data.failResponses) {
+				data.failResponses.forEach(response => this.addFailResponse(data, response));
 			}
 		}
 		
@@ -102,6 +109,10 @@ class FunctionEntity extends StaticObjectEntity {
 	
 	addResponse(data, response) {
 		this.addObject(response, 'responses', ResponseChoiceEntity);
+	}
+	
+	addFailResponse(data, response) {
+		this.addObject(response, 'failResponses', ResponseChoiceEntity);
 	}
 	
 	getTriggerTypes() {

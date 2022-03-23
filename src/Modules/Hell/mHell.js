@@ -37,6 +37,10 @@ class Hell extends Module {
 	}
 	
 	sellSoul(data) {
+		if (this.data.souls[data.user.name]) {
+			return false;
+		}
+		
 		this.data.souls[data.user.name] = data.user.displayName;
 		this.saveData();
 		
@@ -70,10 +74,13 @@ class Hell extends Module {
 	functions = {
 		sellSoul: {
 			name: 'Sell Soul',
-			description: "The user's soul is sold for all eternity",
+			description: "The user's soul is sold for all eternity (fails if already sold)",
 			action: data => this.sellSoul(data),
 			responses: [
 				this.response.chat('/me finds the soul of $user absolutely scrumptious!'),
+			],
+			failResponses: [
+				this.response.chat('Yo'),
 			],
 		},
 
