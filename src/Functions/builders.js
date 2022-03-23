@@ -25,6 +25,7 @@ const FilterBuilder = new Builder({
 const VariableBuilder = new Builder({
 	custom:	require('./Variables/functionVariable'),
 	out:	require('./Variables/outputVariable'),
+	getter:	require('./Variables/getterVariable'),
 });
 
 const TriggerBuilder = new Builder({

@@ -13,8 +13,9 @@ function EMPTY_ACTION() {
 }
 
 class Function {
-	constructor(settings) {
+	constructor(settings, module) {
 		this.validateSettings(settings);
+		this.module = module;
 		this.funcID = settings.funcID;
 		this.name = settings.name;
 		this.enabled = settings.enabled !== false;
@@ -22,7 +23,7 @@ class Function {
 		this.parameters = this._makeParameters(settings.parameters);
 		this.action = settings.action || EMPTY_ACTION;
 		this.filter = this._makeFilter(settings.filters);
-		this.variables = settings.variables || [];
+		this.variables = [].concat(settings.variables || []).concat(module.variables || []);
 		this.cooldowns = settings.cooldowns;
 		this.triggers = this._makeTriggers(settings.triggers);
 		this.responses = this._makeResponses(settings.responses);

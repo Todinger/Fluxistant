@@ -789,7 +789,8 @@ class TwitchManager extends EventNotifier {
 	// 				ignore it.
 	_processMessage(userstate, message, self) {
 		try {
-			if(self) return;
+			// Uncomment to make the bot ignore messages from itself:
+			// if(self) return;
 			
 			// Create an internal User object out of the external userstate
 			// object, to have a friendlier interface

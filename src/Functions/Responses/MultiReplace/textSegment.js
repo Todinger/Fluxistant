@@ -9,7 +9,7 @@ class TextSegment extends SearchSegment {
 	}
 	
 	process(variable, context) {
-		let matches = this.text.match(variable.expr);
+		let matches = this.text && this.text.match(variable.expr);
 		if (matches) {
 			// return Utils.regExpGroupReplace(
 			// 	this.expr,

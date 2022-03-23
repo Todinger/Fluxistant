@@ -217,7 +217,7 @@ class Module {
 	// ----------- START OF FUNCTION FEATURES ----------- //
 	
 	createFunctionObject(func) {
-		return new Function(func);
+		return new Function(func, this);
 	}
 	
 	createFunctionObjects(funcs) {
@@ -884,6 +884,13 @@ class Module {
 	// Logs a message to the log, marked as coming from this Module.
 	log(message) {
 		Logger.info(this._printForm(message));
+	}
+	
+	// [For use by inheriting classes]
+	// Prints a message to the console, marked as coming from this Module.
+	// Does not go to the log, and disregards log level settings.
+	print(message) {
+		console.log(this._printForm(message));
 	}
 	
 	
