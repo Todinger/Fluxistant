@@ -160,7 +160,7 @@ class Function {
 	
 	_sendResponses(responses, context) {
 		if (this.responseDelay > 0 && responses.length > 0) {
-			responses.send(context);
+			responses[0].send(context);
 			for (let i = 1; i < responses.length; i++) {
 				setTimeout(() => responses[i].send(context), i * this.responseDelay);
 			}
