@@ -47,6 +47,7 @@ const entities = {
 	Response_ChatEntity: require('./WebEntities/Functions/Responses/response_ChatEntity.js'),
 	Response_ConsoleEntity: require('./WebEntities/Functions/Responses/response_ConsoleEntity.js'),
 	Response_SEEntity: require('./WebEntities/Functions/Responses/response_SEEntity.js'),
+	Response_StreamerChatEntity: require('./WebEntities/Functions/Responses/response_StreamerChatEntity.js'),
 	TriggerChoiceEntity: require('./WebEntities/Functions/Triggers/triggerChoiceEntity.js'),
 	TriggerEntity: require('./WebEntities/Functions/Triggers/triggerEntity.js'),
 	Trigger_ChannelRewardEntity: require('./WebEntities/Functions/Triggers/trigger_ChannelRewardEntity.js'),

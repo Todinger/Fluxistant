@@ -307,8 +307,20 @@ class TwitchManager extends EventNotifier {
 		this._forwardSEEvent('follow');
 	}
 	
-	// Makes our bot say something on the channel chat.
+	// Makes the broadcaster's user say something on the channel chat.
 	// 
+	// Parameters:
+	// 	msg		The message to send.
+	streamerSay(msg) {
+		if (this.isConnected) {
+			this.streamerClient.say(this.channel, msg);
+		} else {
+			cli.warn(`[Twitch] Can't send message when not connected to Twitch. Message received: ${msg}`)
+		}
+	}
+	
+	// Makes our bot say something on the channel chat.
+	//
 	// Parameters:
 	// 	msg		The message to send.
 	say(msg) {

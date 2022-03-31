@@ -8,9 +8,10 @@ class ResponseChoiceEntity extends ChoiceEntity {
 	constructor() {
 		super();
 		this._addOptions({
-			["console"]:	'Response_Console',
-			["chat"]:		'Response_Chat',
-			["se"]:			'Response_SE',
+			["console"]:	    'Response_Console',
+			["chat"]:		    'Response_Chat',
+			["streamerChat"]:	'Response_StreamerChat',
+			["se"]:			    'Response_SE',
 		});
 	}
 }

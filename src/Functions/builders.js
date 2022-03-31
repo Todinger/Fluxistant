@@ -45,9 +45,10 @@ const TriggerBuilder = new Builder({
 });
 
 const ResponseBuilder = new Builder({
-	console:	require('./Responses/consoleResponse'),
-	chat:		require('./Responses/chatResponse'),
-	se:			require('./Responses/seResponse'),
+	console:	    require('./Responses/consoleResponse'),
+	chat:		    require('./Responses/chatResponse'),
+	streamerChat:	require('./Responses/streamerChatResponse'),
+	se:			    require('./Responses/seResponse'),
 });
 
 function combineFilters(filters) {

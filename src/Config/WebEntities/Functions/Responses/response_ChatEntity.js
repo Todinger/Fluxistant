@@ -6,7 +6,7 @@ class Response_ChatEntity extends ResponseEntity {
 	
 	constructor() {
 		super('Chat Message');
-		this.setDescription('Sends the response to the channel Chat');
+		this.setDescription('Sends the response to the channel chat');
 	}
 }
 
