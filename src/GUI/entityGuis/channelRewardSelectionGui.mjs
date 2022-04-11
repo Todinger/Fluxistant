@@ -28,7 +28,7 @@ export default class ChannelRewardSelectionGui extends EntityGui {
 		let selectionPresent = false;
 		rewardsList.forEach(reward => {
 			this._addOption(reward.rewardID, reward.rewardName);
-			if (this.entity.getValue() === reward.rewardName) {
+			if (this.entity.getValue() === reward.rewardID) {
 				selectionPresent = true;
 			}
 		});
