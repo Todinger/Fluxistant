@@ -954,12 +954,13 @@ class Module {
 	// [For use by inheriting classes]
 	// Modifies the amount of StreamElements loyalty points the user has by the
 	// given (positive or negative (or zero, honestly)) amount.
-	modifyUserPoints(user, amount) {
-		SEManager.addUserPoints(
-			user.name,
-			amount,
-			(newAmount) => this.log(`${this.pointsString(amount)} added to ${user.displayName}. New amount: ${newAmount}`),
-			(err) => this.error(`Failed to add points to ${user.name}: ${err}`));
+	async modifyUserPoints(user, amount) {
+		try {
+			let newAmount = await SEManager.addUserPoints(user.name, amount);
+			this.log(`${this.pointsString(amount)} added to ${user.displayName}. New amount: ${newAmount}`);
+		} catch (err) {
+			this.error(`Failed to add points to ${user.name}: ${err}`);
+		}
 	}
 	
 	// [For use by inheriting classes]

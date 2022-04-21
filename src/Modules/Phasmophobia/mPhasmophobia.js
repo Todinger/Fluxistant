@@ -476,7 +476,7 @@ If this is set to 1 then reward amounts will not be affected by the amount of ev
 				this.config.guessingGame.correctionFactor,
 				guessData.numEvidencePresent);
 			let winAmount = Math.round(this.config.guessingGame.reward * amountFactor);
-			this.modifyUserPoints(guessData.user, winAmount);
+			this.modifyUserPoints(guessData.user, winAmount).then().catch();
 			
 			if (winnerNum++ < MAX_WINNERS_IN_MESSAGE) {
 				winMessages.push(`${guessData.user.displayName} (${this.pointsString(winAmount)})`);

@@ -425,7 +425,7 @@ class Adventure extends Module {
 			this.startNextPartTimer();
 		} else {
 			// Otherwise we give the winner their points and end the adventure
-			this.modifyUserPoints(this.activeAdventure.winner, this.config.victoryReward);
+			this.modifyUserPoints(this.activeAdventure.winner, this.config.victoryReward).then().catch();
 			this.endAdventure();
 		}
 	}

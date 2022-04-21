@@ -265,7 +265,7 @@ class CandyGame extends Module {
 		}
 		
 		try {
-			this.modifyUserPoints(user, reward);
+			this.modifyUserPoints(user, reward).then().catch();
 		} catch (err) {
 			this.error(err);
 		}

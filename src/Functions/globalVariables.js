@@ -1,3 +1,4 @@
+const SEManager = requireMain('./seManager');
 const Variable = require('./Variables/functionVariable');
 
 const GlobalVars = [
@@ -38,6 +39,28 @@ const GlobalVars = [
 				return data.context.params.in.join(' ');
 			} else {
 				return data.matchString; // Return the expression unchanged
+			}
+		},
+	}),
+	
+	new Variable({
+		name: 'Updated User Points (`$points:username`, `$namedpoints:username`)',
+		description: "If `username`'s points were modified by the function's Points setting, returns their points after the update. Using namedpoints includes the name of your SE points, adjusted for plurality. NOTE: If the wrong username is used, this will say '???' instead.",
+		example: 'If adding a Points entry for bobross with 50 points, and he had 100 beforehand, writing "GJ Bob, you now have $points:bobross points!" would show "GJ Bob, you now have 150 points!" If your points are called "antenna"/"antennae", in the same situation, writing "GJ Bob, you now have $namedpoints:bobross!" would show "GJ Bob, you now have 150 antennae!", whereas if he had 1 point it would show "GJ Bob, you now have 1 antenna!"',
+		
+		expr: /\$(named)?points:(\w+)/,
+		replacement: data => {
+			let named = data.matchData[1] != null;
+			let username = data.matchData[2];
+			let points = data.context.points[username];
+			if (points === undefined) {
+				return '???';
+			}
+			
+			if (named) {
+				return SEManager.pointsString(points);
+			} else {
+				return points.toString();
 			}
 		},
 	}),

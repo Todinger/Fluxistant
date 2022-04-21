@@ -109,10 +109,12 @@ class Question {
 		module.say(`Question ${this.index + 1} / ${this.total}: ${this.text}`);
 	}
 	
+	// noinspection JSUnusedLocalSymbols
 	showAnswerHint(module) {
 		Errors.abstract();
 	}
 	
+	// noinspection JSUnusedLocalSymbols
 	checkAnswer(answerText) {
 		Errors.abstract();
 	}
@@ -752,7 +754,7 @@ class Trivia extends Module {
 		this.addCorrectAnswer(user);
 		let reward = this.config.answerReward;
 		this.say(`${user.displayName} is correct and wins ${this.pointsString(reward)}! The answer is: ${this.game.currentQuestion.answer}`);
-		this.modifyUserPoints(user, reward);
+		this.modifyUserPoints(user, reward).then().catch();
 		this.endQuestion();
 	}
 	
@@ -796,11 +798,11 @@ class Trivia extends Module {
 			let score = this.round.scores[winners[0].name].score;
 			let winsMessage = (score === 1) ? `one correct answer` : `${score} correct answers`;
 			if (winners.length === 1) {
-				this.modifyUserPoints(winners[0], this.config.victoryReward);
+				this.modifyUserPoints(winners[0], this.config.victoryReward).then().catch();
 				message = `Winner: ${winners[0].displayName} with ${winsMessage}! (+${this.pointsString(this.config.victoryReward)})`;
 			} else {
 				let victoryReward = Math.round(this.config.victoryReward / winners.length);
-				winners.forEach(winner => this.modifyUserPoints(winner, victoryReward));
+				winners.forEach(winner => this.modifyUserPoints(winner, victoryReward).then().catch());
 				message = `Winners: ${Utils.makeEnglishAndList(winners.map(user => user.displayName))} with ${winsMessage} each! (+${this.pointsString(victoryReward)} each)`;
 			}
 		}

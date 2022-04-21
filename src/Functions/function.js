@@ -2,6 +2,7 @@ const assert = require('assert').strict;
 const Utils = requireMain('utils');
 const Parameter = require('./functionParameter');
 const CooldownManager = require('../cooldownManager');
+const SEManager = requireMain('SEManager');
 const Trigger = require('./Triggers/functionTrigger');
 const Response = require('./Responses/functionResponse');
 const Filter = require('./Filters/functionFilter');
@@ -26,6 +27,7 @@ class Function {
 		this.variables = [].concat(settings.variables || []).concat(module.variables || []);
 		this.cooldowns = settings.cooldowns;
 		this.triggers = this._makeTriggers(settings.triggers);
+		this.points = settings.points || [];
 		this.responses = this._makeResponses(settings.responses);
 		this.failResponses = this._makeResponses(settings.failResponses);
 		this.responseDelay = settings.responseDelay || 0;
@@ -48,7 +50,7 @@ class Function {
 		let objects = [];
 		if (objectsData) {
 			objectsData.forEach(objectData => {
-				let object = buildersCollection[objectData.type](objectData);
+				let object = buildersCollection[objectData.type]({ ...objectData, func: this });
 				objects.push(object);
 			});
 		}
@@ -218,7 +220,7 @@ class Function {
 		invocationData.params = [];
 	}
 	
-	invoke(invocationData) {
+	async invoke(invocationData) {
 		if (!this._active ||
 			!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user) ||
 			!this.filter.test(invocationData)) {
@@ -247,17 +249,37 @@ class Function {
 			func: this,
 			user: invocationData.user,
 			variables: invocationData.triggerVariables.concat(this.variables),
+			points: {},
 			params: {
 				in: invocationData.params,
 				trigger: invocationData.triggerParams,
 			},
 		};
 		
+		let sendFunc;
 		if (results === false) {
-			this._sendFailureResponses(context);
+			sendFunc = this._sendFailureResponses;
 		} else {
 			context.params.out = results;
-			this._sendSuccessResponses(context);
+			sendFunc = this._sendSuccessResponses;
+		}
+		
+		if (this.points.length > 0) {
+			let promises = this.points.map(
+				async entry => ({
+					username: entry.username,
+					newPoints: await SEManager.addUserPoints(entry.username, entry.amount)
+				})
+			);
+			
+			let newPointValues = await Promise.all(promises);
+			newPointValues.forEach(resultEntry => {
+				context.points[resultEntry.username] = resultEntry.newPoints;
+			});
+			
+			sendFunc.call(this, context);
+		} else {
+			sendFunc.call(this, context);
 		}
 	}
 }

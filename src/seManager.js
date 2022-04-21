@@ -257,11 +257,8 @@ class SEManager extends EventNotifier {
 	// 
 	// Parameters:
 	// 	username	Twitch username for the user we want to look into.
-	// 	onDone		Will be invoked when the request has finished successfully.
-	// 				Should accept a single argument with the amount of points.
-	// 	onError		Will be invoked if something goes wrong with the request.
-	// 				Should accept a single argument with error details, I think.
-	addUserPoints(username, amount, onDone, onError) {
+	//  amount      Number of points to add.
+	async addUserPoints(username, amount) {
 		if (!this.connected) {
 			onError('Not connected to StreamElements.');
 			return;
@@ -269,21 +266,15 @@ class SEManager extends EventNotifier {
 		
 		let requestURL =
 			`${URL_POINTS}/${this.params.accountID}/${username}/${amount}`;
-		let promise = axios.put(requestURL);
-		if (onDone) {
-			promise = promise.then(response => onDone(response.data.newAmount));
-		}
-		
-		if (onError) {
-			promise = promise.catch(onError);
-		}
+		let response = await axios.put(requestURL);
+		return response.data.newAmount;
 	}
 	
 	// Same as addUserPoints, only subtracts the amount.
 	// If you put a negative number here, it will add points.
 	// Just a negative version of addUserPoints, really.
 	subtractUserPoints(username, amount, onDone, onError) {
-		this.addUserPoints(username, -amount, onDone, onError);
+		return this.addUserPoints(username, -amount, onDone, onError);
 	}
 	
 	// Attempts to deduct the given amount of points from the user, and if
@@ -370,4 +361,8 @@ class SEManager extends EventNotifier {
 	}
 }
 
-module.exports = new SEManager();
+if (global.seManagerInstance === undefined) {
+	global.seManagerInstance = new SEManager();
+}
+
+module.exports = global.seManagerInstance;

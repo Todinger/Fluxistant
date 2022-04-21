@@ -34,8 +34,9 @@ class FunctionEntity extends StaticObjectEntity {
 		this.addDynamicArray('triggers', 'TriggerChoice')
 			.setName('Triggers')
 			.setDescription('Defines when this function will be invoked');
-		// console.log(`Function Self: ${this.dbg} / Triggers: ${this.getChild('triggers').dbg}`);
-		
+		this.addDynamicArray('points', 'PointsEntry')
+			.setName('Points')
+			.setDescription('Add or Remove SE Points of users');
 		this.addDynamicArray('responses', 'ResponseChoice')
 			.setName('Responses')
 			.setDescription('Defines messages that will be sent after the function is done');

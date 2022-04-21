@@ -34,6 +34,7 @@ const entities = {
 	SoundFileEntity: require('./WebEntities/Assets/soundFileEntity.js'),
 	VideoEntity: require('./WebEntities/Assets/videoEntity.js'),
 	FunctionEntity: require('./WebEntities/Functions/functionEntity.js'),
+	PointsEntryEntity: require('./WebEntities/Functions/pointsEntryEntity.js'),
 	FilterChoiceEntity: require('./WebEntities/Functions/Filters/filterChoiceEntity.js'),
 	FilterEntity: require('./WebEntities/Functions/Filters/filterEntity.js'),
 	Filter_IsModEntity: require('./WebEntities/Functions/Filters/filter_IsModEntity.js'),

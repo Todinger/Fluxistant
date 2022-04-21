@@ -724,7 +724,7 @@ class BranchingAdventure extends Module {
 		
 		let points = userAdventure.chapters[chapterName].points;
 		if (points) {
-			this.modifyUserPoints(userAdventure.user, points);
+			this.modifyUserPoints(userAdventure.user, points).then().catch();
 			this.sayPointDiffMessage(points, userAdventure);
 		}
 		

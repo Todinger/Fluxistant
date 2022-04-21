@@ -252,7 +252,7 @@ class TreasureHunt extends Module {
 	}
 	
 	processWin(user) {
-		this.modifyUserPoints(user, this.config.reward);
+		this.modifyUserPoints(user, this.config.reward).then().catch();
 		if (this.config.enableWinChatMessage) {
 			let message = this.config.winChatMessage;
 			message = message.replace(WIN_MESSAGE_USER_PLACEHOLDER, user.displayName);
