@@ -265,16 +265,24 @@ class Function {
 		}
 		
 		if (this.points.length > 0) {
-			let promises = this.points.map(
-				async entry => ({
-					username: entry.username,
-					newPoints: await SEManager.addUserPoints(entry.username, entry.amount)
-				})
-			);
+			let promises = [];
+			for (let entry of this.points) {
+				if (Utils.isNonEmptyString(entry.username)) {
+					let username = entry.username.trim();
+					if (Utils.isNonEmptyString(username)) {
+						promises.push({
+							username: entry.username.trim().toLowerCase(),
+							newPoints: await SEManager.addUserPoints(entry.username, entry.amount)
+						});
+					}
+				}
+			}
 			
 			let newPointValues = await Promise.all(promises);
 			newPointValues.forEach(resultEntry => {
-				context.points[resultEntry.username] = resultEntry.newPoints;
+				if (resultEntry !== null) {
+					context.points[resultEntry.username] = resultEntry.newPoints;
+				}
 			});
 			
 			sendFunc.call(this, context);

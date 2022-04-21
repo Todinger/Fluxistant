@@ -2,6 +2,8 @@ const SearchSegment = require('./searchSegment');
 const FinalSegment = require('./finalSegment');
 const MultiSegment = require('./multiSegment');
 
+REPROCESS_MARK = '$';
+
 class TextSegment extends SearchSegment {
 	constructor(text) {
 		super();
@@ -9,22 +11,10 @@ class TextSegment extends SearchSegment {
 	}
 	
 	process(variable, context) {
+		let reprocess = false;
 		let matches = this.text && this.text.match(variable.expr);
+		let result;
 		if (matches) {
-			// return Utils.regExpGroupReplace(
-			// 	this.expr,
-			// 	message,
-			// 	(matchString, matchData) => {
-			// 		let replacementData = {
-			// 			matchString,
-			// 			matchData,
-			// 			context,
-			// 			message
-			// 		};
-			//
-			// 		return this.getReplacementFor(replacementData);
-			// 	});
-			
 			// If the 'g' flag isn't included, the loop will run forever since the RegExp isn't stateful
 			let regex = variable.expr;
 			if (!regex.flags.includes('g')) {
@@ -35,7 +25,12 @@ class TextSegment extends SearchSegment {
 			let lastStartIndex = 0;
 			let parts = [];
 			while ((match = regex.exec(this.text)) !== null) {
-				parts.push(new TextSegment(this.text.substring(lastStartIndex, match.index)));
+				let prevEndIndex = match.index;
+				if (match.index > 0 && this.text[match.index - 1] === REPROCESS_MARK) {
+					reprocess = true;
+					prevEndIndex--;
+				}
+				parts.push(new TextSegment(this.text.substring(lastStartIndex, prevEndIndex)));
 				parts.push(new FinalSegment(variable.getReplacementFor({
 					matchString: match[0],
 					matchData: match,
@@ -50,10 +45,12 @@ class TextSegment extends SearchSegment {
 				parts.push(new TextSegment(this.text.substring(lastStartIndex)));
 			}
 			
-			return new MultiSegment(parts);
+			result = new MultiSegment(parts);
 		} else {
-			return this;
+			result = this;
 		}
+		
+		return { result, reprocess };
 	}
 	
 	toString() {

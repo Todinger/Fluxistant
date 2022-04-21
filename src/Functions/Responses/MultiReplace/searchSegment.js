@@ -7,10 +7,12 @@ class SearchSegment {
 	// noinspection JSUnusedLocalSymbols
 	process(variable, context) {
 		Errors.abstract();
+		return null;
 	}
 	
 	toString() {
 		Errors.abstract();
+		return "";
 	}
 }
 

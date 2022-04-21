@@ -7,11 +7,14 @@ class MultiSegment extends SearchSegment {
 	}
 	
 	process(variable, context) {
+		let reprocessTotal = false;
 		for (let i = 0; i < this.parts.length; i++) {
-			this.parts[i] = this.parts[i].process(variable, context);
+			let { result, reprocess } = this.parts[i].process(variable, context);
+			this.parts[i] = result;
+			reprocessTotal = reprocessTotal || reprocess;
 		}
 		
-		return this;
+		return { result: this, reprocess: reprocessTotal };
 	}
 	
 	toString() {

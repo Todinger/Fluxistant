@@ -8,7 +8,7 @@ class FinalSegment extends SearchSegment {
 	
 	process(variable, context) {
 		// Do nothing, our result is already final
-		return this;
+		return { result: this, reprocess: false };
 	}
 	
 	toString() {

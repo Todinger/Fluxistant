@@ -52,7 +52,7 @@ const GlobalVars = [
 		replacement: data => {
 			let named = data.matchData[1] != null;
 			let username = data.matchData[2];
-			let points = data.context.points[username];
+			let points = data.context.points[username.toLowerCase()];
 			if (points === undefined) {
 				return '???';
 			}

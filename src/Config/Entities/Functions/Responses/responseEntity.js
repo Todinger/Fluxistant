@@ -9,7 +9,7 @@ class ResponseEntity extends ChoiceValueEntity {
 			.setName('Enabled')
 			.setDescription('Enables/disables this response');
 		this.addString('message')
-			.setDescription('The message that will be sent by this response (variables are available)');
+			.setDescription('The message that will be sent by this response (variables are available - prefix a variable with an extra $ to force another evaluation pass on the message)');
 	}
 	
 	setData(response) {
