@@ -8,6 +8,7 @@ const Response = require('./Responses/functionResponse');
 const Filter = require('./Filters/functionFilter');
 const Builders = require('./builders');
 const GlobalVariables = require('./globalVariables');
+const replaceVariables = require('./Responses/MultiReplace/multiReplaceEngine');
 
 function EMPTY_ACTION() {
 	// Do nothing because that's what we do best
@@ -266,13 +267,15 @@ class Function {
 		
 		if (this.points.length > 0) {
 			let promises = [];
+			let allVars = [...context.variables].concat(GlobalVariables);
 			for (let entry of this.points) {
 				if (Utils.isNonEmptyString(entry.username)) {
 					let username = entry.username.trim();
+					username = replaceVariables(allVars, username, context);
 					if (Utils.isNonEmptyString(username)) {
 						promises.push({
-							username: entry.username.trim().toLowerCase(),
-							newPoints: await SEManager.addUserPoints(entry.username, entry.amount)
+							username: username,
+							newPoints: await SEManager.addUserPoints(username, entry.amount),
 						});
 					}
 				}
@@ -280,9 +283,7 @@ class Function {
 			
 			let newPointValues = await Promise.all(promises);
 			newPointValues.forEach(resultEntry => {
-				if (resultEntry !== null) {
-					context.points[resultEntry.username] = resultEntry.newPoints;
-				}
+				context.points[resultEntry.username] = resultEntry.newPoints;
 			});
 			
 			sendFunc.call(this, context);

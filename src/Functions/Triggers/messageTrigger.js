@@ -87,7 +87,7 @@ class MessageTrigger extends Trigger {
 		new Variable({
 			name: 'Captured Group (`$g0`, `$g1`, `$g2`, `$g3`, ...)',
 			description: 'Returns one of the groups captured when regular expressions are used. Accepts any number as the index.',
-			example: 'For a regex trigger defined as "Hello (.*), (.*)!" with the message "Hello there, neighbor!", the response "$2, you are helloed $1." will produce "neighbor, you are helloed there." $0 always produces the entire captured text.',
+			example: 'For a regex trigger defined as "Hello (.\\*), (.\\*)!" with the message "Hello there, neighbor!", the response "$2, you are helloed $1." will produce "neighbor, you are helloed there." $0 always produces the entire captured text.',
 			condition: 'Can only be used when activated by a chat message, and only if it is marked as a regular expression.',
 			
 			expr: /\$g(\d+)/,
