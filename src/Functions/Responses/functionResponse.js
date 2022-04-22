@@ -30,8 +30,12 @@ class FunctionResponse {
 	
 	send(funcResults) {
 		if (this.enabled) {
-			let response = this._buildResponse(funcResults);
-			this._sendImpl(response);
+			try {
+				let response = this._buildResponse(funcResults);
+				this._sendImpl(response);
+			} catch (err) {
+				console.error(err);
+			}
 		}
 	}
 	
