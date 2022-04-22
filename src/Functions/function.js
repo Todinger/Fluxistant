@@ -270,8 +270,8 @@ class Function {
 			let allVars = [...context.variables].concat(GlobalVariables);
 			for (let entry of this.points) {
 				if (Utils.isNonEmptyString(entry.username)) {
-					let username = entry.username.trim();
-					username = replaceVariables(allVars, username, context);
+					let username = entry.username.toLowerCase().trim();
+					username = replaceVariables(allVars, username, context).toLowerCase().trim();
 					if (Utils.isNonEmptyString(username)) {
 						promises.push({
 							username: username,
