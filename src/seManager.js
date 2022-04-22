@@ -264,10 +264,16 @@ class SEManager extends EventNotifier {
 			return;
 		}
 		
-		let requestURL =
-			`${URL_POINTS}/${this.params.accountID}/${username}/${amount}`;
-		let response = await axios.put(requestURL);
-		return response.data.newAmount;
+		try {
+			let requestURL =
+				`${URL_POINTS}/${this.params.accountID}/${username}/${amount}`;
+			let response = await axios.put(requestURL);
+			return response.data.newAmount;
+		} catch (err) {
+			cli.error(`Failed to add points to user '${username}':`);
+			cli.error(err.toString());
+			return null;
+		}
 	}
 	
 	// Same as addUserPoints, only subtracts the amount.

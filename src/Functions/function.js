@@ -165,10 +165,20 @@ class Function {
 		if (this.responseDelay > 0 && responses.length > 0) {
 			responses[0].send(context);
 			for (let i = 1; i < responses.length; i++) {
-				setTimeout(() => responses[i].send(context), i * this.responseDelay);
+				try {
+					setTimeout(() => responses[i].send(context), i * this.responseDelay);
+				} catch (err) {
+					console.error(err);
+				}
 			}
 		} else {
-			responses.forEach(response => response.send(context));
+			responses.forEach(response => {
+				try {
+					response.send(context);
+				} catch (err) {
+					console.error(err);
+				}
+			});
 		}
 	}
 	
@@ -222,73 +232,81 @@ class Function {
 	}
 	
 	async invoke(invocationData) {
-		if (!this._active ||
-			!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user) ||
-			!this.filter.test(invocationData)) {
+		try {
+			if (!this._active ||
+				!CooldownManager.checkCooldowns(this.cooldownID, invocationData.user) ||
+				!this.filter.test(invocationData)) {
 				return;
-		}
-		
-		CooldownManager.applyCooldowns(this.cooldownID, invocationData.user);
-		
-		invocationData.func = this;
-		this._applyDefaultParamValues(invocationData);
-		this._processLastParam(invocationData);
-		this._cleanPrams(invocationData);
-		invocationData.getParam = (index) => {
-			if (invocationData.params.length > index) {
-				return invocationData.params[index];
-			} else {
-				return undefined;
 			}
-		};
-		
-		invocationData.firstParam = invocationData.getParam(0);
-		
-		let results = this.action(invocationData);
-		
-		let context = {
-			func: this,
-			user: invocationData.user,
-			variables: invocationData.triggerVariables.concat(this.variables),
-			points: {},
-			params: {
-				in: invocationData.params,
-				trigger: invocationData.triggerParams,
-			},
-		};
-		
-		let sendFunc;
-		if (results === false) {
-			sendFunc = this._sendFailureResponses;
-		} else {
-			context.params.out = results;
-			sendFunc = this._sendSuccessResponses;
-		}
-		
-		if (this.points.length > 0) {
-			let promises = [];
-			let allVars = [...context.variables].concat(GlobalVariables);
-			for (let entry of this.points) {
-				if (Utils.isNonEmptyString(entry.username)) {
-					let username = entry.username.toLowerCase().trim();
-					username = replaceVariables(allVars, username, context).toLowerCase().trim();
-					if (Utils.isNonEmptyString(username)) {
-						promises.push({
-							username: username,
-							newPoints: await SEManager.addUserPoints(username, entry.amount),
-						});
+			
+			CooldownManager.applyCooldowns(this.cooldownID, invocationData.user);
+			
+			invocationData.func = this;
+			this._applyDefaultParamValues(invocationData);
+			this._processLastParam(invocationData);
+			this._cleanPrams(invocationData);
+			invocationData.getParam = (index) => {
+				if (invocationData.params.length > index) {
+					return invocationData.params[index];
+				} else {
+					return undefined;
+				}
+			};
+			
+			invocationData.firstParam = invocationData.getParam(0);
+			
+			let results = this.action(invocationData);
+			
+			let context = {
+				func:      this,
+				user:      invocationData.user,
+				variables: invocationData.triggerVariables.concat(this.variables),
+				points:    {},
+				params:    {
+					in:      invocationData.params,
+					trigger: invocationData.triggerParams,
+				},
+			};
+			
+			let sendFunc;
+			if (results === false) {
+				sendFunc = this._sendFailureResponses;
+			} else {
+				context.params.out = results;
+				sendFunc = this._sendSuccessResponses;
+			}
+			
+			if (this.points.length > 0) {
+				let promises = [];
+				let allVars = [...context.variables].concat(GlobalVariables);
+				for (let entry of this.points) {
+					try {
+						if (Utils.isNonEmptyString(entry.username)) {
+							let username = entry.username.toLowerCase().trim();
+							username = replaceVariables(allVars, username, context).toLowerCase().trim();
+							if (Utils.isNonEmptyString(username)) {
+								promises.push({
+									username:  username,
+									newPoints: await SEManager.addUserPoints(username, entry.amount),
+								});
+							}
+						}
+					} catch (err) {
+						console.error(err);
 					}
 				}
+				
+				let newPointValues = await Promise.all(promises);
+				newPointValues.forEach(resultEntry => {
+					context.points[resultEntry.username] = resultEntry.newPoints;
+				});
+				
+				sendFunc.call(this, context);
+			} else {
+				sendFunc.call(this, context);
 			}
-			
-			let newPointValues = await Promise.all(promises);
-			newPointValues.forEach(resultEntry => {
-				context.points[resultEntry.username] = resultEntry.newPoints;
-			});
-			
-			sendFunc.call(this, context);
-		} else {
-			sendFunc.call(this, context);
+		} catch (err) {
+			console.error(err);
 		}
 	}
 }

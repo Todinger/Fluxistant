@@ -23,7 +23,7 @@ const GlobalVars = [
 			if (1 <= num && num <= args.length && args[num - 1] !== undefined) {
 				return args[num - 1];
 			} else {
-				return data.matchString; // Return the expression unchanged
+				throw `Function argument out of range: given ${data.matchData[0]} but the index must be between 1 and ${args.length}.`;
 			}
 		},
 	}),
@@ -53,8 +53,8 @@ const GlobalVars = [
 			let named = data.matchData[1] != null;
 			let username = data.matchData[2];
 			let points = data.context.points[username.toLowerCase()];
-			if (points === undefined) {
-				return '???';
+			if (points === undefined || points === null) {
+				throw `Username without any points set given: ${username}`;
 			}
 			
 			if (named) {
