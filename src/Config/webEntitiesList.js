@@ -86,6 +86,7 @@ const entities = {
 	NaturalNumberEntity: require('./WebEntities/Values/naturalNumberEntity.js'),
 	NonNegativeNumberEntity: require('./WebEntities/Values/nonNegativeNumberEntity.js'),
 	NumberEntity: require('./WebEntities/Values/numberEntity.js'),
+	PercentageNumberEntity: require('./WebEntities/Values/percentageNumberEntity.js'),
 	PositiveNumberEntity: require('./WebEntities/Values/positiveNumberEntity.js'),
 	StringEntity: require('./WebEntities/Values/stringEntity.js'),
 	ValueEntity: require('./WebEntities/Values/valueEntity.js'),

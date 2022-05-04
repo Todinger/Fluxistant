@@ -268,12 +268,23 @@ class Function {
 				},
 			};
 			
-			let sendFunc;
 			if (results === false) {
-				sendFunc = this._sendFailureResponses;
-			} else {
-				context.params.out = results;
+				results = { success: false };
+			} else if (results === null || results === undefined) {
+				results = { success: true };
+			} else if (results.success === undefined) {
+				results = {
+					success: true,
+					variables: results,
+				};
+			}
+			
+			let sendFunc;
+			if (results.success) {
+				context.params.out = results.variables;
 				sendFunc = this._sendSuccessResponses;
+			} else {
+				sendFunc = this._sendFailureResponses;
 			}
 			
 			if (this.points.length > 0) {

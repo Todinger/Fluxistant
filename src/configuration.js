@@ -111,6 +111,10 @@ class Configuration {
 		return this.configRoot.addNonNegativeNumber(key, defaultValue);
 	}
 	
+	addPercentageNumber(key, defaultValue) {
+		return this.configRoot.addPercentageNumber(key, defaultValue);
+	}
+	
 	addDuration(key, defaultValue) {
 		return this.configRoot.addDuration(key, defaultValue);
 	}

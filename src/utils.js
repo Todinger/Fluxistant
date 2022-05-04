@@ -165,7 +165,7 @@ class Utils {
 	
 	// Returns true iff the given value is of the object type.
 	static isObject(val) {
-		return typeof val === 'object' && val !== null;
+		return typeof val === 'object' && val !== null && !Array.isArray(val);
 	}
 	
 	static isNaturalNumberString(str) {
@@ -481,6 +481,10 @@ class Utils {
 	// From MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
 	static escapeRegExp(string) {
 		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+	}
+	
+	static stringReplaceAll(string, find, replace) {
+		return string.replace(new RegExp(Utils.escapeRegExp(find), 'g'), replace);
 	}
 	
 	// Finds all the matches of the given regular expression in the given string, invokes the given
