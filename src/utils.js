@@ -44,6 +44,10 @@ class Utils {
 		});
 	}
 	
+	static filterObject(obj, filter) {
+		return Object.fromEntries(Object.entries(obj).filter(([key, value]) => filter(key, value)));
+	}
+	
 	// Splits two collections into three lists of "things to add," "things
 	// to remove" and "things to keep".
 	// Values that have the same keys in the old and the new are checked for

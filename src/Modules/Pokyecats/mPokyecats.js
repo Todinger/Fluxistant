@@ -1,5 +1,6 @@
 const Module = requireMain('module');
 const Utils = requireMain('utils');
+const CONSTANTS = requireMain('constants');
 
 const PLACEHOLDERS = {
 	USER: '$user',
@@ -8,10 +9,13 @@ const PLACEHOLDERS = {
 	SHINIES: '$shinies',
 };
 
+const SHINY_CATCHERS_MESSAGE_PREFIX = "✨ You gotta be kitten me! Look who caught a rare shiny Yecats! ✨ ";
+
 class Pokyecats extends Module {
 	constructor() {
 		super({
 			name: 'Pokyecats',
+			debug: true,
 		});
 		
 		this.data.catches = {};
@@ -57,6 +61,7 @@ class Pokyecats extends Module {
 		return {
 			catches: 0,
 			shinyCatches: 0,
+			displayName: '',
 		};
 	}
 	
@@ -109,6 +114,7 @@ class Pokyecats extends Module {
 		}
 		
 		this.data.catches[data.user.name] = catchData;
+		this.data.catches[data.user.name].displayName = data.user.displayName;
 		
 		this.saveData();
 		
@@ -124,6 +130,32 @@ class Pokyecats extends Module {
 			success:   true,
 			variables: this.variableValuesFromCatchData(catchData),
 		};
+	}
+	
+	listShinyCatchers(data) {
+		let shinyCatchers = Object.keys(this.data.catches)
+			.filter(name => this.data.catches[name].shinyCatches > 0)
+			.map(name => ({ name: this.data.catches[name].displayName, count: this.data.catches[name].shinyCatches }));
+		if (shinyCatchers.length === 0) {
+			this.tell(data.user, "Aww, nobody has caught a shiny Yecats yet. =(");
+			return;
+		}
+		
+		let message = SHINY_CATCHERS_MESSAGE_PREFIX + `${shinyCatchers[0].name}: ${shinyCatchers[0].count}`;
+		let i = 1;
+		while (i < shinyCatchers.length) {
+			let extendedMessage = `${message}, ${shinyCatchers[i].name}: ${shinyCatchers[i].count}`;
+			if (extendedMessage.length >= CONSTANTS.TWITCH.MAX_MESSAGE_LENGTH) {
+				this.say(message);
+				message = `${shinyCatchers[i].name}: ${shinyCatchers[i].count}`;
+			} else {
+				message = extendedMessage;
+			}
+			
+			i++;
+		}
+		
+		this.say(message);
 	}
 	
 	functions = {
@@ -142,6 +174,17 @@ class Pokyecats extends Module {
 			name: 'Get Catches',
 			description: 'Give a report of the Yecatses caught so far',
 			action: () => this.getCatches(),
+		},
+		
+		listShinyCatchers: {
+			name: 'List Shiny Catchers',
+			description: "Send a list to the chat of everyone who's caught a shiny Yecats",
+			triggers: [
+				this.trigger.command({
+					cmdname: 'shinyecats',
+				}),
+			],
+			action: (data) => this.listShinyCatchers(data),
 		},
 	}
 }
