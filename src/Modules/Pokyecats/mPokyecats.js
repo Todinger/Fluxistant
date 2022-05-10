@@ -15,7 +15,6 @@ class Pokyecats extends Module {
 	constructor() {
 		super({
 			name: 'Pokyecats',
-			debug: true,
 		});
 		
 		this.data.catches = {};
