@@ -75,6 +75,9 @@ class KeyboardManager {
 	// None of the registered keyboard shortcuts will work until this is called.
 	start() {
 		ioHook.start();
+		
+		cli.on('on', () => this.enableAllLogs());
+		cli.on('off', () => this.disableAllLogs());
 	}
 	
 	// Called when a key is held down.
@@ -84,8 +87,7 @@ class KeyboardManager {
 	// 			such (see ioHook documentation for the full details).
 	_onKeyDown(event) {
 		if (this.logAllDown) {
-			cli.log('KeyDown Event:');
-			cli.log(event);
+			cli.log(`KeyDown Event: ${JSON.stringify(event)}`);
 		}
 	}
 	
@@ -96,8 +98,7 @@ class KeyboardManager {
 	// 			such (see ioHook documentation for the full details).
 	_onKeyUp(event) {
 		if (this.logAllUp) {
-			cli.log('KeyUp Event:');
-			cli.log(event);
+			cli.log(`KeyUp Event: ${JSON.stringify(event)}`);
 		}
 	}
 	
@@ -115,6 +116,16 @@ class KeyboardManager {
 	
 	removeKeyUpHandler(handler) {
 		ioHook.removeListener('keyup', handler);
+	}
+	
+	enableAllLogs() {
+		this.logAllDown = true;
+		this.logAllUp = true;
+	}
+	
+	disableAllLogs() {
+		this.logAllDown = false;
+		this.logAllUp = false;
 	}
 }
 
