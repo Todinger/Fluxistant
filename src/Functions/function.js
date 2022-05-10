@@ -254,6 +254,7 @@ class Function {
 			};
 			
 			invocationData.firstParam = invocationData.getParam(0);
+			invocationData.allParams = invocationData.params.join(" ");
 			
 			let results = this.action(invocationData);
 			

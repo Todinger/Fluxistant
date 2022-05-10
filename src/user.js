@@ -7,14 +7,18 @@ class User {
 	constructor(userstate) {
     	this.name			= userstate.username;
     	this.displayName	= userstate['display-name'];
-    	this.isBroadcaster	= userstate.badges &&
-    						  userstate.badges.broadcaster === '1';
+    	this.isBroadcaster	= User.hasBadge(userstate, 'broadcaster');
+    	this.isVIP			= User.hasBadge(userstate, 'vip');
     	this.isMod			= userstate.mod;
     	this.isSub			= userstate.subscriber;
     	this.hasTurbo		= userstate.turbo;
     	this.badges			= userstate.badges;
     	this.color			= userstate.color;
     	this.userstate		= userstate;
+	}
+	
+	static hasBadge(userstate, badge) {
+		return userstate.badges && userstate.badges[badge] === '1';
 	}
 	
 	get isAtLeastMod() {

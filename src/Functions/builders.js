@@ -15,6 +15,8 @@ const FilterBuilder = new Builder({
 	oneOfUsers:		require('./Filters/oneOfUsersFilter'),
 	isMod:			require('./Filters/isModFilter'),
 	isSub:			require('./Filters/isSubFilter'),
+	isVIP:			require('./Filters/isVIPFilter'),
+	isBroadcaster:	require('./Filters/isBroadcasterFilter'),
 	and:			require('./Filters/andFilter'),
 	or:				require('./Filters/orFilter'),
 	not:			require('./Filters/notFilter'),
