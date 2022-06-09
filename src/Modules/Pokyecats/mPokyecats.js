@@ -1,6 +1,5 @@
 const Module = requireMain('module');
 const Utils = requireMain('utils');
-const CONSTANTS = requireMain('constants');
 
 const PLACEHOLDERS = {
 	USER: '$user',
@@ -140,21 +139,13 @@ class Pokyecats extends Module {
 			return;
 		}
 		
-		let message = SHINY_CATCHERS_MESSAGE_PREFIX + `${shinyCatchers[0].name}: ${shinyCatchers[0].count}`;
-		let i = 1;
-		while (i < shinyCatchers.length) {
-			let extendedMessage = `${message}, ${shinyCatchers[i].name}: ${shinyCatchers[i].count}`;
-			if (extendedMessage.length >= CONSTANTS.TWITCH.MAX_MESSAGE_LENGTH) {
-				this.say(message);
-				message = `${shinyCatchers[i].name}: ${shinyCatchers[i].count}`;
-			} else {
-				message = extendedMessage;
-			}
-			
-			i++;
-		}
+		let parts = Utils.splitIntoTwitchMessages(
+			SHINY_CATCHERS_MESSAGE_PREFIX,
+			Utils.arrayMapGenerator(
+				shinyCatchers,
+				(i) => `${shinyCatchers[i].name}: ${shinyCatchers[i].count}`));
 		
-		this.say(message);
+		parts.forEach(part => this.say(part));
 	}
 	
 	functions = {

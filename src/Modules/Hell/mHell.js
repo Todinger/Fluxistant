@@ -56,10 +56,20 @@ class Hell extends Module {
 		return Object.keys(this.data.souls).length;
 	}
 	
+	makeSoulReport() {
+		return Utils.splitIntoTwitchMessages(
+			`${this.getSoulCount()} souls have been sold so far by: `,
+			Utils.arrayMapGenerator(Object.values(this.data.souls)));
+	}
+	
 	soulReport() {
-		let victims = Utils.makeEnglishAndList(Object.values(this.data.souls));
-		let report = `${this.getSoulCount()} souls have been sold so far by: ${victims}`;
-		this.print(report);
+		let soulReportParts = this.makeSoulReport();
+		soulReportParts.forEach(part => this.print(part));
+	}
+	
+	soulChatReport() {
+		let soulReportParts = this.makeSoulReport();
+		soulReportParts.forEach(this.say);
 	}
 	
 	resetSouls() {
@@ -86,16 +96,19 @@ class Hell extends Module {
 
 		soulReport: {
 			name: 'Soul Report',
-			description: "Give a report of the souls acquired so far",
+			description: "Print a report of the souls acquired so far to the console",
+			action: () => this.soulReport(),
+		},
+		
+		soulChatReport: {
+			name: 'Soul Chat Report',
+			description: "Give a report of the souls acquired so far to the chat",
 			triggers: [
 				this.trigger.command({
-					cmdname: 'soulreport',
+					cmdname: 'souls',
 				}),
 			],
-			filters: [
-				this.filter.isMod(),
-			],
-			action: () => this.soulReport(),
+			action: () => this.soulChatReport(),
 		},
 		
 		resetSouls: {

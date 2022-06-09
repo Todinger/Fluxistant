@@ -3,6 +3,7 @@ const fsPromise = require('fs/promises');
 const path = require('path');
 const assert = require('assert').strict;
 const _ = require('lodash');
+const CONSTANTS = requireMain('constants');
 
 // A general-purpose "static" class with various paraphernalia functions useful
 // for all sorts of things.
@@ -407,6 +408,44 @@ class Utils {
 		
 		// Split by the spaces that we just inserted
 		return text.split(' ');
+	}
+	
+	static arrayMapGenerator(array, mapFunc = undefined) {
+		mapFunc = mapFunc || ((i) => array[i]);
+		let i = 0;
+		return () => {
+			let retVal = null;
+			if (i < array.length) {
+				retVal = mapFunc(i);
+			}
+			i++;
+			return retVal;
+		}
+	}
+	
+	static splitIntoTwitchMessages(prefix, generator) {
+		let first = generator();
+		if (!first) {
+			return [];
+		}
+		
+		let message = prefix + first;
+		let parts = [];
+		let next = generator();
+		while (next) {
+			let extendedMessage = `${message}, ${next}`;
+			if (extendedMessage.length >= CONSTANTS.TWITCH.MAX_MESSAGE_LENGTH) {
+				parts.push(message);
+				message = next;
+			} else {
+				message = extendedMessage;
+			}
+			
+			next = generator();
+		}
+		
+		parts.push(message);
+		return parts;
 	}
 	
 	// Returns true iff every key in sub is also a key in obj
