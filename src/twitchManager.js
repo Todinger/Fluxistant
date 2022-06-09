@@ -129,22 +129,26 @@ class TwitchManager extends EventNotifier {
 			return;
 		}
 		
-		// Disconnect if necessary
-		if (this.client) {
-			this.client.disconnect();
-			this.client = null;
-		}
-		if (this.streamerClient) {
-			this.streamerClient.disconnect();
-			this.streamerClient = null;
-		}
-		
 		this.params = {
 			channel: params.channel.toLowerCase(),
 			botname: params.botname.toLowerCase(),
 			oAuth: params.oAuth,
 			oAuthStreamer: params.oAuthStreamer,
 		};
+		
+		this.connectBot();
+		this.connectStreamer();
+		
+		// Register to all the tmi.js and SE events that we want to know about
+		this._registerToTwitchEvents();
+	}
+	
+	connectBot() {
+		// Disconnect if necessary
+		if (this.client) {
+			this.client.disconnect();
+			this.client = null;
+		}
 		
 		this.client = new tmi.Client({
 			// Turn on if you want to see channel messages and debug info
@@ -161,15 +165,24 @@ class TwitchManager extends EventNotifier {
 		});
 		
 		// Connect to Twitch via tmi.js
-		cli.log(`[Twitch] Connecting to channel: ${this.params.channel}`);
+		cli.log(`[Twitch] Connecting bot account to channel: ${this.params.channel}`);
 		this.client.connect()
 		.catch(err => {
-			cli.error(`[Twitch] Connection failed: ${err}`);
+			cli.error(`[Twitch] Bot account connection failed: ${err}`);
 			// this.params = null;
 			this.client = null;
 		});
+	}
+	
+	connectStreamer() {
+		// Disconnect if necessary
+		if (this.streamerClient) {
+			this.streamerClient.disconnect();
+			this.streamerClient = null;
+		}
 		
 		if (Utils.isNonEmptyString(this.params.oAuthStreamer)) {
+			cli.log(`[Twitch] Connecting streamer account to channel: ${this.params.channel}`);
 			this.streamerClient = new tmi.Client({
 				// Turn on if you want to see channel messages and debug info
 				// options: { debug: true },
@@ -186,34 +199,43 @@ class TwitchManager extends EventNotifier {
 			
 			this.streamerClient.connect()
 			.catch(err => {
-				cli.error(`[Twitch] Streamer connection failed: ${err}`);
+				cli.error(`[Twitch] Streamer account connection failed: ${err}`);
 				this.streamerClient = null;
 			});
 		}
-		
-		// Register to all the tmi.js and SE events that we want to know about
-		this._registerToTwitchEvents();
 	}
 	
-	disconnect() {
-		let disconnectionPerformed = false;
-		let channel = this.params.channel;
-		
+	disconnectBot() {
 		if (this.client) {
 			this.client.disconnect();
 			this.client = null;
-			disconnectionPerformed = true;
+			cli.log(`[Twitch] Disconnected bot account from channel: ${this.params.channel}`);
 		}
+	}
+	
+	disconnectStreamer() {
 		if (this.streamerClient) {
 			this.streamerClient.disconnect();
 			this.streamerClient = null;
-			disconnectionPerformed = true;
+			cli.log(`[Twitch] Disconnected bot account from channel: ${this.params.channel}`);
 		}
-		
+	}
+	
+	disconnect() {
+		this.disconnectBot();
+		this.disconnectStreamer();
 		this.params = null;
-		if (disconnectionPerformed) {
-			cli.log(`[Twitch] Disconnected from channel: ${channel}`);
-		}
+	}
+	
+	reconnect() {
+		let params = this.params;
+		this.disconnect();
+		this.connect(params);
+	}
+	
+	reconnectStreamer() {
+		this.disconnectStreamer();
+		this.connectStreamer();
 	}
 	
 	// Returns true iff we're currently connected to Twitch

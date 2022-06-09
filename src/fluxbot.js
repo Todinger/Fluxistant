@@ -131,6 +131,15 @@ class FluxBot {
 			],
 			() => this.configManager.loadAll()
 		);
+		
+		// Numpad- = Reconnect streamer account to Twitch
+		this.keyboardManager.registerShortcut(
+			'TwitchManager:ReconnectStreamer',
+			[
+				KEYCODES.VC_KP_SUBTRACT,
+			],
+			() => this.twitchManager.reconnectStreamer()
+		);
 	}
 	
 	// Load channel rewards
