@@ -260,7 +260,7 @@ class SEManager extends EventNotifier {
 	//  amount      Number of points to add.
 	async addUserPoints(username, amount) {
 		if (!this.connected) {
-			onError('Not connected to StreamElements.');
+			cli.error('Not connected to StreamElements.');
 			return;
 		}
 		
