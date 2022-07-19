@@ -110,6 +110,8 @@ const entities = {
 	ObsFunctionDetails_SetSourceVisibilityEntity: require('./WebEntities/obsFunctionDetails_SetSourceVisibilityEntity.js'),
 	ObsFunctionDetails_SwitchToPreviousSceneEntity: require('./WebEntities/obsFunctionDetails_SwitchToPreviousSceneEntity.js'),
 	ObsFunctionEntity: require('./WebEntities/obsFunctionEntity.js'),
+	BallConfigEntity: require('./WebEntities/ballConfigEntity.js'),
+	SingleMediaEntity: require('./WebEntities/singleMediaEntity.js'),
 	NumberChoiceEntity: require('./WebEntities/numberChoiceEntity.js'),
 	TextChoiceEntity: require('./WebEntities/textChoiceEntity.js'),
 	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),

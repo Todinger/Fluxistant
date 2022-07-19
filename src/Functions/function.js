@@ -10,7 +10,7 @@ const Builders = require('./builders');
 const GlobalVariables = require('./globalVariables');
 const replaceVariables = require('./Responses/MultiReplace/multiReplaceEngine');
 
-function EMPTY_ACTION() {
+function EMPTY_FUNCTION() {
 	// Do nothing because that's what we do best
 }
 
@@ -23,7 +23,7 @@ class Function {
 		this.enabled = settings.enabled !== false;
 		this.description = settings.description || '';
 		this.parameters = this._makeParameters(settings.parameters);
-		this.action = settings.action || EMPTY_ACTION;
+		this.action = settings.action || EMPTY_FUNCTION;
 		this.filter = this._makeFilter(settings.filters);
 		this.variables = [].concat(settings.variables || []).concat(module.variables || []);
 		this.cooldowns = settings.cooldowns;
@@ -281,11 +281,13 @@ class Function {
 			}
 			
 			let sendFunc;
-			if (results.success) {
+			if (results.success === true) {
 				context.params.out = results.variables;
 				sendFunc = this._sendSuccessResponses;
-			} else {
+			} else if (results.success === false) {
 				sendFunc = this._sendFailureResponses;
+			} else {
+				sendFunc = EMPTY_FUNCTION;
 			}
 			
 			if (this.points.length > 0) {

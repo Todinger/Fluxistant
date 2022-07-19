@@ -8,17 +8,38 @@ const PLACEHOLDERS = {
 	SHINIES: '$shinies',
 };
 
+const BALLS = {
+	NORMAL: 'normal',
+	YARN: 'yarnball',
+	GOLD: 'goldball',
+	RAINBOW: 'prettyball',
+}
+
+const NORMAL_BALL = {
+	name: BALLS.NORMAL,
+	catchMultiplier: 1,
+	shinyMultiplier: 1,
+}
+
 const SHINY_CATCHERS_MESSAGE_PREFIX = "✨ You gotta be kitten me! Look who caught a rare shiny Yecats! ✨ ";
 
 class Pokyecats extends Module {
 	constructor() {
 		super({
 			name: 'Pokyecats',
+			tags: ['imgdisp'],
+			description: 'Yecats! Yecats! Iioooooioooioiiiooo...',
 		});
 		
 		this.data.catches = {};
 		this.catchChance = 0;
 		this.shinyChance = 0;
+	}
+	
+	defineModAssets(modData) {
+		modData.addNamedCollection('Images');
+		modData.addNamedCollection('Sounds');
+		modData.addNamedCollection('Videos');
 	}
 	
 	defineModConfig(modConfig) {
@@ -48,6 +69,76 @@ class Pokyecats extends Module {
 			.setName('Catch Message: Shiny')
 			.setDescription('Message to send when a *shiny* Yecats is caught ' +
 							'($user = user name, $caught = total, $normals = normal catches, $shinies = shiny catches)');
+		
+		let mediaConfig = modConfig.addGroup('media')
+			.setName('Media Files')
+			.setDescription('The images, sounds and videos to show for the various Yecats types');
+		mediaConfig.add('regular', 'SingleMedia')
+			.setName('Pokyecats')
+			.setDescription('Media for the regular Pokyecats form');
+		mediaConfig.add('shiny', 'SingleMedia')
+			.setName('Shiny Pokyecats')
+			.setDescription('Media for the shiny Pokyecats form');
+		mediaConfig.add('legendary', 'SingleMedia')
+			.setName('Legendary Pokyecats')
+			.setDescription('Media for the legendary Pokyecats form');
+		
+		let ballConfig = modConfig.addGroup('ballConfig')
+			.setName('Ball Settings')
+			.setDescription('Yarn ball-related settings');
+		ballConfig.add(BALLS.YARN, 'BallConfig')
+			.setName('Yarn Ball')
+			.setDescription('Settings for the standard Yarn Ball');
+		ballConfig.add(BALLS.GOLD, 'BallConfig')
+			.setName('Golden Yarn Ball')
+			.setDescription('Settings for the Golden Yarn Ball');
+		ballConfig.add(BALLS.RAINBOW, 'BallConfig')
+			.setName('Rainbow Yarn Ball')
+			.setDescription('Settings for the Rainbow Yarn Ball');
+	}
+	
+	_sendToDisplay(mediaDesc) {
+		let imageConf = mediaDesc.image;
+		let soundConf = mediaDesc.sound;
+		let videoConf = mediaDesc.video;
+		let imageFileConf = imageConf.file;
+		let soundFileConf = soundConf.file;
+		let videoFileConf = videoConf.file;
+		let hasImage = this.assets.Images.hasKey(imageFileConf.fileKey);
+		let hasSound = this.assets.Sounds.hasKey(soundFileConf.fileKey);
+		let hasVideo = this.assets.Videos.hasKey(videoFileConf.fileKey);
+		
+		let imagePromise = hasImage ?
+		                   this.assets.getFileWeb(imageFileConf) :
+		                   Promise.resolve();
+		
+		let soundPromise = hasSound ?
+		                   this.assets.getFileWeb(soundFileConf) :
+		                   Promise.resolve();
+		
+		let videoPromise = hasVideo ?
+		                   this.assets.getFileWeb(videoFileConf) :
+		                   Promise.resolve();
+		
+		if (hasImage || hasSound || hasVideo) {
+			Promise.all([imagePromise, soundPromise, videoPromise])
+			.then(([imageFile, soundFile, videoFile]) => {
+				let parameters = {};
+				if (hasImage) {
+					parameters.image = imageConf.makeDisplayData(imageFile);
+				}
+				
+				if (hasSound) {
+					parameters.sound = soundConf.makeDisplayData(soundFile);
+				}
+				
+				if (hasVideo) {
+					parameters.video = videoConf.makeDisplayData(videoFile);
+				}
+				
+				this.broadcastEvent('showImage', parameters);
+			});
+		}
 	}
 	
 	loadModConfig(conf) {
@@ -55,11 +146,28 @@ class Pokyecats extends Module {
 		this.shinyChance = conf.shinyChance / 100;
 	}
 	
+	persistentDataLoaded() {
+		Object.keys(this.data.catches).forEach(user => {
+			if (this.data.catches[user].balls === undefined) {
+				this.data.catches[user].balls = this.newBallData();
+			}
+		});
+	}
+	
+	newBallData() {
+		return {
+			[BALLS.YARN]: 0,
+			[BALLS.GOLD]: 0,
+			[BALLS.RAINBOW]: 0,
+		};
+	}
+	
 	newCatchData() {
 		return {
 			catches: 0,
 			shinyCatches: 0,
 			displayName: '',
+			balls: this.newBallData(),
 		};
 	}
 	
@@ -83,16 +191,68 @@ class Pokyecats extends Module {
 		this.tell(user, message);
 	}
 	
+	tryGetBall(name) {
+		if (!name) {
+			return null;
+		}
+		
+		name = name.toLowerCase();
+		return Object.values(BALLS).includes(name) ? name : null;
+	}
+	
+	consumeUserBall(catchData, ballName) {
+		if (ballName === BALLS.NORMAL) {
+			return true;
+		}
+		
+		if (catchData.balls[ballName] === 0) {
+			return false;
+		}
+		
+		catchData.balls[ballName]--;
+		
+		return true;
+	}
+	
+	getBall(data) {
+		let ballName = this.tryGetBall(data.firstParam) ||
+			this.tryGetBall(Utils.stringReplaceAll(data.allParams, ' ', '')) ||
+			BALLS.NORMAL;
+		if (ballName === BALLS.NORMAL) {
+			return NORMAL_BALL;
+		}
+		
+		let config = this.config.ballConfig[ballName];
+		
+		return {
+			name: ballName,
+			catchMultiplier: config.catchMultiplier,
+			shinyMultiplier: config.shinyMultiplier,
+		};
+	}
+	
 	tryCatch(data) {
 		let catchData = this.getUserCatchData(data.user);
 		
+		let ball = this.getBall(data);
+		if (!this.consumeUserBall(catchData, ball.name)) {
+			this.tellError(data.user, "Sorry, you don't own that ball.")
+			
+			return {
+				success:   null, // Means not to send any responses at all
+			};
+		}
+		
 		// Caught only if the result is < catch chance
-		if (Math.random() >= this.catchChance) {
+		let catchChance = this.catchChance * ball.catchMultiplier;
+		if (Math.random() >= catchChance) {
 			if (catchData.shinyCatches > 0) {
 				this.tellMessage(data.user, this.config.missMessageWithShinies, catchData);
 			} else {
 				this.tellMessage(data.user, this.config.missMessage, catchData);
 			}
+			
+			this._sendToDisplay(this.config.media.regular);
 			
 			return {
 				success:   false,
@@ -102,7 +262,9 @@ class Pokyecats extends Module {
 		
 		catchData.catches++;
 		
-		if (Math.random() < this.shinyChance) {
+		let shinyChance = this.shinyChance * ball.shinyMultiplier;
+		let shiny = Math.random() < shinyChance;
+		if (shiny) {
 			catchData.shinyCatches++;
 			this.tellMessage(data.user, this.config.shinyCatchMessage, catchData);
 		} else if (catchData.shinyCatches > 0) {
@@ -110,6 +272,8 @@ class Pokyecats extends Module {
 		} else {
 			this.tellMessage(data.user, this.config.normalCatchMessage, catchData);
 		}
+		
+		this._sendToDisplay(shiny ? this.config.media.shiny : this.config.media.regular);
 		
 		this.data.catches[data.user.name] = catchData;
 		this.data.catches[data.user.name].displayName = data.user.displayName;
