@@ -70,7 +70,6 @@ export default class DynamicArrayGui extends EntityGui {
 			newElementRow);
 		
 		this._changed();
-		this._updateStatusIndicators(newElementRow.guiData.marker);
 		newElementGui.activateChangedIndicators();
 		this._notify('elementAdded', newElementGui);
 	}
@@ -99,7 +98,6 @@ export default class DynamicArrayGui extends EntityGui {
 		
 		context.elementRow = elementRow;
 		elementGui.onChangedOrError(() => {
-			elementGui._updateStatusIndicators(elementRow.guiData.marker);
 			this._changed();
 		});
 		
@@ -144,7 +142,6 @@ export default class DynamicArrayGui extends EntityGui {
 	finalizeChanges() {
 		super.finalizeChanges();
 		for (let i = 0; i < this.entity.length; i++) {
-			EntityGui.clearChangeIndicator(this.elementRows[i].guiData.marker);
 			this.elementGUIs[i].finalizeChanges();
 		}
 		

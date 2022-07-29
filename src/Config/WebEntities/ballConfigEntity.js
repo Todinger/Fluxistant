@@ -7,10 +7,10 @@ class BallConfigEntity extends StaticObjectEntity {
 	constructor() {
 		super();
 		
-		this.addNonNegativeNumber('catchMultiplier', 2)
+		this.addNonNegativeNumber('catchMultiplier', 1)
 			.setName('Catch Multiplier')
 			.setDescription('Catch chances are multiplied by this amount when this ball is used');
-		this.addNonNegativeNumber('shinyMultiplier', 2)
+		this.addNonNegativeNumber('shinyMultiplier', 1)
 			.setName('Shiny Multiplier')
 			.setDescription('Shiny chances are multiplied by this amount when this ball is used');
 	}

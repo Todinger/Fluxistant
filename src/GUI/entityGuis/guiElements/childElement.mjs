@@ -3,11 +3,8 @@ import GuiElement from './guiElement.mjs';
 export default class ChildElement extends GuiElement {
 	build(data) {
 		let outerContainer = $(`<div class="uk-child-width-expand uk-child uk-grid uk-grid-small uk-margin-small-top uk-flex-nowrap"></div>`);
-		let marker = $(`<span class="uk-width-auto uk-preserve-width uk-margin-auto-top uk-margin-auto-bottom uk-margin-remove-right" uk-icon="icon: triangle-right"></span>`);
 		let innerContainer = $(`<div></div>`);
 		let separatorHTML = `<span class="uk-width-auto"></span>`;
-		
-		outerContainer.append(marker);
 		
 		if (data.pre) {
 			outerContainer.append(data.pre);
@@ -31,7 +28,6 @@ export default class ChildElement extends GuiElement {
 		}
 		
 		outerContainer.guiData = {
-			marker,
 			innerContainer,
 			pre: data.pre,
 			contents: data.contents,

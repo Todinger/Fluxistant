@@ -8,6 +8,7 @@ import IntegerGui					from "./integerGui.mjs";
 import NaturalNumberGui				from "./naturalNumberGui.mjs";
 import NonNegativeNumberGui			from "./nonNegativeNumberGui.mjs";
 import PercentageNumberGui			from "./percentageNumberGui.mjs";
+import DegreesGui					from "./degreesGui.mjs";
 import StringGui					from "./stringGui.mjs";
 import HiddenStringGui				from "./hiddenStringGui.mjs";
 import FixedArrayGui				from "./fixedArrayGui.mjs";
@@ -41,6 +42,7 @@ export default {
 	NaturalNumberGui,
 	NonNegativeNumberGui,
 	PercentageNumberGui,
+	DegreesGui,
 	StringGui,
 	HiddenStringGui,
 	FixedArrayGui,

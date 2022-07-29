@@ -49,10 +49,6 @@ export default class ObjectGui extends EntityGui {
 			childEntry.addClass('advanced');
 		}
 		
-		childGui.onChangedOrError(() => {
-			childGui._updateStatusIndicators(childEntry.guiData.marker);
-		});
-		
 		return childEntry;
 	}
 	
@@ -123,7 +119,6 @@ export default class ObjectGui extends EntityGui {
 	}
 	
 	_clearChildChangeIndicators(childKey) {
-		EntityGui.clearChangeIndicator(this.childrenEntries[childKey].guiData.marker);
 		if (!this.childrenGUIs[childKey].isContainer) {
 			EntityGui.clearChangeIndicator(
 				this.childrenEntries[childKey].guiData.contents.guiData.label);

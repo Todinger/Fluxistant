@@ -115,6 +115,10 @@ class Configuration {
 		return this.configRoot.addPercentageNumber(key, defaultValue);
 	}
 	
+	addDegrees(key, defaultValue) {
+		return this.configRoot.addDegrees(key, defaultValue);
+	}
+	
 	addDuration(key, defaultValue) {
 		return this.configRoot.addDuration(key, defaultValue);
 	}

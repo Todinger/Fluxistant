@@ -24,7 +24,6 @@ export default class FixedArrayGui extends EntityGui {
 	
 	_onElementChanged(index) {
 		this._changed();
-		this.elementGUIs[index]._updateStatusIndicators(this.elementRows[index].guiData.marker);
 	}
 	
 	_buildElementGUIs() {
@@ -65,7 +64,6 @@ export default class FixedArrayGui extends EntityGui {
 	finalizeChanges() {
 		super.finalizeChanges();
 		for (let i = 0; i < this.entity.length; i++) {
-			EntityGui.clearChangeIndicator(this.elementRows[i].guiData.marker);
 			this.elementGUIs[i].finalizeChanges();
 		}
 		

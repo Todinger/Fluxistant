@@ -102,6 +102,10 @@ class ObjectEntity extends ConfigEntity {
 		return this.add(key, 'PercentageNumber', defaultValue);
 	}
 	
+	addDegrees(key, defaultValue) {
+		return this.add(key, 'Degrees', defaultValue);
+	}
+	
 	addDuration(key, defaultValue) {
 		return this.add(key, 'Duration', defaultValue);
 	}
