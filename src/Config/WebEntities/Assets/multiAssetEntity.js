@@ -37,9 +37,10 @@ class MultiAssetEntity extends AssetEntity {
 		return fittingElements.length > 0 ? fittingElements[0] : undefined;
 	}
 	
-	createAndAddFile(fileKey) {
+	createAndAddFile(fileKey, fileName) {
 		let newFile = this.getFiles().createAndAddElement();
 		newFile.setFileKey(fileKey);
+		newFile.setFileName(fileName);
 		return newFile;
 	}
 	

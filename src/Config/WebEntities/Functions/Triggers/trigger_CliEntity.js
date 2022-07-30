@@ -1,5 +1,4 @@
 const TriggerEntity = require('./triggerEntity');
-const EntityFactory = require('../../../entityFactory');
 
 class Trigger_CliEntity extends TriggerEntity {
 	static get TYPE()		{ return 'Trigger_Cli'; 					}

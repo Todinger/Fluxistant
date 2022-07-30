@@ -26,6 +26,10 @@ class AssetFileEntity extends StaticObjectEntity {
 		return this.getChild('fileKey').setValue(fileKey);
 	}
 	
+	setFileName(fileName) {
+		// Not used normally (created to "let the object know" what the name is if it needs it)
+	}
+	
 	isSet() {
 		return !!this.getFileKey();
 	}

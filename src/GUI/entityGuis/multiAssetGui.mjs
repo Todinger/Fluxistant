@@ -182,7 +182,7 @@ export default class MultiAssetGui extends AssetGui {
 		
 		let newEntity;
 		if (newFile) {
-			newEntity = this.entity.createAndAddFile(file.fileKey);
+			newEntity = this.entity.createAndAddFile(file.fileKey, file.name);
 		} else {
 			newEntity = this.entity.getFileElementByKey(file.fileKey);
 			// Ignore images that aren't part of the configuration

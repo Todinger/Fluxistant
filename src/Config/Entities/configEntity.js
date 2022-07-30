@@ -153,6 +153,7 @@ class ConfigEntity extends MiniEventNotifier {
 	// configuration during runtime).
 	toConf() {
 		Errors.abstract();
+		return null;
 	}
 	
 	_assignableFrom(type) {

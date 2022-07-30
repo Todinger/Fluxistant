@@ -566,6 +566,19 @@ class Utils {
 		return _.assign(_.cloneDeep(obj), extras);
 	}
 	
+	// Based on:
+	// https://stackoverflow.com/a/70789108
+	static getPromiseFromEvent(item, event) {
+		return new Promise((resolve) => {
+			const listener = () => {
+				item.removeCallback(event, listener);
+				resolve();
+			}
+			item.on(event, listener);
+		})
+	}
+	
+	
 	
 	// Checks for equality between two values.
 	// Only supports basic value types.

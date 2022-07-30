@@ -256,7 +256,7 @@ class Function {
 			invocationData.firstParam = invocationData.getParam(0);
 			invocationData.allParams = invocationData.params.join(" ");
 			
-			let results = this.action(invocationData);
+			let results = await this.action(invocationData);
 			
 			let context = {
 				func:      this,
@@ -281,8 +281,8 @@ class Function {
 			}
 			
 			let sendFunc;
+			context.params.out = results.variables;
 			if (results.success === true) {
-				context.params.out = results.variables;
 				sendFunc = this._sendSuccessResponses;
 			} else if (results.success === false) {
 				sendFunc = this._sendFailureResponses;
