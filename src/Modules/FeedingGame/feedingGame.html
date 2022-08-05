@@ -55,8 +55,18 @@
 			z-index: 2;
 		}
 		
-		.fixed {
+		.food {
 			max-width: 20%;
+			position: absolute;
+		}
+		
+		.food-path {
+			max-width: 50%;
+			position: absolute;
+			left: 45%;
+			z-index: -3;
+			padding: 2%;
+			/*visibility: hidden;*/
 		}
 	</style>
 </head>
@@ -71,10 +81,16 @@
 		<img class="back-image" id="backOpen" src="" alt="OH NO, WHERE IS THE CAT?!">
 		<img class="front-image" id="frontOpen" src="" alt="OH NO, WHERE IS THE CAT?!">
 	</div>
-	<img class="mid-image center fixed" id="food" src="" alt="OH NO, WHERE IS THE FOOOOOOOOD?!">
+	<img class="mid-image center food" id="food" src="" alt="OH NO, WHERE IS THE FOOOOOOOOD?!">
+	
+<!--	<svg id="demo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 786 400">-->
+<!--		<path id="motionPath" d="M165.36,297.42s127.17,2.86,146-59c21-69,71-104,165-63s165,80,202,9,93-158,93-158" fill="none" stroke="#5dba47" stroke-miterlimit="10" stroke-width="4"/>-->
+<!--	</svg>-->
+	<object class="food-path" id='foodPath' data="FoodPath.svg" type="image/svg+xml"></object>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="/common/pathAnimator.js"></script>
 <script type="module" src="/common/moduleClient.mjs"></script>
 <script type="module" src="feedingGame.mjs"></script>
 </body>
