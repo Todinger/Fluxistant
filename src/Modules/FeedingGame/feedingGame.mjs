@@ -35,8 +35,14 @@ class FeedingGameClient extends ModuleClient {
 		};
 		
 		this.forms = {
-			open: $('#open'),
-			closed: $('#closed'),
+			open: {
+				back: $('#backOpen'),
+				front: $('#frontOpen'),
+			},
+			closed: {
+				back: $('#backClosed'),
+				front: $('#frontClosed'),
+			}
 		};
 		
 		this.foodImage = $('#food');
@@ -73,13 +79,17 @@ class FeedingGameClient extends ModuleClient {
 	
 	
 	open() {
-		this.forms.open.show();
-		this.forms.closed.hide();
+		this.forms.open.back.show();
+		this.forms.open.front.show();
+		this.forms.closed.back.hide();
+		this.forms.closed.front.hide();
 	}
 	
 	close() {
-		this.forms.closed.show();
-		this.forms.open.hide();
+		this.forms.closed.back.show();
+		this.forms.closed.front.show();
+		this.forms.open.back.hide();
+		this.forms.open.front.hide();
 	}
 	
 	setLevelImage(data, name) {

@@ -15,6 +15,7 @@
 			height: 100%;
 			margin: 0;
 			padding: 0;
+			overflow: hidden;
 		}
 		
 		.main {
@@ -73,20 +74,14 @@
 
 <body>
 <div id="all" class="main">
-	<div class="center sq" id="closed">
-		<img class="back-image" id="backClosed" src="" alt="OH NO, WHERE IS THE CAT?!">
-		<img class="front-image" id="frontClosed" src="" alt="OH NO, WHERE IS THE CAT?!">
-	</div>
-	<div class="center sq" id="open">
-		<img class="back-image" id="backOpen" src="" alt="OH NO, WHERE IS THE CAT?!">
-		<img class="front-image" id="frontOpen" src="" alt="OH NO, WHERE IS THE CAT?!">
-	</div>
-	<img class="mid-image center food" id="food" src="" alt="OH NO, WHERE IS THE FOOOOOOOOD?!">
+	<img class="back-image center sq" id="backClosed" src="" alt="OH NO, WHERE IS THE CAT?!">
+	<img class="front-image center sq" id="frontClosed" src="" alt="OH NO, WHERE IS THE CAT?!">
 	
-<!--	<svg id="demo" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 786 400">-->
-<!--		<path id="motionPath" d="M165.36,297.42s127.17,2.86,146-59c21-69,71-104,165-63s165,80,202,9,93-158,93-158" fill="none" stroke="#5dba47" stroke-miterlimit="10" stroke-width="4"/>-->
-<!--	</svg>-->
+	<img class="mid-image center food" id="food" src="" alt="OH NO, WHERE IS THE FOOOOOOOOD?!">
 	<object class="food-path" id='foodPath' data="FoodPath.svg" type="image/svg+xml"></object>
+	
+	<img class="back-image center sq" id="backOpen" src="" alt="OH NO, WHERE IS THE CAT?!">
+	<img class="front-image center sq" id="frontOpen" src="" alt="OH NO, WHERE IS THE CAT?!">
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
