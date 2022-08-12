@@ -1,7 +1,11 @@
 import { ModuleClient } from "/common/moduleClient.mjs";
+import AnimationTimer from "/common/animationTimer.mjs";
+import { clamp } from "/common/clientUtils.mjs";
 
 const TRANSPARENT_PIXEL_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const NO_IMAGE = TRANSPARENT_PIXEL_IMAGE;
+
+const ROTATIONS = 2;
 
 // This takes an asymmetric function f (one for which f(-x) = -f(x) for all x)
 // and creates an easing function g from it with the following properties:
@@ -21,6 +25,44 @@ function asymmetricFunctionToEasing(f) {
 // errors when calculating for some values.
 function transformTangent(outerCoefficient = 1, exponent = 1, innerCoefficient = 1) {
 	return x => outerCoefficient * Math.pow(Math.tan(innerCoefficient * x), exponent);
+}
+
+
+function linearShift(fromMin, fromMax, toMin, toMax, value) {
+	return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
+}
+
+function normalizedToActual(point) {
+	const width = $(window).width();
+	const height = $(window).height();
+	return {
+		x: linearShift(-1, 1, 0, width, point.x),
+		y: linearShift(1, -1, 0, height, point.y),
+	}
+}
+
+
+
+const ANIMATION_PARAMS = {
+	DURATION: 1,
+	FPS: 60,
+	EASING: asymmetricFunctionToEasing(transformTangent(1, 1, 2.2)),
+	ELLIPSE: {
+		HALF_WIDTH: 1 / 2,
+		HALF_HEIGHT: 2.8 / 2,
+		CENTER: {
+			X: 0.4,
+			Y: -0.5,
+		},
+		ANGLE_RANGE: {
+			MIN: 0,
+			MAX: 2 * Math.PI * 210 / 360,
+		},
+		ANGLE_TRUNCATION: {
+			MIN: 0,
+			MAX: 2 * Math.PI * 175 / 360,
+		},
+	}
 }
 
 class FeedingGameClient extends ModuleClient {
@@ -48,29 +90,17 @@ class FeedingGameClient extends ModuleClient {
 		this.foodImage = $('#food');
 		this.setFoodImage(); // Clear the food image
 		
-		this.foodPathContainer = $('#foodPath');
-		let svg = this.foodPathContainer[0];
-		svg.addEventListener('load', () => {
-			let svgDoc = svg.contentDocument;
-			let foodPath = svgDoc.getElementById('foodPath');
-			let path = foodPath.getAttribute('d');
-			
-			console.log('Creating pathAnimator');
-			this.pathAnimator = new PathAnimator(path, {
-				duration: 1,
-				step: (point, angle) => this.setFoodImagePos(point, angle),
-				easing: asymmetricFunctionToEasing(transformTangent(1, 1, 2)), //t => t * (2 - t),// + 3,
-				onDone: () => this.feedDone(),
-			});
-			console.log('pathAnimator created');
-			
-			this.foodPathOffset = this.foodPathContainer.position();
-			this.foodPathContainer.hide();
-		});
+		this.animationTimer = new AnimationTimer(
+			ANIMATION_PARAMS.DURATION,
+			ANIMATION_PARAMS.FPS,
+			ANIMATION_PARAMS.EASING,
+			t => this.setFoodImagePos(t),
+			() => this.feedDone(),
+		)
 	}
 	
 	hide() {
-		// $('#all').hide();
+		$('#all').hide();
 	}
 	
 	show() {
@@ -119,13 +149,30 @@ class FeedingGameClient extends ModuleClient {
 		this.setFoodImage(data);
 		this.open();
 		this.foodImage.show();
-		// setTimeout(() => this.feedDone(), 1000);
-		this.pathAnimator.start(0, 100);
+		this.animationTimer.start();
 	}
 	
-	setFoodImagePos(point /*, angle */) {
-		let offset = this.foodPathOffset;
-		this.foodImage.css({ top: offset.top + point.y, left: offset.left + point.x });
+	setFoodImagePos(t) {
+		let ELLIPSE = ANIMATION_PARAMS.ELLIPSE;
+		let angle = clamp(
+			ELLIPSE.ANGLE_TRUNCATION.MIN,
+			linearShift(0, 1, ELLIPSE.ANGLE_RANGE.MIN, ELLIPSE.ANGLE_RANGE.MAX, t),
+			ELLIPSE.ANGLE_TRUNCATION.MAX,
+		);
+		let normalized = {
+			x: ELLIPSE.CENTER.X + ELLIPSE.HALF_WIDTH * Math.cos(angle),
+			y: ELLIPSE.CENTER.Y + ELLIPSE.HALF_HEIGHT * Math.sin(angle),
+		}
+		
+		let actual = normalizedToActual(normalized);
+		
+		this.foodImage.css({
+			top: actual.y,
+			left: actual.x,
+			transform: `translate(-50%, -50%)`,
+			'-ms-transform': 'translate(-50%, -50%)',
+			'-webkit-transform': `rotate(${t * ROTATIONS}turn)`,
+		});
 	}
 	
 	feedDone() {

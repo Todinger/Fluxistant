@@ -43,6 +43,14 @@
 			/*max-height: 100%;*/
 		}
 		
+		.centered {
+			position: relative;
+			top: 50%;
+			left: 50%;
+			-ms-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+		}
+		
 		
 		.back-image {
 			z-index: 0;
@@ -57,17 +65,9 @@
 		}
 		
 		.food {
-			max-width: 20%;
+			max-width: 15vw;
+			max-height: 15vw;
 			position: absolute;
-		}
-		
-		.food-path {
-			max-width: 50%;
-			position: absolute;
-			left: 45%;
-			z-index: -3;
-			padding: 2%;
-			/*visibility: hidden;*/
 		}
 	</style>
 </head>
@@ -77,8 +77,7 @@
 	<img class="back-image center sq" id="backClosed" src="" alt="OH NO, WHERE IS THE CAT?!">
 	<img class="front-image center sq" id="frontClosed" src="" alt="OH NO, WHERE IS THE CAT?!">
 	
-	<img class="mid-image center food" id="food" src="" alt="OH NO, WHERE IS THE FOOOOOOOOD?!">
-	<object class="food-path" id='foodPath' data="FoodPath.svg" type="image/svg+xml"></object>
+	<img class="mid-image centered food" id="food" src="" alt="OH NO, WHERE IS THE FOOOOOOOOD?!">
 	
 	<img class="back-image center sq" id="backOpen" src="" alt="OH NO, WHERE IS THE CAT?!">
 	<img class="front-image center sq" id="frontOpen" src="" alt="OH NO, WHERE IS THE CAT?!">
