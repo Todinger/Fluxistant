@@ -3,6 +3,8 @@ import EntityGui from "./entityGuis/entityGui.mjs";
 import MainManager from "./mainManager.mjs";
 import SourceManager from "./sourceManager.mjs";
 
+const NO_MODULE = -1;
+
 function setStyleRule(sheetName, selector, property, value) {
 	let styleSheet = document.querySelector('link[href*=' + sheetName + ']')
 	
@@ -37,7 +39,16 @@ class Configurator {
 			main: null,
 			modules: null,
 			tabTitles: null,
+			moduleContainers: null,
 		}
+		
+		this.sortedModuleNames = null;
+		this.activeModuleIndex = NO_MODULE;
+		
+		this.moduleStatuses = {
+			changed: [],
+			error: [],
+		};
 		
 		this.error = false;
 	}
@@ -58,8 +69,8 @@ class Configurator {
 		});
 		
 		this.configViewSwitcher = $('#configViewSwitcher');
-		this.mainTabTitle = $('#mainTabTitle');
-		this.allModulesTabTitle = $('#modulesTabTitle');
+		this.mainTabTitle = $('#mainTabTitle').click(() => this.showModule(NO_MODULE));
+		this.allModulesTabTitle = $('#modulesTabTitle').click(() => this.showModule(0));
 		
 		this.question = {
 			modal: $('#question'),
@@ -69,6 +80,14 @@ class Configurator {
 		};
 		
 		this.rewardsChangedHandler = () => this.rewardsChanged();
+	}
+	
+	get isModuleActive() {
+		return this.activeModuleIndex !== NO_MODULE;
+	}
+	
+	get activeModuleName() {
+		return this.sortedModuleNames[this.activeModuleIndex];
 	}
 	
 	disableButton(btn) {
@@ -83,7 +102,7 @@ class Configurator {
 	
 	applyButtonClicked() {
 		let error = this.guis.main.error;
-		error = Object.values(this.guis.modules).reduce((soFar, modGui) => soFar || modGui.error, error);
+		error = this.moduleStatuses.error.reduce((soFar, error) => soFar || error, error);
 		if (error) {
 			this.showError('Please fix all errors before saving the configuration.');
 		} else {
@@ -98,14 +117,15 @@ class Configurator {
 	
 	updateStatusIndicators() {
 		this.guis.main._updateStatusIndicators(this.mainTabTitle);
-		let modsChanged = false;
-		let modsError = false;
-		Object.keys(this.guis.modules).forEach(modName => {
+		if (this.isModuleActive) {
+			let modName = this.activeModuleName;
 			this.guis.modules[modName]._updateStatusIndicators(this.guis.tabTitles[modName]);
-			modsChanged = modsChanged || this.guis.modules[modName].changed;
-			modsError = modsError || this.guis.modules[modName].error;
-		});
+			this.moduleStatuses.changed[this.activeModuleIndex] = this.guis.modules[modName].changed;
+			this.moduleStatuses.error[this.activeModuleIndex] = this.guis.modules[modName].error;
+		}
 		
+		let modsChanged = this.moduleStatuses.changed.reduce((soFar, changed) => soFar || changed, false);
+		let modsError = this.moduleStatuses.error.reduce((soFar, error) => soFar || error, false);
 		EntityGui.updateStatusIndicator(this.allModulesTabTitle, modsChanged, modsError);
 	}
 	
@@ -117,9 +137,11 @@ class Configurator {
 	finalizeContentChanges() {
 		this.guis.main.finalizeChanges();
 		Object.keys(this.guis.modules).forEach(modName => {
-			this.guis.modules[modName].finalizeChanges();
 			EntityGui.clearChangeIndicator(this.guis.tabTitles[modName]);
 		});
+		if (this.isModuleActive) {
+			this.guis.modules[this.activeModuleName].finalizeChanges();
+		}
 	}
 	
 	finalizeChanges() {
@@ -185,44 +207,87 @@ class Configurator {
 		moduleTabs.empty();
 		let allModulesContainer = $('#modules-contents');
 		allModulesContainer.empty();
+		this.guis.moduleContainers = null;
+		this.moduleStatuses = {
+			changed: [],
+			error: [],
+		};
 		if (this.displayedConfig.modules) {
-			let moduleNames = Object.keys(this.displayedConfig.modules).sort();
-			moduleNames.forEach(modName => {
+			this.sortedModuleNames = Object.keys(this.displayedConfig.modules).sort();
+			this.guis.moduleContainers = [];
+			for (let index = 0; index < this.sortedModuleNames.length; index++) {
+				let modName = this.sortedModuleNames[index];
 				let moduleTabTitle = $(`<a href="#">${modName}</a>`);
 				let moduleTabItem = $(`<li></li>`);
-				moduleTabItem.append(moduleTabTitle);
+				moduleTabItem.append(moduleTabTitle).click(() => this.showModule(index));
 				moduleTabs.append(moduleTabItem);
 				
 				let moduleID = `mod-${modName}`;
-				let moduleContainer = $(`<li id="${moduleID}"></li>`);
-				let moduleGUI = GuiRegistry.buildGui(
-					this.displayedConfig.modules[modName],
-					moduleID,
-					modName,
-					'RawObject');
-				let moduleGUIContents = moduleGUI.getGUI();
-				moduleGUI.onChanged(() => this.updateStatusIndicators());
-				moduleGUI.onError((err) => {
-					this.updateStatusIndicators();
-					this.showError(err.message);
-				});
-				this.guis.modules[modName] = moduleGUI;
+				this.guis.moduleContainers[index] = $(`<li id="${moduleID}"></li>`);
 				this.guis.tabTitles[modName] = moduleTabTitle;
 				
-				// The GUI construction method normally adds the GUI's ID as
-				// the id attribute of the root element returned, but in this
-				// case we'd rather have that on the container so we're
-				// removing it from the constructed GUI object
-				moduleGUIContents.removeAttr('id');
-				
-				moduleContainer.append(moduleGUIContents);
-				allModulesContainer.append(moduleContainer);
-			});
+				allModulesContainer.append(this.guis.moduleContainers[index]);
+			}
 		}
 		
 		this.clearTabChangeIndicators();
 		setTimeout(
 			() => UIkit.switcher(this.loadingSwitcher).show(1),
+			100);
+	}
+	
+	buildModuleDisplay(index) {
+		let modName = this.sortedModuleNames[index];
+		let moduleID = `mod-${modName}`;
+		let moduleGUI = GuiRegistry.buildGui(
+			this.displayedConfig.modules[modName],
+			moduleID,
+			modName,
+			'RawObject');
+		let moduleGUIContents = moduleGUI.getGUI();
+		moduleGUI.onChanged(() => this.updateStatusIndicators());
+		moduleGUI.onError((err) => {
+			this.updateStatusIndicators();
+			this.showError(err.message);
+		});
+		this.guis.modules[modName] = moduleGUI;
+		
+		// The GUI construction method normally adds the GUI's ID as
+		// the id attribute of the root element returned, but in this
+		// case we'd rather have that on the container so we're
+		// removing it from the constructed GUI object
+		moduleGUIContents.removeAttr('id');
+		
+		this.guis.moduleContainers[index].append(moduleGUIContents);
+	}
+	
+	destroyModuleDisplay(index) {
+		let modName = this.sortedModuleNames[index];
+		this.guis.modules[modName] = null;
+		this.guis.moduleContainers[index].empty();
+	}
+	
+	showModule(index) {
+		if (!this.displayedConfig.modules) {
+			return;
+		}
+		
+		UIkit.switcher(this.loadingSwitcher).show(0);
+		setTimeout(
+			() => {
+				if (this.activeModuleIndex !== NO_MODULE) {
+					this.destroyModuleDisplay(this.activeModuleIndex);
+				}
+				
+				if (index !== NO_MODULE) {
+					this.buildModuleDisplay(index);
+				}
+				
+				this.activeModuleIndex = index;
+				setTimeout(
+					() => UIkit.switcher(this.loadingSwitcher).show(1),
+					100);
+			},
 			100);
 	}
 	

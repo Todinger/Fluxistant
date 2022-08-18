@@ -221,9 +221,9 @@ export default class MultiAssetGui extends AssetGui {
 	}
 	
 	_selfRemoved() {
-		Object.keys(this.fileGuiComponents).forEach(fileKey => {
-			this._deleteFile(fileKey, false);
-		});
+		// Object.keys(this.fileGuiComponents).forEach(fileKey => {
+		// 	this._deleteFile(fileKey, false);
+		// });
 	}
 	
 	// Add an indication that this value has been changed (note: not its children)
