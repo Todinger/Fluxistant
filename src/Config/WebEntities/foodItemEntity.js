@@ -17,26 +17,26 @@ class FoodItemEntity extends ImageFileEntity {
 	
 	constructor(fileKey) {
 		super(fileKey);
-		this.addString('foodName')
-			.setName('Name')
-			.setDescription('Name for this food item');
+		this.addString('tags')
+			.setName('Tags')
+			.setDescription('Groups this food item belongs to');
 		this.addNaturalNumber('minValue', 10)
 			.setName('Minimum Nutrition Value')
 			.setDescription('Minimum amount of food units that will be added when the cat eats this food item');
 		this.addNaturalNumber('maxValue', 20)
 			.setName('Maximum Nutrition Value')
 			.setDescription('Maximum amount of food units that will be added when the cat eats this food item');
-		this.addNaturalNumber('points')
+		this.addNaturalNumber('points', 100)
 			.setName('Points')
 			.setDescription('Base amount of points added for successfully feeding the cat this item (multiplied by current level factor)');
 	}
 	
-	getFoodName() {
-		return this.getChild('foodName').getValue();
+	getTags() {
+		return this.getChild('tags').getValue();
 	}
 	
-	setFoodName(foodName) {
-		return this.getChild('foodName').setValue(foodName);
+	setTags(foodName) {
+		return this.getChild('tags').setValue(foodName);
 	}
 	
 	getMinValue() {
@@ -56,8 +56,8 @@ class FoodItemEntity extends ImageFileEntity {
 	}
 	
 	setFileName(fileName) {
-		if (!this.getFoodName()) {
-			this.setFoodName(baseName(fileName));
+		if (!this.getTags()) {
+			this.setTags(baseName(fileName));
 		}
 	}
 }

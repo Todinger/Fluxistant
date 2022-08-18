@@ -1,6 +1,5 @@
 'use strict';
 
-const assert = require('assert').strict;
 const Module = requireMain('module');
 const EventNotifier = requireMain('eventNotifier');
 const Utils = requireMain('utils');
@@ -17,9 +16,9 @@ class FeedingGame extends Module {
 		
 		this.resetGame();
 		this.food = {
-			groups: {}, // Mapping of group name to array of food names in the group
-			items: {},  // Mapping of food name to FoodItemEntity conf
-		}
+			tags: {},
+			all: [],
+		};
 		
 		this.events = new EventNotifier();
 		this.events._addEvent('feedDone');
@@ -34,9 +33,16 @@ class FeedingGame extends Module {
 		modConfig.addNaturalNumber('lossPenalty', 10000)
 			.setName('Loss Penalty')
 			.setDescription('Amount of points the viewer who goes over the limit loses');
-		modConfig.addDynamicArray('foodGroups', 'FoodGroup')
-			.setName('Food Groups')
-			.setDescription('All the food types and items available');
+		modConfig.add(
+				'foodItems',
+				'MultiAsset',
+				{
+					collection: 'Images',
+					dataType: 'IMAGE',
+					elementValueType: 'FoodItem',
+				})
+			.setName('Food Items')
+			.setDescription('All available foodstuffs in the game');
 		modConfig.addDynamicArray('feedingLevels', 'FeedingLevel')
 			.setName('Feeding Levels')
 			.setDescription('The various levels of chubbiness our munching champion has');
@@ -45,45 +51,38 @@ class FeedingGame extends Module {
 			.setDescription('The image shown when overfed and the game ends');
 	}
 	
-	validateModConfig(conf) {
-		// Validate that each food group and food item is unique (also disallow the same name between
-		// food groups and food items)
-		let seenFoodNames = [];
-		conf.foodGroups.forEach(foodGroup => {
-			assert (!seenFoodNames.includes(foodGroup.groupName),
-				`Duplicate food / food group name: ${foodGroup.groupName}`);
-			seenFoodNames.push(foodGroup.groupName);
-			Object.values(foodGroup.foodItems.files).forEach(foodItem => {
-				assert (!seenFoodNames.includes(foodItem.foodName),
-					`Duplicate food / food group name: ${foodItem.foodName}`);
-				seenFoodNames.push(foodItem.foodName);
-			});
-		});
-	}
-	
 	loadModConfig(conf) {
 		if (!conf.enabled) {
 			return;
 		}
-		
-		this.validateModConfig(conf);
 		
 		// Changing configuration kills the game
 		this.stop();
 		
 		// Index the foods and food groups by name
 		this.food = {
-			groups: {},
-			items:  {},
-		}
-		conf.foodGroups.forEach(foodGroup => {
-			let groupName = foodGroup.groupName.trim().toLowerCase();
-			this.food.groups[groupName] = [];
-			Object.values(foodGroup.foodItems.files).forEach(foodItem => {
-				let foodName = foodItem.foodName.trim().toLowerCase();
-				this.food.groups[groupName].push(foodName);
-				this.food.items[foodName] = foodItem;
-			});
+			tags: {},
+			all: [],
+		};
+		Object.values(conf.foodItems.files).forEach(foodItem => {
+			let tagsString = foodItem.tags.toLowerCase();
+			let tags = tagsString
+				.split(',')
+				.map(tag => tag.trim().replace(/\s+/g, ' ')) // Remove duplicate spaces
+				.filter(tag => Utils.isNonEmptyString(tag)); // Remove empty tags
+			tags = [...new Set(tags)]; // Remove duplicates
+			if (tags.length > 0) {
+				foodItem.foodName = tags[0];
+				tags.forEach(tag => {
+					if (!(tag in this.food.tags)) {
+						this.food.tags[tag] = [foodItem];
+					} else {
+						this.food.tags[tag].push(foodItem);
+					}
+					
+					this.food.all.push(foodItem);
+				});
+			}
 		});
 	}
 	
@@ -166,16 +165,16 @@ class FeedingGame extends Module {
 	}
 	
 	selectFoodItem(data) {
-		let name = Utils.isNonEmptyString(data.allParams) ? data.allParams.toLowerCase() : "";
-		if (name in this.food.groups) {
-			name = Utils.randomElement(this.food.groups[name]);
+		let tag = Utils.isNonEmptyString(data.allParams) ? data.allParams.toLowerCase() : "";
+		if (tag !== "") {
+			if (tag in this.food.tags) {
+				return Utils.randomElement(this.food.tags[tag]);
+			} else {
+				return null;
+			}
+		} else {
+			return Utils.randomElement(this.food.all);
 		}
-		
-		if (!(name in this.food.items)) {
-			name = Utils.randomKey(this.food.items);
-		}
-		
-		return this.food.items[name];
 	}
 	
 	getCurrentLevelImages() {
@@ -223,6 +222,12 @@ class FeedingGame extends Module {
 		}
 		
 		let foodItem = this.selectFoodItem(data);
+		if (!foodItem) {
+			this.tellError(data.user, "Silly, kitty doesn't like that!");
+			return {
+				success: null,
+			};
+		}
 		
 		// NOM NOM NOM
 		this.busy = true;

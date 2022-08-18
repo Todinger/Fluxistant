@@ -102,7 +102,6 @@ const entities = {
 	CandyInflation_NoneEntity: require('./WebEntities/candyInflation_NoneEntity.js'),
 	CounterEntity: require('./WebEntities/counterEntity.js'),
 	FeedingLevelEntity: require('./WebEntities/feedingLevelEntity.js'),
-	FoodGroupEntity: require('./WebEntities/foodGroupEntity.js'),
 	FoodItemEntity: require('./WebEntities/foodItemEntity.js'),
 	UserGroupEntity: require('./WebEntities/userGroupEntity.js'),
 	ImageCommandEntity: require('./WebEntities/imageCommandEntity.js'),
