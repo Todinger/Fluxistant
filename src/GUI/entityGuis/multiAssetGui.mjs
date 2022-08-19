@@ -123,9 +123,9 @@ export default class MultiAssetGui extends AssetGui {
 			"left": "50%",
 			"transform": "translate(-50%, -50%)",
 			"max-width": "100%",
+			"max-height": "100%",
 		});
 		
-		// let acontent = $(`<img src="${data}" alt="Error Displaying Image" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)" uk-img>`);
 		let closeButton = this._makeCardCloseButton(fileKey);
 		let nameTag = $(`<span class="uk-margin uk-text-meta uk-text-break uk-transition-slide-bottom-small uk-overlay uk-position-bottom uk-padding-small file-upload-name">${name}</span>`);
 		
