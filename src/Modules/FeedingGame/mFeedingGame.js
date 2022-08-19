@@ -230,10 +230,21 @@ class FeedingGame extends Module {
 		}
 		
 		// NOM NOM NOM
-		this.busy = true;
+		
+		// !!! NOTE !!!
+		// I'm removing the busy flag because if an answer never comes, the
+		// game gets stuck forever. Ideally we'd have a timeout, but that
+		// requires using Abort Controllers, which requires Node 15+, and
+		// updating Node causes issues with the iohook library that I am not
+		// liable to fix at the moment (I tried, it got complicated, I
+		// stopped).
+		// So be sure to add proper cooldowns yourself and not use the game
+		// without its client showing.
+		
+		// this.busy = true;
 		this.sendFoodImage(foodItem);
 		await Utils.getPromiseFromEvent(this.events, 'feedDone');
-		this.busy = false;
+		// this.busy = false;
 		
 		// Feeding logic (points, food levels, etc.)
 		
@@ -274,6 +285,9 @@ class FeedingGame extends Module {
 		feed: {
 			name: 'Feed',
 			description: 'Feed the cat!',
+			cooldowns: {
+				global: 5, // Default cooldown to let the feeding animation end
+			},
 			triggers: [
 				this.trigger.command({
 					cmdname: 'feed',
