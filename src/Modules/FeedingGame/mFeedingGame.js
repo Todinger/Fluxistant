@@ -71,8 +71,11 @@ class FeedingGame extends Module {
 				.map(tag => tag.trim().replace(/\s+/g, ' ')) // Remove duplicate spaces
 				.filter(tag => Utils.isNonEmptyString(tag)); // Remove empty tags
 			tags = [...new Set(tags)]; // Remove duplicates
+			
+			// Update the foodItem's tags with the changes
+			foodItem.tags = tags;
+			
 			if (tags.length > 0) {
-				foodItem.foodName = tags[0];
 				tags.forEach(tag => {
 					if (!(tag in this.food.tags)) {
 						this.food.tags[tag] = [foodItem];
@@ -271,7 +274,7 @@ class FeedingGame extends Module {
 		await this.modifyUserPoints(data.user, reward);
 		
 		return {
-			food: foodItem.foodName,
+			food: Utils.randomElement(foodItem.tags),
 			reward,
 		};
 	}
