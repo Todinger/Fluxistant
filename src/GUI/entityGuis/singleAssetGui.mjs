@@ -140,7 +140,7 @@ export default class SingleAssetGui extends AssetGui {
 	}
 	
 	_selfRemoved() {
-		this._deleteFile(this.entity.getFileKey(), false);
+		// this._deleteFile(this.entity.getFileKey(), false);
 	}
 }
 
