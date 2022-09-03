@@ -33,6 +33,9 @@ class FeedingGame extends Module {
 		modConfig.addNaturalNumber('lossPenalty', 10000)
 			.setName('Loss Penalty')
 			.setDescription('Amount of points the viewer who goes over the limit loses');
+		modConfig.addString('generalFoodTags')
+			.setName('General Food Tags', 'food, anything, stuff, thing, something, whatever')
+			.setDescription('Using any of these comma-separated tags will select a random food item.');
 		modConfig.add(
 				'foodItems',
 				'MultiAsset',
@@ -51,6 +54,19 @@ class FeedingGame extends Module {
 			.setDescription('The image shown when overfed and the game ends');
 	}
 	
+	toTagsList(tagsString) {
+		if (!tagsString) {
+			return [];
+		}
+		
+		let tags = tagsString
+			.split(',')
+			.map(tag => tag.trim().replace(/\s+/g, ' ')) // Remove duplicate spaces
+			.filter(tag => Utils.isNonEmptyString(tag)); // Remove empty tags
+		tags = [...new Set(tags)]; // Remove duplicates
+		return tags;
+	}
+	
 	loadModConfig(conf) {
 		if (!conf.enabled) {
 			return;
@@ -66,11 +82,7 @@ class FeedingGame extends Module {
 		};
 		Object.values(conf.foodItems.files).forEach(foodItem => {
 			let tagsString = foodItem.tags.toLowerCase();
-			let tags = tagsString
-				.split(',')
-				.map(tag => tag.trim().replace(/\s+/g, ' ')) // Remove duplicate spaces
-				.filter(tag => Utils.isNonEmptyString(tag)); // Remove empty tags
-			tags = [...new Set(tags)]; // Remove duplicates
+			let tags = this.toTagsList(tagsString);
 			
 			// Update the foodItem's tags with the changes
 			foodItem.tags = tags;
@@ -87,6 +99,9 @@ class FeedingGame extends Module {
 				});
 			}
 		});
+		
+		// Parse the general food item tags
+		this.generalFoodTags = this.toTagsList(conf.generalFoodTags);
 	}
 	
 	load() {
@@ -172,6 +187,8 @@ class FeedingGame extends Module {
 		if (tag !== "") {
 			if (tag in this.food.tags) {
 				return Utils.randomElement(this.food.tags[tag]);
+			} else if (this.generalFoodTags.includes(tag)) {
+				return Utils.randomElement(this.food.all);
 			} else {
 				return null;
 			}
