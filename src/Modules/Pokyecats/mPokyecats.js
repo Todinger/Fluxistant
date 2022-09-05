@@ -170,6 +170,10 @@ class Pokyecats extends Module {
 		});
 	}
 	
+	getDisplayName(user) {
+		return this.data.catches[user].displayName ?? user;
+	}
+	
 	newBallData() {
 		return {
 			[BALLS.YARN]: 0,
@@ -204,7 +208,7 @@ class Pokyecats extends Module {
 	}
 	
 	tellMessage(user, message, catchData) {
-		message = Utils.stringReplaceAll(message, PLACEHOLDERS.USER, user.displayName);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.USER, this.getDisplayName(user.name));
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.CATCHES, catchData.catches);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.SHINIES, catchData.shinyCatches);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.NORMALS, catchData.catches - catchData.shinyCatches);
@@ -344,7 +348,7 @@ class Pokyecats extends Module {
 	listShinyCatchers(data) {
 		let shinyCatchers = Object.keys(this.data.catches)
 			.filter(name => this.data.catches[name].shinyCatches > 0)
-			.map(name => ({ name: this.data.catches[name].displayName, count: this.data.catches[name].shinyCatches }));
+			.map(name => ({ name: this.getDisplayName(name), count: this.data.catches[name].shinyCatches }));
 		if (shinyCatchers.length === 0) {
 			this.tell(data.user, "Aww, nobody has caught a shiny Yecats yet. =(");
 			return;
@@ -364,7 +368,7 @@ class Pokyecats extends Module {
 			let username = data.firstParam.toLowerCase();
 			if (username in this.data.catches) {
 				let catchData = this.data.catches[username];
-				this.print(`Current yarn for ${catchData.displayName}: ${catchData.yarn}`);
+				this.print(`Current yarn for ${this.getDisplayName(username)}: ${catchData.yarn}`);
 			} else {
 				this.print(`There is no yarn data for the username "${username}".`)
 			}
@@ -376,7 +380,7 @@ class Pokyecats extends Module {
 			let currPlayerNum = 1;
 			playerUserNames.forEach(username => {
 				let catchData = this.data.catches[username];
-				this.print(`${currPlayerNum.toString().padStart(maxPlayerNumLength)}. ${catchData.displayName}: ${catchData.yarn}`);
+				this.print(`${currPlayerNum.toString().padStart(maxPlayerNumLength)}. ${this.getDisplayName(username)}: ${catchData.yarn}`);
 				currPlayerNum++;
 			})
 		}
