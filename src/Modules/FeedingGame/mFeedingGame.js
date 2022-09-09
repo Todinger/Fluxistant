@@ -14,11 +14,13 @@ class FeedingGame extends Module {
 			source: 'feedingGame.html',
 		});
 		
-		this.resetGame();
+		this.data.state = {};
+		
 		this.food = {
 			tags: {},
 			all: [],
 		};
+		
 		
 		this.events = new EventNotifier();
 		this.events._addEvent('feedDone');
@@ -71,9 +73,6 @@ class FeedingGame extends Module {
 		if (!conf.enabled) {
 			return;
 		}
-		
-		// Changing configuration kills the game
-		this.stop();
 		
 		// Index the foods and food groups by name
 		this.food = {
@@ -128,6 +127,21 @@ class FeedingGame extends Module {
 		});
 	}
 	
+	persistentDataLoaded() {
+		if (this.running) {
+			this.sendCurrentLevel();
+			this.broadcastEvent('show');
+		}
+	}
+	
+	get running() {
+		return this.data && this.data.state && this.data.state.running;
+	}
+	
+	get currentLevel() {
+		return this.data.state.currentLevel;
+	}
+	
 	get maxLevel() {
 		return this.config.feedingLevels.length - 1;
 	}
@@ -156,10 +170,12 @@ class FeedingGame extends Module {
 	}
 	
 	resetGame() {
-		this.running = false;
-		this.busy = false; // Used when feeding has begun until it's done
-		this.currentLevel = 0;
-		this.currentFullness = 0;
+		this.data.state = {};
+		this.saveData();
+		// this.running = false;
+		// this.busy = false; // Used when feeding has begun until it's done
+		// this.currentLevel = 0;
+		// this.currentFullness = 0;
 	}
 	
 	async start(data) {
@@ -168,11 +184,16 @@ class FeedingGame extends Module {
 			return false;
 		}
 		
-		this.resetGame();
-		this.running = true;
+		this.data.state = {
+			running: true,
+			currentLevel: 0,
+			currentFullness: 0,
+		};
+		
+		this.saveData();
 		
 		this.sendCurrentLevel();
-		await Utils.getPromiseFromEvent(this.events, 'levelImagesSet');
+		// await Utils.getPromiseFromEvent(this.events, 'levelImagesSet');
 		
 		this.broadcastEvent('show');
 	}
@@ -222,9 +243,10 @@ class FeedingGame extends Module {
 	}
 	
 	async nextLevel(feeder) {
-		this.currentLevel++;
+		this.data.state.currentLevel++;
 		this.sendCurrentLevel();
-		this.currentFullness = 0;
+		this.data.state.currentFullness = 0;
+		this.saveData();
 		
 		if (this.currentLevel > this.maxLevel) {
 			await this.modifyUserPoints(feeder, -this.config.lossPenalty);
@@ -235,7 +257,7 @@ class FeedingGame extends Module {
 	}
 	
 	async feed(data) {
-		if (!this.running || this.busy || this.currentLevel > this.maxLevel) {
+		if (!this.running || this.currentLevel > this.maxLevel) {
 			return {
 				success: null,
 			};
@@ -270,8 +292,9 @@ class FeedingGame extends Module {
 		
 		let feedingLevel = this.config.feedingLevels[this.currentLevel];
 		let addedNutrition = Utils.randomInt(foodItem.minValue, foodItem.maxValue);
-		this.currentFullness += addedNutrition;
-		if (this.currentFullness > feedingLevel.capacity) {
+		this.data.state.currentFullness += addedNutrition;
+		this.saveData();
+		if (this.data.state.currentFullness > feedingLevel.capacity) {
 			if (!await this.nextLevel(data.user)) {
 				return {
 					success: false,
