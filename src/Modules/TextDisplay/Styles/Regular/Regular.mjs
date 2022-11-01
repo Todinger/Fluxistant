@@ -2,6 +2,7 @@ import { ModuleClient } from "/common/moduleClient.mjs";
 import { applyDefaults } from "/common/clientUtils.mjs";
 
 const DEFAULTS = {
+	font: 'impact, sans-serif',
 	fontSize: 100,
 	color: '#000',
 	strokeSize: 0,
@@ -21,6 +22,7 @@ class RegularText extends ModuleClient {
 			applyDefaults(textData, DEFAULTS);
 			// let top = `${}`
 			$('body').css({
+				'font-family': textData.font,
 				'color': textData.color,
 				'font-size': textData.fontSize,
 				'-ms-transform': `translate(${textData.xShift}vw, ${-textData.yShift}vw)`,

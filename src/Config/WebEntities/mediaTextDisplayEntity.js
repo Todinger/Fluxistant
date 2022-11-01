@@ -9,6 +9,9 @@ class MediaTextDisplayEntity extends StaticObjectEntity {
 		this.addString('text', '')
 			.setName('Text')
 			.setDescription('Text to display');
+		this.addString('font', 'arial, sans-serif')
+			.setName('Font')
+			.setDescription('Text to display');
 		this.addNaturalNumber('fontSize', 100)
 			.setName('Font Size')
 			.setDescription('How large to make the displayed text');
@@ -21,13 +24,13 @@ class MediaTextDisplayEntity extends StaticObjectEntity {
 		this.addNaturalNumber('strokeSize', 0)
 			.setName('Stroke Width')
 			.setDescription('How large to make the stroke on the text (set to 0 for no stroke)');
-		this.addNaturalNumber('xShift', 0)
+		this.addInteger('xShift', 0)
 			.setName('Horizontal Shift')
 			.setDescription('Move the text on the horizontal axis (-50 for left edge of screen, 50 for right edge)');
-		this.addNaturalNumber('yShift', 0)
+		this.addInteger('yShift', 0)
 			.setName('Vertical Shift')
 			.setDescription('Move the text on the vertical axis (-50 for bottom of screen, 50 for top)');
-		this.addDuration('duration')
+		this.addDuration('duration', 5)
 			.setName('Duration')
 			.setDescription('Duration in seconds that the text will be displayed')
 			.setAdvanced();
