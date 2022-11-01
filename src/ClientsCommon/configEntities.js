@@ -22174,7 +22174,7 @@ class MediaTextDisplayEntity extends StaticObjectEntity {
 		this.addString('text', '')
 			.setName('Text')
 			.setDescription('Text to display');
-		this.addColor('color')
+		this.addColor('color', '#000000')
 			.setName('Color')
 			.setDescription('Text color');
 		this.addNonNegativeNumber('duration')

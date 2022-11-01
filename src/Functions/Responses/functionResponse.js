@@ -31,7 +31,7 @@ class FunctionResponse {
 	send(funcResults) {
 		if (this.enabled) {
 			try {
-				let response = this._buildResponse(funcResults);
+				let response = FunctionResponse.compileFunctionText(this.message, funcResults);
 				this._sendImpl(response);
 			} catch (err) {
 				console.error(err);
@@ -39,9 +39,9 @@ class FunctionResponse {
 		}
 	}
 	
-	_buildResponse(context) {
+	static compileFunctionText(message, context) {
 		let allVars = [...context.variables].concat(GlobalVariables);
-		return replaceVariables(allVars, this.message, context);
+		return replaceVariables(allVars, message, context);
 	}
 	
 	// noinspection JSUnusedLocalSymbols

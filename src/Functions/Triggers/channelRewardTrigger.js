@@ -57,7 +57,7 @@ class ChannelRewardTrigger extends Trigger {
 		}),
 		
 		new Variable({
-			name: 'Reward Name ($reward)',
+			name: 'Reward Name (`$reward`)',
 			description: "The name you've assigned for this reward in the configuration.",
 			example: `"Isn't my $reward reward the best? :O" ---For reward "Yay"---> "Isn't my Yay reward the best? :O"`,
 			condition: 'Can only be used when activated by a channel reward redemption.',

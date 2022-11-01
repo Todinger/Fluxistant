@@ -256,8 +256,6 @@ class Function {
 			invocationData.firstParam = invocationData.getParam(0);
 			invocationData.allParams = invocationData.params.join(" ");
 			
-			let results = await this.action(invocationData);
-			
 			let context = {
 				func:      this,
 				user:      invocationData.user,
@@ -268,6 +266,10 @@ class Function {
 					trigger: invocationData.triggerParams,
 				},
 			};
+			
+			invocationData.compileText = (text) => Response.compileFunctionText(text, context);
+			
+			let results = await this.action(invocationData);
 			
 			if (results === false) {
 				results = { success: false };

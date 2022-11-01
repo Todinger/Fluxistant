@@ -34,7 +34,7 @@ class ImageCommands extends Module {
 		return dd;
 	}
 	
-	_sendToDisplay(funcObject, displaySendFunc) {
+	_sendToDisplay(funcObject, displaySendFunc, data) {
 		let imageConf = funcObject.image;
 		let soundConf = funcObject.sound;
 		let videoConf = funcObject.video;
@@ -78,7 +78,9 @@ class ImageCommands extends Module {
 				
 				displaySendFunc(parameters);
 				if (hasText) {
-					_this.broadcastEvent('showText', textConf);
+					let textData = Utils.clone(textConf);
+					textData.text = data.compileText(textData.text);
+					_this.broadcastEvent('showText', textData);
 				}
 			});
 		}
@@ -117,7 +119,7 @@ class ImageCommands extends Module {
 		funcObject.sound = func.sound;
 		funcObject.video = func.video;
 		funcObject.text = func.text;
-		funcObject.action = () => action(funcObject);
+		funcObject.action = (data) => action(funcObject, data);
 		
 		return funcObject;
 	}
@@ -132,9 +134,10 @@ class ImageCommands extends Module {
 				let funcObject = this.makeImageFunction(
 					func,
 					`ImageFunc[${i}]`,
-						fo => this._sendToDisplay(
+					(fo, data) => this._sendToDisplay(
 							fo,
-							parameters => this.broadcastEvent('showImage', parameters)));
+							parameters => this.broadcastEvent('showImage', parameters),
+							data));
 				this.imageFunctions[funcObject.funcID] = funcObject;
 			}
 		}
@@ -146,12 +149,13 @@ class ImageCommands extends Module {
 				let funcObject = this.makeImageFunction(
 					func,
 					id,
-					fo => this._sendToDisplay(
+					(fo, data) => this._sendToDisplay(
 						fo,
 						parameters => {
 							parameters.name = `${id}: ${func.name}`;
 							this.broadcastEvent('toggleNamed', parameters);
-						}));
+						},
+						data));
 				this.imageFunctions[funcObject.funcID] = funcObject;
 			}
 		}
