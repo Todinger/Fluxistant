@@ -120,7 +120,7 @@ class TextDisplay extends ModuleClient {
 	start() {
 		// Expects an array of names
 		this.server.on('styleList', styleList => {
-			this.log('Received style list.');
+			this.log(`Received style list: ${styleList}`);
 			
 			let stylesToRemove = subtractArrays(Object.keys(this.styles), styleList);
 			stylesToRemove.forEach(styleName => {
@@ -145,6 +145,8 @@ class TextDisplay extends ModuleClient {
 					text: textData,
 					style: 'Regular',
 				};
+			} else if (!textData.style) {
+				textData.style = 'Regular';
 			}
 			
 			console.assert(textData.style && textData.text,

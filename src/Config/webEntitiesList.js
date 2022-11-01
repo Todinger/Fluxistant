@@ -106,6 +106,7 @@ const entities = {
 	UserGroupEntity: require('./WebEntities/userGroupEntity.js'),
 	ImageCommandEntity: require('./WebEntities/imageCommandEntity.js'),
 	ImageFunctionEntity: require('./WebEntities/imageFunctionEntity.js'),
+	MediaTextDisplayEntity: require('./WebEntities/mediaTextDisplayEntity.js'),
 	ImageEntity: require('./WebEntities/imageEntity.js'),
 	SoundEntity: require('./WebEntities/soundEntity.js'),
 	ObsFunctionDetailsEntity: require('./WebEntities/obsFunctionDetailsEntity.js'),

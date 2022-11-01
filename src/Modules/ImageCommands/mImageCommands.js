@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 const Module = requireMain('module');
+const Utils = requireMain('utils');
 
 const DESCRIPTION =
 `Allows you to define your own functions which show images and/or play sounds on the main overlay.
@@ -19,7 +20,7 @@ class ImageCommands extends Module {
 	constructor() {
 		super({
 			name: 'Image Commands',
-			tags: ['imgdisp'],
+			tags: ['imgdisp', 'textdisp'],
 			description: DESCRIPTION,
 		});
 		
@@ -37,12 +38,14 @@ class ImageCommands extends Module {
 		let imageConf = funcObject.image;
 		let soundConf = funcObject.sound;
 		let videoConf = funcObject.video;
+		let textConf = funcObject.text;
 		let imageFileConf = imageConf.file;
 		let soundFileConf = soundConf.file;
 		let videoFileConf = videoConf.file;
 		let hasImage = this.assets.Images.hasKey(imageFileConf.fileKey);
 		let hasSound = this.assets.Sounds.hasKey(soundFileConf.fileKey);
 		let hasVideo = this.assets.Videos.hasKey(videoFileConf.fileKey);
+		let hasText = Utils.isNonEmptyString(textConf.text);
 		
 		let imagePromise = hasImage ?
 			this.assets.getFileWeb(imageFileConf) :
@@ -56,6 +59,7 @@ class ImageCommands extends Module {
 			this.assets.getFileWeb(videoFileConf) :
 			Promise.resolve();
 		
+		let _this = this;
 		if (hasImage || hasSound || hasVideo) {
 			Promise.all([imagePromise, soundPromise, videoPromise])
 			.then(function([imageFile, soundFile, videoFile]) {
@@ -73,6 +77,9 @@ class ImageCommands extends Module {
 				}
 				
 				displaySendFunc(parameters);
+				if (hasText) {
+					_this.broadcastEvent('showText', textConf);
+				}
 			});
 		}
 	}
@@ -109,6 +116,7 @@ class ImageCommands extends Module {
 		funcObject.image = func.image;
 		funcObject.sound = func.sound;
 		funcObject.video = func.video;
+		funcObject.text = func.text;
 		funcObject.action = () => action(funcObject);
 		
 		return funcObject;

@@ -2,6 +2,7 @@ const FunctionEntity = requireConfig('Functions/functionEntity');
 const ImageEntity = requireModConfig('ImageDisplay', 'imageEntity');
 const SoundEntity = requireModConfig('ImageDisplay', 'soundEntity');
 const VideoEntity = requireConfig('./Assets/videoEntity');
+const MediaTextDisplayEntity = require('./mediaTextDisplayEntity');
 
 class ImageFunctionEntity extends FunctionEntity {
 	static get TYPE()		{ return 'ImageFunction'; 					}
@@ -19,6 +20,9 @@ class ImageFunctionEntity extends FunctionEntity {
 		this.addChild('video', new VideoEntity())
 			.setName('Video')
 			.setDescription('Video playing parameters');
+		this.addChild('text', new MediaTextDisplayEntity())
+			.setName('Text')
+			.setDescription('Text to display onscreen');
 	}
 }
 

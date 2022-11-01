@@ -18,5 +18,6 @@
     <orderEntry type="library" name="phaser" level="application" />
     <orderEntry type="library" name="TweenMax" level="application" />
     <orderEntry type="library" name="jquery" level="application" />
+    <orderEntry type="library" name="normalize" level="application" />
   </component>
 </module>
