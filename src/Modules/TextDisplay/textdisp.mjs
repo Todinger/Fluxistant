@@ -27,7 +27,7 @@ class DisplayEffects {
 	static get fade() {
 		return {
 			DEFAULTS: {
-				duration: 1000,
+				duration: 500,
 			},
 			show: function(jTarget, displayEffectData) {
 				applyDefaults(displayEffectData, DisplayEffects.fade.DEFAULTS);
@@ -52,9 +52,9 @@ class DisplayEffects {
 }
 
 const TEXTDATA_DEFAULTS = {
-	duration: 5000,
+	duration: 1000,
 	displayEffect: {
-		name: 'appear',
+		name: 'fade',
 	},
 }
 
@@ -93,7 +93,6 @@ class TextDisplay extends ModuleClient {
 					this.notifyChild(textData.style, 'hideText');
 					this.freeBlockingEvent('Text');
 				});
-			
 		},
 		textData.duration - displayEffect.duration(
 			textData.displayEffect));
