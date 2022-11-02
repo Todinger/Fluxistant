@@ -8,6 +8,7 @@ const Response = require('./Responses/functionResponse');
 const Filter = require('./Filters/functionFilter');
 const Builders = require('./builders');
 const GlobalVariables = require('./globalVariables');
+const Logger = requireMain('logger')
 const replaceVariables = require('./Responses/MultiReplace/multiReplaceEngine');
 
 function EMPTY_FUNCTION() {
@@ -168,7 +169,7 @@ class Function {
 				try {
 					setTimeout(() => responses[i].send(context), i * this.responseDelay);
 				} catch (err) {
-					console.error(err);
+					Logger.error(err);
 				}
 			}
 		} else {
@@ -176,7 +177,7 @@ class Function {
 				try {
 					response.send(context);
 				} catch (err) {
-					console.error(err);
+					Logger.error(err);
 				}
 			});
 		}
@@ -308,7 +309,7 @@ class Function {
 							}
 						}
 					} catch (err) {
-						console.error(err);
+						Logger.error(err);
 					}
 				}
 				
@@ -322,7 +323,7 @@ class Function {
 				sendFunc.call(this, context);
 			}
 		} catch (err) {
-			console.error(err);
+			Logger.error(err);
 		}
 	}
 }

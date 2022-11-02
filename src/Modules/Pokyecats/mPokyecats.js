@@ -193,7 +193,11 @@ class Pokyecats extends Module {
 	}
 	
 	getUserCatchData(user) {
-		return this.data.catches[user.name] || this.newCatchData();
+		if (!(user.name in this.data.catches)) {
+			this.data.catches[user.name] = this.newCatchData();
+		}
+		
+		return this.data.catches[user.name];
 	}
 	
 	variableValuesFromCatchData(catchData) {

@@ -68,6 +68,9 @@ class Logger {
 	
 	error(...params) {
 		this.logger.error(...params);
+		if (params.length === 1 && (params[0] instanceof Error)) {
+			console.trace();
+		}
 	}
 	
 	debug(...params) {
