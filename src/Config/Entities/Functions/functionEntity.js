@@ -11,6 +11,7 @@ class FunctionEntity extends StaticObjectEntity {
 	
 	constructor(data) {
 		super();
+		this.setDescription(data && data.description);
 		this.addString('funcID', data && data.funcID)
 			.hide();
 		this.addString('name', data && data.name)

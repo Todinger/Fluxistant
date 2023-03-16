@@ -20,6 +20,7 @@ class Variable {
 		assert(
 			variableData.expr instanceof RegExp || typeof variableData.expr === 'string',
 			`Expected string or RegExp, got: ${variableData.expr}`);
+		this.plainExpr = variableData.expr;
 		this.expr = variableData.expr;
 		if (typeof this.expr === 'string') {
 			// This was my previous attempt at dealing with users writing $ in the chat.

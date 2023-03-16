@@ -23,6 +23,7 @@ const Utils = require('./utils');
 
 const Function = require('./Functions/function');
 const FunctionBuilders = require('./Functions/builders');
+const replaceVariables = require('./Functions/Responses/MultiReplace/multiReplaceEngine');
 
 // This is the base class for all server-side Module-specific logic classes.
 // 
@@ -125,7 +126,7 @@ class Module {
 		// Loads the module in debug mode, replacing chat messages with
 		// console log printouts
 		if (settings.debug) {
-			this.say = this.log;
+			this.say = this.print;
 			this.tell = (user, msg) => {
 				this.say(`@${user.displayName} ${msg}`);
 			}
@@ -863,6 +864,10 @@ class Module {
 		TwitchManager.say(`@${this.getStreamerName()} ${msg}`);
 	}
 	
+	sayConfig(id) {
+		this.say(this.config[id]);
+	}
+	
 	// [For use by inheriting classes]
 	// Gets the streamer's name that they configured in the main configuration.
 	getStreamerName() {
@@ -920,6 +925,30 @@ class Module {
 		Logger.debug(this._printForm(message));
 	}
 	
+	listVariables() {
+		if (this.variables) {
+			return this.variables.map(variable => variable.plainExpr).join(', ');
+		} else {
+			return '';
+		}
+	}
+	
+	compile(message, extraVariableValues) {
+		extraVariableValues = extraVariableValues || {};
+		let extraVariables = Object.keys(extraVariableValues).map(name =>
+			this.variable.getter(name, { getter: () => extraVariableValues[name] }));
+		let allVariables = extraVariables.concat(this.variables || []);
+		return replaceVariables(allVariables, message);
+	}
+	
+	compileSay(message, extraVariableValues) {
+		this.say(this.compile(message, extraVariableValues));
+	}
+	
+	compileTell(user, message, extraVariableValues) {
+		this.tell(user, this.compile(message, extraVariableValues));
+	}
+	
 	// [For use by inheriting classes]
 	deepPrint(obj, header) {
 		if (header) {
@@ -960,8 +989,10 @@ class Module {
 		try {
 			let newAmount = await SEManager.addUserPoints(user.name, amount);
 			this.log(`${this.pointsString(amount)} added to ${user.displayName}. New amount: ${newAmount}`);
+			return newAmount;
 		} catch (err) {
 			this.error(`Failed to add points to ${user.name}: ${err}`);
+			return null;
 		}
 	}
 	

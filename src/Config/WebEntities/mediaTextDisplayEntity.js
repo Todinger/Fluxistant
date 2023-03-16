@@ -9,7 +9,7 @@ class MediaTextDisplayEntity extends StaticObjectEntity {
 		this.addString('text', '')
 			.setName('Text')
 			.setDescription('Text to display');
-		this.addString('font', 'arial, sans-serif')
+		this.addString('font', 'impact, sans-serif')
 			.setName('Font')
 			.setDescription('Text to display');
 		this.addNaturalNumber('fontSize', 100)
