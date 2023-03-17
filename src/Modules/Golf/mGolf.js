@@ -34,6 +34,8 @@ class Golf extends Module {
 		this.state = States.Inactive;
 		this.stateTimer = null;
 		this.activeGame = null;
+		this.reminderTimer = null;
+		this.cancelTimer = null;
 		
 		this.calculateDistanceFromForce = DistanceFunctions.RandomizedExponential(
 			2.5,
@@ -58,12 +60,32 @@ class Golf extends Module {
 		.setName('Start Text')
 		.setDescription('What will be written to the chat when a game starts' +
 						` (vars - ${this.listVariables()})`);
-		modConfig.addNaturalNumber('maxStrokes', 3)
+		
+		modConfig.addDuration('reminderInterval', 30)
+		.setName('Swing Reminder Interval')
+		.setDescription(
+			'How often (in seconds) to reminder players to swing when the game is idle (set to 0 to disable)');
+		modConfig.addString('reminderText', 'There are lonely golf balls here just begging for some attention.')
+		.setName('Reminder Text')
+		.setDescription('What will be written to chat to remind players to play.' +
+			` (vars - ${this.listVariables()})`);
+		modConfig.addDuration('gameTimeout', 300)
+		.setName('Game Timeout')
+		.setDescription('How long (in seconds) without activity before the game is canceled (set to 0 to disable)');
+		modConfig.addString('cancelText', 'The golf balls have had enough and have retired to their quarters.')
+		.setName('Cancellation Text')
+		.setDescription('What will be written to chat when the game is aborted due to timeout.' +
+			` (vars - ${this.listVariables()})`);
+		
+		modConfig.addNaturalNumber('maxStrokes', 10)
 		.setName('Stroke Count')
 		.setDescription('Maximum number of strokes each player has');
-		modConfig.addNaturalNumber('pointsPerStrokeLeft', 1000)
-		.setName('Points per Stroke Left')
-		.setDescription('Upon scoring, how many points to award the player - multiplied by the amount of strokes left');
+		modConfig.addNaturalNumber('pointsForScoring', 1000)
+		.setName('Points for Scoring')
+		.setDescription('Upon scoring, how many base points to award the player');
+		modConfig.addNaturalNumber('pointsPerStrokeLeft', 100)
+		.setName('Bonus Points per Stroke Left')
+		.setDescription('Upon scoring, how many extra points to award the player per stroke they have left');
 		
 		modConfig.addPositiveNumber('maxForce', 10)
 		.setName('Maximum Force')
@@ -85,6 +107,33 @@ class Golf extends Module {
 		.setDescription('What will be written to a player in the chat when they miss the hole' +
 						` (vars - $distance, $strokes, $left, ${this.listVariables()})`);
 		
+		let swingPhysics = modConfig.addGroup('swingPhysics')
+		.setName('Swing Physics')
+		.setDescription('Parameters for deciding how far the ball goes based on swing force' +
+						' (final distance = multiplier * force ^ exponent + addition)');
+		
+		swingPhysics.addPositiveNumber('minExp', 2.5)
+		.setName('Minimum Exponent')
+		.setDescription('Minimum value to raise the force to the power of');
+		swingPhysics.addPositiveNumber('maxExp', 3.2)
+		.setName('Maximum Exponent')
+		.setDescription('Maximum value to raise the force to the power of');
+		swingPhysics.addNumber('minMultiplier', 0.6)
+		.setName('Minimum Multiplier')
+		.setDescription('Minimum amount to multiply the force by');
+		swingPhysics.addNumber('maxMultiplier', 1.4)
+		.setName('Maximum Multiplier')
+		.setDescription('Maximum amount to multiply the force by');
+		swingPhysics.addNumber('minAddition', -2)
+		.setName('Minimum Addition')
+		.setDescription('Minimum amount to add to the total distance');
+		swingPhysics.addNumber('maxAddition', 2)
+		.setName('Maximum Addition')
+		.setDescription('Maximum amount to add to the total distance');
+		
+		modConfig.addDynamicArray('tracks', 'Track')
+		.setName('Tracks')
+		.setDescription('The golf tracks available in the game');
 		
 		let mediaConfig = modConfig.addGroup('media')
 		.setName('Media Files')
@@ -106,11 +155,30 @@ class Golf extends Module {
 		.setDescription('Media for missing (ball outside hole)');
 	}
 	
-	loadModConfig(conf) {
+	validateRange(lower, upper, name) {
+		if (lower > upper) {
+			throw `Minimum ${name} must be <= maximum ${name}.`;
+		}
 	}
 	
-	enable() {
-		TrackManager.loadTracks(require('./trackData.json'));
+	loadModConfig(conf) {
+		this.validateRange(conf.swingPhysics.minExp, conf.swingPhysics.maxExp, "Exponent");
+		this.validateRange(conf.swingPhysics.minMultiplier, conf.swingPhysics.maxMultiplier, "Multiplier");
+		this.validateRange(conf.swingPhysics.minAddition, conf.swingPhysics.maxAddition, "Addition");
+		
+		TrackManager.clearTracks();
+		TrackManager.loadTracks(conf.tracks);
+		this.calculateDistanceFromForce = DistanceFunctions.RandomizedExponential(
+			conf.swingPhysics.minExp,
+			conf.swingPhysics.maxExp,
+			conf.swingPhysics.minMultiplier,
+			conf.swingPhysics.maxMultiplier,
+			conf.swingPhysics.minAddition,
+			conf.swingPhysics.maxAddition);
+	}
+	
+	disable() {
+		this.stopGame();
 	}
 	
 	get activeTrackName() {
@@ -155,13 +223,63 @@ class Golf extends Module {
 			duration);
 	}
 	
+	cancelGameTimers() {
+		if (this.reminderTimer) {
+			clearTimeout(this.reminderTimer);
+			this.reminderTimer = null;
+		}
+		if (this.cancelTimer) {
+			clearTimeout(this.cancelTimer);
+			this.cancelTimer = null;
+		}
+	}
+	
+	cancelTimers() {
+		if (this.stateTimer) {
+			clearTimeout(this.stateTimer);
+			this.stateTimer = null;
+		}
+		
+		this.cancelGameTimers();
+	}
+	
+	resetGameTimers() {
+		this.cancelGameTimers();
+		this.startReminderTimer();
+		this.startCancelTimer();
+	}
+	
+	remindPlayers() {
+		this.compileSay(this.config.reminderText);
+		this.startReminderTimer();
+	}
+	
+	startReminderTimer() {
+		if (this.config.reminderInterval > 0) {
+			this.reminderTimer = setTimeout(
+				() => this.remindPlayers(),
+				this.config.reminderInterval
+			)
+		}
+	}
+	
+	cancelGame() {
+		this.compileSay(this.config.cancelText);
+		this.stopGame();
+	}
+	
+	startCancelTimer() {
+		if (this.config.gameTimeout > 0) {
+			this.cancelTimer = setTimeout(
+				() => this.cancelGame(),
+				this.config.gameTimeout
+			)
+		}
+	}
+	
 	stopGame() {
 		if (this.state !== States.Inactive) {
-			if (this.stateTimer !== null) {
-				clearTimeout(this.stateTimer);
-				this.stateTimer = null;
-			}
-			
+			this.cancelTimers();
 			this.activeGame = null;
 			this.state = States.Inactive;
 		}
@@ -181,7 +299,13 @@ class Golf extends Module {
 	}
 	
 	startRecruiting(data) {
-		if (this.state !== States.Inactive) return;
+		if (this.state !== States.Inactive) return false;
+		if (!TrackManager.hasTracks) {
+			this.tellError(
+				data.user,
+				'Sorry, all the golf tracks are still under constructions. Please come back later.')
+			return false;
+		}
 		
 		this.setNewGameData();
 		this.addUserToGame(data.user);
@@ -196,6 +320,8 @@ class Golf extends Module {
 		this.state = States.Ongoing;
 		this.activeGame.playersWithStrokesLeft = Object.keys(this.activeGame.players).length;
 		this.compileSay(this.config.trackStartText);
+		this.startReminderTimer();
+		this.startCancelTimer();
 	}
 	
 	join(data) {
@@ -204,7 +330,7 @@ class Golf extends Module {
 				this.tellError(data.user, "The game has already started; it's too late to join it now.")
 			}
 			
-			return;
+			return false;
 		}
 		
 		this.addUserToGame(data.user);
@@ -215,11 +341,13 @@ class Golf extends Module {
 	}
 	
 	async swing(data) {
-		if (this.state !== States.Ongoing || !(data.user.name in this.activeGame.players)) return;
+		if (this.state !== States.Ongoing || !(data.user.name in this.activeGame.players)) return false;
 		
 		let user = data.user;
 		let userGameRecord = this.activeGame.players[user.name];
 		if (userGameRecord.strokes === this.maxStrokes) return;
+		
+		this.resetGameTimers();
 		
 		let force = data.firstParam;
 		if (Number.isNaN(force) || !Utils.inRange(-this.config.maxForce, force, this.config.maxForce)) {
@@ -263,7 +391,7 @@ class Golf extends Module {
 	
 	async playerScored(user, userGameRecord) {
 		let strokesLeft = this.maxStrokes - userGameRecord.strokes;
-		let award = this.config.pointsPerStrokeLeft * strokesLeft;
+		let award = this.config.pointsForScoring + this.config.pointsPerStrokeLeft * strokesLeft;
 		let points = await this.modifyUserPoints(user, award);
 		if (points !== null) {
 			let vars = this.variablesFromUserGameRecord(userGameRecord);

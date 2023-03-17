@@ -104,6 +104,7 @@ const entities = {
 	FeedingLevelEntity: require('./WebEntities/feedingLevelEntity.js'),
 	FoodItemEntity: require('./WebEntities/foodItemEntity.js'),
 	UserGroupEntity: require('./WebEntities/userGroupEntity.js'),
+	TrackEntity: require('./WebEntities/trackEntity.js'),
 	ImageCommandEntity: require('./WebEntities/imageCommandEntity.js'),
 	ImageFunctionEntity: require('./WebEntities/imageFunctionEntity.js'),
 	MediaTextDisplayEntity: require('./WebEntities/mediaTextDisplayEntity.js'),

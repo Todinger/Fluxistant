@@ -1,21 +1,29 @@
 const Utils = requireMain('./utils');
 
 class Track {
-	constructor(name, trackData) {
-		this.name = name;
-		this.length = trackData['length'];
+	constructor(trackData) {
+		this.name = trackData.name;
+		this.length = trackData.length;
 	}
 }
 
 class TrackManager {
 	constructor() {
+		this.clearTracks();
+	}
+	
+	clearTracks() {
 		this.tracks = {};
 	}
 	
-	loadTracks(data) {
-		Object.keys(data).forEach(name => {
-			this.tracks[name] = new Track(name, data[name]);
+	loadTracks(trackList) {
+		trackList.forEach(trackData => {
+			this.tracks[trackData.name] = new Track(trackData);
 		})
+	}
+	
+	get hasTracks() {
+		return Object.keys(this.tracks).length > 0;
 	}
 	
 	getTrack(name) {
