@@ -127,6 +127,10 @@ class Utils {
 		return min <= val && val <= max;
 	}
 	
+	static transformLinear(fromMin, fromMax, toMin, toMax, value) {
+		return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
+	}
+	
 	// Returns a random key from an object, with each value having a differet
 	// chance of being selected based on weight.
 	// A weight can be any positive number. If one value has the weight of X and
@@ -335,6 +339,10 @@ class Utils {
 			
 			return Promise.all(deletePromises);
 		});
+	}
+	
+	static async sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 	
 	// Turns an array into a correct form of a list in English with the given

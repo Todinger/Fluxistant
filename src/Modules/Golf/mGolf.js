@@ -1,5 +1,6 @@
 const Module = requireMain('module');
 const Utils = requireMain('utils');
+const { TrackManager } = require('./tracks.js');
 
 const States = {
 	Inactive: 0,
@@ -7,7 +8,17 @@ const States = {
 	Ongoing: 2,
 }
 
-const { TrackManager } = require('./tracks.js');
+const AnimationTimes = {
+	Pre: 3,
+	PerAim: 1,
+	WaitForIt: 2,
+	Post: 4,
+}
+
+const MAX_ANIMATION_SWINGS = 5;
+
+const USER_SECONDS = 1000;
+
 
 const DistanceFunctions = {
 	Linear: (multiplier, addition) => (force) => multiplier * force + addition,
@@ -44,6 +55,12 @@ class Golf extends Module {
 			1.4,
 			1,
 			3);
+		
+		this.busy = false;
+	}
+	
+	defineModAssets(modData) {
+		modData.addUniformPool('Images');
 	}
 	
 	defineModConfig(modConfig) {
@@ -94,6 +111,10 @@ class Golf extends Module {
 		.setName('Leniency')
 		.setDescription('How close to the hole is considered "in"');
 		
+		modConfig.addString('aimMessage', '$user takes aim and...')
+		.setName('Aim Message')
+		.setDescription('What will be written to the chat when someone takes a swing, before the animation starts' +
+			` (vars - $distance, $strokes, $left, $user, ${this.listVariables()})`);
 		modConfig.addString(
 			'scoreMessage',
 			'Right into the hole it goes! $user wins $award cat toys for a total of $points!')
@@ -105,7 +126,7 @@ class Golf extends Module {
 			"Oh no, where are you going?! Well, now you're $distance away with $left strokes left.")
 		.setName('Miss Message')
 		.setDescription('What will be written to a player in the chat when they miss the hole' +
-						` (vars - $distance, $strokes, $left, ${this.listVariables()})`);
+						` (vars - $distance, $strokes, $left, $user, ${this.listVariables()})`);
 		
 		let swingPhysics = modConfig.addGroup('swingPhysics')
 		.setName('Swing Physics')
@@ -135,24 +156,24 @@ class Golf extends Module {
 		.setName('Tracks')
 		.setDescription('The golf tracks available in the game');
 		
-		let mediaConfig = modConfig.addGroup('media')
-		.setName('Media Files')
-		.setDescription('The images, sounds and videos to show for the various swinging poses');
-		mediaConfig.add('backSwing', 'SingleMedia')
+		let mediaConfig = modConfig.addGroup('images')
+		.setName('Image Files')
+		.setDescription('The images to show for the various swinging poses');
+		mediaConfig.add('backSwing', 'Image')
 		.setName('Back Swing')
-		.setDescription('Media for the holding the golf club backwards');
-		mediaConfig.add('atBall', 'SingleMedia')
+		.setDescription('Image for the holding the golf club backwards');
+		mediaConfig.add('atBall', 'Image')
 		.setName('At Ball')
-		.setDescription('Media for the holding the golf club next to the ball');
-		mediaConfig.add('swing', 'SingleMedia')
+		.setDescription('Image for the holding the golf club next to the ball');
+		mediaConfig.add('swing', 'Image')
 		.setName('Swing')
-		.setDescription('Media for swinging forward after hitting the ball');
-		mediaConfig.add('score', 'SingleMedia')
+		.setDescription('Image for swinging forward after hitting the ball');
+		mediaConfig.add('score', 'Image')
 		.setName('Score')
-		.setDescription('Media for scoring (ball in hole)');
-		mediaConfig.add('miss', 'SingleMedia')
+		.setDescription('Image for scoring (ball in hole)');
+		mediaConfig.add('miss', 'Image')
 		.setName('Miss')
-		.setDescription('Media for missing (ball outside hole)');
+		.setDescription('Image for missing (ball outside hole)');
 	}
 	
 	validateRange(lower, upper, name) {
@@ -175,6 +196,38 @@ class Golf extends Module {
 			conf.swingPhysics.maxMultiplier,
 			conf.swingPhysics.minAddition,
 			conf.swingPhysics.maxAddition);
+	}
+	
+	load() {
+		this.onClientAttached(socket => {
+			socket.on('getGameData', () => {
+				this.sendGameDataToClients();
+				if (this.state === States.Ongoing) {
+					socket.emit('show');
+				}
+			});
+		});
+	}
+	
+	sendGameDataToClients() {
+		let entries = Object.entries(this.config.images);
+		let promises = entries.map(
+			([_, image]) => image.file.fileKey ? this.assets.Images.getFileWebByKey(image.file.fileKey) : null);
+		
+		Promise.all(promises)
+		.then(files => {
+			let animationImages = {};
+			for (let i = 0; i < entries.length; i++) {
+				animationImages[entries[i][0]] = files[i] ? entries[i][1].makeDisplayData(files[i]): null;
+			}
+			
+			let gameData = {
+				animationImages,
+				timingConstants: AnimationTimes,
+			};
+			
+			this.broadcastEvent('setGameData', gameData);
+		});
 	}
 	
 	disable() {
@@ -283,6 +336,8 @@ class Golf extends Module {
 			this.activeGame = null;
 			this.state = States.Inactive;
 		}
+		
+		this.broadcastEvent('hide');
 	}
 	
 	addUserToGame(user) {
@@ -317,6 +372,7 @@ class Golf extends Module {
 	}
 	
 	startTrack() {
+		this.broadcastEvent('show');
 		this.state = States.Ongoing;
 		this.activeGame.playersWithStrokesLeft = Object.keys(this.activeGame.players).length;
 		this.compileSay(this.config.trackStartText);
@@ -341,7 +397,11 @@ class Golf extends Module {
 	}
 	
 	async swing(data) {
-		if (this.state !== States.Ongoing || !(data.user.name in this.activeGame.players)) return false;
+		if (this.state !== States.Ongoing ||
+			!(data.user.name in this.activeGame.players) ||
+			this.busy) {
+				return false;
+		}
 		
 		let user = data.user;
 		let userGameRecord = this.activeGame.players[user.name];
@@ -354,8 +414,13 @@ class Golf extends Module {
 			this.tellError(
 				user,
 				`Please enter a number in the range [${-this.config.maxForce}, ${this.config.maxForce}].`);
-			return;
+			return false;
 		}
+		
+		this.busy = true;
+		this.compileSay(this.config.aimMessage, this.variablesFromUserGameRecord(data.user, userGameRecord));
+		await this.animate(force);
+		this.resetGameTimers();
 		
 		let distance = this.calculateDistanceFromForce(force);
 		userGameRecord.position += distance;
@@ -372,6 +437,9 @@ class Golf extends Module {
 			}
 		}
 		
+		await Utils.sleep((AnimationTimes.Post + 1) * USER_SECONDS);
+		
+		this.busy = false;
 		this.checkEndOfGame();
 	}
 	
@@ -381,32 +449,34 @@ class Golf extends Module {
 		}
 	}
 	
-	variablesFromUserGameRecord(userGameRecord) {
+	variablesFromUserGameRecord(user, userGameRecord) {
 		return {
 			distance: (this.activeGame.track.length - userGameRecord.position).toFixed(2),
 			strokes: userGameRecord.strokes,
 			left: this.maxStrokes - userGameRecord.strokes,
+			user: user.displayName,
 		};
 	}
 	
 	async playerScored(user, userGameRecord) {
+		this.broadcastEvent('score');
 		let strokesLeft = this.maxStrokes - userGameRecord.strokes;
 		let award = this.config.pointsForScoring + this.config.pointsPerStrokeLeft * strokesLeft;
 		let points = await this.modifyUserPoints(user, award);
 		if (points !== null) {
-			let vars = this.variablesFromUserGameRecord(userGameRecord);
+			let vars = this.variablesFromUserGameRecord(user, userGameRecord);
 			vars = {
 				...vars,
 				award,
 				points,
-				user: user.displayName,
 			}
 			this.compileTell(user, this.config.scoreMessage, vars);
 		}
 	}
 	
 	playerMissed(user, userGameRecord) {
-		this.compileTell(user, this.config.missMessage, this.variablesFromUserGameRecord(userGameRecord));
+		this.broadcastEvent('miss');
+		this.compileTell(user, this.config.missMessage, this.variablesFromUserGameRecord(user, userGameRecord));
 	}
 	
 	comparePlayerGameRecords(record1, record2) {
@@ -448,6 +518,36 @@ class Golf extends Module {
 		});
 		
 		this.saveData();
+	}
+	
+	
+	calculateSwingAnimationTime(aimCount) {
+		return (AnimationTimes.Pre + aimCount * AnimationTimes.PerAim + AnimationTimes.WaitForIt) * USER_SECONDS;
+	}
+	
+	async waitForAnimation(aimCount) {
+		return new Promise((resolve) => {
+			setTimeout(
+				() => {
+					resolve();
+				},
+				this.calculateSwingAnimationTime(aimCount));
+		});
+	}
+	
+	calculateAimCountFromForce(force) {
+		return Math.round(Utils.transformLinear(
+			0,
+			this.config.maxForce,
+			1,
+			MAX_ANIMATION_SWINGS,
+			Math.abs(force)));
+	}
+	
+	async animate(force) {
+		let aimCount = this.calculateAimCountFromForce(force);
+		this.broadcastEvent('animate', aimCount);
+		await this.waitForAnimation(aimCount);
 	}
 	
 	
