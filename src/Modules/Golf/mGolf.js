@@ -38,7 +38,6 @@ class Golf extends Module {
 			name:    'Golf',
 			webname: 'golf',
 			source:  'golf.html',
-			debug: true,
 		});
 		
 		this.data.records = {};
