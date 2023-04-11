@@ -72,7 +72,7 @@ class Golf extends Module {
 		.setDescription('How long (in seconds) people have to join a game');
 		modConfig.addString(
 			'trackStartText',
-			'A new match has started on $track with $players player(s)! Distance to hole: $distance')
+			'A new match has started on $track with $players player(s)! Distance to hole: $length')
 		.setName('Start Text')
 		.setDescription('What will be written to the chat when a game starts' +
 						` (vars - ${this.listVariables()})`);
@@ -485,7 +485,7 @@ class Golf extends Module {
 			return proximity1 - proximity2;
 		}
 		
-		return record1.strokes - record2.strokes;
+		return record2.strokes - record1.strokes;
 	}
 	
 	playerResult(username) {
