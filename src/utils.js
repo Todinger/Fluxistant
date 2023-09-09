@@ -409,6 +409,17 @@ class Utils {
 			return 'a ' + word;
 		}
 	}
+
+	// Very simplistic function for transforming a unit name to its singular or plural
+	// form based on the quantity. It assumes the plural is obtained by adding an "s"
+	// by default.
+	static plurality(count, units, pluralUnits) {
+		if (pluralUnits === undefined) {
+			pluralUnits = units + 's';
+		}
+
+		return count === 1 ? units : pluralUnits;
+	}
 	
 	static splitIntoWords(text) {
 		// Remove multiple consecutive spaces

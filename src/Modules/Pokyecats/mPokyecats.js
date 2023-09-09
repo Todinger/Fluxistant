@@ -296,7 +296,10 @@ class Pokyecats extends Module {
 		
 		// Give any balls the viewer is entitled for
 		this.grantBalls(catchData);
-		
+
+		this.saveCatchData(data.user, catchData);
+		this.saveData();
+
 		// Caught only if the result is < catch chance
 		let catchChance = this.catchChance * ball.catchMultiplier;
 		if (Math.random() >= catchChance) {
@@ -389,6 +392,26 @@ class Pokyecats extends Module {
 			})
 		}
 	}
+
+	addBallCountString(targetArray, catchData, ballName, ballTitle) {
+		let count = catchData.balls[ballName];
+		if (count > 0) {
+			targetArray.push(`${count} ${Utils.plurality(count, `${ballTitle} ball`)}`)
+		}
+	}
+
+	showUserInventory(data) {
+		if (data.user.name in this.data.catches) {
+			let catchData = this.data.catches[data.user.name];
+			let contents = [];
+			contents.push(`${catchData.yarn} yarn`);
+			this.addBallCountString(contents, catchData, BALLS.YARN, "yarn");
+			this.addBallCountString(contents, catchData, BALLS.GOLD, "gold");
+			this.tell(data.user, `You currently have ${Utils.makeEnglishAndList(contents)}.`);
+		} else {
+			this.tell(data.user, "Sorry, you don't have any yarn yet. Try catching Pokyecats to get some!");
+		}
+	}
 	
 	functions = {
 		sellSoul: {
@@ -428,6 +451,17 @@ class Pokyecats extends Module {
 				}),
 			],
 			action: (data) => this.showYarn(data),
+		},
+
+		showUserInventory: {
+			name: 'Show User Inventory',
+			description: "Shows what the user currently owns (yarn and balls)",
+			triggers: [
+				this.trigger.command({
+					cmdname: 'yarn',
+				}),
+			],
+			action: (data) => this.showUserInventory(data),
 		},
 	}
 }
