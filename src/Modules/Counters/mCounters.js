@@ -4,65 +4,107 @@ class Counters extends Module {
 	constructor() {
 		super({
 			name: 'Counters',
-			enabledByDefault: false,
-			configurable: false,
 		});
+
+		this.globalCounterFunctions = {};
+		this.userCounterFunctions = {};
 		
-		this.counterFunctions = {};
-		
-		this.data.counters = {};
+		this.data = {
+			global: {},
+			user: {},
+		};
+	}
+
+	defineModConfig(modConfig) {
+		modConfig.addDynamicArray('globalCounters', 'Counter')
+			.setName('Global Counters')
+			.setDescription('Counters whose values are independent of users');
+		modConfig.addDynamicArray('userCounters', 'Counter')
+			.setName('User Counters')
+			.setDescription('Counters whose values are specific to each user');
+	}
+
+	loadModConfig(conf) {
+		this.globalCounterFunctions = this.loadCountersFromConfig(
+			conf.globalCounters,
+			this.globalCounterFunctions,
+			'Global',
+			(name) => this.incrementGlobal(name),
+		);
+
+		this.userCounterFunctions = this.loadCountersFromConfig(
+			conf.userCounters,
+			this.userCounterFunctions,
+			'User',
+			(name, data) => this.incrementUser(name, data),
+		);
 	}
 	
-	loadModConfig(conf) {
-		this.deactivateFunctions(this.counterFunctions || {});
-		
-		this.counterFunctions = {};
-		if (conf.counterFunctions) {
-			for (let i = 0; i < conf.counterFunctions.length; i++) {
-				let func = conf.counterFunctions[i];
+	loadCountersFromConfig(counters, objectCollection, idPrefix, increment_function) {
+		this.deactivateFunctions(objectCollection || {});
+		objectCollection = {};
+
+		if (counters) {
+			for (let i = 0; i < counters.length; i++) {
+				let func = counters[i].incrementFunction;
+				func.action = (data) => increment_function(counters[i].name, data);
+
 				let funcObject = this.createFunctionObject(func);
-				
-				funcObject.action = function() {};
 				if (!funcObject.funcID) {
-					funcObject.funcID = `CounterFunc[${i}]`;
+					funcObject.funcID = `${idPrefix}CounterIncrementFunc[${i}]`;
 				}
-				
-				this.counterFunctions[funcObject.funcID] = funcObject;
+
+				objectCollection[funcObject.funcID] = funcObject;
 			}
 		}
-		
-		this.activateFunctions(this.counterFunctions);
+
+		this.activateFunctions(objectCollection);
+		return objectCollection;
 	}
-	
-	increment(data) {
-		
+
+	incrementCounter(counterCollection, counterName) {
+		if (!(counterName in counterCollection)) {
+			counterCollection[counterName] = 0;
+		}
+
+		let newValue = ++counterCollection[counterName];
+		this.saveData();
+		return newValue;
 	}
-	
-	functions = {
-		showImage: {
-			name: 'Show Image',
-			description: 'Shows a randomly selected picture from the image pool.',
-			action: data => this.showRandomImage(data.user),
-			triggers: [
-				this.trigger.command({
-					cmdname: 'pixelate',
-					cost: 300,
-				})
-			],
-			variables: [
-				this.variable.out('imageName', {
-					name: 'Image Name (`$image`)',
-					description: 'The name of the file image that was chosen for display, without its extension',
-					example: '"Showing the beautiful `$image`!" ---When showing "Happy Face.png"---> "Showing the beautiful Happy Face!"',
-					expr: '$image',
-				}),
-			],
-			responses: [
-				this.response.chat('$cmdname redeemed by $user for $pcost! Showing "$image" by Yecats!'),
-			],
-			// message: `${_.capitalize(COMMAND_NAME)} redeemed by $user for $pcost! One random drawing by Yecats coming up!`,
-		},
+
+	incrementResultForCounter(newValue) {
+		return {
+			success:   true,
+			variables: {
+				value: newValue,
+			},
+		};
 	}
+
+	incrementGlobal(counterName) {
+		let newValue = this.incrementCounter(this.data.global, counterName);
+
+		return this.incrementResultForCounter(newValue);
+	}
+
+	incrementUser(counterName, data) {
+		if (!(counterName in this.data.user)) {
+			this.data.user[counterName] = {};
+		}
+
+		let newValue = this.incrementCounter(this.data.user[counterName], data.user.name);
+
+		return this.incrementResultForCounter(newValue);
+	}
+
+	variables = [
+		this.variable.out('value', {
+			name: 'Value (`$value`)',
+			description: 'The updated value of the counter',
+			example: 'Yecats got lost again! She has now lost her way $value times!',
+			expr: 'value',
+		}),
+	]
 }
 
 module.exports = new Counters();

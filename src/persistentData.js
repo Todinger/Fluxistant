@@ -34,12 +34,16 @@ class PersistentData {
 		});
 	}
 	
-	load() {
+	load(defaultValue) {
 		try {
 			let savedData = fs.readFileSync(this.filename);
 			this.data = JSON.parse(savedData);
 		} catch (err) {
 			cli.warn(`Error loading persistent data from ${this.filename}: ${Utils.errMessage(err)}. Creating empty data file.`);
+			if (Utils.isObject(defaultValue)) {
+				this.data = defaultValue;
+			}
+
 			this.save();
 		}
 	}

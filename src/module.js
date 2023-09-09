@@ -564,7 +564,7 @@ class Module {
 	// [NOT for override by inheriting classes!]
 	// Loads the persistent data from disk and notifies the module about it
 	loadPersistentData() {
-		this.persistentData.load();
+		this.persistentData.load(this.data);
 		this.data = this.persistentData.get();
 		this.persistentDataLoaded();
 	}

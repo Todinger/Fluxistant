@@ -1,18 +1,24 @@
-const StaticObjectEntity = require('./staticObjectEntity');
+const NamedEntity = require('././namedEntity');
 
-class CounterEntity extends StaticObjectEntity {
+class CounterEntity extends NamedEntity {
 	static get TYPE()		{ return 'Counter'; 					}
 	static get BUILDER()	{ return () => new CounterEntity(); 	}
 	
 	constructor() {
 		super();
-		this.getChild('name').show();
-		
-		let funcs = this.addGroup('functions')
-			.setName("Functions")
-			.setDescription("All the things that can be done with this counter");
-		
-		
+
+		this.addString('name', '')
+			.setName('Name')
+			.setDescription('Counter name');
+
+		this.add('incrementFunction', 'Function', {
+			name: 'Increment Function',
+			description: 'Increase the counter',
+		});
+	}
+
+	getNameOverride() {
+		return this.getChild('name').getValue();
 	}
 }
 
