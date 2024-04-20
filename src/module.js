@@ -719,6 +719,7 @@ class Module {
 	// Modules that have a tage that this Module has.
 	attachClient(socket, source) {
 		this._connectedClients[socket.id] = socket;
+		socket.setMaxListeners(100);
 		socket.on('disconnect', () => {
 			this._clientDisconnectedHandlers.forEach(handler => handler(socket));
 			delete this._connectedClients[socket.id];

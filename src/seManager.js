@@ -90,7 +90,9 @@ class SEManager extends EventNotifier {
 		
 		// Used for event notifications
 		this.socket = null;
-		
+
+		this.configured = false;
+
 		this._registerToCliEvents();
 	}
 	
@@ -164,6 +166,7 @@ class SEManager extends EventNotifier {
 		this.socket.on('event:message', (data) => this._onEvent(data));
 		
 		this.connected = false;
+		this.configured = true;
 	}
 	
 	disconnect() {
@@ -233,8 +236,8 @@ class SEManager extends EventNotifier {
 	// 	onError		Will be invoked if something goes wrong with the request.
 	// 				Should accept a single argument with error details, I think.
 	getUserPoints(username, onDone, onError) {
-		if (!this.connected) {
-			onError('Not connected to StreamElements.');
+		if (!this.configured) {
+			onError('StreamElements access has not been configured.');
 			return;
 		}
 		
@@ -259,8 +262,8 @@ class SEManager extends EventNotifier {
 	// 	username	Twitch username for the user we want to look into.
 	//  amount      Number of points to add.
 	async addUserPoints(username, amount) {
-		if (!this.connected) {
-			cli.error('Not connected to StreamElements.');
+		if (!this.configured) {
+			onError('StreamElements access has not been configured.');
 			return;
 		}
 		
@@ -308,8 +311,8 @@ class SEManager extends EventNotifier {
 	// 	onError					Called if something goes wrong that isn't the
 	// 							user not having enough points.
 	consumeUserPoints(username, amount, onDone, onInsufficientPoints, onError) {
-		if (!this.connected) {
-			onError('Not connected to StreamElements.');
+		if (!this.configured) {
+			onError('StreamElements access has not been configured.');
 			return;
 		}
 		
@@ -347,8 +350,8 @@ class SEManager extends EventNotifier {
 	// 	onDone		Called once the message has been successfully sent.
 	// 	onError		Called if something goes wrong with the request.
 	say(msg, onDone, onError) {
-		if (!this.connected) {
-			onError('Not connected to StreamElements.');
+		if (!this.configured) {
+			onError('StreamElements access has not been configured.');
 			return;
 		}
 		

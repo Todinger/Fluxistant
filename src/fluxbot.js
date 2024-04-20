@@ -107,6 +107,8 @@ class FluxBot {
 		// The files here are needed by the HTML pages of the various modules
 		this.webDirs.registerDir(path.join(__dirname, 'ClientsCommon'), '/common');
 		this.app.use(GUI_DIR_WEB, express.static(GUI_DIR));
+		console.log(`Configuration UI address: http://localhost:${this.mainConfig.getPort()}${GUI_DIR_WEB}cfg.html`);
+		console.log(`Main overlay address: http://localhost:${this.mainConfig.getPort()}/mod/ScriptedModules/ScriptedModules.html`);
 	}
 	
 	// Gets a collection of { username: imageurl } pairs for all the users who have
