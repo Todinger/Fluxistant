@@ -318,6 +318,11 @@ class FeedingGame extends Module {
 			reward,
 		};
 	}
+
+	async lagSkip() {
+		this.broadcastEvent('forceFeedDoneEvent');
+	}
+
 	
 	functions = {
 		startGame: {
@@ -364,6 +369,16 @@ class FeedingGame extends Module {
 			name: 'Stop Game',
 			description: "Stop the game if it's running",
 			action: () => this.stop(),
+		},
+		lagSkip: {
+			name: 'Lag Skip',
+			description: "Forces the game to skip a step, hopefully fixing a one-action lag (use again for larger lag)",
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'feedskip',
+				}),
+			],
+			action: () => this.lagSkip(),
 		},
 	}
 }

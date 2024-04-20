@@ -193,6 +193,7 @@ class FeedingGameClient extends ModuleClient {
 			this.setLevelImages(data, true);
 			this.show();
 		});
+		this.server.on('forceFeedDoneEvent', () => this.server.emit('feedDone'));
 		
 		this.server.attach();
 		
