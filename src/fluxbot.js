@@ -408,6 +408,13 @@ class FluxBot {
 			});
 		});
 	}
+
+	startStreamRaidersManager() {
+		this.streamRaidersManager = require('./streamRaidersManager');
+		this.streamRaidersManager.setToken('');
+		this.streamRaidersManager.logging = true;
+		// this.streamRaidersManager.start();
+	}
 	
 	// Starts the server. Do this last.
 	startServer() {
@@ -448,6 +455,7 @@ class FluxBot {
 		this.saveConfig();
 		this.registerServerEvents();
 		this.deleteOldBackups();
+		this.startStreamRaidersManager();
 		this.startServer();
 	}
 	
