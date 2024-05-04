@@ -93,6 +93,11 @@ class ApiPoller {
 		this._timer = null;
 	}
 
+	trigger() {
+		this.stop();
+		this.start();
+	}
+
 	async _onTick() {
 		try {
 			let data = await this.requestEngine.request(this.url, this.method);

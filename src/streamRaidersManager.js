@@ -161,6 +161,10 @@ class API {
 		this.poller.stop();
 	}
 
+	refresh() {
+		this.poller.trigger();
+	}
+
 	mockResponses(responseData) {
 		this.mockRequestEngine.setResponse(responseData);
 		this.poller.setRequestEngine(this.mockRequestEngine);
@@ -276,9 +280,14 @@ class StreamRaidersManager extends EventNotifier {
 
 		this._addEvent('skinathonChanged');
 		this._addEvent('skinathonPointsChanged');
+		this._addEvent('battleChanged');
+		this._addEvent('battleStarted');
+		this._addEvent('battleEnded');
+		this._addEvent('battleTimerSync');
 
 		cli.on('sr-mock', () => this.mockData());
 		cli.on('sr-mock-stop', () => this.stopMockingData());
+		cli.on('sr-refresh', () => this._refresh());
 
 		this.logging = false;
 		this.errorLogging = true;
@@ -338,6 +347,12 @@ class StreamRaidersManager extends EventNotifier {
 	_updateAPIs() {
 		Object.keys(this.apis).forEach(apiName => {
 			this.apis[apiName].setToken(this._token);
+		});
+	}
+
+	_refresh() {
+		Object.keys(this.apis).forEach(apiName => {
+			this.apis[apiName].refresh();
 		});
 	}
 
