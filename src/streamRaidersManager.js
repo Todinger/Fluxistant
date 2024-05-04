@@ -1,5 +1,4 @@
 'use strict';
-const assert = require('assert').strict;
 const EventNotifier = require('./eventNotifier');
 const { ApiPoller, AxiosRequestEngine, MockRequestEngine } = require('./apiPoller');
 const _ = require('lodash');
@@ -260,26 +259,6 @@ class StreamRaidersManager extends EventNotifier {
 			battle: new BattleState(),
 		}
 
-		// this.apis = {
-		// 	skinathon: {
-		// 		url: fillUrlParametersFromObject(API_URL, API_SETTINGS.skinathon.urlParams),
-		// 		poller: new ApiPoller(
-		// 			"",
-		// 			API_SETTINGS.skinathon.intervals.inactive,
-		// 			(data) => this._updateSkinathonState(data)
-		// 		),
-		// 		getActive: () => this.states.skinathon.isActive,
-		// 	},
-		// 	battleBox: {
-		// 		url: fillUrlParametersFromObject(API_URL, API_SETTINGS.battleBox.urlParams),
-		// 		poller: new ApiPoller(
-		// 			"",
-		// 			API_SETTINGS.battleBox.intervals.inactive,
-		// 			(data) => this._updateBattleState(data)
-		// 		),
-		// 		getActive: () => this.states.battle.isActive,
-		// 	},
-		// }
 		this.apis = {
 			skinathon: new API(
 				API_SETTINGS.skinathon,
@@ -295,35 +274,20 @@ class StreamRaidersManager extends EventNotifier {
 			),
 		}
 
-		// this.urls = {
-		// 	skinathon: fillUrlParametersFromObject(API_URL, API_SETTINGS.skinathon.urlParams),
-		// 	battleBox: fillUrlParametersFromObject(API_URL, API_SETTINGS.battleBox.urlParams),
-		// }
-		//
-		// this.pollers = {
-		// 	skinathon: new ApiPoller(
-		// 		"",
-		// 		API_SETTINGS.skinathon.intervals.inactive,
-		// 		(data) => this._updateSkinathonState(data)
-		// 	),
-		// 	battleBox: new ApiPoller(
-		// 		"",
-		// 		API_SETTINGS.battleBox.intervals.inactive,
-		// 		(data) => this._updateBattleState(data)
-		// 	),
-		// }
-
 		this._addEvent('skinathonChanged');
-		this._addEvent('skinathonPointsIncreased');
+		this._addEvent('skinathonPointsChanged');
 
 		cli.on('sr-mock', () => this.mockData());
 		cli.on('sr-mock-stop', () => this.stopMockingData());
 
 		this.logging = false;
+		this.errorLogging = true;
 	}
 
 	_apiError(apiName, err) {
-		this.log(`Error in ${apiName} API: ${err}`);
+		if (this.errorLogging) {
+			Logger.warn(`[StreamRaidersManager] Error in ${apiName} API: ${err}`);
+		}
 	}
 
 	_updateSkinathonState(data) {
@@ -334,7 +298,7 @@ class StreamRaidersManager extends EventNotifier {
 			this._notifySkinathonChanged(newState, oldState);
 
 			if (newState.totalSkinPoints !== oldState.totalSkinPoints) {
-				this._notifySkinathonPointsIncreased(newState.totalSkinPoints, oldState.totalSkinPoints);
+				this._notifySkinathonPointsChanged(newState.totalSkinPoints, oldState.totalSkinPoints);
 			}
 		}
 
@@ -378,12 +342,21 @@ class StreamRaidersManager extends EventNotifier {
 	}
 
 	setToken(token) {
-		this._token = token;
-		this._updateAPIs();
+		if (token) {
+			this._token = token;
+			this._updateAPIs();
+		} else {
+			this.stop();
+			this._token = null;
+		}
 	}
 
 	start() {
-		assert(this._token !== null, "Cannot start Stream Raiders Manager without a token set.");
+		if (this._token === null) {
+			Logger.warn("A Stream Raiders token has not been set, so Stream Raiders interaction is disabled.");
+			return;
+		}
+
 		Object.keys(this.apis).forEach(apiName => {
 			this.apis[apiName].start();
 		});
@@ -432,17 +405,17 @@ class StreamRaidersManager extends EventNotifier {
 		this.log(`skinathonChanged: ${JSON.stringify(oldState)} -> ${JSON.stringify(newState)}`);
 	}
 
-	onSkinathonPointsIncreased(callback) {
-		return this.on('skinathonPointsIncreased', callback);
+	onSkinathonPointsChanged(callback) {
+		return this.on('skinathonPointsChanged', callback);
 	}
 
-	removeSkinathonPointsIncreasedCallback(callback) {
-		return this.removeCallback('skinathonPointsIncreased', callback);
+	removeSkinathonPointsChangedCallback(callback) {
+		return this.removeCallback('skinathonPointsChanged', callback);
 	}
 
-	_notifySkinathonPointsIncreased(newPoints, oldPoints) {
-		this._notify('skinathonPointsIncreased', newPoints, oldPoints);
-		this.log(`skinathonPointsIncreased: ${oldPoints} -> ${newPoints}`);
+	_notifySkinathonPointsChanged(newPoints, oldPoints) {
+		this._notify('skinathonPointsChanged', newPoints, oldPoints);
+		this.log(`skinathonPointsChanged: ${oldPoints} -> ${newPoints}`);
 	}
 
 	onBattleChanged(callback) {

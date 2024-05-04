@@ -61,7 +61,23 @@ You can find it on your [StreamElements account details page](https://streamelem
 		se.addString('pointsNameSingular', 'point')
 			.setName('Points Name: Singular')
 			.setDescription('The name of the loyalty points you defined on StreamElements in singular form (e.g. "pixel")');
-		
+
+		let sr = this.addGroup('streamRaiders')
+			.setName('Stream Raiders')
+			.setDescription('Settings for Stream Raiders interactions');
+		sr.addHiddenString('token')
+			.setName('Account Token')
+			.setDescription('Secret (?) token used to get information about your account and battles')
+			.setHelp(`This might be sensitive information (not sure about that), so probably best not to give it out to people.
+To find it, go to your [Battle Box overlay page](https://www.streamraiders.com/game/streamer-tools/overlays/battle-box/).
+The link it shows there has a part at the end that says "?ss=" - everything after that is the "token".`);
+		sr.addBoolean('logging', false)
+			.setName('Enable Logging')
+			.setDescription('When enabled, information will be logged to the console with every change of state.');
+		sr.addBoolean('errorLogging', true)
+			.setName('Enable Error Logging')
+			.setDescription('When enabled, information will be logged to the console whenever an error occurs communicating with the SR servers.');
+
 		this.addDynamicArray('channelRewards', 'ChannelReward')
 			.setName('Channel Rewards')
 			.setDescription("A list of all the channel point rewards that the bot can recognize on your channel");
@@ -103,7 +119,11 @@ You can find it on your [StreamElements account details page](https://streamelem
 	getStreamElementsParams() {
 		return this.getGroupValues('streamElements');
 	}
-	
+
+	getStreamRaidersParams() {
+		return this.getGroupValues('streamRaiders');
+	}
+
 	// getLoggerParams() {
 	// 	return this.getGroupValues('logs');
 	// }

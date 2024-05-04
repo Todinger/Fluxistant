@@ -174,14 +174,11 @@ class FluxBot {
 		this.twitchManager = require('./twitchManager');
 		// TODO: Switch to new configuration system
 		this.twitchManager.init();
-		
-		this.twitchManager.connect(this.mainConfig.getTwitchParams());
 	}
 	
 	// Set up StreamElements integration
 	setupStreamElements() {
 		this.seManager = require('./seManager');
-		this.seManager.connect(this.mainConfig.getStreamElementsParams());
 	}
 	
 	// Save the current assets for the modules - this is to create default
@@ -376,7 +373,7 @@ class FluxBot {
 					this.rewardsManager.setRewards(this.mainConfig.getChannelRewards());
 					await this.assetManager.commitChanges();
 					
-					this.handleMainConfigChange();
+					this.applyMainConfig();
 					
 					socket.emit('configSaved');
 				} catch (err) {
@@ -411,9 +408,6 @@ class FluxBot {
 
 	startStreamRaidersManager() {
 		this.streamRaidersManager = require('./streamRaidersManager');
-		this.streamRaidersManager.setToken('');
-		this.streamRaidersManager.logging = true;
-		// this.streamRaidersManager.start();
 	}
 	
 	// Starts the server. Do this last.
@@ -424,9 +418,14 @@ class FluxBot {
 		this.cli.start();
 	}
 	
-	handleMainConfigChange() {
+	applyMainConfig() {
 		this.twitchManager.connect(this.mainConfig.getTwitchParams());
 		this.seManager.connect(this.mainConfig.getStreamElementsParams());
+
+		let srSettings = this.mainConfig.getStreamRaidersParams();
+		this.streamRaidersManager.setToken(srSettings.token);
+		this.streamRaidersManager.logging = srSettings.logging;
+		this.streamRaidersManager.start();
 		// this.logger.init(this.mainConfig.getLoggerParams());
 	}
 	
@@ -456,6 +455,7 @@ class FluxBot {
 		this.registerServerEvents();
 		this.deleteOldBackups();
 		this.startStreamRaidersManager();
+		this.applyMainConfig();
 		this.startServer();
 	}
 	
