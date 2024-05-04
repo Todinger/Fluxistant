@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bot Stream Raiders Overlay</title>
+    <link rel="stylesheet" href="./streamRaiders.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!--suppress HtmlUnknownTarget -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<div id="skinathonRoad" class="bottom-center">
+    <img src="assets/RoadNormal.png" alt="X" class="road-element">
+    <img id="traveled" src="assets/RoadTraveled.png" alt="X" class="road-element road-overlay">
+    <img id="progress-panel" src="assets/ProgressPanel.png" alt="X" class="absolute">
+    <div id="progress-sp-container" class="absolute">
+        <span id="progress-sp" class="absolute">0</span>
+    </div>
+</div>
+
+<!--suppress HtmlUnknownTarget -->
+<script type="module" src="/common/moduleClient.mjs"></script>
+<script type="module" src="./streamRaiders.mjs"></script>
+</body>
+</html>

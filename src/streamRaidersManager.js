@@ -19,7 +19,7 @@ const API_SETTINGS = {
 			command: "getSkinathonState",
 		},
 		intervals: {
-			active: 3 * SECONDS,
+			active: 1000, // One second
 			inactive: 20 * SECONDS,
 			// active: 30 * SECONDS,
 			// inactive: 60 * MINUTES,

@@ -1,0 +1,49 @@
+@font-face {
+    font-family: 'm5x7';
+    src: local('./assets/m5x7.ttf');
+}
+
+.bottom-center {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    margin: 0;
+}
+
+.road-element {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.road-overlay {
+    z-index: 2;
+    clip-path: inset(0 1920px 0 0);
+}
+
+.absolute {
+    position: absolute;
+}
+
+#progress-panel {
+    bottom: 13px;
+    left: -971px;
+    z-index: 3;
+}
+
+#progress-sp-container {
+    transform: rotate(-90deg);
+    bottom: 41px;
+    left: -971px;
+    z-index: 4;
+}
+
+#progress-sp {
+    transform: translate(-50%, 0);
+    margin: auto;
+    color: black;
+    font-family: m5x7, serif;
+    font-size: 16pt;
+}
