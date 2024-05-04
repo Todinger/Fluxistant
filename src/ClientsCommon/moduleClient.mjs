@@ -766,6 +766,8 @@ class ModuleClient extends EventNotifier {
 			// (this is easier than having the parent look through its children)
 			parent.moduleClient.addChild(this);
 		}
+
+		window.addEventListener('load', () => this.windowLoaded());
 	}
 	
 	// Makes the server bot say the message to the user with the given username.
@@ -1048,6 +1050,11 @@ class ModuleClient extends EventNotifier {
 	// in our form to show which Module it's from.
 	assert(test, message) {
 		console.assert(test, this._printForm(message));
+	}
+
+	// Invoked when the document has finished loading
+	windowLoaded() {
+		// Meant to be overridden by inheriting classes
 	}
 }
 

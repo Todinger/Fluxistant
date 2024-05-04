@@ -125,6 +125,8 @@ const entities = {
 	NumberChoiceEntity: require('./WebEntities/numberChoiceEntity.js'),
 	TextChoiceEntity: require('./WebEntities/textChoiceEntity.js'),
 	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),
+	SkinathonCharacterEntity: require('./WebEntities/skinathonCharacterEntity.js'),
+	SkinathonMilestoneEntity: require('./WebEntities/skinathonMilestoneEntity.js'),
 	TextFunctionEntity: require('./WebEntities/textFunctionEntity.js'),
 	TriviaGameTypeEntity: require('./WebEntities/triviaGameTypeEntity.js'),
 	TriviaGameType_BaseEntity: require('./WebEntities/triviaGameType_BaseEntity.js'),

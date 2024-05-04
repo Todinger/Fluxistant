@@ -732,6 +732,10 @@ class Module {
 		
 		this.log(`Client attached.`);
 	}
+
+	get clientsAreConnected() {
+		return Object.keys(this._connectedClients).length > 0;
+	}
 	
 	// [For external use (by ModuleManager), for override by inheriting classes]
 	// Should check if a given command (= { cmdname, args }) is a command

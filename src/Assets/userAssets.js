@@ -182,6 +182,10 @@ class UserAssets {
 	}
 	
 	getFileWebByKey(key) {
+		if (!(key in this.savedFiles)) {
+			Logger.error(`File key not found: ${key}`);
+			return null;
+		}
 		return this._readFile(this.savedFiles[key].path, this.savedFiles[key].name)
 			.then(file => {
 				file.fileKey = key;
