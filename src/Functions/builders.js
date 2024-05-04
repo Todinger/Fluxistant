@@ -31,20 +31,23 @@ const VariableBuilder = new Builder({
 });
 
 const TriggerBuilder = new Builder({
-	command:			require('./Triggers/commandTrigger'),
-	cli:				require('./Triggers/cliTrigger'),
-	message:			require('./Triggers/messageTrigger'),
-	shortcut:			require('./Triggers/shortcutTrigger'),
-	keyDown:			require('./Triggers/keyDownTrigger'),
-	keyUp:				require('./Triggers/keyUpTrigger'),
-	reward:				require('./Triggers/channelRewardTrigger'),
-	windowActivated:	require('./Triggers/windowActivatedTrigger'),
-	windowDeactivated:	require('./Triggers/windowDeactivatedTrigger'),
-	windowStarted:		require('./Triggers/windowStartedTrigger'),
-	windowExited:		require('./Triggers/windowExitedTrigger'),
-	host:       		require('./Triggers/hostTrigger'),
-	raid:       		require('./Triggers/raidTrigger'),
-	time:       		require('./Triggers/timeTrigger'),
+	command:								require('./Triggers/commandTrigger'),
+	cli:									require('./Triggers/cliTrigger'),
+	message:								require('./Triggers/messageTrigger'),
+	shortcut:								require('./Triggers/shortcutTrigger'),
+	keyDown:								require('./Triggers/keyDownTrigger'),
+	keyUp:									require('./Triggers/keyUpTrigger'),
+	reward:									require('./Triggers/channelRewardTrigger'),
+	windowActivated:						require('./Triggers/windowActivatedTrigger'),
+	windowDeactivated:						require('./Triggers/windowDeactivatedTrigger'),
+	windowStarted:							require('./Triggers/windowStartedTrigger'),
+	windowExited:							require('./Triggers/windowExitedTrigger'),
+	host:       							require('./Triggers/hostTrigger'),
+	raid:       							require('./Triggers/raidTrigger'),
+	time:       							require('./Triggers/timeTrigger'),
+	streamRaidersBattleEnded:				require('./Triggers/streamRaidersBattleEndedTrigger'),
+	streamRaidersSkinathonPointsChanged:	require('./Triggers/streamRaidersSkinathonPointsChangedTrigger'),
+	streamRaidersBattleStarted:				require('./Triggers/streamRaidersBattleStartedTrigger'),
 });
 
 const ResponseBuilder = new Builder({
