@@ -47,3 +47,48 @@
     font-family: m5x7, serif;
     font-size: 16pt;
 }
+
+.character-wrapper {
+    position: relative;
+    left: -945px;
+    bottom: 62px;
+}
+
+.character-grid {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 0;
+}
+
+.character {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+}
+
+.character:nth-child(1) {
+    top: -12px;
+    left: -12px;
+}
+
+.character:nth-child(2) {
+    top: -12px;
+    left: 12px;
+}
+
+.character:nth-child(3) {
+    top: 12px;
+    left: -12px;
+}
+
+.character:nth-child(4) {
+    top: 12px;
+    left: 12px;
+}
