@@ -1,15 +1,57 @@
 const Module = requireMain('module');
+const ConfigSourceManager = requireMain('configSourceManager');
 const Utils = requireMain('utils');
 const _ = require('lodash');
+
+
+const FONT_TYPES_SOURCE_NAME = 'ContinuousGiveaway.FontTypes';
+
+const MESSAGE_TEMPLATE = {
+	winner: "$winner",
+};
+
+const MESSAGE_TEMPLATE_VARIABLE_HINTS = `${MESSAGE_TEMPLATE.winner} = winner's username`;
+
 
 class ContinuousGiveaway extends Module {
 	constructor() {
 		super({
 			name: 'Continuous Giveaway',
+			tags: ['textdisp'],
 		});
 		
 		this.ongoing = false;
 		this.data.entrees = {};
+	}
+
+	defineModConfig(modConfig) {
+		modConfig.addString('winMessageChat', `${MESSAGE_TEMPLATE.winner} has won the giveaway!`)
+			.setName('Win Message: Chat')
+			.setDescription(`Message to send to the winner when they win (${MESSAGE_TEMPLATE_VARIABLE_HINTS})`);
+		modConfig.addBoolean('showWinnerOnScreen', false)
+			.setName('Show Winner on Screen')
+			.setDescription("Whether or not the winner's name should be displayed on the screen");
+		modConfig.addString('winMessageScreen', `${MESSAGE_TEMPLATE.winner} has won the giveaway!`)
+			.setName('Win Message: Screen')
+			.setDescription(`Message to show on the screen when someone wins (${MESSAGE_TEMPLATE_VARIABLE_HINTS})`);
+		modConfig.addCustomChoice('winnerDisplayStyle', {
+				source: FONT_TYPES_SOURCE_NAME,
+			})
+			.setName('Winner Display Text Style')
+			.setDescription("The style in which the winner's name will be displayed on the screen");
+		modConfig.addColor('winnerDisplayColor', '#000000')
+			.setName('Winner Display Text Color')
+			.setDescription('Text color when displaying the winner on the screen');
+		modConfig.addDuration('winnerDisplayDuration', 10)
+			.setName('Winner Display Text Duration')
+			.setDescription('How long (in seconds) to show the winning message on the screen');
+	}
+
+	load() {
+		ConfigSourceManager.setSourceOptions(
+			FONT_TYPES_SOURCE_NAME,
+			['Regular', 'Creepy'],
+		);
 	}
 	
 	start(data) {
@@ -56,13 +98,17 @@ class ContinuousGiveaway extends Module {
 		this.saveData();
 		this.log(`${data.user.displayName} entered.`);
 	}
+
+	getActiveEntrees() {
+		return Object.keys(this.data.entrees).filter(entree => !this.data.entrees[entree]);
+	}
 	
 	draw(data) {
 		if (!this.ongoing && _.isEmpty(this.data.entrees)) {
 			return;
 		}
 		
-		let options = Object.keys(this.data.entrees).filter(entree => !this.data.entrees[entree]);
+		let options = this.getActiveEntrees();
 		if (options.length === 0) {
 			this.tellError(data.user, "There are no entrees viable for winning at this time.")
 			return;
@@ -71,7 +117,28 @@ class ContinuousGiveaway extends Module {
 		let winner = Utils.randomElement(options);
 		this.data.entrees[winner] = true;
 		this.saveData();
-		this.say(`${winner} has won the giveaway!`);
+		let templateValues = {
+			winner,
+		};
+		this.sayTemplate(this.config.winMessageChat, MESSAGE_TEMPLATE, templateValues);
+		if (this.config.showWinnerOnScreen) {
+			this.broadcastEvent('showText', {
+				text: this.fillTemplate(this.config.winMessageScreen, MESSAGE_TEMPLATE, templateValues),
+				style: this.config.winnerDisplayStyle,
+				color: this.config.winnerDisplayColor,
+				duration: this.config.winnerDisplayDuration,
+			});
+		}
+	}
+
+	list() {
+		let names = this.getActiveEntrees();
+		if (names.length > 0) {
+			this.print('Current giveaway entries:');
+			names.forEach(username => this.print(`- ${username}`));
+		} else {
+			this.print('There are currently no entries in the giveaway.')
+		}
 	}
 	
 	functions = {
@@ -139,6 +206,16 @@ class ContinuousGiveaway extends Module {
 				this.filter.specificUser("fluxistence"),
 			],
 			action: data => this.draw(data),
+		},
+		list: {
+			name: 'List Entries',
+			description: "List all the people who have entered the giveaway in the console",
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'entries',
+				}),
+			],
+			action: () => this.list(),
 		},
 	}
 }

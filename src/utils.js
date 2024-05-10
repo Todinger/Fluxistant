@@ -48,6 +48,10 @@ class Utils {
 	static filterObject(obj, filter) {
 		return Object.fromEntries(Object.entries(obj).filter(([key, value]) => filter(key, value)));
 	}
+
+	static ObjectForEach(obj, func) {
+		Object.entries(obj).forEach(entry => func(entry[0], entry[1]));
+	}
 	
 	// Splits two collections into three lists of "things to add," "things
 	// to remove" and "things to keep".

@@ -868,6 +868,21 @@ class Module {
 	tellStreamer(msg) {
 		TwitchManager.say(`@${this.getStreamerName()} ${msg}`);
 	}
+
+	fillTemplate(msg, template, values) {
+		Object.keys(template).forEach(name => {
+			msg = Utils.stringReplaceAll(msg, template[name], values[name]);
+		});
+		return msg;
+	}
+
+	sayTemplate(msg, template, values) {
+		this.say(this.fillTemplate(msg, template, values));
+	}
+
+	tellTemplate(user, msg, template, values) {
+		this.tell(user, this.fillTemplate(msg, template, values));
+	}
 	
 	sayConfig(id) {
 		this.say(this.config[id]);
