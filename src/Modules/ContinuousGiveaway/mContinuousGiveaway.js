@@ -27,7 +27,10 @@ class ContinuousGiveaway extends Module {
 	defineModConfig(modConfig) {
 		modConfig.addString('alreadyJoinedMessage', 'You have already joined the giveaway.')
 			.setName('Already Joined Message')
-			.setDescription(`Message to send to a user who joins the giveaway if they've already joined`);
+			.setDescription("Message to send to a user who joins the giveaway if they've already joined");
+		modConfig.addString('alreadyWonMessage', "You've already won this giveaway once and cannot enter again.")
+			.setName('Already Won Message')
+			.setDescription("Message to send to a user who joins the giveaway if they've already won it once");
 		modConfig.addString('winMessageChat', `${WIN_MESSAGE_TEMPLATE.winner} has won the giveaway!`)
 			.setName('Win Message: Chat')
 			.setDescription(`Message to send to the winner when they win (${WIN_MESSAGE_TEMPLATE_VARIABLE_HINTS})`);
@@ -94,8 +97,14 @@ class ContinuousGiveaway extends Module {
 		}
 		
 		if (data.user.displayName in this.data.entrees) {
-			if (this.config.alreadyJoinedMessage && this.config.alreadyJoinedMessage.length > 0) {
-				this.tell(data.user, this.config.alreadyJoinedMessage);
+			if (this.data.entrees[data.user.displayName]) {
+				if (this.config.alreadyWonMessage && this.config.alreadyWonMessage.length > 0) {
+					this.tell(data.user, this.config.alreadyWonMessage);
+				}
+			} else {
+				if (this.config.alreadyJoinedMessage && this.config.alreadyJoinedMessage.length > 0) {
+					this.tell(data.user, this.config.alreadyJoinedMessage);
+				}
 			}
 			return false;
 		}
