@@ -1,6 +1,6 @@
-const ResponseEntity = require('./responseEntity');
+const SingleResponseEntity = require('./singleResponseEntity');
 
-class Response_ConsoleEntity extends ResponseEntity {
+class Response_ConsoleEntity extends SingleResponseEntity {
 	static get TYPE()		{ return 'Response_Console'; 					}
 	static get BUILDER()	{ return () => new Response_ConsoleEntity(); 	}
 	

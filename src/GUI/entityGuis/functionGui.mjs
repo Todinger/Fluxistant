@@ -19,8 +19,22 @@ export default class FunctionGui extends ObjectGui {
 	}
 	
 	_getMessageGUIs(responseGUI) {
-		return Object.values(responseGUI.optionGUIs).map(
-			optionGUI => optionGUI.childrenGUIs['message']);
+		let messageGUIs = [];
+		Object.values(responseGUI.optionGUIs).forEach(optionGUI => {
+			if ('message' in optionGUI.childrenGUIs) {
+				messageGUIs.push(optionGUI.childrenGUIs['message']);
+			} else if ('messages' in optionGUI.childrenGUIs) {
+				let childMessagesGUI = optionGUI.childrenGUIs['messages'];
+				childMessagesGUI.on(
+					'elementAdded',
+					messageGUI => this._onMessageGUIAdded(messageGUI),
+				);
+				childMessagesGUI.elementGUIs.forEach(messageGUI => {
+					messageGUIs.push(messageGUI);
+				});
+			}
+		});
+		return messageGUIs;
 	}
 	
 	_updateResponseMessageGUIs(responseGUI, helpText) {
@@ -37,6 +51,10 @@ export default class FunctionGui extends ObjectGui {
 			this._updateResponseMessageGUIs(responseGUI, helpText);
 		});
 	}
+
+	_onMessageGUIAdded(messageGUI) {
+		messageGUI.setHelpText(this._getHelpText());
+	}
 	
 	_buildGUI() {
 		let gui = super._buildGUI();
@@ -46,7 +64,7 @@ export default class FunctionGui extends ObjectGui {
 		this._responsesGUI.on('elementAdded', responseGUI => {
 			this._updateResponseMessageGUIs(responseGUI, this._getHelpText());
 		});
-		
+
 		return gui;
 	}
 }

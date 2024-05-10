@@ -53,6 +53,7 @@ const TriggerBuilder = new Builder({
 const ResponseBuilder = new Builder({
 	console:	    require('./Responses/consoleResponse'),
 	chat:		    require('./Responses/chatResponse'),
+	chatRandom:	    require('./Responses/chatResponseRandom'),
 	streamerChat:	require('./Responses/streamerChatResponse'),
 	se:			    require('./Responses/seResponse'),
 });
