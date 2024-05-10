@@ -1,7 +1,7 @@
-const FunctionResponse = require('./functionResponse');
+const FunctionResponseSingle = require('./functionResponseSingle');
 const SEManager = requireMain('./seManager');
 
-class SEResponse extends FunctionResponse {
+class SEResponse extends FunctionResponseSingle {
 	constructor(params) {
 		super(params);
 	}

@@ -1,6 +1,6 @@
-const ResponseEntity = require('./responseEntity');
+const SingleResponseEntity = require('./singleResponseEntity');
 
-class Response_StreamerChatEntity extends ResponseEntity {
+class Response_StreamerChatEntity extends SingleResponseEntity {
 	static get TYPE()		{ return 'Response_StreamerChat'; 					}
 	static get BUILDER()	{ return () => new Response_StreamerChatEntity(); 	}
 	

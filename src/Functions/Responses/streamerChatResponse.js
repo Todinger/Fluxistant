@@ -1,7 +1,7 @@
-const FunctionResponse = require('./functionResponse');
+const FunctionResponseSingle = require('./functionResponseSingle');
 const TwitchManager = requireMain('./twitchManager');
 
-class StreamerChatResponse extends FunctionResponse {
+class StreamerChatResponse extends FunctionResponseSingle {
 	constructor(params) {
 		super(params);
 	}

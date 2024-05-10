@@ -1,7 +1,7 @@
-const FunctionResponse = require('./functionResponse');
+const FunctionResponseSingle = require('./functionResponseSingle');
 const Logger = require('../../logger');
 
-class ConsoleResponse extends FunctionResponse {
+class ConsoleResponse extends FunctionResponseSingle {
 	constructor(params) {
 		super(params);
 	}
@@ -10,11 +10,13 @@ class ConsoleResponse extends FunctionResponse {
 		return 'console';
 	}
 	
-	_defaultInit() {
+	_defaultInit(message) {
+		super._paramsInit(message);
 		this.level = 'info';
 	}
 	
 	_paramsInit(params) {
+		super._paramsInit(params);
 		this.level = params.level || 'info';
 	}
 	

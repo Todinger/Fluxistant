@@ -7,13 +7,17 @@ class FunctionResponse {
 		settings = settings || {};
 		if (typeof settings === 'string') {
 			this.enabled = true;
-			this.message = settings;
 			this._defaultInit(settings);
 		} else {
 			this.enabled = settings.enabled !== false;
-			this.message = settings.message;
 			this._paramsInit(settings);
 		}
+	}
+
+	get message() {
+		Errors.abstract();
+		// For deriving classes
+		return "";
 	}
 	
 	get type() {
