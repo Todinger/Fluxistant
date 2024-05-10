@@ -6,11 +6,11 @@ const _ = require('lodash');
 
 const FONT_TYPES_SOURCE_NAME = 'ContinuousGiveaway.FontTypes';
 
-const MESSAGE_TEMPLATE = {
+const WIN_MESSAGE_TEMPLATE = {
 	winner: "$winner",
 };
 
-const MESSAGE_TEMPLATE_VARIABLE_HINTS = `${MESSAGE_TEMPLATE.winner} = winner's username`;
+const WIN_MESSAGE_TEMPLATE_VARIABLE_HINTS = `${WIN_MESSAGE_TEMPLATE.winner} = winner's username`;
 
 
 class ContinuousGiveaway extends Module {
@@ -25,15 +25,18 @@ class ContinuousGiveaway extends Module {
 	}
 
 	defineModConfig(modConfig) {
-		modConfig.addString('winMessageChat', `${MESSAGE_TEMPLATE.winner} has won the giveaway!`)
+		modConfig.addString('alreadyJoinedMessage', 'You have already joined the giveaway.')
+			.setName('Already Joined Message')
+			.setDescription(`Message to send to a user who joins the giveaway if they've already joined`);
+		modConfig.addString('winMessageChat', `${WIN_MESSAGE_TEMPLATE.winner} has won the giveaway!`)
 			.setName('Win Message: Chat')
-			.setDescription(`Message to send to the winner when they win (${MESSAGE_TEMPLATE_VARIABLE_HINTS})`);
+			.setDescription(`Message to send to the winner when they win (${WIN_MESSAGE_TEMPLATE_VARIABLE_HINTS})`);
 		modConfig.addBoolean('showWinnerOnScreen', false)
 			.setName('Show Winner on Screen')
 			.setDescription("Whether or not the winner's name should be displayed on the screen");
-		modConfig.addString('winMessageScreen', `${MESSAGE_TEMPLATE.winner} has won the giveaway!`)
+		modConfig.addString('winMessageScreen', `${WIN_MESSAGE_TEMPLATE.winner} has won the giveaway!`)
 			.setName('Win Message: Screen')
-			.setDescription(`Message to show on the screen when someone wins (${MESSAGE_TEMPLATE_VARIABLE_HINTS})`);
+			.setDescription(`Message to show on the screen when someone wins (${WIN_MESSAGE_TEMPLATE_VARIABLE_HINTS})`);
 		modConfig.addCustomChoice('winnerDisplayStyle', {
 				source: FONT_TYPES_SOURCE_NAME,
 			})
@@ -87,11 +90,14 @@ class ContinuousGiveaway extends Module {
 	
 	join(data) {
 		if (!this.ongoing) {
-			return;
+			return false;
 		}
 		
 		if (data.user.displayName in this.data.entrees) {
-			return;
+			if (this.config.alreadyJoinedMessage && this.config.alreadyJoinedMessage.length > 0) {
+				this.tell(data.user, this.config.alreadyJoinedMessage);
+			}
+			return false;
 		}
 		
 		this.data.entrees[data.user.displayName] = false; // false = hasn't won yet
@@ -120,10 +126,10 @@ class ContinuousGiveaway extends Module {
 		let templateValues = {
 			winner,
 		};
-		this.sayTemplate(this.config.winMessageChat, MESSAGE_TEMPLATE, templateValues);
+		this.sayTemplate(this.config.winMessageChat, WIN_MESSAGE_TEMPLATE, templateValues);
 		if (this.config.showWinnerOnScreen) {
 			this.broadcastEvent('showText', {
-				text: this.fillTemplate(this.config.winMessageScreen, MESSAGE_TEMPLATE, templateValues),
+				text: this.fillTemplate(this.config.winMessageScreen, WIN_MESSAGE_TEMPLATE, templateValues),
 				style: this.config.winnerDisplayStyle,
 				color: this.config.winnerDisplayColor,
 				duration: this.config.winnerDisplayDuration,
