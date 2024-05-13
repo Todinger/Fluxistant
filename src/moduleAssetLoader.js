@@ -53,11 +53,15 @@ class ModuleAssetLoader {
     }
 
     _loadTarget(target) {
-        let isFile, fileKey;
-        ({isFile, fileKey} = this._checkFile(target));
+        let isFile, fileKey, width, height;
+        ({isFile, fileKey, width, height} = this._checkFile(target));
         if (isFile) {
             if (fileKey) {
-                return this._append(this._assets.getFileWebByKey(fileKey));
+                return {
+                    url: this._append(this._assets.getFileWebByKey(fileKey)),
+                    width,
+                    height,
+                };
             }
 
             return null;
@@ -79,8 +83,16 @@ class ModuleAssetLoader {
 
     _checkFile(target) {
         if (!_.isPlainObject(target)) return {isFile: false};
-        if (target.fileKey) return {isFile: true, fileKey: target.fileKey};
-        if (_.isPlainObject(target.file) && target.file.fileKey) return {isFile: true, fileKey: target.file.fileKey};
+        if (target.fileKey) return {
+            isFile: true,
+            fileKey: target.fileKey,
+        };
+        if (_.isPlainObject(target.file) && target.file.fileKey) return {
+            isFile: true,
+            fileKey: target.file.fileKey,
+            width: target.width,
+            height: target.height,
+        };
         return {isFile: false};
     }
 }
