@@ -11,6 +11,14 @@
     margin: 0;
 }
 
+.bottom-left {
+    position: fixed;
+    bottom: 0;
+    left: -960px;
+    transform: translate(0, 0);
+    margin: 0;
+}
+
 .road-element {
     position: absolute;
     bottom: 0;
@@ -18,8 +26,12 @@
     transform: translateX(-50%);
 }
 
+.road-bg {
+    z-index: -5;
+}
+
 .road-overlay {
-    z-index: 2;
+    z-index: -2;
     clip-path: inset(0 1920px 0 0);
 }
 
@@ -30,14 +42,14 @@
 #progress-panel {
     bottom: 13px;
     left: -971px;
-    z-index: 3;
+    z-index: 10;
 }
 
 #progress-sp-container {
     transform: rotate(-90deg);
     bottom: 41px;
     left: -971px;
-    z-index: 4;
+    z-index: 11;
 }
 
 #progress-sp {
@@ -46,12 +58,14 @@
     color: black;
     font-family: m5x7, serif;
     font-size: 16pt;
+    z-index: 11;
 }
 
 .character-wrapper {
     position: relative;
     left: -945px;
     bottom: 62px;
+    z-index: 30;
 }
 
 .character-grid {
@@ -71,6 +85,7 @@
     justify-content: center;
     width: 48px;
     height: 48px;
+    z-index: 30;
 }
 
 .character:nth-child(1) {
@@ -91,4 +106,27 @@
 .character:nth-child(4) {
     top: 12px;
     left: 12px;
+}
+
+.milestone-container {
+    z-index: 20;
+}
+
+.milestone {
+    position: absolute;
+    bottom: 60px;
+}
+
+.milestone-item {
+    position: absolute;
+}
+
+.milestone-bg {
+    z-index: 20;
+}
+
+.milestone-reward {
+    z-index: 25;
+    /*width: 120px;*/
+    /*height: 120px;*/
 }

@@ -23600,14 +23600,14 @@ class SkinathonMilestoneEntity extends StaticObjectEntity {
 			.setDescription('Vertical offset for the reward image to align it with the background image');
 
 		let enemy = this.addGroup('enemy')
-			.setName('Reward')
-			.setDescription('Settings for the reward granted when unlocking this milestone');
+			.setName('Enemy')
+			.setDescription('Settings for the enemy guarding the milestone');
 		enemy.addChild('image', new ImageEntity())
 			.setName('Enemy Image')
-			.setDescription('The regular appearance of the enemy guarding this milestone');
+			.setDescription('The regular appearance of the enemy guarding this milestone (facing left)');
 		enemy.addChild('deathImage', new ImageEntity())
 			.setName('Enemy Death Image')
-			.setDescription('The appearance of the enemy guarding this milestone when it is killed');
+			.setDescription('The appearance of the enemy guarding this milestone when it is killed (facing left)');
 		enemy.addNumber('offsetX', 0)
 			.setName('Reward Image: X Offset')
 			.setDescription('Horizontal offset for the images to align them with the milestone sign');
