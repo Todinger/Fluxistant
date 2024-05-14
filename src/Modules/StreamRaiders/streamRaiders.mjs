@@ -223,8 +223,7 @@ class StreamRaiders extends ModuleClient {
     }
 
     clearMilestones() {
-        // this.elements.jMilestones.empty();
-        this.elements.jMilestones.children(":first").nextAll().remove();
+        this.elements.jMilestones.empty();
     }
 
     buildMilestones() {
@@ -249,7 +248,6 @@ class StreamRaiders extends ModuleClient {
 
     setData(data) {
         if (!data) return;
-        // this.elements.jRoad.hide();
         this.hideRoad();
         this.setCharacterImages(data['characters']);
 
