@@ -133,6 +133,9 @@ class Milestone {
         this.jReward = $(`<img src="" alt="" class="milestone-item milestone-reward">`)
             .appendTo(this.jMilestone);
         this.setImageProperties(this.jReward, this.reward.image);
+        this.jEnemy = $(`<img src="" alt="" class="milestone-item milestone-enemy">`)
+            .appendTo(this.jMilestone);
+        this.setImageProperties(this.jEnemy, this.enemy.image);
 
         return this.jMilestone;
     }
@@ -144,12 +147,17 @@ class Milestone {
         }));
     }
 
-    fixPositions() {
+    fixBackgroundPosition() {
         this.jBackground.css(toCSSProperties({
             left: Math.round(-this.jBackground.width() / 2),
             bottom: 0
         }));
+    }
+
+    fixPositions() {
+        this.fixBackgroundPosition();
         this.fixPositionFromSettings(this.jReward, this.reward);
+        this.fixPositionFromSettings(this.jEnemy, this.enemy);
     }
 }
 
@@ -231,9 +239,18 @@ class StreamRaiders extends ModuleClient {
         }
     }
 
+    hideRoad() {
+        this.elements.jRoad.css(toCSSProperties({bottom: -1000}));
+    }
+
+    showRoad() {
+        this.elements.jRoad.css(toCSSProperties({bottom: 0}));
+    }
+
     setData(data) {
         if (!data) return;
-        this.elements.jRoad.hide();
+        // this.elements.jRoad.hide();
+        this.hideRoad();
         this.setCharacterImages(data['characters']);
 
         this.clearMilestones();
@@ -241,7 +258,7 @@ class StreamRaiders extends ModuleClient {
         this.buildMilestones();
         setTimeout(() => {
             this.fixMilestonePositions();
-            this.elements.jRoad.show();
+            this.showRoad();
         }, 100);
     }
 

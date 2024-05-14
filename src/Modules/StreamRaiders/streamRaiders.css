@@ -127,6 +127,8 @@
 
 .milestone-reward {
     z-index: 25;
-    /*width: 120px;*/
-    /*height: 120px;*/
+}
+
+.milestone-enemy {
+    z-index: 25;
 }
