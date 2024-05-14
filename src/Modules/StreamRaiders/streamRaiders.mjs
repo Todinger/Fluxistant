@@ -6,6 +6,7 @@ const NO_IMAGE = TRANSPARENT_PIXEL_IMAGE;
 const NO_IMAGE_OBJECT = {url: NO_IMAGE};
 const MAX_PROGRESS = 1920;
 const DEFAULT_ATTACK_DURATION = 3000;
+const DEFAULT_ADVANCEMENT_PIXELS_PER_SEC = 20;
 
 function pixelStringToInt(pixelString) {
     return parseInt(pixelString.replace("px", ""))
@@ -187,6 +188,7 @@ class StreamRaiders extends ModuleClient {
             progressSPContainer: document.getElementById('progress-sp-container'),
             characters: document.getElementById('characters'),
             jMilestones: $("#milestones"),
+            jAnimator: $("#animator"),
         };
 
         let charactersStyle = getComputedStyle(this.elements.characters);
@@ -203,6 +205,9 @@ class StreamRaiders extends ModuleClient {
         this.milestones = [];
 
         this.attackDuration = DEFAULT_ATTACK_DURATION;
+        this.advancementPixelsPerSecond = DEFAULT_ADVANCEMENT_PIXELS_PER_SEC;
+        this.currentSP = 0;
+        this.currentPixelProgress = 0;
     }
 
     windowLoaded() {
@@ -268,6 +273,10 @@ class StreamRaiders extends ModuleClient {
             this.attackDuration = data['attackDuration'] || DEFAULT_ATTACK_DURATION;
         }
 
+        if ('advancementPixelsPerSecond' in data) {
+            this.advancementPixelsPerSecond = data['advancementPixelsPerSecond'] || DEFAULT_ADVANCEMENT_PIXELS_PER_SEC;
+        }
+
         this.hideRoad();
         this.setCharacterImages(data['characters']);
 
@@ -321,6 +330,45 @@ class StreamRaiders extends ModuleClient {
         this.elements.progressSPContainer.style.left = centeredLeft;
         this.elements.progressSP.textContent = sp.toString();
         this.elements.characters.style.left = `${this.charactersInitialPosition.left + pixelProgress}px`;
+
+        this.currentPixelProgress = pixelProgress;
+        this.currentSP = sp;
+    }
+
+    animate(from, to, step, done, options) {
+        options = options || {};
+        if (step) {
+            if (from === to) {
+                options.step = (current) => step(current, 1);
+            } else {
+                options.step = (current) => step(current, (current - from) / (to - from));
+            }
+        }
+        if (done) {
+            options.done = done;
+        }
+
+        this.elements.jAnimator.css({left: from});
+        this.elements.jAnimator.animate(
+            {left: toPixels(to)},
+            options,
+        );
+    }
+
+    advance(targetPixelProgress, targetSP) {
+        let startingSP = this.currentSP;
+        let spDiff = targetSP - startingSP;
+        this.toMoving();
+        this.animate(
+            this.currentPixelProgress,
+            targetPixelProgress,
+            (current, alpha) => this.setProgress(Math.round(current), Math.round(startingSP + alpha * spDiff)),
+            () => this.toIdle(),
+            {
+                easing: "linear",
+                duration: 1000 * (targetPixelProgress - this.currentPixelProgress) / this.advancementPixelsPerSecond,
+            },
+        );
     }
 
     start() {

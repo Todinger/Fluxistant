@@ -132,3 +132,8 @@
 .milestone-enemy {
     z-index: 25;
 }
+
+.animator {
+    display: none;
+    position: absolute;
+}

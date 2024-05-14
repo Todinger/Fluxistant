@@ -46,6 +46,10 @@ class StreamRaiders extends Module {
 			.setName('Attack Duration')
 			.setDescription('How long the attack and death animations will be played when a milestone is unlocked');
 
+		modConfig.addNonNegativeNumber('advancementPixelsPerSecond', 0)
+			.setName('Advancement Speed (in pixels per second)')
+			.setDescription('How quickly characters move on the road');
+
 		let characters = modConfig.addFixedArray('characters', 'SkinathonCharacter')
 			.setName('Characters')
 			.setDescription('Configuration for the displayed "character" skins');
@@ -147,6 +151,7 @@ class StreamRaiders extends Module {
 		let mal = new ModuleAssetLoader(this.assets.Images);
 		let data = {
 			attackDuration: this.config.attackDuration,
+			advancementPixelsPerSecond: this.config.advancementPixelsPerSecond,
 			characters: this.config.characters,
 			milestones: this.getMilestoneData(),
 		}
