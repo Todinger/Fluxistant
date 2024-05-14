@@ -3,8 +3,10 @@ const SkinathonCharacterEntity = require("./Config/skinathonCharacterEntity");
 const SkinathonMilestoneEntity = require("./Config/skinathonMilestoneEntity");
 const StreamRaidersManager = requireMain('streamRaidersManager');
 const ModuleAssetLoader = requireMain('moduleAssetLoader');
+const Utils = requireMain('./utils');
 
 const MAX_PIXEL_PROGRESS = 1920;
+const MAX_SP = 1100;
 
 const NUM_OF_CHARACTERS = 4;
 
@@ -35,6 +37,9 @@ class StreamRaiders extends Module {
 		});
 
 		this.sortedMilestones = [];
+		this.currentSP = 0;
+		this.currentPixelProgress = 0;
+		this.nextMilestoneIndex = 0;
 	}
 
 	defineModAssets(modData) {
@@ -163,10 +168,152 @@ class StreamRaiders extends Module {
 
 	_skinathonPointsChanged(newPoints, _oldPoints) {
 		if (newPoints < 0) return;
-		const MAX_SP = 100;
 		if (newPoints > MAX_SP) newPoints = MAX_SP;
 		let pixelProgress = Math.round((newPoints / MAX_SP) * MAX_PIXEL_PROGRESS);
 		this.broadcastEvent('setPixelProgress', {pixelProgress, sp: newPoints});
+	}
+
+	setProgressDirect() {
+		this.broadcastEvent('setPixelProgress', {
+			pixelProgress: this.currentPixelProgress,
+			sp: this.currentSP,
+		});
+	}
+
+	lastClearedMilestoneIndexForSP(sp) {
+		for (let i = 0; i < this.sortedMilestones.length; i++) {
+			if (this.sortedMilestones[i].sp > sp) {
+				return i - 1;
+			}
+		}
+	}
+
+	pixelProgressFromSP(sp, nextMilestoneIndex) {
+		let leftSP, leftPosition, rightSP, rightPosition;
+		if (nextMilestoneIndex === 0) {
+			leftSP = 0;
+			leftPosition = 0;
+			rightSP = this.sortedMilestones[0].sp;
+			rightPosition = this.sortedMilestones[0].position;
+		} else {
+			let leftMilestone, rightMilestone;
+			if (nextMilestoneIndex >= this.sortedMilestones.length - 1) {
+				leftMilestone = this.sortedMilestones[this.sortedMilestones.length - 1];
+				rightMilestone = this.sortedMilestones[this.sortedMilestones.length - 2];
+			} else {
+				leftMilestone = this.sortedMilestones[nextMilestoneIndex - 1];
+				rightMilestone = this.sortedMilestones[nextMilestoneIndex];
+			}
+
+			leftSP = leftMilestone.sp;
+			leftPosition = leftMilestone.position;
+			rightSP = rightMilestone.sp;
+			rightPosition = rightMilestone.position;
+		}
+
+		let alpha = (sp - leftSP) / (rightSP - leftSP);
+		return Math.round(leftPosition + alpha * (rightPosition - leftPosition));
+	}
+
+	makeAdvanceEvent(targetPixelProgress, targetSP) {
+		return {
+			name: 'advance',
+			data: {targetPixelProgress, targetSP},
+		};
+	}
+
+	makeConquerEvent(milestoneIndex) {
+		return {
+			name: 'conquer',
+			data: {milestoneIndex},
+		};
+	}
+
+	makeLockEvent(milestoneIndex) {
+		return {
+			name: 'lock',
+			data: {milestoneIndex},
+		};
+	}
+
+	createFlatProgressEvent(newSP) {
+		let pixelProgress = Math.round((newSP / MAX_SP) * MAX_PIXEL_PROGRESS);
+		return this.makeAdvanceEvent(pixelProgress, newSP);
+	}
+
+	createDirectAdvanceEvent(newSP, nextMilestoneIndex) {
+		let pixelProgress = this.pixelProgressFromSP(newSP, nextMilestoneIndex);
+		return this.makeAdvanceEvent(pixelProgress, newSP);
+	}
+
+	createProgressEvents(newSP) {
+		if (this.sortedMilestones.length <= 1) {
+			return [this.createFlatProgressEvent(newSP)];
+		}
+
+		let events = [];
+		let lastClearedMilestoneIndex = this.lastClearedMilestoneIndexForSP(newSP);
+		for (let index = this.nextMilestoneIndex; index <= lastClearedMilestoneIndex; index++) {
+			const milestone = this.sortedMilestones[index];
+			events.push(this.makeAdvanceEvent(milestone.position, milestone.sp));
+			events.push(this.makeConquerEvent(index));
+		}
+
+		let lastClearedMilestoneSP =
+			lastClearedMilestoneIndex >= 0 ?
+				this.sortedMilestones[lastClearedMilestoneIndex].sp :
+				0;
+
+		if (newSP > lastClearedMilestoneSP) {
+			let pixelProgress = this.pixelProgressFromSP(newSP, lastClearedMilestoneIndex + 1);
+			events.push(this.makeAdvanceEvent(pixelProgress, newSP));
+		}
+
+		return {
+			nextMilestoneIndex: lastClearedMilestoneIndex + 1,
+			events,
+		};
+	}
+
+	setSP(sp) {
+		let events;
+		if (sp < this.currentSP) {
+			let newNextMilestoneIndex = this.lastClearedMilestoneIndexForSP(sp) + 1;
+			events = [this.createDirectAdvanceEvent(sp, newNextMilestoneIndex)];
+			for (let index = newNextMilestoneIndex; index < this.nextMilestoneIndex; index++) {
+				events.push(this.makeLockEvent(index));
+			}
+		} else {
+			let progress = this.createProgressEvents(sp);
+			this.nextMilestoneIndex = progress.nextMilestoneIndex;
+			events = progress.events;
+		}
+
+		this.currentSP = sp;
+
+		this.broadcastEvent('eventList', events);
+	}
+
+	directSetSP(data) {
+		if (!Utils.isNonEmptyString(data.firstParam)) {
+			return;
+		}
+
+		let sp = parseInt(data.firstParam);
+		this.setSP(sp);
+	}
+
+	functions = {
+		setSP: {
+			name: 'Set SP',
+			description: 'Set the current SP for the skinathon',
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'sp',
+				}),
+			],
+			action: data => this.directSetSP(data),
+		},
 	}
 }
 

@@ -173,6 +173,11 @@ class Milestone {
     unlock() {
         this.setImageProperties(this.jBackground, this.bg.unlocked);
     }
+
+    lock() {
+        this.setImageProperties(this.jBackground, this.bg.locked);
+        this.setImageProperties(this.jEnemy, this.enemy.image);
+    }
 }
 
 
@@ -210,6 +215,18 @@ class ConquerEvent extends Event {
 
     perform() {
         sr.conquerMilestone(this.milestoneIndex, () => this._done());
+    }
+}
+
+class LockEvent extends Event {
+    constructor(sr, milestoneIndex) {
+        super(sr);
+        this.milestoneIndex = milestoneIndex;
+    }
+
+    perform() {
+        sr.lockMilestone(this.milestoneIndex);
+        this._done();
     }
 }
 
@@ -341,16 +358,22 @@ class StreamRaiders extends ModuleClient {
         Object.values(this.characters).forEach(character => character.toAttacking());
     }
 
-    conquerMilestone(milestoneIndex, onDone) {
+    validateMilestoneIndex(milestoneIndex) {
         if (!Number.isInteger(milestoneIndex)) {
             console.log(`milestoneIndex should be an integer. Got: ${milestoneIndex}`);
-            return;
+            return false;
         } else if (milestoneIndex < 0 || milestoneIndex >= this.milestones.length) {
             console.log(
                 `milestoneIndex is out of the range of [0, ${this.milestones.length - 1}]. Got: ${milestoneIndex}`
             );
-            return;
+            return false;
         }
+
+        return true;
+    }
+
+    conquerMilestone(milestoneIndex, onDone) {
+        if (!this.validateMilestoneIndex(milestoneIndex)) return;
 
         let milestone = this.milestones[milestoneIndex];
         this.toAttacking();
@@ -363,6 +386,12 @@ class StreamRaiders extends ModuleClient {
                 onDone();
             }
         }, this.attackDuration);
+    }
+
+    lockMilestone(milestoneIndex) {
+        if (!this.validateMilestoneIndex(milestoneIndex)) return;
+
+        this.milestones[milestoneIndex].lock();
     }
 
     setProgress(pixelProgress, sp) {
@@ -444,6 +473,35 @@ class StreamRaiders extends ModuleClient {
         this.pushEvent(new ConquerEvent(this, data['milestoneIndex']));
     }
 
+    pushLockEvent(data) {
+        if (!(data && 'milestoneIndex' in data)) {
+            console.log(`Bad lock event data received: ${data}`);
+            return;
+        }
+
+        this.pushEvent(new LockEvent(this, data['milestoneIndex']));
+    }
+
+    pushEventList(eventList) {
+        if (!Array.isArray(eventList)) {
+            console.error(`Bad event list received. Expected an array, got: ${typeof eventList}`);
+            return;
+        }
+
+        for (let i = 0; i < eventList.length; i++) {
+            let eventData = eventList[i];
+            if (eventData['name'] === 'advance') {
+                this.pushAdvanceEvent(eventData['data']);
+            } else if (eventData['name'] === 'conquer') {
+                this.pushConquerEvent(eventData['data']);
+            } else if (eventData['name'] === 'lock') {
+                this.pushLockEvent(eventData['data']);
+            } else {
+                console.error(`Bad event data received: ${eventData}`);
+            }
+        }
+    }
+
     eventFinished(event) {
         if (this.eventQueue.length > 0 && this.eventQueue[0] === event) {
             this.eventQueue.shift();
@@ -459,6 +517,8 @@ class StreamRaiders extends ModuleClient {
         this.server.on('setData', (data) => this.setData(data));
         this.server.on('advance', (data) => this.pushAdvanceEvent(data));
         this.server.on('conquer', (data) => this.pushConquerEvent(data));
+        this.server.on('lock', (data) => this.pushLockEvent(data));
+        this.server.on('eventList', (data) => this.pushEventList(data));
 
         this.server.attach();
     }
