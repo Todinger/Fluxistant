@@ -314,7 +314,7 @@ class StreamRaidersManager extends EventNotifier {
 		if (this.apis.skinathon.isMocking) {
 			this.apis.skinathon.mockResponses(API_SETTINGS.skinathon.makeMockData(
 				Date.now(),
-				this.states.skinathon.totalSkinPoints + 1,
+				this.states.skinathon.totalSkinPoints + 5,
 			));
 		}
 	}

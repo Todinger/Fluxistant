@@ -6,7 +6,7 @@ const ModuleAssetLoader = requireMain('moduleAssetLoader');
 const Utils = requireMain('./utils');
 
 const MAX_PIXEL_PROGRESS = 1920;
-const MAX_SP = 1100;
+const DEFAULT_MAX_SP = 1100;
 
 const NUM_OF_CHARACTERS = 4;
 
@@ -87,7 +87,7 @@ class StreamRaiders extends Module {
 
 	loadModConfig(modConfig) {
 		if (this.clientsAreConnected) {
-			setTimeout(async () => await this.sendData(), 500);
+			this.syncClients();
 		}
 
 		let milestoneConfig = modConfig.milestones;
@@ -110,13 +110,22 @@ class StreamRaiders extends Module {
 	load() {
 		this.onClientAttached(async _socket => {
 			if (this.enabled) {
-				await this.sendData();
+				this.syncClients();
 			}
 		});
 
 		StreamRaidersManager.onSkinathonPointsChanged(
 			(newPoints, oldPoints) => this._skinathonPointsChanged(newPoints, oldPoints)
 		);
+	}
+
+	syncClients() {
+		setTimeout(async () => {
+			await this.sendData();
+			setTimeout(() => {
+				this.sendState();
+			}, 300);
+		}, 200);
 	}
 
 	getMilestoneData() {
@@ -152,6 +161,14 @@ class StreamRaiders extends Module {
 		return milestones;
 	}
 
+	get maxSP() {
+		if (this.sortedMilestones.length === 0) {
+			return DEFAULT_MAX_SP;
+		}
+
+		return this.sortedMilestones[this.sortedMilestones.length - 1].sp;
+	}
+
 	async sendData() {
 		let mal = new ModuleAssetLoader(this.assets.Images);
 		let data = {
@@ -166,11 +183,23 @@ class StreamRaiders extends Module {
 		this.broadcastEvent('setData', webData);
 	}
 
+	sendState() {
+		let state = {
+			sp: this.currentSP,
+			pixelProgress: this.pixelProgressFromSP(this.currentSP, this.nextMilestoneIndex),
+		};
+
+		if (this.nextMilestoneIndex > 0) {
+			state.lastUnlockedMilestoneIndex = this.nextMilestoneIndex - 1;
+		}
+
+		this.broadcastEvent('setState', state);
+	}
+
 	_skinathonPointsChanged(newPoints, _oldPoints) {
 		if (newPoints < 0) return;
-		if (newPoints > MAX_SP) newPoints = MAX_SP;
-		let pixelProgress = Math.round((newPoints / MAX_SP) * MAX_PIXEL_PROGRESS);
-		this.broadcastEvent('setPixelProgress', {pixelProgress, sp: newPoints});
+		if (newPoints > this.maxSP) newPoints = this.maxSP;
+		this.setSP(newPoints);
 	}
 
 	setProgressDirect() {
@@ -181,6 +210,10 @@ class StreamRaiders extends Module {
 	}
 
 	lastClearedMilestoneIndexForSP(sp) {
+		if (sp >= this.maxSP) {
+			return this.sortedMilestones.length - 1;
+		}
+
 		for (let i = 0; i < this.sortedMilestones.length; i++) {
 			if (this.sortedMilestones[i].sp > sp) {
 				return i - 1;
@@ -237,7 +270,7 @@ class StreamRaiders extends Module {
 	}
 
 	createFlatProgressEvent(newSP) {
-		let pixelProgress = Math.round((newSP / MAX_SP) * MAX_PIXEL_PROGRESS);
+		let pixelProgress = Math.round((newSP / this.maxSP) * MAX_PIXEL_PROGRESS);
 		return this.makeAdvanceEvent(pixelProgress, newSP);
 	}
 

@@ -174,6 +174,11 @@ class Milestone {
         this.setImageProperties(this.jBackground, this.bg.unlocked);
     }
 
+    fullUnlock() {
+        this.unlock();
+        this.removeEnemy();
+    }
+
     lock() {
         this.setImageProperties(this.jBackground, this.bg.locked);
         this.setImageProperties(this.jEnemy, this.enemy.image);
@@ -346,6 +351,23 @@ class StreamRaiders extends ModuleClient {
         }, 100);
     }
 
+    setState(data) {
+        if (!data) return;
+
+        if ('lastUnlockedMilestoneIndex' in data) {
+            let lastUnlockedMilestoneIndex = data['lastUnlockedMilestoneIndex'];
+            if (this.validateMilestoneIndex(lastUnlockedMilestoneIndex)) {
+                for (let index = 0; index <= lastUnlockedMilestoneIndex; index++) {
+                    this.milestones[index].fullUnlock();
+                }
+            }
+        }
+
+        if (('pixelProgress' in data) && ('sp' in data)) {
+            this.setProgress(data['pixelProgress'], data['sp']);
+        }
+    }
+
     toIdle() {
         Object.values(this.characters).forEach(character => character.toIdle());
     }
@@ -515,6 +537,7 @@ class StreamRaiders extends ModuleClient {
     start() {
         this.server.on('setPixelProgress', (data) => this.setProgress(data['pixelProgress'], data['sp']));
         this.server.on('setData', (data) => this.setData(data));
+        this.server.on('setState', (data) => this.setState(data));
         this.server.on('advance', (data) => this.pushAdvanceEvent(data));
         this.server.on('conquer', (data) => this.pushConquerEvent(data));
         this.server.on('lock', (data) => this.pushLockEvent(data));
