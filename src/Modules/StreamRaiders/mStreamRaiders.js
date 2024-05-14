@@ -283,6 +283,8 @@ class StreamRaiders extends Module {
 			for (let index = newNextMilestoneIndex; index < this.nextMilestoneIndex; index++) {
 				events.push(this.makeLockEvent(index));
 			}
+
+			this.nextMilestoneIndex = newNextMilestoneIndex;
 		} else {
 			let progress = this.createProgressEvents(sp);
 			this.nextMilestoneIndex = progress.nextMilestoneIndex;
