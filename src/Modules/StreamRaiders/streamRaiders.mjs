@@ -176,6 +176,44 @@ class Milestone {
 }
 
 
+class Event {
+    constructor(sr) {
+        this.sr = sr;
+    }
+
+    perform() {
+        // Meant to be overridden by children
+    }
+
+    _done() {
+        this.sr.eventFinished(this);
+    }
+}
+
+class AdvanceEvent extends Event {
+    constructor(sr, targetPixelProgress, targetSP) {
+        super(sr);
+        this.targetPixelProgress = targetPixelProgress;
+        this.targetSP = targetSP;
+    }
+
+    perform() {
+        sr.advance(this.targetPixelProgress, this.targetSP, () => this._done());
+    }
+}
+
+class ConquerEvent extends Event {
+    constructor(sr, milestoneIndex) {
+        super(sr);
+        this.milestoneIndex = milestoneIndex;
+    }
+
+    perform() {
+        sr.conquerMilestone(this.milestoneIndex, () => this._done());
+    }
+}
+
+
 class StreamRaiders extends ModuleClient {
     constructor() {
         super('Stream Raiders');
@@ -208,6 +246,8 @@ class StreamRaiders extends ModuleClient {
         this.advancementPixelsPerSecond = DEFAULT_ADVANCEMENT_PIXELS_PER_SEC;
         this.currentSP = 0;
         this.currentPixelProgress = 0;
+
+        this.eventQueue = [];
     }
 
     windowLoaded() {
@@ -301,7 +341,7 @@ class StreamRaiders extends ModuleClient {
         Object.values(this.characters).forEach(character => character.toAttacking());
     }
 
-    conquerMilestone(milestoneIndex) {
+    conquerMilestone(milestoneIndex, onDone) {
         if (!Number.isInteger(milestoneIndex)) {
             console.log(`milestoneIndex should be an integer. Got: ${milestoneIndex}`);
             return;
@@ -319,6 +359,9 @@ class StreamRaiders extends ModuleClient {
             this.toIdle();
             milestone.removeEnemy();
             milestone.unlock();
+            if (onDone) {
+                onDone();
+            }
         }, this.attackDuration);
     }
 
@@ -355,7 +398,7 @@ class StreamRaiders extends ModuleClient {
         );
     }
 
-    advance(targetPixelProgress, targetSP) {
+    advance(targetPixelProgress, targetSP, onDone) {
         let startingSP = this.currentSP;
         let spDiff = targetSP - startingSP;
         this.toMoving();
@@ -363,7 +406,12 @@ class StreamRaiders extends ModuleClient {
             this.currentPixelProgress,
             targetPixelProgress,
             (current, alpha) => this.setProgress(Math.round(current), Math.round(startingSP + alpha * spDiff)),
-            () => this.toIdle(),
+            () => {
+                this.toIdle();
+                if (onDone) {
+                    onDone();
+                }
+            },
             {
                 easing: "linear",
                 duration: 1000 * (targetPixelProgress - this.currentPixelProgress) / this.advancementPixelsPerSecond,
@@ -371,9 +419,46 @@ class StreamRaiders extends ModuleClient {
         );
     }
 
+    pushEvent(event) {
+        this.eventQueue.push(event);
+        if (this.eventQueue.length === 1) {
+            event.perform();
+        }
+    }
+
+    pushAdvanceEvent(data) {
+        if (!(data && 'targetPixelProgress' in data && 'targetSP' in data)) {
+            console.log(`Bad advance event data received: ${data}`);
+            return;
+        }
+
+        this.pushEvent(new AdvanceEvent(this, data['targetPixelProgress'], data['targetSP']));
+    }
+
+    pushConquerEvent(data) {
+        if (!(data && 'milestoneIndex' in data)) {
+            console.log(`Bad conquer event data received: ${data}`);
+            return;
+        }
+
+        this.pushEvent(new ConquerEvent(this, data['milestoneIndex']));
+    }
+
+    eventFinished(event) {
+        if (this.eventQueue.length > 0 && this.eventQueue[0] === event) {
+            this.eventQueue.shift();
+
+            if (this.eventQueue.length > 0) {
+                this.eventQueue[0].perform();
+            }
+        }
+    }
+
     start() {
         this.server.on('setPixelProgress', (data) => this.setProgress(data['pixelProgress'], data['sp']));
         this.server.on('setData', (data) => this.setData(data));
+        this.server.on('advance', (data) => this.pushAdvanceEvent(data));
+        this.server.on('conquer', (data) => this.pushConquerEvent(data));
 
         this.server.attach();
     }
