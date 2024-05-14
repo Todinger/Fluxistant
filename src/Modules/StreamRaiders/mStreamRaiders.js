@@ -42,6 +42,10 @@ class StreamRaiders extends Module {
 	}
 
 	defineModConfig(modConfig) {
+		modConfig.addNaturalNumber('attackDuration', 0)
+			.setName('Attack Duration')
+			.setDescription('How long the attack and death animations will be played when a milestone is unlocked');
+
 		let characters = modConfig.addFixedArray('characters', 'SkinathonCharacter')
 			.setName('Characters')
 			.setDescription('Configuration for the displayed "character" skins');
@@ -142,6 +146,7 @@ class StreamRaiders extends Module {
 	async sendData() {
 		let mal = new ModuleAssetLoader(this.assets.Images);
 		let data = {
+			attackDuration: this.config.attackDuration,
 			characters: this.config.characters,
 			milestones: this.getMilestoneData(),
 		}

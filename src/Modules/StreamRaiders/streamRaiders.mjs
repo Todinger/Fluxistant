@@ -5,6 +5,7 @@ const TRANSPARENT_PIXEL_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///
 const NO_IMAGE = TRANSPARENT_PIXEL_IMAGE;
 const NO_IMAGE_OBJECT = {url: NO_IMAGE};
 const MAX_PROGRESS = 1920;
+const DEFAULT_ATTACK_DURATION = 3000;
 
 function pixelStringToInt(pixelString) {
     return parseInt(pixelString.replace("px", ""))
@@ -159,6 +160,18 @@ class Milestone {
         this.fixPositionFromSettings(this.jReward, this.reward);
         this.fixPositionFromSettings(this.jEnemy, this.enemy);
     }
+
+    playEnemyDeath() {
+        this.setImageProperties(this.jEnemy, this.enemy.deathImage);
+    }
+
+    removeEnemy() {
+        this.setImageProperties(this.jEnemy, NO_IMAGE_OBJECT);
+    }
+
+    unlock() {
+        this.setImageProperties(this.jBackground, this.bg.unlocked);
+    }
 }
 
 
@@ -188,6 +201,8 @@ class StreamRaiders extends ModuleClient {
         });
 
         this.milestones = [];
+
+        this.attackDuration = DEFAULT_ATTACK_DURATION;
     }
 
     windowLoaded() {
@@ -248,6 +263,11 @@ class StreamRaiders extends ModuleClient {
 
     setData(data) {
         if (!data) return;
+
+        if ('attackDuration' in data) {
+            this.attackDuration = data['attackDuration'] || DEFAULT_ATTACK_DURATION;
+        }
+
         this.hideRoad();
         this.setCharacterImages(data['characters']);
 
@@ -270,6 +290,27 @@ class StreamRaiders extends ModuleClient {
 
     toAttacking() {
         Object.values(this.characters).forEach(character => character.toAttacking());
+    }
+
+    conquerMilestone(milestoneIndex) {
+        if (!Number.isInteger(milestoneIndex)) {
+            console.log(`milestoneIndex should be an integer. Got: ${milestoneIndex}`);
+            return;
+        } else if (milestoneIndex < 0 || milestoneIndex >= this.milestones.length) {
+            console.log(
+                `milestoneIndex is out of the range of [0, ${this.milestones.length - 1}]. Got: ${milestoneIndex}`
+            );
+            return;
+        }
+
+        let milestone = this.milestones[milestoneIndex];
+        this.toAttacking();
+        milestone.playEnemyDeath();
+        setTimeout(() => {
+            this.toIdle();
+            milestone.removeEnemy();
+            milestone.unlock();
+        }, this.attackDuration);
     }
 
     setProgress(pixelProgress, sp) {
