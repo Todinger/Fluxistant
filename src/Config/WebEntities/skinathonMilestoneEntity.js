@@ -23,12 +23,18 @@ class SkinathonMilestoneEntity extends StaticObjectEntity {
 		reward.addChild('image', new ImageEntity())
 			.setName('Reward Image')
 			.setDescription('The reward that gets unlocked by this milestone');
+		reward.addNumber('centerX', 0)
+			.setName('Center X Position')
+			.setDescription('Horizontal center of the reward image, to align it with the background image');
+		reward.addNumber('centerY', 0)
+			.setName('Center X Position')
+			.setDescription('Vertical center of the reward image, to align it with the background image');
 		reward.addNumber('offsetX', 0)
 			.setName('Reward Image: X Offset')
-			.setDescription('Horizontal offset for the reward image to align it with the background image');
+			.setDescription('Horizontal offset for the reward from the center point');
 		reward.addNumber('offsetY', 0)
 			.setName('Reward Image: Y Offset')
-			.setDescription('Vertical offset for the reward image to align it with the background image');
+			.setDescription('Vertical offset for the reward from the center point');
 
 		let enemy = this.addGroup('enemy')
 			.setName('Enemy')
@@ -39,12 +45,18 @@ class SkinathonMilestoneEntity extends StaticObjectEntity {
 		enemy.addChild('deathImage', new ImageEntity())
 			.setName('Enemy Death Image')
 			.setDescription('The appearance of the enemy guarding this milestone when it is killed (facing left)');
+		enemy.addNumber('centerX', 0)
+			.setName('Center X Position')
+			.setDescription('Horizontal center of the enemy image, to align it with the background image');
+		enemy.addNumber('centerY', 0)
+			.setName('Center X Position')
+			.setDescription('Vertical center of the enemy image, to align it with the background image');
 		enemy.addNumber('offsetX', 0)
-			.setName('Reward Image: X Offset')
-			.setDescription('Horizontal offset for the images to align them with the milestone sign');
+			.setName('X Offset')
+			.setDescription('Horizontal offset for the enemy from the center point');
 		enemy.addNumber('offsetY', 0)
-			.setName('Reward Image: Y Offset')
-			.setDescription('Vertical offset for the images to align them with the milestone sign');
+			.setName('Y Offset')
+			.setDescription('Vertical offset for the enemy from the center point');
 	}
 }
 

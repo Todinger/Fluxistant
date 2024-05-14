@@ -9,7 +9,7 @@
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-<div id="skinathonRoad" class="bottom-center">
+<div id="skinathonRoad" class="bottom-center" style="display: none">
     <img src="assets/RoadNormal.png" alt="" class="road-element road-bg">
     <img id="traveled" src="assets/RoadTraveled.png" alt="" class="road-element road-overlay">
     <img id="progress-panel" src="assets/ProgressPanel.png" alt="" class="absolute">
@@ -25,7 +25,7 @@
         </div>
     </div>
     <div id="milestones" class="bottom-left milestone-container">
-        <div class="milestone" style="left: 0;">
+        <div class="milestone" style="left: -100px;">
             <img src="./tmp/sign.png" alt="" class="milestone-item milestone-bg" style="bottom: 0; left: 0;">
             <img src="./tmp/flag.gif" alt="" class="milestone-item milestone-reward" style="bottom: 10px; left: 0; width: 120px; height: 120px;">
         </div>

@@ -33,6 +33,8 @@ class StreamRaiders extends Module {
 			webname: 'streamRaiders',
 			source: 'streamRaiders.html',
 		});
+
+		this.sortedMilestones = [];
 	}
 
 	defineModAssets(modData) {
@@ -60,18 +62,35 @@ class StreamRaiders extends Module {
 			.setName('Last Milestone Position')
 			.setDescription('Distance in pixels from the **right** edge of the road at which to place the last milestone');
 
-		milestones.addChild('defaultMilestoneValues', new SkinathonMilestoneEntity())
+		let defaultMilestoneValues = milestones.addChild('defaultMilestoneValues', new SkinathonMilestoneEntity())
 			.setName('Default Milestone Values')
 			.setDescription('Default settings that will be applied to all milestones unless overridden (offsets are added instead of replaced)');
+		defaultMilestoneValues.getChild('sp').hide();
 
 		milestones.addDynamicArray('milestones', 'SkinathonMilestone')
 			.setName('Milestones')
 			.setDescription('Settings for the different unlockable milestones');
 	}
 
-	loadModConfig(_modConfig) {
+	loadModConfig(modConfig) {
 		if (this.clientsAreConnected) {
 			setTimeout(async () => await this.sendData(), 500);
+		}
+
+		let milestoneConfig = modConfig.milestones;
+
+		this.sortedMilestones = milestoneConfig.milestones.sort((a, b) => a.sp - b.sp);
+		let firstPos = milestoneConfig.firstMilestonePos;
+		let lastPos = MAX_PIXEL_PROGRESS - milestoneConfig.lastMilestonePos;
+		let range = lastPos - firstPos;
+		let numMilestones = this.sortedMilestones.length;
+		if (numMilestones === 1) {
+			this.sortedMilestones.position = lastPos;
+		} else {
+			let segments = numMilestones - 1;
+			for (let i = 0; i < numMilestones; i++) {
+				this.sortedMilestones[i].position = firstPos + range * i / segments;
+			}
 		}
 	}
 	
@@ -87,46 +106,37 @@ class StreamRaiders extends Module {
 		);
 	}
 
-	getImage(fileData) {
-		let promise =
-			fileData.file.fileKey ?
-				this.assets.Images.getFileWebByKey(fileData.file.fileKey) :
-				Promise.resolve(null);
-		promises.push(promise);
-		return promise;
-	}
-
 	getMilestoneData() {
 		let cfg = this.config.milestones;
 		let def = cfg.defaultMilestoneValues;
-		let sortedConfigMilestones = cfg.milestones.sort((a, b) => a.sp - b.sp);
 		let milestones = [];
-		for (let i = 0; i < sortedConfigMilestones.length; i++) {
-			let milestone = sortedConfigMilestones[i];
+		for (let i = 0; i < this.sortedMilestones.length; i++) {
+			let milestone = this.sortedMilestones[i];
 			milestones.push({
+				position: milestone.position,
 				bg: {
 					locked: imageDefault(milestone.lockedBackImage, def.lockedBackImage),
 					unlocked: imageDefault(milestone.unlockedBackImage, def.unlockedBackImage),
 				},
 				reward: {
 					image: imageDefault(milestone.reward.image, def.reward.image),
+					centerX: milestone.reward.centerX + def.reward.centerX,
+					centerY: milestone.reward.centerY + def.reward.centerY,
 					offsetX: milestone.reward.offsetX + def.reward.offsetX,
 					offsetY: milestone.reward.offsetY + def.reward.offsetY,
 				},
 				enemy: {
 					image: imageDefault(milestone.enemy.image, def.enemy.image),
 					deathImage: imageDefault(milestone.enemy.deathImage, def.enemy.deathImage),
+					centerX: milestone.enemy.centerX + def.enemy.centerX,
+					centerY: milestone.enemy.centerY + def.enemy.centerY,
 					offsetX: milestone.enemy.offsetX + def.enemy.offsetX,
 					offsetY: milestone.enemy.offsetY + def.enemy.offsetY,
 				},
 			});
 		}
 
-		return {
-			firstMilestonePos: cfg.firstMilestonePos,
-			lastMilestonePos: cfg.lastMilestonePos,
-			milestones: milestones,
-		};
+		return milestones;
 	}
 
 	async sendData() {
@@ -139,46 +149,6 @@ class StreamRaiders extends Module {
 		let webData = await mal.loadWeb(data);
 
 		this.broadcastEvent('setData', webData);
-	}
-
-	async sendImages() {
-		let promises = [];
-		const getImage = (fileData) => {
-			let promise =
-				fileData.file.fileKey ?
-					this.assets.Images.getFileWebByKey(fileData.file.fileKey) :
-					Promise.resolve(null);
-			promises.push(promise);
-			return promise;
-		};
-
-		let images = {
-			characters: this.config.characters.map(character => ({
-				idle: getImage(character.idle),
-				moving: getImage(character.moving),
-				attacking: getImage(character.attacking),
-			})),
-		}
-
-		try {
-			await Promise.all(promises);
-			for (let i = 0; i < NUM_OF_CHARACTERS; i++) {
-				let character = images.characters[i];
-				images.characters[i] = {
-					idle: (await character.idle).data,
-					moving: (await character.moving).data,
-					attacking: (await character.attacking).data,
-				};
-			}
-
-			// let parameters = {
-			// 	characters: images.characters.map(async (filePromise) => (await filePromise).data),
-			// };
-
-			this.broadcastEvent('setImages', images);
-		} catch(err) {
-			this.error(err);
-		}
 	}
 
 	_skinathonPointsChanged(newPoints, _oldPoints) {

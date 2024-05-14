@@ -36,6 +36,21 @@ function setImageAttributes(imageElement, attributes) {
     imageElement.style.height = isNaN(attributes.height) ? "" : `${attributes.height}px`;
 }
 
+function toPixels(num) {
+    return num === 0 ? `${num}` : `${num}px`;
+}
+
+function toCSSProperties(properties) {
+    let result = {};
+    for (let prop of ['top', 'left', 'bottom', 'right', 'width', 'height']) {
+        if (prop in properties) {
+            result[prop] = toPixels(properties[prop]);
+        }
+    }
+
+    return result;
+}
+
 
 class Character {
     constructor(element) {
@@ -71,6 +86,9 @@ class Character {
 class Milestone {
     constructor(data) {
         data = data || {};
+
+        this.position = data['position'] || 0;
+
         let bg = data['bg'] || {};
         this.bg = {
             locked: getImageFromData(bg['locked']),
@@ -80,6 +98,8 @@ class Milestone {
         let reward = data['reward'] || {};
         this.reward = {
             image: getImageFromData(reward['image']),
+            centerX: reward['centerX'] || 0,
+            centerY: reward['centerY'] || 0,
             offsetX: reward['offsetX'] || 0,
             offsetY: reward['offsetY'] || 0,
         }
@@ -88,9 +108,48 @@ class Milestone {
         this.enemy = {
             image: getImageFromData(enemy['image']),
             deathImage: getImageFromData(enemy['deathImage']),
+            centerX: enemy['centerX'] || 0,
+            centerY: enemy['centerY'] || 0,
             offsetX: enemy['offsetX'] || 0,
             offsetY: enemy['offsetY'] || 0,
         }
+
+        this.jMilestone = null;
+        this.jBackground = null;
+        this.jReward = null;
+        this.jEnemy = null;
+    }
+
+    setImageProperties(jImage, properties) {
+        jImage.attr("src", properties.url);
+        jImage.css(toCSSProperties(properties));
+    }
+
+    build() {
+        this.jMilestone = $(`<div class="milestone" style="left: ${toPixels(this.position)};"></div>`);
+        this.jBackground = $(`<img src="" alt="" class="milestone-item milestone-bg">`)
+            .appendTo(this.jMilestone);
+        this.setImageProperties(this.jBackground, this.bg.locked);
+        this.jReward = $(`<img src="" alt="" class="milestone-item milestone-reward">`)
+            .appendTo(this.jMilestone);
+        this.setImageProperties(this.jReward, this.reward.image);
+
+        return this.jMilestone;
+    }
+
+    fixPositionFromSettings(jImage, settings) {
+        jImage.css(toCSSProperties({
+            left: Math.round((-jImage.width() / 2) + settings.centerX + settings.offsetX),
+            bottom: Math.round((-jImage.height() / 2) + settings.centerY + settings.offsetY),
+        }));
+    }
+
+    fixPositions() {
+        this.jBackground.css(toCSSProperties({
+            left: Math.round(-this.jBackground.width() / 2),
+            bottom: 0
+        }));
+        this.fixPositionFromSettings(this.jReward, this.reward);
     }
 }
 
@@ -100,11 +159,13 @@ class StreamRaiders extends ModuleClient {
         super('Stream Raiders');
 
         this.elements = {
+            jRoad: $("#skinathonRoad"),
             traveled: document.getElementById('traveled'),
             progressPanel: document.getElementById('progress-panel'),
             progressSP: document.getElementById('progress-sp'),
             progressSPContainer: document.getElementById('progress-sp-container'),
             characters: document.getElementById('characters'),
+            jMilestones: $("#milestones"),
         };
 
         let charactersStyle = getComputedStyle(this.elements.characters);
@@ -118,8 +179,6 @@ class StreamRaiders extends ModuleClient {
             this.characters[index] = new Character(element);
         });
 
-        this.firstMilestonePos = 0;
-        this.lastMilestonePos = MAX_PROGRESS;
         this.milestones = [];
     }
 
@@ -144,12 +203,9 @@ class StreamRaiders extends ModuleClient {
         }
     }
 
-    setMilestoneData(milestoneData) {
-        if (!milestoneData) return;
-        this.firstMilestonePos = milestoneData['firstMilestonePos'] || 0;
-        this.lastMilestonePos = milestoneData['lastMilestonePos'] || 0;
+    setMilestoneData(milestones) {
+        if (!milestones) return;
 
-        let milestones = milestoneData['milestones'] || [];
         if (!Array.isArray(milestones)) {
             console.error(`Bad milestone data received. Expected an array, got: ${typeof milestones}`);
             return;
@@ -158,10 +214,35 @@ class StreamRaiders extends ModuleClient {
         this.milestones = milestones.map(data => new Milestone(data));
     }
 
+    clearMilestones() {
+        // this.elements.jMilestones.empty();
+        this.elements.jMilestones.children(":first").nextAll().remove();
+    }
+
+    buildMilestones() {
+        for (let i = 0; i < this.milestones.length; i++) {
+            this.elements.jMilestones.append(this.milestones[i].build());
+        }
+    }
+
+    fixMilestonePositions() {
+        for (let i = 0; i < this.milestones.length; i++) {
+            this.milestones[i].fixPositions();
+        }
+    }
+
     setData(data) {
         if (!data) return;
+        this.elements.jRoad.hide();
         this.setCharacterImages(data['characters']);
+
+        this.clearMilestones();
         this.setMilestoneData(data['milestones']);
+        this.buildMilestones();
+        setTimeout(() => {
+            this.fixMilestonePositions();
+            this.elements.jRoad.show();
+        }, 100);
     }
 
     toIdle() {
