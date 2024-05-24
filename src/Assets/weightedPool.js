@@ -14,8 +14,8 @@ const Errors = require('../errors');
 // Weights are relative, so if all keys have the same weight, be it 1 or 31415926, it will still act as
 // a uniform pool (there's no change to efficiency with different weight values, by the way).
 class WeightedPool extends FilePool {
-	constructor(assetsDirPath) {
-		super(assetsDirPath);
+	constructor(assetsDirPath, modName) {
+		super(assetsDirPath, modName);
 		this.weights = {};
 	}
 	

@@ -6,8 +6,8 @@ const UserAssets = require('./userAssets');
 // Note that this is still an abstract class, as it does not specify how to choose a key
 // from our pool.
 class FilePool extends UserAssets {
-	constructor(assetsDirPath) {
-		super(assetsDirPath);
+	constructor(assetsDirPath, modName) {
+		super(assetsDirPath, modName);
 	}
 	
 	_getFileKeys(params) {

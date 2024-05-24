@@ -7,8 +7,8 @@ const Utils = require('../utils');
 // Represents assets that contain multiple files, of which we normally choose one at a time.
 // The selection is done at random, with every file in the pool having the same odds of being chosen.
 class UniformGroupsPool extends UniformPool {
-	constructor(assetsDirPath) {
-		super(assetsDirPath);
+	constructor(assetsDirPath, modName) {
+		super(assetsDirPath, modName);
 		this.groups = {};
 	}
 	

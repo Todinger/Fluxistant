@@ -6,8 +6,8 @@ const UserAssets = require('./userAssets');
 // Represents assets that contain multiple files, where we choose a file
 // directly by its key.
 class NamedCollection extends UserAssets {
-	constructor(assetsDirPath) {
-		super(assetsDirPath);
+	constructor(assetsDirPath, modName) {
+		super(assetsDirPath, modName);
 	}
 	
 	_ensurePresence(fileKey) {

@@ -44,7 +44,7 @@ class ModuleAssets {
 	}
 	
 	add(collectionID, collectionClass) {
-		let collection = new collectionClass(path.join(this.assetsDirPath, collectionID));
+		let collection = new collectionClass(path.join(this.assetsDirPath, collectionID), this.modName);
 		this.collections[collectionID] = collection;
 		this[collectionID] = collection;
 	}

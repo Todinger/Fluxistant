@@ -12,19 +12,29 @@ const Utils = require('../utils');
 
 // Base class for user asset files
 class UserAssets {
-	constructor(assetsDirPath) {
+	constructor(assetsDirPath, modName) {
 		this.assetsDirPath = assetsDirPath;
+		this.modName = modName;
 		Utils.ensureDirExists(this.assetsDirPath);
 		
 		this.savedFiles = {};       // Current state
 		this.filesToAdd = {};       // Uncommitted new files
 		this.filesToDelete = [];    // Uncommitted deletions
 	}
+
+	_info(msg) {
+		Logger.info(`[${this.modName} Assets] ${msg}`);
+	}
 	
+	_error(msg) {
+		Logger.error(`[${this.modName} Assets] ${msg}`);
+	}
+
 	// Selects a file from the stored assets, according to the concrete class's own selection rules
 	// noinspection JSUnusedLocalSymbols
 	_getFileKeys(params) {
 		Errors.abstract();
+		return "";
 	}
 	
 	_pathFor(filename) {
@@ -38,7 +48,7 @@ class UserAssets {
 	
 	_addFile(file) {
 		let fileKey = uuidv4();
-		Logger.info(`[UserAssets] <${this.assetsDirPath}> _addFile(): ${fileKey}`);
+		this._info(`<${this.assetsDirPath}> _addFile(): ${fileKey}`);
 		let readPromise = this._readFile(file.tempFilePath, file.name)
 			.then(savedFile => {
 				savedFile.fileKey = fileKey;
@@ -53,7 +63,7 @@ class UserAssets {
 	}
 	
 	_unAddFile(fileKey) {
-		Logger.info(`[UserAssets] <${this.assetsDirPath}> _unaddFile(): ${fileKey}`);
+		this._info(`<${this.assetsDirPath}> _unaddFile(): ${fileKey}`);
 		return this.filesToAdd[fileKey].readPromise
 			.then(() => {
 				let file = this.filesToAdd[fileKey].file;
@@ -63,7 +73,7 @@ class UserAssets {
 	}
 	
 	_deleteFile(fileKey) {
-		Logger.info(`[UserAssets] <${this.assetsDirPath}> _deleteFile(): ${fileKey}`);
+		this._info(`<${this.assetsDirPath}> _deleteFile(): ${fileKey}`);
 		let filename = this.savedFiles[fileKey].path;
 		return fsPromise.unlink(filename)
 			.then(() => {
@@ -85,7 +95,7 @@ class UserAssets {
 	}
 	
 	delete(params) {
-		Logger.info(`[UserAssets] <${this.assetsDirPath}> delete(): ${params.fileKey}`);
+		this._info(`<${this.assetsDirPath}> delete(): ${params.fileKey}`);
 		if (params.fileKey in this.filesToAdd) {
 			return this._unAddFile(params.fileKey);
 		} else if ((params.fileKey in this.savedFiles) &&
@@ -97,7 +107,7 @@ class UserAssets {
 	}
 	
 	commitChanges() {
-		Logger.info(`[UserAssets] <${this.assetsDirPath}> commit(): Started`);
+		this._info(`<${this.assetsDirPath}> commit(): Started`);
 		// First remove everything marked for removal
 		let deletePromises = this.filesToDelete.map(
 			fileKey => this._deleteFile(fileKey));
@@ -106,7 +116,7 @@ class UserAssets {
 		// if we remove and add something with the same name - i.e.
 		// replace it - then it'll work properly
 		return Promise.all(deletePromises).catch().then(deletedKeys => {
-			Logger.info(`[UserAssets] <${this.assetsDirPath}> commit(): Delete finished`);
+			this._info(`<${this.assetsDirPath}> commit(): Delete finished`);
 			Utils.ensureDirExists(this.assetsDirPath);
 			_.pullAll(this.filesToDelete, deletedKeys);
 			let movePromises = [];
@@ -115,7 +125,7 @@ class UserAssets {
 				let filePath = this._pathForKey(fileKey, file.name);
 				let promise = file.mv(filePath)
 					.then(() => {
-						Logger.info(`[UserAssets] <${this.assetsDirPath}> _addFile(): Add finished`);
+						this._info(`<${this.assetsDirPath}> _addFile(): Add finished`);
 						this.savedFiles[fileKey] = {
 							name: file.name,
 							path: filePath,
@@ -130,7 +140,7 @@ class UserAssets {
 	}
 	
 	dropChanges() {
-		Logger.info(`[UserAssets] <${this.assetsDirPath}> dropChanges()`);
+		this._info(`<${this.assetsDirPath}> dropChanges()`);
 		this.filesToDelete = [];
 		
 		let promises = [];
@@ -183,7 +193,7 @@ class UserAssets {
 	
 	getFileWebByKey(key) {
 		if (!(key in this.savedFiles)) {
-			Logger.error(`File key not found: ${key}`);
+			this._error(`File key not found: ${key}`);
 			return null;
 		}
 		return this._readFile(this.savedFiles[key].path, this.savedFiles[key].name)
@@ -207,6 +217,7 @@ class UserAssets {
 	// noinspection JSUnusedLocalSymbols
 	selectFileKey(params) {
 		Errors.abstract();
+		return "";
 	}
 	
 	selectFile(...params) {
@@ -219,7 +230,7 @@ class UserAssets {
 	}
 	
 	import(exportedAssets) {
-		Logger.info(`[UserAssets] <${this.assetsDirPath}> import()`);
+		this._info(`<${this.assetsDirPath}> import()`);
 		
 		// Added the '|| {}' part to shut the IDE up about it might being
 		// null or undefined (despite our test above to make sure it isn't...)
