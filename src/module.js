@@ -122,6 +122,11 @@ class Module {
 		if (!this.functions) {
 			this.functions = undefined;
 		}
+
+		// A module can define "extra" functions of its own - if it does, it should
+		// put them all in here (this is used by the Module Manager to display all
+		// commands in the bot)
+		this.extraFuncObjects = undefined;
 		
 		// Loads the module in debug mode, replacing chat messages with
 		// console log printouts

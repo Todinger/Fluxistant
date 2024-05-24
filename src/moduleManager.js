@@ -314,31 +314,45 @@ class ModuleManager {
 		});
 	}
 
+	_showAllCommandsForFunctions(modName, includeFiltered, firstInMod, funcObjects) {
+		Object.values(funcObjects).forEach(funcObject => {
+			if (!funcObject.triggers) return;
+
+			funcObject.triggers.forEach(trigger => {
+				if (trigger.type !== "command") return;
+				if (!trigger.cmdname) return;
+				if ((trigger.hasFilters || funcObject.hasFilters) && !includeFiltered) return;
+				if (firstInMod) {
+					let line = '+' + '-'.repeat(modName.length + 2) + '+';
+					console.log(line);
+					console.log(`| ${modName} |`);
+					console.log(line);
+					firstInMod = false;
+				}
+
+				console.log(`!${trigger.cmdname}`);
+			});
+		});
+
+		return firstInMod;
+	}
+
 	showAllCommands(includeFiltered) {
 		console.log("Command list:");
 		let firstInMod;
 		Utils.objectForEach(this.modules, (modName, mod) => {
-			if (!mod.funcObjects || !mod.enabled) return;
+			if (!mod.enabled) return;
 			firstInMod = true;
-
-			Object.values(mod.funcObjects).forEach(funcObject => {
-				if (!funcObject.triggers) return;
-
-				funcObject.triggers.forEach(trigger => {
-					if (trigger.type !== "command") return;
-					if (!trigger.cmdname) return;
-					if ((trigger.hasFilters || funcObject.hasFilters) && !includeFiltered) return;
-					if (firstInMod) {
-						let line = '+' + '-'.repeat(modName.length + 2) + '+';
-						console.log(line);
-						console.log(`| ${modName} |`);
-						console.log(line);
-						firstInMod = false;
-					}
-
-					console.log(`!${trigger.cmdname}`);
-				});
-			});
+			if (mod.funcObjects) {
+				firstInMod = this._showAllCommandsForFunctions(modName, includeFiltered, firstInMod, mod.funcObjects);
+			}
+			if (mod.extraFuncObjects) {
+				firstInMod = this._showAllCommandsForFunctions(
+					modName,
+					includeFiltered,
+					firstInMod,
+					mod.extraFuncObjects);
+			}
 		});
 	}
 }

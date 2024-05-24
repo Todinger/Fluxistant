@@ -37,6 +37,7 @@ class TextFunctions extends Module {
 		}
 		
 		this.activateFunctions(this.textFunctions);
+		this.extraFuncObjects = this.textFunctions;
 	}
 }
 

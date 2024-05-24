@@ -161,6 +161,7 @@ class ImageCommands extends Module {
 		}
 		
 		this.activateFunctions(this.imageFunctions);
+		this.extraFuncObjects = this.imageFunctions;
 	}
 }
 
