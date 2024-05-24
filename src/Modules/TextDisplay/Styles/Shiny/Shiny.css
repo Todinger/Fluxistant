@@ -53,7 +53,7 @@ h1 {
     line-height: 1;
 
     font-family: "Rubik", sans-serif;
-    font-size: clamp(2em, 2vw, 4em);
+    font-size: 100px;
     font-weight: 400;
     margin: 0;
     padding: 20px;
