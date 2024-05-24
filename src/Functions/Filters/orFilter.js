@@ -9,6 +9,10 @@ class OrFilter extends FunctionFilter {
 	get type() {
 		return "or";
 	}
+
+	get isEmpty() {
+		return this.filters.length === 0;
+	}
 	
 	getSubFilters() {
 		return this.filters;

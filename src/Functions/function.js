@@ -95,6 +95,10 @@ class Function {
 			return [];
 		}
 	}
+
+	get hasFilters() {
+		return this.filter && !this.filter.isEmpty;
+	}
 	
 	getAllVariables() {
 		let vars = [...this.variables];

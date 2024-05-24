@@ -24,7 +24,11 @@ class FunctionTrigger extends EventNotifier {
 	get selfUser() {
 		return Globals.StreamerUser;
 	}
-	
+
+	get hasFilters() {
+		return this.filter && !this.filter.isEmpty;
+	}
+
 	_makeFilter(filters) {
 		if (filters && filters.length > 0) {
 			if (filters[0] instanceof Filter) {

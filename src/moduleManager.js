@@ -47,7 +47,10 @@ class ModuleManager {
 		ConfigManager.onModConfigLoaded(
 			(modName, modConfig) => this._onConfigLoaded(modName, modConfig));
 
-		cli.on('commands', () => this.showAllCommands());
+		cli.on('commands', (param) => {
+			let includeFiltered = param === "all";
+			this.showAllCommands(includeFiltered);
+		});
 	}
 	
 	getModule(modName) {
@@ -311,11 +314,11 @@ class ModuleManager {
 		});
 	}
 
-	showAllCommands() {
+	showAllCommands(includeFiltered) {
 		console.log("Command list:");
 		let firstInMod;
 		Utils.objectForEach(this.modules, (modName, mod) => {
-			if (!mod.funcObjects) return;
+			if (!mod.funcObjects || !mod.enabled) return;
 			firstInMod = true;
 
 			Object.values(mod.funcObjects).forEach(funcObject => {
@@ -324,6 +327,7 @@ class ModuleManager {
 				funcObject.triggers.forEach(trigger => {
 					if (trigger.type !== "command") return;
 					if (!trigger.cmdname) return;
+					if ((trigger.hasFilters || funcObject.hasFilters) && !includeFiltered) return;
 					if (firstInMod) {
 						let line = '+' + '-'.repeat(modName.length + 2) + '+';
 						console.log(line);
