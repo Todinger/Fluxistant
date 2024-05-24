@@ -46,6 +46,8 @@ class ModuleManager {
 		// Register to configuration updates
 		ConfigManager.onModConfigLoaded(
 			(modName, modConfig) => this._onConfigLoaded(modName, modConfig));
+
+		cli.on('commands', () => this.showAllCommands());
 	}
 	
 	getModule(modName) {
@@ -306,6 +308,33 @@ class ModuleManager {
 			} catch (err) {
 				cli.log(`[Module Manager] Error loading data in ${mod.name}: ${err}`);
 			}
+		});
+	}
+
+	showAllCommands() {
+		console.log("Command list:");
+		let firstInMod;
+		Utils.objectForEach(this.modules, (modName, mod) => {
+			if (!mod.funcObjects) return;
+			firstInMod = true;
+
+			Object.values(mod.funcObjects).forEach(funcObject => {
+				if (!funcObject.triggers) return;
+
+				funcObject.triggers.forEach(trigger => {
+					if (trigger.type !== "command") return;
+					if (!trigger.cmdname) return;
+					if (firstInMod) {
+						let line = '+' + '-'.repeat(modName.length + 2) + '+';
+						console.log(line);
+						console.log(`| ${modName} |`);
+						console.log(line);
+						firstInMod = false;
+					}
+
+					console.log(`!${trigger.cmdname}`);
+				});
+			});
 		});
 	}
 }

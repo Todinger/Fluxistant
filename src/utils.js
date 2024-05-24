@@ -49,7 +49,7 @@ class Utils {
 		return Object.fromEntries(Object.entries(obj).filter(([key, value]) => filter(key, value)));
 	}
 
-	static ObjectForEach(obj, func) {
+	static objectForEach(obj, func) {
 		Object.entries(obj).forEach(entry => func(entry[0], entry[1]));
 	}
 	
