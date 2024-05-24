@@ -119,6 +119,10 @@ class StreamRaiders extends Module {
 		);
 	}
 
+	get hasMilestones() {
+		return this.sortedMilestones.length > 0;
+	}
+
 	syncClients() {
 		setTimeout(async () => {
 			await this.sendData();
@@ -170,30 +174,38 @@ class StreamRaiders extends Module {
 	}
 
 	async sendData() {
-		let mal = new ModuleAssetLoader(this.assets.Images);
-		let data = {
-			attackDuration: this.config.attackDuration,
-			advancementPixelsPerSecond: this.config.advancementPixelsPerSecond,
-			characters: this.config.characters,
-			milestones: this.getMilestoneData(),
+		try {
+			let mal = new ModuleAssetLoader(this.assets.Images);
+			let data = {
+				attackDuration: this.config.attackDuration,
+				advancementPixelsPerSecond: this.config.advancementPixelsPerSecond,
+				characters: this.config.characters,
+				milestones: this.getMilestoneData(),
+			}
+
+			let webData = await mal.loadWeb(data);
+
+			this.broadcastEvent('setData', webData);
+		} catch (err) {
+			this.error(`Error sending data: ${err}`);
 		}
-
-		let webData = await mal.loadWeb(data);
-
-		this.broadcastEvent('setData', webData);
 	}
 
 	sendState() {
-		let state = {
-			sp: this.currentSP,
-			pixelProgress: this.pixelProgressFromSP(this.currentSP, this.nextMilestoneIndex),
-		};
+		try {
+			let state = {
+				sp: this.currentSP,
+				pixelProgress: this.pixelProgressFromSP(this.currentSP, this.nextMilestoneIndex),
+			};
 
-		if (this.nextMilestoneIndex > 0) {
-			state.lastUnlockedMilestoneIndex = this.nextMilestoneIndex - 1;
+			if (this.nextMilestoneIndex > 0) {
+				state.lastUnlockedMilestoneIndex = this.nextMilestoneIndex - 1;
+			}
+
+			this.broadcastEvent('setState', state);
+		} catch (err) {
+			this.error(`Error sending data: ${err}`);
 		}
-
-		this.broadcastEvent('setState', state);
 	}
 
 	_skinathonPointsChanged(newPoints, _oldPoints) {
@@ -222,6 +234,8 @@ class StreamRaiders extends Module {
 	}
 
 	pixelProgressFromSP(sp, nextMilestoneIndex) {
+		if (!this.hasMilestones) return 0;
+
 		let leftSP, leftPosition, rightSP, rightPosition;
 		if (nextMilestoneIndex === 0) {
 			leftSP = 0;
