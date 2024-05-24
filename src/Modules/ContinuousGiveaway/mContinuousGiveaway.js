@@ -56,7 +56,7 @@ class ContinuousGiveaway extends Module {
 	load() {
 		ConfigSourceManager.setSourceOptions(
 			FONT_TYPES_SOURCE_NAME,
-			['Regular', 'Creepy'],
+			['Regular', 'Creepy', 'Shiny'],
 		);
 	}
 	
