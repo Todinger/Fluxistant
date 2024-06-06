@@ -25,41 +25,72 @@ class Counters extends Module {
 	}
 
 	loadModConfig(conf) {
-		this.globalCounterFunctions = this.loadCountersFromConfig(
+		this.loadCountersFromConfig(
 			conf.globalCounters,
 			this.globalCounterFunctions,
 			'Global',
 			(name) => this.incrementGlobal(name),
+			(name) => this.showGlobal(name),
 		);
 
-		this.userCounterFunctions = this.loadCountersFromConfig(
+		this.loadCountersFromConfig(
 			conf.userCounters,
 			this.userCounterFunctions,
 			'User',
 			(name, data) => this.incrementUser(name, data),
+			(name, data) => this.showUser(name, data),
 		);
+
+		this.extraFuncObjects = {
+			...this.globalCounterFunctions.incrementFunctionObjects,
+			...this.globalCounterFunctions.showFunctionObjects,
+			...this.userCounterFunctions.incrementFunctionObjects,
+			...this.userCounterFunctions.showFunctionObjects,
+		};
+	}
+
+	makeCounterFunction(counterName, func, actionFunction, funcID) {
+		func.action = (data) => actionFunction(counterName, data);
+
+		let funcObject = this.createFunctionObject(func);
+		if (!funcObject.funcID) {
+			funcObject.funcID = funcID;
+		}
+
+		return funcObject;
 	}
 	
-	loadCountersFromConfig(counters, objectCollection, idPrefix, increment_function) {
-		this.deactivateFunctions(objectCollection || {});
-		objectCollection = {};
+	loadCountersFromConfig(counters, objectCollection, idPrefix, incrementAction, showAction) {
+		if (objectCollection) {
+			this.deactivateFunctions(objectCollection.incrementFunctionObjects || {});
+			this.deactivateFunctions(objectCollection.showFunctionObjects || {});
+		}
+
+		objectCollection.incrementFunctionObjects = {};
+		objectCollection.showFunctionObjects = {};
 
 		if (counters) {
 			for (let i = 0; i < counters.length; i++) {
-				let func = counters[i].incrementFunction;
-				func.action = (data) => increment_function(counters[i].name, data);
+				let incrementFuncObject = this.makeCounterFunction(
+					counters[i].name,
+					counters[i].incrementFunction,
+					incrementAction,
+					`${idPrefix}CounterIncrementFunc[${i}]`,
+				);
+				objectCollection.incrementFunctionObjects[incrementFuncObject.funcID] = incrementFuncObject;
 
-				let funcObject = this.createFunctionObject(func);
-				if (!funcObject.funcID) {
-					funcObject.funcID = `${idPrefix}CounterIncrementFunc[${i}]`;
-				}
-
-				objectCollection[funcObject.funcID] = funcObject;
+				let showFuncObject = this.makeCounterFunction(
+					counters[i].name,
+					counters[i].showFunction,
+					showAction,
+					`${idPrefix}CounterShowFunc[${i}]`,
+				);
+				objectCollection.showFunctionObjects[showFuncObject.funcID] = showFuncObject;
 			}
 		}
 
-		this.activateFunctions(objectCollection);
-		return objectCollection;
+		this.activateFunctions(objectCollection.incrementFunctionObjects);
+		this.activateFunctions(objectCollection.showFunctionObjects);
 	}
 
 	incrementCounter(counterCollection, counterName) {
@@ -72,7 +103,15 @@ class Counters extends Module {
 		return newValue;
 	}
 
-	incrementResultForCounter(newValue) {
+	getCounter(counterCollection, counterName) {
+		if (counterName in counterCollection) {
+			return counterCollection[counterName];
+		} else {
+			return 0;
+		}
+	}
+
+	actionResultForCounter(newValue) {
 		return {
 			success:   true,
 			variables: {
@@ -84,7 +123,7 @@ class Counters extends Module {
 	incrementGlobal(counterName) {
 		let newValue = this.incrementCounter(this.data.global, counterName);
 
-		return this.incrementResultForCounter(newValue);
+		return this.actionResultForCounter(newValue);
 	}
 
 	incrementUser(counterName, data) {
@@ -94,7 +133,22 @@ class Counters extends Module {
 
 		let newValue = this.incrementCounter(this.data.user[counterName], data.user.name);
 
-		return this.incrementResultForCounter(newValue);
+		return this.actionResultForCounter(newValue);
+	}
+
+	showGlobal(counterName) {
+		let value = this.getCounter(this.data.global, counterName);
+
+		return this.actionResultForCounter(value);
+	}
+
+	showUser(counterName, data) {
+		let value = 0;
+		if (counterName in this.data.user) {
+			value = this.getCounter(this.data.user[counterName], data.user.name);
+		}
+		
+		return this.actionResultForCounter(value);
 	}
 
 	variables = [

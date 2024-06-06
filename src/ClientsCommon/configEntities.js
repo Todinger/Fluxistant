@@ -22573,6 +22573,11 @@ class CounterEntity extends NamedEntity {
 			name: 'Increment Function',
 			description: 'Increase the counter',
 		});
+
+		this.add('showFunction', 'Function', {
+			name: 'Show Function',
+			description: 'Show the current value of the counter',
+		});
 	}
 
 	getNameOverride() {
