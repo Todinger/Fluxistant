@@ -51,6 +51,8 @@ class ModuleManager {
 			let includeFiltered = param === "all";
 			this.showAllCommands(includeFiltered);
 		});
+
+		cli.on('save', () => this.saveAllData());
 	}
 	
 	getModule(modName) {
@@ -354,6 +356,18 @@ class ModuleManager {
 					mod.extraFuncObjects);
 			}
 		});
+	}
+
+	saveAllData() {
+		Utils.objectForEach(this.modules, (modName, mod) => {
+			console.log(`Saving data for ${modName}...`);
+			try {
+				mod.saveData();
+			} catch (ex) {
+				console.error(`Error: ${ex}`);
+			}
+		});
+		console.log("Done.");
 	}
 }
 
