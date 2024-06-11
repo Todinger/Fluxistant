@@ -65,6 +65,9 @@ You can find it on your [StreamElements account details page](https://streamelem
 		let sr = this.addGroup('streamRaiders')
 			.setName('Stream Raiders')
 			.setDescription('Settings for Stream Raiders interactions');
+		sr.addBoolean('enabled', false)
+			.setName('Enable Stream Raiders Integration')
+			.setDescription('Enables/disables getting events and triggers from Stream Raiders.');
 		sr.addHiddenString('token')
 			.setName('Account Token')
 			.setDescription('Secret (?) token used to get information about your account and battles')

@@ -425,7 +425,11 @@ class FluxBot {
 		let srSettings = this.mainConfig.getStreamRaidersParams();
 		this.streamRaidersManager.setToken(srSettings.token);
 		this.streamRaidersManager.logging = srSettings.logging;
-		this.streamRaidersManager.start();
+		if (srSettings.enabled) {
+			this.streamRaidersManager.start();
+		} else {
+			this.streamRaidersManager.stop();
+		}
 		// this.logger.init(this.mainConfig.getLoggerParams());
 	}
 	
