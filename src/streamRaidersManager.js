@@ -5,15 +5,19 @@ const _ = require('lodash');
 const Logger = require('./logger');
 const cli = require('./cliManager');
 const TwitchManager = require('./twitchManager');
+const Utils = require('./utils');
 const Errors = require('./errors');
 
 
 const SECONDS = 1000;
+const ONE_SECOND = 1000;
 // const MINUTES = 60 * SECONDS;
 
 // Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
 
 const CTV_BOT_USER = "captaintvbot";
+const SKIN_BOMB_AGGREGATION_PATIENCE = 5 * SECONDS;
+const SKIN_BOMB_AGGREGATION_INTERVAL = ONE_SECOND;
 const CTV_BOT_MESSAGES = {
 	PURCHASE: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<gold>Gold) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) for \$(?<cost>[0-9]+)\.00! Thank you for supporting the channel!/,
 	GIFT: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<flag>Flag Bearer)?(?<head>Head)?(?<full>Full)?(?<epic>Epic)?(?<holo>Holo)?(?<gold>Gold)? skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
@@ -329,17 +333,19 @@ class StreamRaidersManager extends EventNotifier {
 
 		this._onMessageHandler = (user, message) => this._onChatMessage(user, message);
 		this._messageHandlers = [
-			{regex: CTV_BOT_MESSAGES.PURCHASE, handler: (details) => this._onSkinPurchase(details)},
-			{regex: CTV_BOT_MESSAGES.GIFT, handler: (details) => this._onSkinGifted(details)},
-			{regex: CTV_BOT_MESSAGES.BOMB.SINGLE, handler: (details) => this._onSkinBombSingle(details)},
-			{regex: CTV_BOT_MESSAGES.BOMB.MULTIPLE, handler: (details) => this._onSkinBombMulti(details)},
+			{regex: CTV_BOT_MESSAGES.PURCHASE, handler: (details) => this._emitSkinPurchase(details)},
+			{regex: CTV_BOT_MESSAGES.GIFT, handler: (details) => this._emitSkinGifted(details)},
+			{regex: CTV_BOT_MESSAGES.BOMB.SINGLE, handler: (details) => this._onSkinBombSinglePurchase(details)},
+			{regex: CTV_BOT_MESSAGES.BOMB.MULTIPLE, handler: (details) => this._emitSkinBombMulti(details)},
 		];
+		this._singleBombQueues = {};
+		this._bombAggregationTimer = null;
 
 		// this._messageHandlers = {
-		// 	[CTV_BOT_MESSAGES.PURCHASE]: (match) => this._onSkinPurchase(match),
-		// 	[CTV_BOT_MESSAGES.GIFT]: (match) => this._onSkinGifted(match),
-		// 	[CTV_BOT_MESSAGES.BOMB.SINGLE]: (match) => this._onSkinBombSingle(match),
-		// 	[CTV_BOT_MESSAGES.BOMB.MULTIPLE]: (match) => this._onSkinBombMulti(match),
+		// 	[CTV_BOT_MESSAGES.PURCHASE]: (match) => this._emitSkinPurchase(match),
+		// 	[CTV_BOT_MESSAGES.GIFT]: (match) => this._emitSkinGifted(match),
+		// 	[CTV_BOT_MESSAGES.BOMB.SINGLE]: (match) => this._onSkinBombSinglePurchase(match),
+		// 	[CTV_BOT_MESSAGES.BOMB.MULTIPLE]: (match) => this._emitSkinBombMulti(match),
 		// };
 
 		this.logging = false;
@@ -420,26 +426,99 @@ class StreamRaidersManager extends EventNotifier {
 				return;
 			}
 		}
-		// if ((match = CTV_BOT_MESSAGES.PURCHASE.exec(message)) !== null) this._onSkinPurchase(match);
-		// else if ((match = CTV_BOT_MESSAGES.GIFT.exec(message)) !== null) this._onSkinGifted(match);
-		// else if ((match = CTV_BOT_MESSAGES.BOMB.SINGLE.exec(message)) !== null) this._onSkinBombSingle(match);
-		// else if ((match = CTV_BOT_MESSAGES.BOMB.MULTIPLE.exec(message)) !== null) this._onSkinBombMulti(match);
+		// if ((match = CTV_BOT_MESSAGES.PURCHASE.exec(message)) !== null) this._emitSkinPurchase(match);
+		// else if ((match = CTV_BOT_MESSAGES.GIFT.exec(message)) !== null) this._emitSkinGifted(match);
+		// else if ((match = CTV_BOT_MESSAGES.BOMB.SINGLE.exec(message)) !== null) this._onSkinBombSinglePurchase(match);
+		// else if ((match = CTV_BOT_MESSAGES.BOMB.MULTIPLE.exec(message)) !== null) this._emitSkinBombMulti(match);
 	}
 
-	_onSkinPurchase(details) {
+	_emitSkinPurchase(details) {
 		console.log(`Skin purchase: ${JSON.stringify(details)}`);
 	}
 
-	_onSkinGifted(details) {
+	_emitSkinGifted(details) {
 		console.log(`Skin gift: ${JSON.stringify(details)}`);
 	}
 
-	_onSkinBombSingle(details) {
-		console.log(`Skin bomb single: ${JSON.stringify(details)}`);
+	_onSkinBombSinglePurchase(details) {
+		console.log(`[SQ] Skin bomb single pushed to queue: ${JSON.stringify(details)}`);
+
+		let player = details['player'];
+		if (!(player in this._singleBombQueues)) {
+			this._singleBombQueues[player] = [];
+		}
+		if (this._singleBombQueues[player].length + 1 >= 5) {  // Five-bomb found
+			this._emitSkinBombMulti({
+				player,
+				amount: 5,
+				captain: details['captain'],
+			});
+			delete this._singleBombQueues[player];
+			return;
+		}
+
+		this._singleBombQueues[player].push({timestamp: Date.now() , details});
 	}
 
-	_onSkinBombMulti(details) {
-		console.log(`Skin bomb multi: ${JSON.stringify(details)}`);
+	_emitSkinBombSingle(details) {
+		console.log(`[S] Skin bomb single emitted: ${JSON.stringify(details)}`);
+	}
+
+	_emitSkinBombMulti(details) {
+		console.log(`[M] Skin bomb multi: ${JSON.stringify(details)}`);
+	}
+
+	_onAggregationTick() {
+		const now = Date.now();
+		let playersToRemove = [];
+
+		Utils.objectForEach(this._singleBombQueues, (player, queue) => {
+			let numOfExpiredItems = 0;
+			for (let i = 0; i < queue.length; i++) {
+				if (now - queue[i].timestamp >= SKIN_BOMB_AGGREGATION_PATIENCE) {
+					numOfExpiredItems++;
+				} else {
+					break;
+				}
+			}
+
+			for (let i = 0; i < numOfExpiredItems; i++) {
+				this._emitSkinBombSingle(queue[0].details);
+				queue.shift();
+			}
+
+			if (queue.length === 0) {
+				playersToRemove.push(player);
+			}
+		});
+
+		for (let player of playersToRemove) {
+			delete this._singleBombQueues[player];
+		}
+
+		// let indicesToRemove = [];
+		// let numOfExpiredItems = 0;
+		// let gifters = {};
+		// let single_bombs = [];
+		// let quinta_bombs = [];
+		// for (let i = 0; i < this._singleBombQueue.length; i++) {
+		// 	let bomb = this._singleBombQueue[i];
+		// 	if (now - bomb.timestamp > SKIN_BOMB_AGGREGATION_PATIENCE) {
+		// 		numOfExpiredItems++;
+		// 		indicesToRemove.push(i);
+		// 	}
+		// 	let gifter = bomb.details['player'];
+		// 	if (!(gifter in gifters)) {
+		// 		gifters[gifter] = [];
+		// 	}
+		// 	gifters[gifter].push(i);
+		// }
+		//
+		// Utils.objectForEach(gifters, (gifter, indices) => {
+		// 	if (indices.length >= 5) {
+		//
+		// 	}
+		// });
 	}
 
 	setToken(token) {
@@ -462,7 +541,9 @@ class StreamRaidersManager extends EventNotifier {
 			this.apis[apiName].start();
 		});
 
+		this._singleBombQueues = {};
 		TwitchManager.on('message', this._onMessageHandler);
+		this._bombAggregationTimer = setInterval(() => this._onAggregationTick(), SKIN_BOMB_AGGREGATION_INTERVAL);
 	}
 
 	stop() {
@@ -471,6 +552,10 @@ class StreamRaidersManager extends EventNotifier {
 		});
 
 		TwitchManager.removeCallback('message', this._onMessageHandler, true);
+		if (this._bombAggregationTimer !== null) {
+			clearInterval(this._bombAggregationTimer);
+			this._bombAggregationTimer = null;
+		}
 	}
 
 	mockData() {
