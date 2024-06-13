@@ -4,13 +4,51 @@ const { ApiPoller, AxiosRequestEngine, MockRequestEngine } = require('./apiPolle
 const _ = require('lodash');
 const Logger = require('./logger');
 const cli = require('./cliManager');
+const TwitchManager = require('./twitchManager');
 const Errors = require('./errors');
 
 
 const SECONDS = 1000;
 // const MINUTES = 60 * SECONDS;
 
-const API_URL = "https://www.streamraiders.com/api/game/?ss=$TOKEN&cn=$CN&command=$COMMAND"
+// Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
+
+const CTV_BOT_USER = "captaintvbot";
+const CTV_BOT_MESSAGES = {
+	PURCHASE: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<gold>Gold) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) for \$(?<cost>[0-9]+)\.00! Thank you for supporting the channel!/,
+	GIFT: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<flag>Flag Bearer)?(?<head>Head)?(?<full>Full)?(?<epic>Epic)?(?<holo>Holo)?(?<gold>Gold)? skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+	BOMB: {
+		SINGLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:Gold )?(?:Holo )?(?:Epic )?(?<unit>[\w ]+)) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+		MULTIPLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted (?<amount>\d+) (?<captain>[a-zA-Z0-9][\w]{2,24}) skins to .* and .* more people!.*/,
+	},
+};
+// const CTV_BOT_MESSAGES = {
+// 	PURCHASE: {
+// 		ALL: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<gold>Gold) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) for \$(?<cost>[0-9]+)\.00! Thank you for supporting the channel!/,
+// 		FLAG: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?<unit>Flag Bearer)) for \$5.00! Thank you for supporting the channel!/,
+// 		HEAD: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?<unit>[\w ]+)) for \$5\.00! Thank you for supporting the channel!/,
+// 		// Note: FULL also captures EPIC/HOLO/GOLD for one-word skins, so FULL needs to be checked last
+// 		FULL: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?<unit>[\w ]+)) for \$10\.00! Thank you for supporting the channel!/,
+// 		EPIC: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>Epic (?<unit>[\w ]+)) for \$10\.00! Thank you for supporting the channel!/,
+// 		HOLO: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?<color>Pink|Blue|Green) Holo (?<unit>[\w ]+)) for \$15\.00! Thank you for supporting the channel!/,
+// 		GOLD: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>Gold (?<unit>[\w ]+)) for \$25\.00! Thank you for supporting the channel!/,
+// 	},
+// 	GIFT: {
+// 		ALL: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<flag>Flag Bearer)?(?<head>Head)?(?<full>Full)?(?<epic>Epic)?(?<holo>Holo)?(?<gold>Gold)? skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+// 		FLAG: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Flag Bearer) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+// 		HEAD: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Head) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+// 		FULL: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Full) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+// 		EPIC: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Epic) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+// 		HOLO: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Holo) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+// 		GOLD: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Gold) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+// 	},
+// 	BOMB: {
+// 		SINGLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:Gold )?(?:Holo )?(?:Epic )?(?<unit>[\w ]+)) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+// 		MULTIPLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted (?<amount>\d+) (?<captain>[a-zA-Z0-9][\w]{2,24}) skins to .* and .* more people!.*/,
+// 	},
+// };
+
+const API_URL = "https://www.streamraiders.com/api/game/?ss=$TOKEN&cn=$CN&command=$COMMAND";
 
 const API_SETTINGS = {
 	skinathon: {
@@ -289,6 +327,21 @@ class StreamRaidersManager extends EventNotifier {
 		cli.on('sr-mock-stop', () => this.stopMockingData());
 		cli.on('sr-refresh', () => this._refresh());
 
+		this._onMessageHandler = (user, message) => this._onChatMessage(user, message);
+		this._messageHandlers = [
+			{regex: CTV_BOT_MESSAGES.PURCHASE, handler: (details) => this._onSkinPurchase(details)},
+			{regex: CTV_BOT_MESSAGES.GIFT, handler: (details) => this._onSkinGifted(details)},
+			{regex: CTV_BOT_MESSAGES.BOMB.SINGLE, handler: (details) => this._onSkinBombSingle(details)},
+			{regex: CTV_BOT_MESSAGES.BOMB.MULTIPLE, handler: (details) => this._onSkinBombMulti(details)},
+		];
+
+		// this._messageHandlers = {
+		// 	[CTV_BOT_MESSAGES.PURCHASE]: (match) => this._onSkinPurchase(match),
+		// 	[CTV_BOT_MESSAGES.GIFT]: (match) => this._onSkinGifted(match),
+		// 	[CTV_BOT_MESSAGES.BOMB.SINGLE]: (match) => this._onSkinBombSingle(match),
+		// 	[CTV_BOT_MESSAGES.BOMB.MULTIPLE]: (match) => this._onSkinBombMulti(match),
+		// };
+
 		this.logging = false;
 		this.errorLogging = true;
 	}
@@ -356,6 +409,39 @@ class StreamRaidersManager extends EventNotifier {
 		});
 	}
 
+	_onChatMessage(user, message) {
+		if (user.name !== CTV_BOT_USER) return;
+
+		let match = null;
+		for (let handlerDesc of this._messageHandlers) {
+			match = handlerDesc.regex.exec(message);
+			if (match) {
+				handlerDesc.handler(match.groups);
+				return;
+			}
+		}
+		// if ((match = CTV_BOT_MESSAGES.PURCHASE.exec(message)) !== null) this._onSkinPurchase(match);
+		// else if ((match = CTV_BOT_MESSAGES.GIFT.exec(message)) !== null) this._onSkinGifted(match);
+		// else if ((match = CTV_BOT_MESSAGES.BOMB.SINGLE.exec(message)) !== null) this._onSkinBombSingle(match);
+		// else if ((match = CTV_BOT_MESSAGES.BOMB.MULTIPLE.exec(message)) !== null) this._onSkinBombMulti(match);
+	}
+
+	_onSkinPurchase(details) {
+		console.log(`Skin purchase: ${JSON.stringify(details)}`);
+	}
+
+	_onSkinGifted(details) {
+		console.log(`Skin gift: ${JSON.stringify(details)}`);
+	}
+
+	_onSkinBombSingle(details) {
+		console.log(`Skin bomb single: ${JSON.stringify(details)}`);
+	}
+
+	_onSkinBombMulti(details) {
+		console.log(`Skin bomb multi: ${JSON.stringify(details)}`);
+	}
+
 	setToken(token) {
 		if (token) {
 			this._token = token;
@@ -375,12 +461,16 @@ class StreamRaidersManager extends EventNotifier {
 		Object.keys(this.apis).forEach(apiName => {
 			this.apis[apiName].start();
 		});
+
+		TwitchManager.on('message', this._onMessageHandler);
 	}
 
 	stop() {
 		Object.keys(this.apis).forEach(apiName => {
 			this.apis[apiName].stop();
 		});
+
+		TwitchManager.removeCallback('message', this._onMessageHandler, true);
 	}
 
 	mockData() {

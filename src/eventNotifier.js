@@ -73,14 +73,14 @@ class EventNotifier {
 	}
 	
 	// Removes a callback from the list for the given event
-	removeCallback(eventName, callback) {
+	removeCallback(eventName, callback, ignoreMissing = false) {
 		if (this._ignoreCase) {
 			eventName = eventName.toLowerCase();
 		}
 		
 		if (eventName in this._eventHandlers) {
 			_.pull(this._eventHandlers[eventName], callback);
-		} else {
+		} else if (!ignoreMissing) {
 			Logger.warn(`Cannot remove event handler for nonexistent event "${eventName}"`);
 		}
 	}
