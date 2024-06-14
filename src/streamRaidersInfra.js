@@ -6,6 +6,8 @@ const Errors = require('./errors');
 
 // Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
 
+const DOLLARS_PER_SP = 5;  // $5 for 1 SP
+
 const CTV_BOT_USER = "fluxistence";
 const CTV_BOT_MESSAGES = {
 	PURCHASE: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<gold>Gold) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) for \$(?<cost>[0-9]+)\.00! Thank you for supporting the channel!/,
@@ -251,6 +253,80 @@ class BattleState extends StreamRaidersBaseState {
 }
 
 
+class SkinPurchaseDetailsBase {
+	constructor(details) {
+		this.player = details['player'];
+		this.sp = 0;
+	}
+}
+
+class SkinPurchaseDetails extends SkinPurchaseDetailsBase {
+	constructor(details) {
+		super(details);
+		this.captain = details['captain'];
+		this.skin = details['skin'];
+		this.epic = details['epic'];
+		this.gold = details['gold'];
+		this.color = details['color'];
+		this.holo = details['holo'];
+		this.unit = details['unit'];
+		this.cost = parseInt(details['cost']);
+
+		this.sp = this.cost / DOLLARS_PER_SP;
+	}
+}
+
+class SkinGiftDetails extends SkinPurchaseDetailsBase {
+	constructor(details) {
+		super(details);
+		this.flag = details['flag'];
+		this.head = details['head'];
+		this.full = details['full'];
+		this.epic = details['epic'];
+		this.holo = details['holo'];
+		this.gold = details['gold'];
+		this.recipient = details['recipient'];
+
+		if (this.flag || this.head) {
+			this.sp = 1;
+		} else if (this.full || this.epic) {
+			this.sp = 2;
+		} else if (this.holo) {
+			this.sp = 3;
+		} else if (this.gold) {
+			this.sp = 5;
+		} else {
+			throw "Unknown skin gift!";
+		}
+	}
+}
+
+class SkinBombSingleDetails extends SkinPurchaseDetailsBase {
+	constructor(details) {
+		super(details);
+		this.captain = details['captain'];
+		this.amount = parseInt(details['amount']);
+
+		this.sp = this.amount;
+	}
+}
+
+class SkinBombMultiDetails extends SkinPurchaseDetailsBase {
+	constructor(details) {
+		super(details);
+		this.captain = details['captain'];
+		this.skin = details['skin'];
+		this.epic = details['epic'];
+		this.gold = details['gold'];
+		this.holo = details['holo'];
+		this.unit = details['unit'];
+		this.recipient = details['recipient'];
+
+		this.sp = 1;
+	}
+}
+
+
 module.exports = {
 	CTV_BOT_USER,
 	CTV_BOT_MESSAGES,
@@ -258,4 +334,8 @@ module.exports = {
 	API,
 	SkinathonState,
 	BattleState,
+	SkinPurchaseDetails,
+	SkinGiftDetails,
+	SkinBombSingleDetails,
+	SkinBombMultiDetails,
 };

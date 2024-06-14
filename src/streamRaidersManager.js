@@ -5,7 +5,18 @@ const cli = require('./cliManager');
 const TwitchManager = require('./twitchManager');
 const Utils = require('./utils');
 const { SECONDS, ONE_SECOND } = require('./constants');
-const {CTV_BOT_USER, CTV_BOT_MESSAGES, API_SETTINGS, API, SkinathonState, BattleState} = require('./streamRaidersInfra');
+const {
+	CTV_BOT_USER,
+	CTV_BOT_MESSAGES,
+	API_SETTINGS,
+	API,
+	SkinathonState,
+	BattleState,
+	SkinPurchaseDetails,
+	SkinGiftDetails,
+	SkinBombSingleDetails,
+	SkinBombMultiDetails,
+} = require('./streamRaidersInfra');
 
 // Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
 
@@ -149,10 +160,16 @@ class StreamRaidersManager extends EventNotifier {
 
 	_emitSkinPurchase(details) {
 		console.log(`Skin purchase: ${JSON.stringify(details)}`);
+		const purchaseDetails = new SkinPurchaseDetails(details);
+		this._notifySingleSkinPurchaseCallback(purchaseDetails);
+		this._notifyAnySkinPurchaseCallback(purchaseDetails);
 	}
 
 	_emitSkinGifted(details) {
 		console.log(`Skin gift: ${JSON.stringify(details)}`);
+		const purchaseDetails = new SkinGiftDetails(details);
+		this._notifySkinGiftCallback(purchaseDetails);
+		this._notifyAnySkinPurchaseCallback(purchaseDetails);
 	}
 
 	_onSkinBombSinglePurchase(details) {
@@ -177,10 +194,16 @@ class StreamRaidersManager extends EventNotifier {
 
 	_emitSkinBombSingle(details) {
 		console.log(`[S] Skin bomb single emitted: ${JSON.stringify(details)}`);
+		const purchaseDetails = new SkinBombSingleDetails(details);
+		this._notifySingleSkinBombCallback(purchaseDetails);
+		this._notifyAnySkinPurchaseCallback(purchaseDetails);
 	}
 
 	_emitSkinBombMulti(details) {
 		console.log(`[M] Skin bomb multi: ${JSON.stringify(details)}`);
+		const purchaseDetails = new SkinBombMultiDetails(details);
+		this._notifyMultiSkinBombCallback(purchaseDetails);
+		this._notifyAnySkinPurchaseCallback(purchaseDetails);
 	}
 
 	_onAggregationTick() {
@@ -349,6 +372,66 @@ class StreamRaidersManager extends EventNotifier {
 	_notifyBattleTimerSync(minutes, seconds) {
 		this._notify('battleTimerSync', minutes, seconds);
 		this.log(`battleTimerSync: ${minutes}:${ ("0" + seconds).slice(-2)}`);
+	}
+
+	onAnySkinPurchase(callback) {
+		return this.on('anySkinPurchase', callback);
+	}
+
+	removeAnySkinPurchaseCallback(callback) {
+		return this.removeCallback('anySkinPurchase', callback);
+	}
+
+	_notifyAnySkinPurchaseCallback(details) {
+		this._notify('anySkinPurchase', details);
+	}
+
+	onSingleSkinPurchase(callback) {
+		return this.on('singleSkinPurchase', callback);
+	}
+
+	removeSingleSkinPurchaseCallback(callback) {
+		return this.removeCallback('singleSkinPurchase', callback);
+	}
+
+	_notifySingleSkinPurchaseCallback(details) {
+		this._notify('singleSkinPurchase', details);
+	}
+
+	onSkinGift(callback) {
+		return this.on('skinGift', callback);
+	}
+
+	removeSkinGiftCallback(callback) {
+		return this.removeCallback('skinGift', callback);
+	}
+
+	_notifySkinGiftCallback(details) {
+		this._notify('skinGift', details);
+	}
+
+	onSingleSkinBomb(callback) {
+		return this.on('singleSkinBomb', callback);
+	}
+
+	removeSingleSkinBombCallback(callback) {
+		return this.removeCallback('singleSkinBomb', callback);
+	}
+
+	_notifySingleSkinBombCallback(details) {
+		this._notify('singleSkinBomb', details);
+	}
+
+	onMultiSkinBomb(callback) {
+		return this.on('multiSkinBomb', callback);
+	}
+
+	removeMultiSkinBombCallback(callback) {
+		return this.removeCallback('multiSkinBomb', callback);
+	}
+
+	_notifyMultiSkinBombCallback(details) {
+		this._notify('multiSkinBomb', details);
 	}
 }
 
