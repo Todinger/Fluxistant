@@ -11,7 +11,6 @@ const Errors = require('./errors');
 
 const SECONDS = 1000;
 const ONE_SECOND = 1000;
-// const MINUTES = 60 * SECONDS;
 
 // Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
 
@@ -26,31 +25,6 @@ const CTV_BOT_MESSAGES = {
 		MULTIPLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted (?<amount>\d+) (?<captain>[a-zA-Z0-9][\w]{2,24}) skins to .* and .* more people!.*/,
 	},
 };
-// const CTV_BOT_MESSAGES = {
-// 	PURCHASE: {
-// 		ALL: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<gold>Gold) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) for \$(?<cost>[0-9]+)\.00! Thank you for supporting the channel!/,
-// 		FLAG: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?<unit>Flag Bearer)) for \$5.00! Thank you for supporting the channel!/,
-// 		HEAD: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?<unit>[\w ]+)) for \$5\.00! Thank you for supporting the channel!/,
-// 		// Note: FULL also captures EPIC/HOLO/GOLD for one-word skins, so FULL needs to be checked last
-// 		FULL: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?<unit>[\w ]+)) for \$10\.00! Thank you for supporting the channel!/,
-// 		EPIC: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>Epic (?<unit>[\w ]+)) for \$10\.00! Thank you for supporting the channel!/,
-// 		HOLO: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?<color>Pink|Blue|Green) Holo (?<unit>[\w ]+)) for \$15\.00! Thank you for supporting the channel!/,
-// 		GOLD: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>Gold (?<unit>[\w ]+)) for \$25\.00! Thank you for supporting the channel!/,
-// 	},
-// 	GIFT: {
-// 		ALL: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<flag>Flag Bearer)?(?<head>Head)?(?<full>Full)?(?<epic>Epic)?(?<holo>Holo)?(?<gold>Gold)? skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
-// 		FLAG: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Flag Bearer) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
-// 		HEAD: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Head) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
-// 		FULL: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Full) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
-// 		EPIC: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Epic) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
-// 		HOLO: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Holo) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
-// 		GOLD: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<skin>Gold) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
-// 	},
-// 	BOMB: {
-// 		SINGLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:Gold )?(?:Holo )?(?:Epic )?(?<unit>[\w ]+)) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
-// 		MULTIPLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted (?<amount>\d+) (?<captain>[a-zA-Z0-9][\w]{2,24}) skins to .* and .* more people!.*/,
-// 	},
-// };
 
 const API_URL = "https://www.streamraiders.com/api/game/?ss=$TOKEN&cn=$CN&command=$COMMAND";
 
@@ -341,13 +315,6 @@ class StreamRaidersManager extends EventNotifier {
 		this._singleBombQueues = {};
 		this._bombAggregationTimer = null;
 
-		// this._messageHandlers = {
-		// 	[CTV_BOT_MESSAGES.PURCHASE]: (match) => this._emitSkinPurchase(match),
-		// 	[CTV_BOT_MESSAGES.GIFT]: (match) => this._emitSkinGifted(match),
-		// 	[CTV_BOT_MESSAGES.BOMB.SINGLE]: (match) => this._onSkinBombSinglePurchase(match),
-		// 	[CTV_BOT_MESSAGES.BOMB.MULTIPLE]: (match) => this._emitSkinBombMulti(match),
-		// };
-
 		this.logging = false;
 		this.errorLogging = true;
 	}
@@ -426,10 +393,6 @@ class StreamRaidersManager extends EventNotifier {
 				return;
 			}
 		}
-		// if ((match = CTV_BOT_MESSAGES.PURCHASE.exec(message)) !== null) this._emitSkinPurchase(match);
-		// else if ((match = CTV_BOT_MESSAGES.GIFT.exec(message)) !== null) this._emitSkinGifted(match);
-		// else if ((match = CTV_BOT_MESSAGES.BOMB.SINGLE.exec(message)) !== null) this._onSkinBombSinglePurchase(match);
-		// else if ((match = CTV_BOT_MESSAGES.BOMB.MULTIPLE.exec(message)) !== null) this._emitSkinBombMulti(match);
 	}
 
 	_emitSkinPurchase(details) {
@@ -495,30 +458,6 @@ class StreamRaidersManager extends EventNotifier {
 		for (let player of playersToRemove) {
 			delete this._singleBombQueues[player];
 		}
-
-		// let indicesToRemove = [];
-		// let numOfExpiredItems = 0;
-		// let gifters = {};
-		// let single_bombs = [];
-		// let quinta_bombs = [];
-		// for (let i = 0; i < this._singleBombQueue.length; i++) {
-		// 	let bomb = this._singleBombQueue[i];
-		// 	if (now - bomb.timestamp > SKIN_BOMB_AGGREGATION_PATIENCE) {
-		// 		numOfExpiredItems++;
-		// 		indicesToRemove.push(i);
-		// 	}
-		// 	let gifter = bomb.details['player'];
-		// 	if (!(gifter in gifters)) {
-		// 		gifters[gifter] = [];
-		// 	}
-		// 	gifters[gifter].push(i);
-		// }
-		//
-		// Utils.objectForEach(gifters, (gifter, indices) => {
-		// 	if (indices.length >= 5) {
-		//
-		// 	}
-		// });
 	}
 
 	setToken(token) {
