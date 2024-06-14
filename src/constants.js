@@ -2,5 +2,7 @@ module.exports = {
 	TWITCH: {
 		MAX_MESSAGE_LENGTH: 500,
 		MAX_USERNAME_LENGTH: 25,
-	}
+	},
+	SECONDS: 1000,
+	ONE_SECOND: 1000,
 }
