@@ -1,5 +1,6 @@
 'use strict';
 const EventNotifier = require('./eventNotifier');
+const Globals = require('./globals');
 const Logger = require('./logger');
 const cli = require('./cliManager');
 const TwitchManager = require('./twitchManager');
@@ -152,6 +153,12 @@ class StreamRaidersManager extends EventNotifier {
 		for (let handlerDesc of this._messageHandlers) {
 			match = handlerDesc.regex.exec(message);
 			if (match) {
+				// Skip false positive that recognizes part of a skin name as the captain name
+				// (e.g. "Flag Bearer" would be recognized as "Flag" being the captain and "Bearer"
+				// being the skin)
+				let captain = match.groups['captain'];
+				if (captain && captain.toLowerCase() !== Globals.StreamerUser.name.toLowerCase()) continue;
+
 				handlerDesc.handler(match.groups);
 				return;
 			}
@@ -196,6 +203,11 @@ class StreamRaidersManager extends EventNotifier {
 		console.log(`[S] Skin bomb single emitted: ${JSON.stringify(details)}`);
 		const purchaseDetails = new SkinBombSingleDetails(details);
 		this._notifySingleSkinBombCallback(purchaseDetails);
+		this._notifyMultiSkinBombCallback(new SkinBombMultiDetails({
+			player: purchaseDetails.player,
+			captain: purchaseDetails.captain,
+			amount: 1,
+		}));
 		this._notifyAnySkinPurchaseCallback(purchaseDetails);
 	}
 

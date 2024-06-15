@@ -8,15 +8,49 @@ const Errors = require('./errors');
 
 const DOLLARS_PER_SP = 5;  // $5 for 1 SP
 
-const CTV_BOT_USER = "fluxistence";
+const CTV_BOT_USER = "captaintvbot";
 const CTV_BOT_MESSAGES = {
-	PURCHASE: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<gold>Gold) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) for \$(?<cost>[0-9]+)\.00! Thank you for supporting the channel!/,
-	GIFT: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<flag>Flag Bearer)?(?<head>Head)?(?<full>Full)?(?<epic>Epic)?(?<holo>Holo)?(?<gold>Gold)? skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+	PURCHASE: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<variant>Gold|Diamond) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) for \$(?<cost>[0-9]+)\.00! Thank you for supporting the channel!/,
+	GIFT: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<flag>Flag Bearer)?(?<head>Head)?(?<full>Full)?(?<epic>Epic)?(?<holo>Holo)?(?<variant>Gold|Diamond)? skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
 	BOMB: {
-		SINGLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<gold>Gold) )?(?:(?<holo>Holo) )?(?<unit>[\w ]+)) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+		SINGLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<variant>Gold|Diamond) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
 		MULTIPLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted (?<amount>\d+) (?<captain>[a-zA-Z0-9][\w]{2,24}) skins to .* and .* more people!.*/,
 	},
 };
+
+/*
+Input Examples
+--------------
+Purchase:
+	Flag: MsSneakyTurtle just purchased a Fluxistence Flag Bearer for $5.00! Thank you for supporting the channel!
+	Head: MsSneakyTurtle just purchased a Fluxistence Templar for $5.00! Thank you for supporting the channel!
+	Full: rasstappen__69__ just purchased a Fluxistence Healer for $10.00! Thank you for supporting the channel!
+	Epic: mixofseasonings just purchased a Fluxistence Epic Vampire for $10.00! Thank you for supporting the channel!
+	Holo: cutsycat just purchased a Fluxistence Pink Holo Buster for $15.00! Thank you for supporting the channel!
+	Gold: mixofseasonings just purchased a Fluxistence Gold Monk for $25.00! Thank you for supporting the channel!
+	Diamond: lockmastah just purchased a Fluxistence Diamond Amazon for $25.00! Thank you for supporting the channel!
+Gift:
+	Flag: drpeppermd87 gifted a Flag Bearer skin to Puinacuppa!
+	Head: EndlessSky82 gifted a Head skin to Meistar!
+	Full: ContraNate gifted a Full skin to PoisonHearrt!
+	Epic: DirtyFlirtyWolf gifted a Epic skin to Bruised420!
+	Holo: cutsycat gifted a Holo skin to immerbock!
+	Gold: DirtyFlirtyWolf gifted a Gold skin to Bruised420!
+	Diamond: coldivfathom gifted a Diamond skin to Bruised420!
+Single Bomb:
+	Flag: Bruised420 gifted a Fluxistence Flag Bearer skin to CloverBug69!
+	Head: YecatsX gifted a Fluxistence Healer skin to 24Slevin!
+	Full: becca_mtbc gifted a Fluxistence Lancer skin to bitter1988!
+	Epic: LiquidMusicEnt gifted a Fluxistence Epic Warbeast skin to mostly_talk!
+	Holo: YecatsX gifted a Fluxistence Pink Holo Buster skin to Carlos_235!
+	Gold: becca_mtbc gifted a Fluxistence Gold Warrior skin to itzCabooseMF!
+	Diamond: Meistar gifted a Fluxistence Diamond Artillery skin to ForgeTheWolf!
+Multi-Bomb:
+	10: s0lskynn gifted 10 Fluxistence skins to bigtimebanjo, pawpawgoespewpew, Marcusow1986, NotedBinkie9727, grote9741, and 5 more people!  All recipients will be notified on the skins tab at https://www.streamraiders.com/
+	20: 24Slevin gifted 20 Fluxistence skins to chairbreakerm8, NotedBinkie9727, piripia, 3aglesdwm, go_licpgm, and 15 more people!  All recipients will be notified on the skins tab at https://www.streamraiders.com/
+	50: YecatsX gifted 50 Fluxistence skins to JQ_GOC, klayre_and_cat, BlasianIvy, ladyjessica84, Jersey_ci92, and 45 more people!  All recipients will be notified on the skins tab at https://www.streamraiders.com/
+	100: AeroGarfield29 gifted 100 Fluxistence skins to GroverMonster, bethleves, MYKLMantis, Anzelagt, Deeztructor, and 95 more people!  All recipients will be notified on the skins tab at https://www.streamraiders.com/
+*/
 
 const API_URL = "https://www.streamraiders.com/api/game/?ss=$TOKEN&cn=$CN&command=$COMMAND";
 
@@ -266,7 +300,7 @@ class SkinPurchaseDetails extends SkinPurchaseDetailsBase {
 		this.captain = details['captain'];
 		this.skin = details['skin'];
 		this.epic = details['epic'];
-		this.gold = details['gold'];
+		this.variant = details['variant'];
 		this.color = details['color'];
 		this.holo = details['holo'];
 		this.unit = details['unit'];
@@ -284,7 +318,7 @@ class SkinGiftDetails extends SkinPurchaseDetailsBase {
 		this.full = details['full'];
 		this.epic = details['epic'];
 		this.holo = details['holo'];
-		this.gold = details['gold'];
+		this.variant = details['variant'];
 		this.recipient = details['recipient'];
 
 		if (this.flag || this.head) {
@@ -293,7 +327,7 @@ class SkinGiftDetails extends SkinPurchaseDetailsBase {
 			this.sp = 2;
 		} else if (this.holo) {
 			this.sp = 3;
-		} else if (this.gold) {
+		} else if (this.variant) {
 			this.sp = 5;
 		} else {
 			throw "Unknown skin gift!";
@@ -305,9 +339,15 @@ class SkinBombSingleDetails extends SkinPurchaseDetailsBase {
 	constructor(details) {
 		super(details);
 		this.captain = details['captain'];
-		this.amount = parseInt(details['amount']);
+		this.skin = details['skin'];
+		this.epic = details['epic'];
+		this.variant = details['variant'];
+		this.holo = details['holo'];
+		this.color = details['color'];
+		this.unit = details['unit'];
+		this.recipient = details['recipient'];
 
-		this.sp = this.amount;
+		this.sp = 1;
 	}
 }
 
@@ -315,14 +355,9 @@ class SkinBombMultiDetails extends SkinPurchaseDetailsBase {
 	constructor(details) {
 		super(details);
 		this.captain = details['captain'];
-		this.skin = details['skin'];
-		this.epic = details['epic'];
-		this.gold = details['gold'];
-		this.holo = details['holo'];
-		this.unit = details['unit'];
-		this.recipient = details['recipient'];
+		this.amount = parseInt(details['amount']);
 
-		this.sp = 1;
+		this.sp = this.amount;
 	}
 }
 
