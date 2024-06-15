@@ -13,7 +13,7 @@ class TriggerEntity extends ChoiceValueEntity {
 		this.addCooldowns('cooldowns')
 			.setDescription('Function-wide cooldowns (work in addition to function-wide cooldowns)')
 			.setAdvanced();
-		this.addDynamicArray('filters', 'FilterChoice')
+		this.addDynamicArray('filters', 'FilterChoice', undefined, data && data.allowedFilters)
 			.setName('Filters')
 			.setDescription('Specifies when and by whom this trigger can be activated')
 			.setAdvanced();
@@ -29,6 +29,10 @@ class TriggerEntity extends ChoiceValueEntity {
 		let filterChoiceEntity = this.getChild('filters').addElement(new FilterChoiceEntity());
 		let selectedTrigger = filterChoiceEntity.select(filter.type);
 		selectedTrigger.setData(filter);
+	}
+
+	alwaysShowFilters() {
+		this.getChild('filters').setSimple();
 	}
 	
 	setData(data) {

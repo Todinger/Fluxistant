@@ -70,6 +70,7 @@ const entities = {
 	Trigger_StreamRaidersBattleSkinathonPointsChangedEntity: require('./WebEntities/Functions/Triggers/trigger_StreamRaidersBattleSkinathonPointsChangedEntity.js'),
 	Trigger_StreamRaidersBattleStartedEntity: require('./WebEntities/Functions/Triggers/trigger_StreamRaidersBattleStartedEntity.js'),
 	Trigger_StreamRaidersMultiSkinBombEntity: require('./WebEntities/Functions/Triggers/trigger_StreamRaidersMultiSkinBombEntity.js'),
+	Trigger_StreamRaidersPurchaseBaseEntity: require('./WebEntities/Functions/Triggers/trigger_StreamRaidersPurchaseBaseEntity.js'),
 	Trigger_StreamRaidersSingleSkinBombEntity: require('./WebEntities/Functions/Triggers/trigger_StreamRaidersSingleSkinBombEntity.js'),
 	Trigger_StreamRaidersSingleSkinPurchaseEntity: require('./WebEntities/Functions/Triggers/trigger_StreamRaidersSingleSkinPurchaseEntity.js'),
 	Trigger_StreamRaidersSkinGiftEntity: require('./WebEntities/Functions/Triggers/trigger_StreamRaidersSkinGiftEntity.js'),

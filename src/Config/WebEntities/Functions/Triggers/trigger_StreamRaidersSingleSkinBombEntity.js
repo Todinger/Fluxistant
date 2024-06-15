@@ -1,6 +1,6 @@
-const TriggerEntity = require('./triggerEntity');
+const Trigger_StreamRaidersPurchaseBaseEntity = require("./trigger_StreamRaidersPurchaseBaseEntity");
 
-class Trigger_StreamRaidersSingleSkinBombEntity extends TriggerEntity {
+class Trigger_StreamRaidersSingleSkinBombEntity extends Trigger_StreamRaidersPurchaseBaseEntity {
 	static get TYPE()		{ return 'Trigger_StreamRaidersSingleSkinBomb'; 							}
 	static get BUILDER()	{ return (...p) => new Trigger_StreamRaidersSingleSkinBombEntity(...p); 	}
 	
