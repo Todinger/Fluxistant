@@ -348,14 +348,23 @@ class StreamRaiders extends Module {
 			return;
 		}
 
-		let sp = parseInt(data.firstParam);
-		this.setSP(sp);
+		if (!Number.isNaN(data.firstParam)) {
+			let sp = parseInt(data.firstParam);
+			if (Number.isInteger(sp) && sp >= 0) {
+				this.setSP(sp);
+			}
+		}
+
+		return {
+			success: true,
+			sp: this.currentSP,
+		}
 	}
 
 	functions = {
 		setSP: {
-			name: 'Set SP',
-			description: 'Set the current SP for the skinathon',
+			name: 'Get / Set SP',
+			description: 'Gets or set the current SP for the skinathon (use without value to only get the current amount)',
 			triggers: [
 				this.trigger.cli({
 					cmdname: 'sp',
@@ -364,6 +373,16 @@ class StreamRaiders extends Module {
 			action: data => this.directSetSP(data),
 		},
 	}
+
+	variables = [
+		this.variable.getter('sp', {
+			name: 'Current Skinathon SP (`$sp`)',
+			description: 'The current total amount of SP in this Skinathon',
+			example: '"We are at $sp so far!" ---When the current is 459---> "We are at 459 so far!"',
+			expr: '$sp',
+			getter: () => this.currentSP,
+		}),
+	]
 }
 
 module.exports = new StreamRaiders();
