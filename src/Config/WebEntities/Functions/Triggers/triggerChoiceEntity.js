@@ -25,6 +25,11 @@ class TriggerChoiceEntity extends ChoiceEntity {
 			["streamRaidersBattleEnded"]:				'Trigger_StreamRaidersBattleEnded',
 			["streamRaidersSkinathonPointsChanged"]:	'Trigger_StreamRaidersSkinathonPointsChanged',
 			["streamRaidersBattleStarted"]:				'Trigger_StreamRaidersBattleStarted',
+			["streamRaidersAnySkinPurchase"]:			'Trigger_StreamRaidersAnySkinPurchase',
+			["streamRaidersSingleSkinPurchase"]:		'Trigger_StreamRaidersSingleSkinPurchase',
+			["streamRaidersSkinGift"]:					'Trigger_StreamRaidersSkinGift',
+			["streamRaidersSingleSkinBomb"]:			'Trigger_StreamRaidersSingleSkinBomb',
+			["streamRaidersMultiSkinBomb"]:				'Trigger_StreamRaidersMultiSkinBomb',
 		});
 	}
 }

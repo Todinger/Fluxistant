@@ -48,6 +48,11 @@ const TriggerBuilder = new Builder({
 	streamRaidersBattleEnded:				require('./Triggers/streamRaidersBattleEndedTrigger'),
 	streamRaidersSkinathonPointsChanged:	require('./Triggers/streamRaidersSkinathonPointsChangedTrigger'),
 	streamRaidersBattleStarted:				require('./Triggers/streamRaidersBattleStartedTrigger'),
+	streamRaidersAnySkinPurchase:			require('./Triggers/streamRaidersAnySkinPurchaseTrigger'),
+	streamRaidersSingleSkinPurchase:		require('./Triggers/streamRaidersSingleSkinPurchaseTrigger'),
+	streamRaidersSkinGift:					require('./Triggers/streamRaidersSkinGiftTrigger'),
+	streamRaidersSingleSkinBomb:			require('./Triggers/streamRaidersSingleSkinBombTrigger'),
+	streamRaidersMultiSkinBomb:				require('./Triggers/streamRaidersMultiSkinBombTrigger'),
 });
 
 const ResponseBuilder = new Builder({
