@@ -30,6 +30,7 @@ class StreamRaidersSkinGiftTrigger extends Trigger {
 
 	variables = SRVars.common.concat([
 		SRVars.recipient,
+		SRVars.type,
 	])
 }
 

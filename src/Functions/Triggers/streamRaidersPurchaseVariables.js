@@ -46,6 +46,15 @@ const variables = {
         expr: '$color',
         replacement: data => data.context.params.trigger.color,
     }),
+    type: new Variable({
+        name: 'Skin Type (`$type`)',
+        description: 'The type skin that was purchased (Head/Full/Holo/etc.)',
+        example: '"$player sure likes them $type skins!" will show e.g. "Fluxbot sure likes them Epic skins!"',
+        condition: 'Can only be used when activated by a direct skin gift.',
+
+        expr: '$type',
+        replacement: data => data.context.params.trigger.type,
+    }),
     recipient: new Variable({
         name: 'Recipient (`$recipient`)',
         description: 'The name of the player who got the gifted skin',

@@ -11,7 +11,7 @@ const DOLLARS_PER_SP = 5;  // $5 for 1 SP
 const CTV_BOT_USER = "captaintvbot";
 const CTV_BOT_MESSAGES = {
 	PURCHASE: /(?<player>[a-zA-Z0-9][\w]{2,24}) just purchased a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<variant>Gold|Diamond) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) for \$(?<cost>[0-9]+)\.00! Thank you for supporting the channel!/,
-	GIFT: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<flag>Flag Bearer)?(?<head>Head)?(?<full>Full)?(?<epic>Epic)?(?<holo>Holo)?(?<variant>Gold|Diamond)? skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
+	GIFT: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<type>(?<flag>Flag Bearer)?(?<head>Head)?(?<full>Full)?(?<epic>Epic)?(?<holo>Holo)?(?<variant>Gold|Diamond)?) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
 	BOMB: {
 		SINGLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<variant>Gold|Diamond) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
 		MULTIPLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted (?<amount>\d+) (?<captain>[a-zA-Z0-9][\w]{2,24}) skins to .* and .* more people!.*/,
@@ -319,6 +319,7 @@ class SkinGiftDetails extends SkinPurchaseDetailsBase {
 		this.epic = details['epic'];
 		this.holo = details['holo'];
 		this.variant = details['variant'];
+		this.type = details['type'];
 		this.recipient = details['recipient'];
 
 		if (this.flag || this.head) {
