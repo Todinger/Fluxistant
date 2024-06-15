@@ -68,6 +68,9 @@ You can find it on your [StreamElements account details page](https://streamelem
 		sr.addBoolean('enabled', false)
 			.setName('Enable Stream Raiders Integration')
 			.setDescription('Enables/disables getting events and triggers from Stream Raiders.');
+		sr.addBoolean('testMode', false)
+			.setName('Test Mode')
+			.setDescription("When enabled, the streamer's messages are used instead of CaptainTVBot's for detecting events.");
 		sr.addHiddenString('token')
 			.setName('Account Token')
 			.setDescription('Secret (?) token used to get information about your account and battles')

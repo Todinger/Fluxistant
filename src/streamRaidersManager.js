@@ -88,6 +88,9 @@ class StreamRaidersManager extends EventNotifier {
 
 		this.logging = false;
 		this.errorLogging = true;
+
+		// When activated, the streamer's messages are used instead of the CaptainTV bot
+		this.testMode = true;
 	}
 
 	_apiError(apiName, err) {
@@ -154,7 +157,8 @@ class StreamRaidersManager extends EventNotifier {
 	}
 
 	_onChatMessage(user, message) {
-		if (user.name !== CTV_BOT_USER) return;
+		const chatEventSourceUsername = this.testMode ? Globals.StreamerUser.name : CTV_BOT_USER;
+		if (user.name !== chatEventSourceUsername) return;
 
 		let match = null;
 		for (let handlerDesc of this._messageHandlers) {
@@ -251,6 +255,17 @@ class StreamRaidersManager extends EventNotifier {
 
 		for (let player of playersToRemove) {
 			delete this._singleBombQueues[player];
+		}
+	}
+
+	applyConfig(srSettings) {
+		this.setToken(srSettings.token);
+		this.logging = srSettings.logging;
+		this.testMode = srSettings.testMode;
+		if (srSettings.enabled) {
+			this.start();
+		} else {
+			this.stop();
 		}
 	}
 

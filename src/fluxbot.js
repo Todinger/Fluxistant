@@ -421,15 +421,8 @@ class FluxBot {
 	applyMainConfig() {
 		this.twitchManager.connect(this.mainConfig.getTwitchParams());
 		this.seManager.connect(this.mainConfig.getStreamElementsParams());
+		this.streamRaidersManager.applyConfig(this.mainConfig.getStreamRaidersParams());
 
-		let srSettings = this.mainConfig.getStreamRaidersParams();
-		this.streamRaidersManager.setToken(srSettings.token);
-		this.streamRaidersManager.logging = srSettings.logging;
-		if (srSettings.enabled) {
-			this.streamRaidersManager.start();
-		} else {
-			this.streamRaidersManager.stop();
-		}
 		// this.logger.init(this.mainConfig.getLoggerParams());
 	}
 	
