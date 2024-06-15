@@ -5,7 +5,16 @@ class Trigger_StreamRaidersSingleSkinPurchaseEntity extends Trigger_StreamRaider
 	static get BUILDER()	{ return (...p) => new Trigger_StreamRaidersSingleSkinPurchaseEntity(...p); 	}
 	
 	constructor() {
-		super('Stream Raiders Single Skin Purchase');
+		super('Stream Raiders Single Skin Purchase', [
+			"skinIsFlag",
+			"skinIsHead",
+			"skinIsFull",
+			"skinIsEpic",
+			"skinIsHolo",
+			"skinIsVariant",
+			"skinIsGold",
+			"skinIsDiamond",
+		]);
 		this.setDescription('Activates this function when someone purchases a Stream Raiders skin for themselves');
 	}
 }

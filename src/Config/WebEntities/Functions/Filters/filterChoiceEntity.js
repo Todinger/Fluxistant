@@ -10,6 +10,14 @@ const ALL_FILTERS = {
 	["isBroadcaster"]:	'Filter_IsBroadcaster',
 	["windowActive"]:	'Filter_WindowActive',
 	["windowRunning"]:	'Filter_WindowRunning',
+	["skinIsDiamond"]:	'Filter_SkinIsDiamond',
+	["skinIsEpic"]:		'Filter_SkinIsEpic',
+	["skinIsFlag"]:		'Filter_SkinIsFlag',
+	["skinIsFull"]:		'Filter_SkinIsFull',
+	["skinIsGold"]:		'Filter_SkinIsGold',
+	["skinIsHead"]:		'Filter_SkinIsHead',
+	["skinIsHolo"]:		'Filter_SkinIsHolo',
+	["skinIsVariant"]:	'Filter_SkinIsVariant',
 }
 
 const DEFAULT_FILTER_NAMES = [

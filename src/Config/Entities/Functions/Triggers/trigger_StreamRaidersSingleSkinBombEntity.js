@@ -5,7 +5,13 @@ class Trigger_StreamRaidersSingleSkinBombEntity extends Trigger_StreamRaidersPur
 	static get BUILDER()	{ return (...p) => new Trigger_StreamRaidersSingleSkinBombEntity(...p); 	}
 	
 	constructor() {
-		super('Stream Raiders Single-Skin Bomb');
+		super('Stream Raiders Single-Skin Bomb', [
+			"skinIsEpic",
+			"skinIsHolo",
+			"skinIsVariant",
+			"skinIsGold",
+			"skinIsDiamond",
+		]);
 		this.setDescription('Activates this function when someone buys a Stream Raiders skin pack with a single skin');
 	}
 }

@@ -32,7 +32,7 @@ class DynamicArrayEntity extends ArrayEntity {
 		this.clear();
 		this.itemConstructionOptions = descriptor.itemConstructionOptions;
 		descriptor.elements.forEach(entryDesc => {
-			let element = ConfigEntity.readEntity(entryDesc, lenient);
+			let element = ConfigEntity.readEntity(entryDesc, lenient, ...this.itemConstructionOptions);
 			this.addElement(element);
 		});
 	}

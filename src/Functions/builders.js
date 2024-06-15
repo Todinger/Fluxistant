@@ -22,6 +22,14 @@ const FilterBuilder = new Builder({
 	not:			require('./Filters/notFilter'),
 	windowActive:	require('./Filters/windowActiveFilter'),
 	windowRunning:	require('./Filters/windowRunningFilter'),
+	skinIsDiamond:	require('./Filters/skinIsDiamondFilter'),
+	skinIsEpic:		require('./Filters/skinIsEpicFilter'),
+	skinIsFlag:		require('./Filters/skinIsFlagFilter'),
+	skinIsFull:		require('./Filters/skinIsFullFilter'),
+	skinIsGold:		require('./Filters/skinIsGoldFilter'),
+	skinIsHead:		require('./Filters/skinIsHeadFilter'),
+	skinIsHolo:		require('./Filters/skinIsHoloFilter'),
+	skinIsVariant:	require('./Filters/skinIsVariantFilter'),
 });
 
 const VariableBuilder = new Builder({

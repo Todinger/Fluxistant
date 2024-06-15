@@ -307,6 +307,18 @@ class SkinPurchaseDetails extends SkinPurchaseDetailsBase {
 		this.cost = parseInt(details['cost']);
 
 		this.sp = this.cost / DOLLARS_PER_SP;
+
+		if (this.sp === 1) {
+			if (this.unit === "Flag Bearer") {
+				this.flag = "Flag Bearer";
+			} else {
+				this.head = "Head";
+			}
+		}
+
+		if (this.sp === 2 && !this.epic) {
+			this.full = "Full";
+		}
 	}
 }
 

@@ -5,7 +5,7 @@ class Trigger_StreamRaidersAnySkinPurchaseEntity extends Trigger_StreamRaidersPu
 	static get BUILDER()	{ return (...p) => new Trigger_StreamRaidersAnySkinPurchaseEntity(...p); 	}
 	
 	constructor() {
-		super('Stream Raiders Any Skin Purchase', ['isVIP']);
+		super('Stream Raiders Any Skin Purchase');
 		this.setDescription('Activates this function when any Stream Raiders skin is purchased in any way');
 	}
 }

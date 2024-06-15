@@ -281,9 +281,9 @@ class ConfigEntity extends MiniEventNotifier {
 		return instance;
 	}
 	
-	static readEntity(entityObject, lenient) {
+	static readEntity(entityObject, lenient, ...constructionOptions) {
 		let type = entityObject.type;
-		let instance = EntityFactory.build(type);
+		let instance = EntityFactory.build(type, ...constructionOptions);
 		
 		if (ConfigEntity.debug) {
 			instance.dbg = `${instance.dbg} / read`;

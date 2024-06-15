@@ -5,7 +5,16 @@ class Trigger_StreamRaidersSkinGiftEntity extends Trigger_StreamRaidersPurchaseB
 	static get BUILDER()	{ return (...p) => new Trigger_StreamRaidersSkinGiftEntity(...p); 	}
 	
 	constructor() {
-		super('Stream Raiders Skin Gift');
+		super('Stream Raiders Skin Gift', [
+			"skinIsFlag",
+			"skinIsHead",
+			"skinIsFull",
+			"skinIsEpic",
+			"skinIsHolo",
+			"skinIsVariant",
+			"skinIsGold",
+			"skinIsDiamond",
+		]);
 		this.setDescription('Activates this function when someone gifts a Stream Raiders skin directly');
 	}
 }
