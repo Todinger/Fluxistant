@@ -130,7 +130,7 @@ class Hell extends Module {
 		this.variable.getter('total', {
 			name: 'Total Souls (`$total`)',
 			description: 'The total amount of souls sold to date',
-			example: '"The devil has eaten `$total` souls so far!" ---When the total is 123---> ""The devil has eaten 123 souls so far!"',
+			example: '"The devil has eaten `$total` souls so far!" ---When the total is 123---> "The devil has eaten 123 souls so far!"',
 			expr: '$total',
 			getter: () => this.getSoulCount(),
 		}),
