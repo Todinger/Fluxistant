@@ -36,6 +36,7 @@ class StreamRaidersManager extends EventNotifier {
 	constructor() {
 		super(false);
 
+		this.active = false;
 		this._token = null;
 
 		this.states = {
@@ -64,6 +65,12 @@ class StreamRaidersManager extends EventNotifier {
 		this._addEvent('battleStarted');
 		this._addEvent('battleEnded');
 		this._addEvent('battleTimerSync');
+		this._addEvent('anySkinPurchase');
+		this._addEvent('singleSkinPurchase');
+		this._addEvent('skinGift');
+		this._addEvent('singleSkinBomb');
+		this._addEvent('multiSkinBomb');
+
 
 		cli.on('sr-mock', () => this.mockData());
 		cli.on('sr-mock-stop', () => this.stopMockingData());
@@ -258,6 +265,8 @@ class StreamRaidersManager extends EventNotifier {
 	}
 
 	start() {
+		if (this.active) return;
+
 		if (this._token === null) {
 			Logger.warn("A Stream Raiders token has not been set, so Stream Raiders interaction is disabled.");
 			return;
@@ -270,9 +279,13 @@ class StreamRaidersManager extends EventNotifier {
 		this._singleBombQueues = {};
 		TwitchManager.on('message', this._onMessageHandler);
 		this._bombAggregationTimer = setInterval(() => this._onAggregationTick(), SKIN_BOMB_AGGREGATION_INTERVAL);
+
+		this.active = true;
 	}
 
 	stop() {
+		if (!this.active) return;
+
 		Object.keys(this.apis).forEach(apiName => {
 			this.apis[apiName].stop();
 		});
@@ -282,6 +295,8 @@ class StreamRaidersManager extends EventNotifier {
 			clearInterval(this._bombAggregationTimer);
 			this._bombAggregationTimer = null;
 		}
+
+		this.active = false;
 	}
 
 	mockData() {
