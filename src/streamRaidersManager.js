@@ -42,7 +42,7 @@ class StreamRaidersManager extends EventNotifier {
 		this.states = {
 			skinathon: new SkinathonState(),
 			battle: new BattleState(),
-		}
+		};
 
 		this.apis = {
 			skinathon: new API(
@@ -57,7 +57,18 @@ class StreamRaidersManager extends EventNotifier {
 				(data) => this._updateBattleState(data),
 				(err) => this._apiError("BattleBox", err),
 			),
-		}
+		};
+
+		this.apiResponseContentTests = {
+			skinathon: (data) => data && data['data'] && data['data'].startDate !== null,
+			battleBox: (data) => data && data['data'] && (
+				data['data'].units.length > 0 ||
+				data['data'].epics.length > 0 ||
+				data['data'].purchases.length > 0 ||
+				data['data'].gifts.length > 0 ||
+				data['data'].skins.length > 0
+			),
+		};
 
 		this._addEvent('skinathonChanged');
 		this._addEvent('skinathonPointsChanged');
@@ -100,7 +111,10 @@ class StreamRaidersManager extends EventNotifier {
 	}
 
 	_updateSkinathonState(data) {
-		// this.log(`updateSkinathonState: data = ${JSON.stringify(data)}`);
+		if (this.apiResponseContentTests.skinathon(data)) {
+			this.log(`<Skinathon API> ${JSON.stringify(data)}`);
+		}
+
 		if (!this.states.skinathon.represents(data['data'])) {
 			let oldState = this.states.skinathon;
 			let newState = this.states.skinathon = new SkinathonState(data['data']);
@@ -120,7 +134,9 @@ class StreamRaidersManager extends EventNotifier {
 	}
 
 	_updateBattleState(data) {
-		// this.log(`_updateBattleState: data = ${JSON.stringify(data)}`);
+		if (this.apiResponseContentTests.battleBox(data)) {
+			this.log(`<BattleBox API> ${JSON.stringify(data)}`);
+		}
 		if (!this.states.battle.represents(data['data'])) {
 			let oldState = this.states.battle;
 			let newState = this.states.battle = new BattleState(data['data']);
@@ -334,7 +350,7 @@ class StreamRaidersManager extends EventNotifier {
 
 	log(msg) {
 		if (this.logging) {
-			Logger.warn(`[StreamRaidersManager] ${msg}`);
+			Logger.info(`[StreamRaidersManager] ${msg}`);
 		}
 	}
 
@@ -348,7 +364,7 @@ class StreamRaidersManager extends EventNotifier {
 
 	_notifySkinathonChanged(newState, oldState) {
 		this._notify('skinathonChanged', newState, oldState);
-		this.log(`skinathonChanged: ${JSON.stringify(oldState)} -> ${JSON.stringify(newState)}`);
+		// this.log(`skinathonChanged: ${JSON.stringify(oldState)} -> ${JSON.stringify(newState)}`);
 	}
 
 	onSkinathonPointsChanged(callback) {
@@ -361,7 +377,7 @@ class StreamRaidersManager extends EventNotifier {
 
 	_notifySkinathonPointsChanged(newPoints, oldPoints) {
 		this._notify('skinathonPointsChanged', newPoints, oldPoints);
-		this.log(`skinathonPointsChanged: ${oldPoints} -> ${newPoints}`);
+		// this.log(`skinathonPointsChanged: ${oldPoints} -> ${newPoints}`);
 	}
 
 	onBattleChanged(callback) {
@@ -374,7 +390,7 @@ class StreamRaidersManager extends EventNotifier {
 
 	_notifyBattleChanged(newState, oldState) {
 		this._notify('battleChanged', newState, oldState);
-		this.log(`battleChanged: ${JSON.stringify(oldState)} -> ${JSON.stringify(newState)}`);
+		// this.log(`battleChanged: ${JSON.stringify(oldState)} -> ${JSON.stringify(newState)}`);
 	}
 
 	onBattleStarted(callback) {
@@ -387,7 +403,7 @@ class StreamRaidersManager extends EventNotifier {
 
 	_notifyBattleStarted() {
 		this._notify('battleStarted');
-		this.log('battleStarted');
+		// this.log('battleStarted');
 	}
 
 	onBattleEnded(callback) {
@@ -400,7 +416,7 @@ class StreamRaidersManager extends EventNotifier {
 
 	_notifyBattleEnded() {
 		this._notify('battleEnded');
-		this.log('battleEnded');
+		// this.log('battleEnded');
 	}
 
 	onBattleTimerSync(callback) {
@@ -413,7 +429,7 @@ class StreamRaidersManager extends EventNotifier {
 
 	_notifyBattleTimerSync(minutes, seconds) {
 		this._notify('battleTimerSync', minutes, seconds);
-		this.log(`battleTimerSync: ${minutes}:${ ("0" + seconds).slice(-2)}`);
+		// this.log(`battleTimerSync: ${minutes}:${ ("0" + seconds).slice(-2)}`);
 	}
 
 	onAnySkinPurchase(callback) {

@@ -4,5 +4,6 @@ module.exports = {
 		MAX_USERNAME_LENGTH: 25,
 	},
 	SECONDS: 1000,
+	MINUTES: 60 * 1000,
 	ONE_SECOND: 1000,
 }

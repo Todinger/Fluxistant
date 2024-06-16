@@ -1,7 +1,7 @@
 'use strict';
 const { ApiPoller, AxiosRequestEngine, MockRequestEngine } = require('./apiPoller');
 const _ = require('lodash');
-const { SECONDS } = require('./constants');
+const { MINUTES, SECONDS } = require('./constants');
 const Errors = require('./errors');
 
 // Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
@@ -61,10 +61,10 @@ const API_SETTINGS = {
 			command: "getSkinathonState",
 		},
 		intervals: {
-			active: 1000, // One second
-			inactive: 20 * SECONDS,
-			// active: 30 * SECONDS,
-			// inactive: 60 * MINUTES,
+			// active: ONE_SECOND,
+			// inactive: 11 * SECONDS,
+			active: 30 * SECONDS,
+			inactive: 60 * MINUTES,
 		},
 		makeMockData: (startDate, skinPoints) => ({
 			"info": {
@@ -102,10 +102,10 @@ const API_SETTINGS = {
 			command: "battleBox",
 		},
 		intervals: {
-			active: SECONDS,
-			inactive: 10 * SECONDS,
-			// active: 10 * SECONDS,
-			// inactive: 30 * SECONDS,
+			// active: ONE_SECOND,
+			// inactive: 7 * SECONDS,
+			active: 10 * SECONDS,
+			inactive: 3 * MINUTES,
 		},
 		makeMockData: (state, minutes, seconds) => ({
 			"info": {
@@ -140,7 +140,7 @@ const API_SETTINGS = {
 					"seconds": seconds,
 					"state": state
 				},
-				"units": [],
+				"units": ["a"],
 				"epics": [],
 				"purchases": [],
 				"gifts": [],
