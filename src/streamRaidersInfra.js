@@ -102,10 +102,10 @@ const API_SETTINGS = {
 			command: "battleBox",
 		},
 		intervals: {
-			// active: ONE_SECOND,
+			// active: 2 * SECONDS,
 			// inactive: 7 * SECONDS,
-			active: 10 * SECONDS,
-			inactive: 3 * MINUTES,
+			active: 5 * SECONDS,
+			inactive: 30 * SECONDS,
 		},
 		makeMockData: (state, minutes, seconds) => ({
 			"info": {
