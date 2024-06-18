@@ -70,6 +70,7 @@ class StreamRaidersManager extends EventNotifier {
 			),
 		};
 
+		this._addEvent('skinathonStarted');
 		this._addEvent('skinathonChanged');
 		this._addEvent('skinathonPointsChanged');
 		this._addEvent('battleChanged');
@@ -118,7 +119,11 @@ class StreamRaidersManager extends EventNotifier {
 		if (!this.states.skinathon.represents(data['data'])) {
 			let oldState = this.states.skinathon;
 			let newState = this.states.skinathon = new SkinathonState(data['data']);
-			this._notifySkinathonChanged(newState, oldState);
+			if (!oldState.isActive && newState.isActive) {
+				this._notifySkinathonStarted(newState);
+			} else {
+				this._notifySkinathonChanged(newState, oldState);
+			}
 
 			if (newState.totalSkinPoints !== oldState.totalSkinPoints) {
 				this._notifySkinathonPointsChanged(newState.totalSkinPoints, oldState.totalSkinPoints);
@@ -352,6 +357,18 @@ class StreamRaidersManager extends EventNotifier {
 		if (this.logging) {
 			Logger.info(`[StreamRaidersManager] ${msg}`);
 		}
+	}
+
+	onSkinathonStarted(callback) {
+		return this.on('skinathonStarted', callback);
+	}
+
+	removeSkinathonStartedCallback(callback) {
+		return this.removeCallback('skinathonStarted', callback);
+	}
+
+	_notifySkinathonStarted(skinathonState) {
+		this._notify('skinathonStarted', skinathonState);
 	}
 
 	onSkinathonChanged(callback) {

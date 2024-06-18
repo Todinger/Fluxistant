@@ -61,9 +61,9 @@ const API_SETTINGS = {
 			command: "getSkinathonState",
 		},
 		intervals: {
-			// active: ONE_SECOND,
+			// active: 2 * SECONDS,
 			// inactive: 11 * SECONDS,
-			active: 30 * SECONDS,
+			active: 10 * SECONDS,
 			inactive: 60 * MINUTES,
 		},
 		makeMockData: (startDate, skinPoints) => ({
@@ -290,7 +290,12 @@ class BattleState extends StreamRaidersBaseState {
 class SkinPurchaseDetailsBase {
 	constructor(details) {
 		this.player = details['player'];
+		this.playerUsername = this.player.toLowerCase();
 		this.sp = 0;
+	}
+
+	toString() {
+		Errors.abstract();
 	}
 }
 
@@ -320,6 +325,14 @@ class SkinPurchaseDetails extends SkinPurchaseDetailsBase {
 			this.full = "Full";
 		}
 	}
+
+	toString() {
+		let skinDesc =
+			this.head ? "Head " :
+			this.full ? "Full " :
+			"";
+		return `(${this.sp} SP) Purchase: ${this.skin} ${skinDesc}Skin`;
+	}
 }
 
 class SkinGiftDetails extends SkinPurchaseDetailsBase {
@@ -346,6 +359,10 @@ class SkinGiftDetails extends SkinPurchaseDetailsBase {
 			throw "Unknown skin gift!";
 		}
 	}
+
+	toString() {
+		return `(${this.sp} SP) Gift: ${this.type} Skin to ${this.recipient}`;
+	}
 }
 
 class SkinBombSingleDetails extends SkinPurchaseDetailsBase {
@@ -362,6 +379,10 @@ class SkinBombSingleDetails extends SkinPurchaseDetailsBase {
 
 		this.sp = 1;
 	}
+
+	toString() {
+		return `(${this.sp} SP) Skin Bomb: 1`;
+	}
 }
 
 class SkinBombMultiDetails extends SkinPurchaseDetailsBase {
@@ -371,6 +392,10 @@ class SkinBombMultiDetails extends SkinPurchaseDetailsBase {
 		this.amount = parseInt(details['amount']);
 
 		this.sp = this.amount;
+	}
+
+	toString() {
+		return `(${this.sp} SP) Skin Bomb: ${this.amount}`;
 	}
 }
 

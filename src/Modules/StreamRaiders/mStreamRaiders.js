@@ -2,6 +2,7 @@ const Module = requireMain('module');
 const SkinathonCharacterEntity = require("./Config/skinathonCharacterEntity");
 const SkinathonMilestoneEntity = require("./Config/skinathonMilestoneEntity");
 const StreamRaidersManager = requireMain('streamRaidersManager');
+const StreamRaidersPurchaseTracker = require("./tracking");
 const ModuleAssetLoader = requireMain('moduleAssetLoader');
 const Utils = requireMain('./utils');
 
@@ -40,6 +41,18 @@ class StreamRaiders extends Module {
 		this.currentSP = 0;
 		this.currentPixelProgress = 0;
 		this.nextMilestoneIndex = 0;
+
+		this.data = {
+			purchases: [],
+			users: {},
+			skinathons: {},
+		};
+
+		this.eventHandlers = {
+			skinathonPointsChanged: (newPoints, oldPoints) => this._skinathonPointsChanged(newPoints, oldPoints),
+		};
+
+		this.tracker = new StreamRaidersPurchaseTracker(this);
 	}
 
 	defineModAssets(modData) {
@@ -106,18 +119,37 @@ class StreamRaiders extends Module {
 			}
 		}
 	}
-	
+
+	_enableEventHandlers() {
+		StreamRaidersManager.onSkinathonPointsChanged(this.eventHandlers.skinathonPointsChanged);
+	}
+
+	_disableEventHandlers() {
+		StreamRaidersManager.removeSkinathonPointsChangedCallback(this.eventHandlers.skinathonPointsChanged);
+	}
+
 	load() {
 		this.onClientAttached(async _socket => {
 			if (this.enabled) {
 				this.syncClients();
 			}
 		});
-
-		StreamRaidersManager.onSkinathonPointsChanged(
-			(newPoints, oldPoints) => this._skinathonPointsChanged(newPoints, oldPoints)
-		);
 	}
+
+	enable() {
+		this._enableEventHandlers();
+		this.tracker.enable();
+	}
+
+	disable() {
+		this._disableEventHandlers();
+		this.tracker.disable();
+	}
+
+	persistentDataLoaded() {
+		this.tracker.dataLoaded();
+	}
+
 
 	get hasMilestones() {
 		return this.sortedMilestones.length > 0;
@@ -210,6 +242,7 @@ class StreamRaiders extends Module {
 
 	_skinathonPointsChanged(newPoints, _oldPoints) {
 		if (newPoints < 0) return;
+		if (newPoints < this.currentSP) return;
 		if (newPoints > this.maxSP) newPoints = this.maxSP;
 		this.setSP(newPoints);
 	}
@@ -361,6 +394,49 @@ class StreamRaiders extends Module {
 		}
 	}
 
+	printUserLifetimeReport(data) {
+		let username = data.firstParam;
+		if (!username) {
+			this.error("No username given.");
+			return;
+		}
+
+		username = username.toLowerCase();
+		let report = this.tracker.getFormattedUserLifetimeReport(username);
+		if (report) {
+			this.print(report);
+		} else {
+			this.print("No data available");
+		}
+	}
+
+	printUserSkinathonReport(data) {
+		let username = data.firstParam;
+		if (!username) {
+			this.error("No username given.");
+			return;
+		}
+
+		username = username.toLowerCase();
+		let report = this.tracker.getFormattedUserSkinathonReport(username);
+		if (report) {
+			this.print(report);
+		} else {
+			this.print("No data available.");
+		}
+	}
+
+	printSkinathonReport() {
+		let report = this.tracker.getFormattedLatestSkinathonReport();
+		if (!report) {
+			this.print("No data available");
+			return;
+		}
+
+		this.print("Skinathon Report");
+		this.print("----------------\n" + report);
+	}
+
 	functions = {
 		setSP: {
 			name: 'Get / Set SP',
@@ -371,6 +447,36 @@ class StreamRaiders extends Module {
 				}),
 			],
 			action: data => this.directSetSP(data),
+		},
+		userLifetimeReport: {
+			name: 'Print User Lifetime Report',
+			description: "Prints a full report of all of the user's purchases in recorded history to the console",
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'user-report',
+				}),
+			],
+			action: (data) => this.printUserLifetimeReport(data),
+		},
+		userSkinathonReport: {
+			name: 'Print User Skinathon Report',
+			description: "Prints a report of all of the user's purchases in the latest (or current) skinathon to the console",
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'user-skinathon-report',
+				}),
+			],
+			action: (data) => this.printUserSkinathonReport(data),
+		},
+		skinathonReport: {
+			name: 'Print Skinathon Report',
+			description: 'Prints a full report of the latest (or current) skinathon to the console',
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'skinathon-report',
+				}),
+			],
+			action: () => this.printSkinathonReport(),
 		},
 	}
 
