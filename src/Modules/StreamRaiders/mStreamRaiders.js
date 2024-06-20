@@ -50,6 +50,7 @@ class StreamRaiders extends Module {
 
 		this.eventHandlers = {
 			skinathonPointsChanged: (newPoints, oldPoints) => this._skinathonPointsChanged(newPoints, oldPoints),
+			skinPurchase: (purchaseDetails) => this._skinPurchase(purchaseDetails),
 		};
 
 		this.tracker = new StreamRaidersPurchaseTracker(this);
@@ -122,10 +123,12 @@ class StreamRaiders extends Module {
 
 	_enableEventHandlers() {
 		StreamRaidersManager.onSkinathonPointsChanged(this.eventHandlers.skinathonPointsChanged);
+		StreamRaidersManager.onAnySkinPurchase(this.eventHandlers.skinPurchase);
 	}
 
 	_disableEventHandlers() {
 		StreamRaidersManager.removeSkinathonPointsChangedCallback(this.eventHandlers.skinathonPointsChanged);
+		StreamRaidersManager.removeAnySkinPurchaseCallback(this.eventHandlers.skinPurchase);
 	}
 
 	load() {
@@ -245,6 +248,10 @@ class StreamRaiders extends Module {
 		if (newPoints < this.currentSP) return;
 		if (newPoints > this.maxSP) newPoints = this.maxSP;
 		this.setSP(newPoints);
+	}
+
+	_skinPurchase(purchaseDetails) {
+		this.setSP(this.currentSP + purchaseDetails.sp);
 	}
 
 	setProgressDirect() {
