@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const Module = requireMain('module');
 const SkinathonCharacterEntity = require("./Config/skinathonCharacterEntity");
 const SkinathonMilestoneEntity = require("./Config/skinathonMilestoneEntity");
@@ -17,12 +18,29 @@ function isValidFile(data) {
 }
 
 function imageDefault(image, defaultImage) {
+	let width = 0, height = 0;
+	if (image) {
+		width = image.width;
+		height = image.height;
+	}
+	if (defaultImage) {
+		width = width || defaultImage.width;
+		height = height || defaultImage.height;
+	}
+
+	let result = null;
 	if (isValidFile(image)) {
-		return image;
+		result = _.clone(image);
 	}
 
 	if (isValidFile(defaultImage)) {
-		return defaultImage;
+		result = _.clone(defaultImage);
+	}
+
+	if (result !== null) {
+		result.width = width;
+		result.height = height;
+		return result;
 	}
 
 	return null;

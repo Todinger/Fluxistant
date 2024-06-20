@@ -23900,7 +23900,7 @@ class SkinathonMilestoneEntity extends StaticObjectEntity {
 			.setName('Center X Position')
 			.setDescription('Horizontal center of the enemy image, to align it with the background image');
 		enemy.addNumber('centerY', 0)
-			.setName('Center X Position')
+			.setName('Center Y Position')
 			.setDescription('Vertical center of the enemy image, to align it with the background image');
 		enemy.addNumber('offsetX', 0)
 			.setName('X Offset')
