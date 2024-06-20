@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const StreamRaidersManager = require("../../streamRaidersManager");
+const StreamRaidersManager = requireMain("./streamRaidersManager");
 const Logger = requireMain('logger')
 const Utils = requireMain('./utils');
 
@@ -21,7 +21,7 @@ class StreamRaidersPurchaseTracker {
         this.data = this.mod.data;
 
         if (this.data.skinathons) {
-            const existingSkinathons = Object.keys(this.data.skinathons);
+            const existingSkinathons = Object.values(this.data.skinathons);
             if (existingSkinathons && existingSkinathons.length > 0) {
                 this.currentSkinathon = existingSkinathons[existingSkinathons.length - 1];
             }
