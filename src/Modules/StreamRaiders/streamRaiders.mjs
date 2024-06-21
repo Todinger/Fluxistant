@@ -4,9 +4,12 @@ import { ModuleClient } from "/common/moduleClient.mjs";
 const TRANSPARENT_PIXEL_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const NO_IMAGE = TRANSPARENT_PIXEL_IMAGE;
 const NO_IMAGE_OBJECT = {url: NO_IMAGE};
-const MAX_PROGRESS = 1920;
+const LAST_MILESTONE_PROGRESS = 1773;
+const MAX_PROGRESS = 2500;
 const DEFAULT_ATTACK_DURATION = 3000;
 const DEFAULT_ADVANCEMENT_PIXELS_PER_SEC = 20;
+const CITY_FOREGROUND_Z_INDEX = 35;
+const CITY_BACKGROUND_Z_INDEX = 10;
 
 function pixelStringToInt(pixelString) {
     return parseInt(pixelString.replace("px", ""))
@@ -249,6 +252,7 @@ class StreamRaiders extends ModuleClient {
             characters: document.getElementById('characters'),
             jMilestones: $("#milestones"),
             jAnimator: $("#animator"),
+            jCity: $("#city"),
         };
 
         let charactersStyle = getComputedStyle(this.elements.characters);
@@ -427,6 +431,12 @@ class StreamRaiders extends ModuleClient {
 
         this.currentPixelProgress = pixelProgress;
         this.currentSP = sp;
+
+        if (this.currentPixelProgress > LAST_MILESTONE_PROGRESS) {
+            $(this.elements.jCity).css("z-index", CITY_FOREGROUND_Z_INDEX);
+        } else {
+            $(this.elements.jCity).css("z-index", CITY_BACKGROUND_Z_INDEX);
+        }
     }
 
     animate(from, to, step, done, options) {
