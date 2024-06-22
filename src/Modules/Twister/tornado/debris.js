@@ -6,7 +6,8 @@ class Debris {
         this.angle = random(0, 2 * PI);
         this.angularSpeedFactor = random(0.3, 2);
         this.distance = random(10, 400);
-        this.rotationDirection = -1;
+        this.spinDirection = -1;
+        this.rotation = 0;
         this.position = this.tornado.positioner.getPositionAroundCenter(
             this.center,
             this.distance,
@@ -20,9 +21,12 @@ class Debris {
         this.imageHeight = imageHeight;
     }
 
-    updatePosition() {
-        this.tornado.updateDebrisPosition(this);
+    updateTransform() {
+        this.tornado.updateDebrisTransform(this);
         translate(this.position);
+        rotateX(this.rotation.x);
+        rotateY(this.rotation.y);
+        rotateZ(this.rotation.z);
     }
 
     show() {
@@ -32,7 +36,7 @@ class Debris {
 
     update() {
         push();
-        this.updatePosition();
+        this.updateTransform();
         this.show();
         pop();
     }

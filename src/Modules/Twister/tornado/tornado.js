@@ -8,10 +8,11 @@ class Tornado {
         this.distancer = new Distancer(this.bottom, this.bottom + this.height, 10, 400);
         this.positioner = new Positioner(this.noiseGen, this.elevator);
         this.spinner = new Spinner();
+        this.rotator = new Rotator(this.noiseGen);
     }
 
-    updateDebrisPosition(debris) {
-        debris.angle = this.spinner.spin(debris.angle, debris.rotationDirection, debris.angularSpeedFactor);
+    updateDebrisTransform(debris) {
+        debris.angle = this.spinner.spin(debris.angle, debris.spinDirection, debris.angularSpeedFactor);
         debris.distance = this.distancer.distanceFromElevation(-debris.position.y)
         debris.position = this.positioner.getPositionAroundCenter(
             debris.center,
@@ -20,6 +21,8 @@ class Tornado {
             debris.position.y,
             debris.index,
         );
+
+        debris.rotation = this.rotator.rotate(debris.rotation, debris.index);
     }
 
     tick() {
