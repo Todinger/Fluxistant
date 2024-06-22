@@ -6,7 +6,6 @@ let tornadoImage;
 
 const DEBRIS_COUNT = 10;
 
-let allDebris = [];
 let center;
 
 let buf;
@@ -27,11 +26,9 @@ function setup() {
     center = createVector(0, -height / 2 ,0);
 
     for (let i = 0; i < DEBRIS_COUNT; i++) {
-        allDebris.push(new Debris(
+        tornado.addDebris(new Debris(
             tornado,
             center,
-            random(-20, -height * 0.8),
-            i,
             kitten,
             100,
             100,
@@ -97,10 +94,7 @@ function draw() {
     plane(tornadoSize, tornadoSize);
     pop();
 
-    // angle += 0.03;
-    for (let debris of allDebris) {
-        debris.update();
-    }
+
 
     tornado.tick();
 }
