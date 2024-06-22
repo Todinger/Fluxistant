@@ -19,6 +19,9 @@ function preload() {
 }
 
 function setup() {
+    // setAttributes('willReadFrequently', true);
+    // let renderer = createCanvas(1920, 880, WEBGL);
+    // renderer.canvas.getContext('2d', { willReadFrequently: true });
     createCanvas(1920, 880, WEBGL);
     tornado = new Tornado();
     center = createVector(0, -height / 2 ,0);
