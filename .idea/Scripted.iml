@@ -19,5 +19,7 @@
     <orderEntry type="library" name="TweenMax" level="application" />
     <orderEntry type="library" name="jquery" level="application" />
     <orderEntry type="library" name="normalize" level="application" />
+    <orderEntry type="library" name="p5" level="application" />
+    <orderEntry type="library" name="@types/p5" level="application" />
   </component>
 </module>
