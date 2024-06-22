@@ -1,4 +1,4 @@
-const DEFAULT_INCREMENT = 0.1;
+const DEFAULT_INCREMENT = 0.05;
 
 
 class Spinner {
@@ -6,8 +6,7 @@ class Spinner {
         this.increment = DEFAULT_INCREMENT;
     }
 
-    spin(angle, direction) {
-        return angle + direction * this.increment;
+    spin(angle, direction, angularSpeedFactor) {
+        return angle + direction * this.increment * angularSpeedFactor;
     }
 }
-

@@ -2,8 +2,9 @@ let angle = 0;
 let kitten;
 
 let tornado;
+let tornadoImage;
 
-const DEBRIS_COUNT = 1;
+const DEBRIS_COUNT = 10;
 
 let allDebris = [];
 let center;
@@ -14,6 +15,7 @@ let shdr;
 
 function preload() {
     kitten = loadImage('tmp/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif');
+    tornadoImage = loadImage('assets/pixel-tornado.gif');
 }
 
 function setup() {
@@ -27,8 +29,8 @@ function setup() {
             center,
             i,
             kitten,
-            300,
-            300,
+            100,
+            100,
         ));
     }
 
@@ -83,17 +85,17 @@ function draw() {
     // fill(0,0,0,0);
     translate(center);
     shader(shdr);
-    texture(kitten);
+    texture(tornadoImage);
     // fill(0,0,0,255);
     // textFont(font);
     // text("Hi", 150, 50);
-    plane(300, 300);
+    let tornadoSize = min(width, height);
+    plane(tornadoSize, tornadoSize);
     pop();
 
     // angle += 0.03;
     for (let debris of allDebris) {
-        debris.updatePosition();
-        debris.show();
+        debris.update();
     }
 
     tornado.tick();
