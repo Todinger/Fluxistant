@@ -5,8 +5,21 @@ class Tornado {
         this.height = height;
         this.noiseGen = new NoiseGenerator();
         this.elevator = new Elevator(-this.height, this.bottom);
+        this.distancer = new Distancer(this.bottom, this.bottom + this.height, 10, 400);
         this.positioner = new Positioner(this.noiseGen, this.elevator);
         this.spinner = new Spinner();
+    }
+
+    updateDebrisPosition(debris) {
+        debris.angle = this.spinner.spin(debris.angle, debris.rotationDirection, debris.angularSpeedFactor);
+        debris.distance = this.distancer.distanceFromElevation(-debris.position.y)
+        debris.position = this.positioner.getPositionAroundCenter(
+            debris.center,
+            debris.distance,
+            debris.angle,
+            debris.position.y,
+            debris.index,
+        );
     }
 
     tick() {

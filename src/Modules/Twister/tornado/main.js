@@ -30,6 +30,7 @@ function setup() {
         allDebris.push(new Debris(
             tornado,
             center,
+            random(-20, -height * 0.8),
             i,
             kitten,
             100,
