@@ -1,6 +1,8 @@
 
 class Tornado {
-    constructor() {
+    constructor(image, shader) {
+        this.image = image;
+        this.shader = shader;
         this.bottom = 0;
         this.height = height;
         this.center = createVector(0, -height / 2, 0);
@@ -188,7 +190,19 @@ class Tornado {
         }
     }
 
+    _showTornado() {
+        push();
+        translate(this.center);
+        shader(this.shader);
+        texture(this.image);
+        let tornadoSize = min(width, height);
+        plane(tornadoSize, tornadoSize);
+        pop();
+    }
+
     show() {
+        this._showTornado();
+
         for (let debris of this.debris) {
             if (debris !== null) {
                 debris.show();

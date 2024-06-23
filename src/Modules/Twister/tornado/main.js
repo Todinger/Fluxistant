@@ -23,7 +23,8 @@ function setup() {
     // let renderer = createCanvas(1920, 880, WEBGL);
     // renderer.canvas.getContext('2d', { willReadFrequently: true });
     createCanvas(1920, 880, WEBGL);
-    tornado = new Tornado();
+    shdr = createShader(vert, frag);
+    tornado = new Tornado(tornadoImage, shdr);
     center = tornado.center;
 
     for (let i = 0; i < DEBRIS_COUNT; i++) {
@@ -35,7 +36,6 @@ function setup() {
         ));
     }
 
-    shdr = createShader(vert, frag);
     mainCamera = createCamera();
 }
 
@@ -89,20 +89,20 @@ function draw() {
     // buf.plane(300, 300);
     // buf.pop();
 
-    push();
-    // // rotateX(angle);
-    // // rotateY(angle * 1.3);
-    // // rotateZ(angle * 0.7);
-    // fill(0,0,0,0);
-    translate(center);
-    shader(shdr);
-    texture(tornadoImage);
-    // fill(0,0,0,255);
-    // textFont(font);
-    // text("Hi", 150, 50);
-    let tornadoSize = min(width, height);
-    plane(tornadoSize, tornadoSize);
-    pop();
+    // push();
+    // // // rotateX(angle);
+    // // // rotateY(angle * 1.3);
+    // // // rotateZ(angle * 0.7);
+    // // fill(0,0,0,0);
+    // translate(center);
+    // shader(shdr);
+    // texture(tornadoImage);
+    // // fill(0,0,0,255);
+    // // textFont(font);
+    // // text("Hi", 150, 50);
+    // let tornadoSize = min(width, height);
+    // plane(tornadoSize, tornadoSize);
+    // pop();
 
 
 
