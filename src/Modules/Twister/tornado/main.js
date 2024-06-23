@@ -12,8 +12,12 @@ let buf;
 let font;
 let shdr;
 let mainCamera;
-let canvasWidth = 1920;
-let canvasHeight = 880;
+const canvasWidth = 1920;
+const canvasHeight = 880;
+const canvasLeft = -canvasWidth / 2;
+const canvasRight = canvasWidth / 2;
+const canvasTop = -canvasHeight;
+const canvasBottom = 0;
 
 function preload() {
     kitten = loadImage('tmp/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif');
@@ -35,6 +39,7 @@ function setup() {
             kitten,
             100,
             100,
+            shdr,
         ));
     }
 
@@ -47,6 +52,7 @@ function whee() {
         kitten,
         100,
         100,
+        shdr,
     ));
 }
 

@@ -12,6 +12,18 @@ const DISTANCER_MAX_LIMITS = {
     maxDistance: 400,
 };
 
+const FINALE_POSITIONS = {
+    leftPadding: 30,
+    rightPadding: 30,
+    dropHeightMin: 30,
+    dropHeightMax: 400,
+    minZ: -200,
+    maxZ: 200,
+};
+
+const FINALE_DROP_SPEED = 5;
+const FINALE_BASE_ROTATION_SPEED = 0.2;
+
 
 class Tornado {
     constructor(image, shader) {
@@ -57,6 +69,13 @@ class Tornado {
 
         this.movementDirection = 1;
         this.movementSpeed = 5;
+
+        this.ended = false;
+        this.inFinale = false;
+        this.finaleDebris = [];
+        this.finaleHighestDebris = null;
+
+        this.running = true;
     }
 
     get sizeFactor() {
@@ -65,6 +84,18 @@ class Tornado {
 
     get height() {
         return canvasHeight * this.sizeFactor;
+    }
+
+    get width() {
+        return canvasHeight * this.sizeFactor;
+    }
+
+    get left() {
+        return this.center.x - this.width / 2;
+    }
+
+    get right() {
+        return this.center.x + this.width / 2;
     }
 
     makeInitialDebrisPosition(debris, center = null) {
@@ -231,13 +262,69 @@ class Tornado {
         }
     }
 
+    initFinaleDebris(debris) {
+        let xPosition = random(canvasLeft + FINALE_POSITIONS.leftPadding, canvasRight - FINALE_POSITIONS.rightPadding);
+        let yPosition = random(canvasTop - FINALE_POSITIONS.dropHeightMin, canvasTop - FINALE_POSITIONS.dropHeightMax);
+        let zPosition = random(FINALE_POSITIONS.minZ, FINALE_POSITIONS.maxZ);
+        debris.position.x = xPosition;
+        debris.position.y = yPosition;
+        debris.position.z = zPosition;
+        console.log(xPosition);
+
+        if (this.finaleHighestDebris === null || debris.position.y < this.finaleHighestDebris.position.y) {
+            this.finaleHighestDebris = debris;
+        }
+    }
+
+    updateFinaleDebris(debris) {
+        debris.position.y += FINALE_DROP_SPEED;
+        debris.rotation.z += FINALE_BASE_ROTATION_SPEED * debris.angularSpeedFactor;
+    }
+
+    showFinale() {
+        for (let debris of this.debris) {
+            if (debris !== null) {
+                this.finaleDebris.push(debris);
+                this.initFinaleDebris(debris);
+            }
+        }
+
+        for (let pendingDebrisData of this.pendingDebris) {
+            this.finaleDebris.push(pendingDebrisData.debris);
+            this.initFinaleDebris(pendingDebrisData.debris);
+        }
+
+        this.inFinale = true;
+    }
+
+    updateFinale() {
+        for (let debris of this.finaleDebris) {
+            this.updateFinaleDebris(debris);
+        }
+
+        for (let debris of this.finaleDebris) {
+            debris.show();
+        }
+
+        if (this.finaleHighestDebris.top > canvasBottom) {
+            this.running = false;
+            console.log("THE END");
+        }
+    }
+
     move() {
         this.center.add(this.movementDirection * this.movementSpeed);
-        if (
-            (this.movementDirection > 0 && this.center.x > this.movementEdges.maxX) ||
-            (this.movementDirection < 0 && this.center.x < this.movementEdges.minX)
-        ) {
-            this.movementDirection *= -1;
+        if (this.ended) {
+            if (this.right < canvasLeft || this.left > canvasRight) {
+                this.showFinale();
+            }
+        } else {
+            if (
+                (this.movementDirection > 0 && this.center.x > this.movementEdges.maxX) ||
+                (this.movementDirection < 0 && this.center.x < this.movementEdges.minX)
+            ) {
+                this.movementDirection *= -1;
+            }
         }
     }
 
@@ -284,7 +371,7 @@ class Tornado {
     }
 
     grow() {
-        if (this.level >= MAX_TORNADO_LEVEL) return;
+        if (this.ended || this.level >= MAX_TORNADO_LEVEL) return;
 
         this.growing = true;
     }
@@ -293,6 +380,10 @@ class Tornado {
         this.level++;
         this.sizeFactorAddition = 0;
         this.growing = false;
+    }
+
+    end() {
+        this.ended = true;
     }
 
     updateSize() {
@@ -305,7 +396,7 @@ class Tornado {
             this.bottom,
             this.bottom + this.height,
             DISTANCER_MAX_LIMITS.minDistance * this.sizeFactor,
-            DISTANCER_MAX_LIMITS.maxDistance * this.sizeFactor
+            DISTANCER_MAX_LIMITS.maxDistance * this.sizeFactor,
         );
 
         if (this.sizeFactor >= TORNADO_SIZE_FACTORS[this.level + 1]) {
@@ -314,10 +405,19 @@ class Tornado {
     }
 
     tick() {
-        this.move();
-        this.updateSize();
-        this.updateDebris();
-        this.show();
+        if (!this.running) return;
+
+        if (this.inFinale) {
+            this.updateFinale();
+        } else {
+            this.move();
+            if (!this.inFinale) {
+                this.updateSize();
+                this.updateDebris();
+                this.show();
+            }
+        }
+
         this.noiseGen.increment();
         this.currentTick++;
     }
