@@ -1,14 +1,38 @@
+const MAX_TORNADO_LEVEL = 4;
+const TORNADO_SIZE_FACTORS = [
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1,
+];
+
+const DISTANCER_MAX_LIMITS = {
+    minDistance: 10,
+    maxDistance: 400,
+};
+
 
 class Tornado {
     constructor(image, shader) {
         this.image = image;
         this.shader = shader;
+        this.level = 0;
+
+        this.sizeFactorAddition = 0;
+        this.growthRate = 0.01;
+        this.growing = false;
+
         this.bottom = 0;
-        this.height = canvasHeight;
-        this.center = createVector(0, -canvasHeight / 2, 0);
+        this.center = createVector(0, -this.height / 2, 0);
         this.noiseGen = new NoiseGenerator();
         this.elevator = new Elevator(-this.height, this.bottom);
-        this.distancer = new Distancer(this.bottom, this.bottom + this.height, 10, 400);
+        this.distancer = new Distancer(
+            this.bottom,
+            this.bottom + this.height,
+            DISTANCER_MAX_LIMITS.minDistance * this.sizeFactor,
+            DISTANCER_MAX_LIMITS.maxDistance * this.sizeFactor
+        );
         this.positioner = new Positioner(this.noiseGen, this.elevator);
         this.spinner = new Spinner();
         this.rotator = new Rotator(this.noiseGen);
@@ -35,10 +59,18 @@ class Tornado {
         this.movementSpeed = 5;
     }
 
+    get sizeFactor() {
+        return TORNADO_SIZE_FACTORS[this.level] + this.sizeFactorAddition;
+    }
+
+    get height() {
+        return canvasHeight * this.sizeFactor;
+    }
+
     makeInitialDebrisPosition(debris, center = null) {
         center = center || this.center;
         let elevation = random(-20 + this.bottom, -this.height * 0.8 + this.bottom);
-        let distance = this.distancer.distanceFromElevation(-elevation)
+        let distance = this.distancer.distanceFromElevation(-elevation);
         return this.positioner.getPositionAroundCenter(
             center,
             distance,
@@ -62,7 +94,7 @@ class Tornado {
         this.noiseGen.fastForward(ticksAhead);
 
         let angle = this.spinner.spin(debris.angle, debris.spinDirection, debris.angularSpeedFactor);
-        let distance = this.distancer.distanceFromElevation(-startingPosition.y)
+        let distance = this.distancer.distanceFromElevation(-startingPosition.y);
         let position = this.positioner.getPositionAroundCenter(
             this.getFuturePosition(ticksAhead),
             distance,
@@ -157,7 +189,7 @@ class Tornado {
         const debris = this.debris[index];
         if (debris === null) return;
         debris.angle = this.spinner.spin(debris.angle, debris.spinDirection, debris.angularSpeedFactor);
-        debris.distance = this.distancer.distanceFromElevation(-debris.position.y)
+        debris.distance = this.distancer.distanceFromElevation(-debris.position.y);
         debris.position = this.positioner.getPositionAroundCenter(
             this.center,
             debris.distance,
@@ -182,7 +214,7 @@ class Tornado {
         }
     }
 
-    update() {
+    updateDebris() {
         for (let i = 0; i < this.debris.length; i++) {
             this.updateDebrisTransform(i);
         }
@@ -232,7 +264,7 @@ class Tornado {
         translate(this.center);
         shader(this.shader);
         texture(this.image);
-        let tornadoSize = min(canvasWidth, canvasHeight);
+        let tornadoSize = this.height;
         plane(tornadoSize, tornadoSize);
         pop();
     }
@@ -251,9 +283,40 @@ class Tornado {
         }
     }
 
+    grow() {
+        if (this.level >= MAX_TORNADO_LEVEL) return;
+
+        this.growing = true;
+    }
+
+    endGrowth() {
+        this.level++;
+        this.sizeFactorAddition = 0;
+        this.growing = false;
+    }
+
+    updateSize() {
+        if (!this.growing) return;
+
+        this.sizeFactorAddition += this.growthRate;
+        this.center.y = -this.height / 2;
+        this.elevator.setLimits(-this.height, this.bottom);
+        this.distancer.setLimits(
+            this.bottom,
+            this.bottom + this.height,
+            DISTANCER_MAX_LIMITS.minDistance * this.sizeFactor,
+            DISTANCER_MAX_LIMITS.maxDistance * this.sizeFactor
+        );
+
+        if (this.sizeFactor >= TORNADO_SIZE_FACTORS[this.level + 1]) {
+            this.endGrowth();
+        }
+    }
+
     tick() {
         this.move();
-        this.update();
+        this.updateSize();
+        this.updateDebris();
         this.show();
         this.noiseGen.increment();
         this.currentTick++;

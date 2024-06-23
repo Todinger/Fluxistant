@@ -1,6 +1,10 @@
 
 class Distancer {
     constructor(minElevation, maxElevation, minDistance, maxDistance) {
+        this.setLimits(minElevation, maxElevation, minDistance, maxDistance);
+    }
+
+    setLimits(minElevation, maxElevation, minDistance, maxDistance) {
         this.minElevation = minElevation;
         this.maxElevation = maxElevation;
         this.minDistance = minDistance;

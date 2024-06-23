@@ -1,6 +1,10 @@
 
 class Elevator {
     constructor(minElevation, maxElevation) {
+        this.setLimits(minElevation, maxElevation);
+    }
+
+    setLimits(minElevation, maxElevation) {
         this.minElevation = minElevation;
         this.maxElevation = maxElevation;
     }
