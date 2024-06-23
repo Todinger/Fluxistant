@@ -12,12 +12,6 @@ class Tornado {
         this.rotator = new Rotator(this.noiseGen);
 
         this.spawnRange = {
-            minX: 0,
-            maxX: 500,
-            minY: -200,
-            maxY: 200,
-            minZ: 100,
-            maxZ: 100,
             minSpeed: 0.01,
             maxSpeed: 0.01,
             minAngle: -3 * PI / 4,
@@ -74,55 +68,6 @@ class Tornado {
     addDebris(debris) {
         debris.position = this.makeInitialDebrisPosition(debris);
         this.debris.push(debris);
-    }
-
-    _addPendingDebrisV1(debris) {
-        let initialDebrisTornadoPosition = this.makeInitialDebrisPosition(debris);
-        let spawnOffset = {
-            x: random(this.spawnRange.minX, this.spawnRange.maxX),
-            y: random(this.spawnRange.minY, this.spawnRange.maxY),
-            z: random(this.spawnRange.minZ, this.spawnRange.maxZ),
-        };
-        if (initialDebrisTornadoPosition.x < this.center.x) {
-            spawnOffset.x *= -1;
-        }
-        let spawnPoint = createVector(
-            mainCamera.eyeX + spawnOffset.x,
-            mainCamera.eyeY + spawnOffset.y,
-            mainCamera.eyeZ + spawnOffset.z,
-        );
-
-        // Calculate an ellipse that goes through the spawn point and the initial point
-        // of the debris inside the tornado, assuming they are at the same height (they
-        // aren't, but the Y value will be interpolated linearly between the spawn point
-        // and the destination initial point)
-        let [asq, bsq] = ellipseFromPoints(
-            initialDebrisTornadoPosition.x, initialDebrisTornadoPosition.z,
-            spawnPoint.x, spawnPoint.z,
-        );
-        const a = sqrt(abs(asq)) * Math.sign(asq);
-        const b = sqrt(abs(bsq)) * Math.sign(bsq);
-        let tStart = parameterizePointOnEllipse(a, spawnPoint.x);
-        let tEnd = parameterizePointOnEllipse(a, initialDebrisTornadoPosition.x);
-        let speed = random(this.spawnRange.minSpeed, this.spawnRange.maxSpeed);
-        let csp = getPointOnEllipseAtY(a, b, tStart, spawnPoint.y);
-        console.log(`a = ${a}, b = ${b}, t = ${tStart}, spawn = (${spawnPoint.x}, ${spawnPoint.y}, ${spawnPoint.z}), csp = (${csp.x}, ${csp.y}, ${csp.z})`);
-
-        let pendingDebrisData = {
-            debris,
-            index: this.debris.length,
-            pendingIndex: this.pendingDebris.length,
-            ellipse: [a, b],
-            speed,
-            tStart,
-            tEnd,
-            yStart: spawnPoint.y,
-            yEnd: initialDebrisTornadoPosition.y,
-            alpha: 0,
-        };
-
-        this.pendingDebris.push(pendingDebrisData);
-        this.debris.push(null);
     }
 
     _getSpawnPointParameterForX(initialPoint, movementDirection, spawnX) {
@@ -211,22 +156,6 @@ class Tornado {
         );
 
         debris.rotation = this.rotator.rotate(debris.rotation, index);
-    }
-
-    updatePendingDebrisTransformV1(pendingDebrisData) {
-        let alpha = min(1, pendingDebrisData.alpha + pendingDebrisData.speed);
-        let [a, b] = pendingDebrisData.ellipse;
-        let t = pendingDebrisData.tStart + (pendingDebrisData.tEnd - pendingDebrisData.tStart) * alpha;
-        let y = pendingDebrisData.yStart + (pendingDebrisData.yEnd - pendingDebrisData.yStart) * alpha;
-        pendingDebrisData.debris.position = getPointOnEllipseAtY(a, b, t, y);
-        // console.log(`alpha = ${alpha}, a = ${a}, b = ${b}, t = ${t}, pos = (${pos.x}, ${pos.y}, ${pos.z})`);
-
-        pendingDebrisData.alpha = alpha;
-
-        if (alpha === 1) {
-            this.debris[pendingDebrisData.index] = pendingDebrisData.debris;
-            this.pendingDebris.splice(pendingDebrisData.pendingIndex, 1);
-        }
     }
 
     updatePendingDebrisTransform(pendingDebrisData) {
