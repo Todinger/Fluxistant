@@ -16,4 +16,14 @@ class NoiseGenerator {
         this.xoff += xoff;
         this.yoff += yoff;
     }
+
+    fastForward(times, xoff = DEFAULT_INCREMENT_X, yoff = DEFAULT_INCREMENT_Y) {
+        this.xoff += xoff * times;
+        this.yoff += yoff * times;
+    }
+
+    rewind(times, xoff = DEFAULT_INCREMENT_X, yoff = DEFAULT_INCREMENT_Y) {
+        this.xoff -= xoff * times;
+        this.yoff -= yoff * times;
+    }
 }

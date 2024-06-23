@@ -1,11 +1,10 @@
 class Debris {
-    constructor(tornado, center, image, imageWidth, imageHeight) {
-        this.center = center;
+    constructor(tornado, image, imageWidth, imageHeight) {
         this.position = createVector(0, 0, 0);
         this.rotation = createVector(0, 0, 0);
         this.angle = random(0, 2 * PI);
         this.angularSpeedFactor = random(0.3, 2);
-        this.distance = random(10, 400);
+        this.distance = 0;
         this.spinDirection = -1;
 
         this.image = image;

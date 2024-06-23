@@ -4,13 +4,14 @@ let kitten;
 let tornado;
 let tornadoImage;
 
-const DEBRIS_COUNT = 10;
+const DEBRIS_COUNT = 0;
 
 let center;
 
 let buf;
 let font;
 let shdr;
+let mainCamera;
 
 function preload() {
     kitten = loadImage('tmp/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif');
@@ -23,12 +24,11 @@ function setup() {
     // renderer.canvas.getContext('2d', { willReadFrequently: true });
     createCanvas(1920, 880, WEBGL);
     tornado = new Tornado();
-    center = createVector(0, -height / 2 ,0);
+    center = tornado.center;
 
     for (let i = 0; i < DEBRIS_COUNT; i++) {
         tornado.addDebris(new Debris(
             tornado,
-            center,
             kitten,
             100,
             100,
@@ -36,6 +36,16 @@ function setup() {
     }
 
     shdr = createShader(vert, frag);
+    mainCamera = createCamera();
+}
+
+function whee() {
+    tornado.throwIn(new Debris(
+        tornado,
+        kitten,
+        100,
+        100,
+    ));
 }
 
 /*
@@ -64,7 +74,7 @@ function draw() {
 function draw() {
     background(120);
     // camera(width/2, height/2, (height/2) / tan(PI/6), width/2, height/2, 0, 0, 1, 0);
-    camera(0, -height / 2, 800, 0, -height / 2, 0, 0, 1, 0);
+    mainCamera.camera(0, -height / 2, 800, 0, -height / 2, 0, 0, 1, 0);
     ambientLight(255);
     // directionalLight(255, 255, 255, 0, 0, 1);
     noStroke();
