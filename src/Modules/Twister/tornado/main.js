@@ -12,6 +12,8 @@ let buf;
 let font;
 let shdr;
 let mainCamera;
+let canvasWidth = 1920;
+let canvasHeight = 880;
 
 function preload() {
     kitten = loadImage('tmp/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif');
@@ -22,7 +24,7 @@ function setup() {
     // setAttributes('willReadFrequently', true);
     // let renderer = createCanvas(1920, 880, WEBGL);
     // renderer.canvas.getContext('2d', { willReadFrequently: true });
-    createCanvas(1920, 880, WEBGL);
+    createCanvas(canvasWidth, canvasHeight, WEBGL);
     shdr = createShader(vert, frag);
     tornado = new Tornado(tornadoImage, shdr);
     center = tornado.center;

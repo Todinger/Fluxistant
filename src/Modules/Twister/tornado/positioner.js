@@ -37,13 +37,12 @@ class Positioner {
             this.axisRegions.z,
         );
 
-        let x = (radius + xNoise * this.noiseScale.x) * Math.cos(angle);
+        let x = center.x + (radius + xNoise * this.noiseScale.x) * Math.cos(angle);
         const elevationDirectionOverride = this.elevator.getElevationDirectionOverride(center, elevation);
         const elevationDiff = yNoise * this.noiseScale.y;
         const elevationDirection = elevationDirectionOverride !== 0 ? elevationDirectionOverride : Math.sign(elevationDiff);
-        // console.log(`Override: ${elevationDirectionOverride} | eldir: ${elevationDirection}`);
         let y = elevation + abs(elevationDiff) * elevationDirection;
-        let z = (radius + zNoise * this.noiseScale.z) * Math.sin(angle);
+        let z = center.z + (radius + zNoise * this.noiseScale.z) * Math.sin(angle);
 
         return createVector(x, y, z);
     }

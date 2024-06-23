@@ -4,8 +4,8 @@ class Tornado {
         this.image = image;
         this.shader = shader;
         this.bottom = 0;
-        this.height = height;
-        this.center = createVector(0, -height / 2, 0);
+        this.height = canvasHeight;
+        this.center = createVector(0, -canvasHeight / 2, 0);
         this.noiseGen = new NoiseGenerator();
         this.elevator = new Elevator(-this.height, this.bottom);
         this.distancer = new Distancer(this.bottom, this.bottom + this.height, 10, 400);
@@ -25,13 +25,22 @@ class Tornado {
         this.pendingDebris = [];
 
         this.currentTick = 0;
+
+        this.movementEdges = {
+            minX: -canvasWidth / 2 + 100,
+            maxX: canvasWidth / 2 - 100,
+        }
+
+        this.movementDirection = 1;
+        this.movementSpeed = 5;
     }
 
-    makeInitialDebrisPosition(debris) {
+    makeInitialDebrisPosition(debris, center = null) {
+        center = center || this.center;
         let elevation = random(-20 + this.bottom, -this.height * 0.8 + this.bottom);
         let distance = this.distancer.distanceFromElevation(-elevation)
         return this.positioner.getPositionAroundCenter(
-            this.center,
+            center,
             distance,
             debris.angle,
             elevation,
@@ -41,7 +50,7 @@ class Tornado {
 
     makeFutureInitialDebrisPosition(debris, ticksAhead) {
         this.noiseGen.fastForward(ticksAhead);
-        let position = this.makeInitialDebrisPosition(debris);
+        let position = this.makeInitialDebrisPosition(debris, this.getFuturePosition(ticksAhead));
         this.noiseGen.rewind(ticksAhead);
         return position;
     }
@@ -55,7 +64,7 @@ class Tornado {
         let angle = this.spinner.spin(debris.angle, debris.spinDirection, debris.angularSpeedFactor);
         let distance = this.distancer.distanceFromElevation(-startingPosition.y)
         let position = this.positioner.getPositionAroundCenter(
-            this.center,
+            this.getFuturePosition(ticksAhead),
             distance,
             angle,
             startingPosition.y,
@@ -105,11 +114,11 @@ class Tornado {
         let p = initialDebrisTornadoPosition;
         let d = movementDirection;
 
-        testedSpawnPointParameter = this._getSpawnPointParameterForX(p, d, -width / 2 - this.spawnRange.outerDistance);
+        testedSpawnPointParameter = this._getSpawnPointParameterForX(p, d, -canvasWidth / 2 - this.spawnRange.outerDistance);
         if (testedSpawnPointParameter > 0 && (t === 0 || testedSpawnPointParameter < t)) {
             t = testedSpawnPointParameter;
         }
-        testedSpawnPointParameter = this._getSpawnPointParameterForX(p, d, width / 2 + this.spawnRange.outerDistance);
+        testedSpawnPointParameter = this._getSpawnPointParameterForX(p, d, canvasWidth / 2 + this.spawnRange.outerDistance);
         if (testedSpawnPointParameter > 0 && (t === 0 || testedSpawnPointParameter < t)) {
             t = testedSpawnPointParameter;
         }
@@ -190,18 +199,46 @@ class Tornado {
         }
     }
 
-    _showTornado() {
+    move() {
+        this.center.add(this.movementDirection * this.movementSpeed);
+        if (
+            (this.movementDirection > 0 && this.center.x > this.movementEdges.maxX) ||
+            (this.movementDirection < 0 && this.center.x < this.movementEdges.minX)
+        ) {
+            this.movementDirection *= -1;
+        }
+    }
+
+    getFuturePosition(ticksAhead) {
+        const ticksPerScreenMovement = Math.ceil(
+            (this.movementEdges.maxX - this.movementEdges.minX) / this.movementSpeed
+        );
+        const ticksPerMovementCycle = 2 * ticksPerScreenMovement;
+        ticksAhead = ticksAhead % ticksPerMovementCycle;
+
+        let futureX;
+        let unboundedFuturePosition = this.center.x + this.movementDirection * this.movementSpeed * ticksAhead;
+        if (this.movementEdges.minX <= unboundedFuturePosition && unboundedFuturePosition <= this.movementEdges.maxX) {
+            futureX = unboundedFuturePosition;
+        } else {
+            futureX = 2 * this.movementEdges.minX - unboundedFuturePosition;
+        }
+
+        return createVector(futureX, this.center.y, this.center.z);
+    }
+
+    showTornado() {
         push();
         translate(this.center);
         shader(this.shader);
         texture(this.image);
-        let tornadoSize = min(width, height);
+        let tornadoSize = min(canvasWidth, canvasHeight);
         plane(tornadoSize, tornadoSize);
         pop();
     }
 
     show() {
-        this._showTornado();
+        this.showTornado();
 
         for (let debris of this.debris) {
             if (debris !== null) {
@@ -215,6 +252,7 @@ class Tornado {
     }
 
     tick() {
+        this.move();
         this.update();
         this.show();
         this.noiseGen.increment();
