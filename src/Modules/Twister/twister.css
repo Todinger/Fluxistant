@@ -1,0 +1,82 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+#frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: hidden;
+}
+
+#main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    pointer-events: none;
+}
+
+#title {
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 2em;
+    color: var(--title-color, black);
+    font-family: "Segoe UI Emoji", sans-serif;
+    text-align: center;
+    pointer-events: all;
+}
+
+#content {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    pointer-events: all;
+}
+
+#level, #timer {
+    width: 50px;
+    text-align: center;
+    color: var(--text-color, black);
+    outline: var(--text-outline-width, 1px) solid var(--text-outline-color, black);
+    pointer-events: all;
+}
+
+#progress-container {
+    width: 200px;
+    height: 20px;
+    border: 2px solid var(--progress-border-color, black);
+    margin: 0 10px;
+    position: relative;
+    overflow: hidden;
+    pointer-events: all;
+}
+
+#progress-bar {
+    height: 100%;
+    background-color: var(--progress-color, lightgreen);
+    width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    pointer-events: all;
+}
+
+#progress-text {
+    margin-right: 5px;
+    color: black;
+    white-space: nowrap;
+    pointer-events: all;
+}

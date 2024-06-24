@@ -12,19 +12,30 @@ let buf;
 let font;
 let alphaShader;
 let mainCamera;
-const canvasWidth = 1920;
-const canvasHeight = 880;
-const canvasLeft = -canvasWidth / 2;
-const canvasRight = canvasWidth / 2;
-const canvasTop = -canvasHeight;
-const canvasBottom = 0;
+let canvasWidth;
+let canvasHeight;
+let canvasLeft = -canvasWidth / 2;
+let canvasRight = canvasWidth / 2;
+let canvasTop = -canvasHeight;
+let canvasBottom = 0;
+
+let assets;
 
 function preload() {
-    kitten = loadImage('tmp/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif');
+    assets = {
+        rogue: loadImage('tmp/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif'),
+        barbarian: loadImage('tmp/skinFullBarbarianYecatsmailbox_attack.8fce65e213f2.gif'),
+    }
     tornadoImage = loadImage('assets/pixel-tornado.gif');
 }
 
 function setup() {
+    canvasWidth = windowWidth;
+    canvasHeight = windowHeight;
+    canvasLeft = -canvasWidth / 2;
+    canvasRight = canvasWidth / 2;
+    canvasTop = -canvasHeight;
+    canvasBottom = 0;
     createCanvas(canvasWidth, canvasHeight, WEBGL);
     alphaShader = createShader(vert, frag);
     tornado = new Tornado(tornadoImage, alphaShader);
@@ -46,7 +57,18 @@ function setup() {
 function whee() {
     tornado.throwIn(new Debris(
         tornado,
-        kitten,
+        assets.rogue,
+        100,
+        100,
+        alphaShader,
+    ));
+}
+
+function throwIn(skinName) {
+    if (!(skinName in assets)) return;
+    tornado.throwIn(new Debris(
+        tornado,
+        assets[skinName],
         100,
         100,
         alphaShader,
@@ -61,3 +83,19 @@ function draw() {
 
     tornado.tick();
 }
+
+
+
+const eventHandlers = {
+    start: () => tornado.start(),
+    end: () => tornado.end(),
+    throwIn,
+};
+
+
+window.addEventListener('message', function(e) {
+    let event = e.data[0];
+    if (!(event in eventHandlers)) return;
+    let argument = e.data[1];
+    eventHandlers[event](argument);
+}, false);
