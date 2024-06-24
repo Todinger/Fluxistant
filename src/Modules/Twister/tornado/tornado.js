@@ -211,6 +211,8 @@ class Tornado {
     }
 
     throwIn(debris) {
+        if (!this.running) return;
+
         this._addPendingDebris(debris);
     }
 
@@ -267,7 +269,6 @@ class Tornado {
         debris.position.x = xPosition;
         debris.position.y = yPosition;
         debris.position.z = zPosition;
-        console.log(xPosition);
 
         if (this.finaleHighestDebris === null || debris.position.y < this.finaleHighestDebris.position.y) {
             this.finaleHighestDebris = debris;
