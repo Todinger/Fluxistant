@@ -27,28 +27,15 @@ const FINALE_BASE_ROTATION_SPEED = 0.2;
 
 class Tornado {
     constructor(image, shader) {
+        // --- Assets ---
         this.image = image;
         this.shader = shader;
-        this.level = 0;
 
-        this.sizeFactorAddition = 0;
-        this.growthRate = 0.01;
-        this.growing = false;
-
-        this.bottom = 0;
-        this.center = createVector(0, -this.height / 2, 0);
-        this.noiseGen = new NoiseGenerator();
-        this.elevator = new Elevator(-this.height, this.bottom);
-        this.distancer = new Distancer(
-            this.bottom,
-            this.bottom + this.height,
-            DISTANCER_MAX_LIMITS.minDistance * this.sizeFactor,
-            DISTANCER_MAX_LIMITS.maxDistance * this.sizeFactor
-        );
-        this.positioner = new Positioner(this.noiseGen, this.elevator);
-        this.spinner = new Spinner();
-        this.rotator = new Rotator(this.noiseGen);
-
+        // --- "Constants" (well, configuration we don't change) ---
+        this.movementEdges = {
+            minX: -canvasWidth / 2 + 100,
+            maxX: canvasWidth / 2 - 100,
+        }
         this.spawnRange = {
             minSpeed: 0.01,
             maxSpeed: 0.01,
@@ -56,26 +43,37 @@ class Tornado {
             maxAngle: PI / 2,
             outerDistance: 100,
         };
-
-        this.debris = [];
-        this.pendingDebris = [];
-
-        this.currentTick = 0;
-
-        this.movementEdges = {
-            minX: -canvasWidth / 2 + 100,
-            maxX: canvasWidth / 2 - 100,
-        }
-
-        this.movementDirection = 1;
+        this.growthRate = 0.01;
+        this.bottom = 0;
         this.movementSpeed = 5;
 
+        // --- Reused objects ---
+        this.noiseGen = new NoiseGenerator();
+        this.elevator = new Elevator();
+        this.distancer = new Distancer();
+        this.positioner = new Positioner(this.noiseGen, this.elevator);
+        this.spinner = new Spinner();
+        this.rotator = new Rotator(this.noiseGen);
+
+        // --- State ---
+        // This is intentional duplication - the logic should be in resetState(),
+        // but I want the variables and initial values here too for visibility of
+        // the properties of the class instance
+        // noinspection DuplicatedCode
+        this.currentTick = 0;
+        this.level = 0;
+        this.center = createVector(0, -this.height / 2, 0);
+        this.sizeFactorAddition = 0;
+        this.growing = false;
+        this.debris = [];
+        this.pendingDebris = [];
+        this.movementDirection = 1;
         this.ended = false;
         this.inFinale = false;
         this.finaleDebris = [];
         this.finaleHighestDebris = null;
 
-        this.running = true;
+        this.running = false;
     }
 
     get sizeFactor() {
@@ -306,7 +304,7 @@ class Tornado {
             debris.show();
         }
 
-        if (this.finaleHighestDebris.top > canvasBottom) {
+        if (this.finaleHighestDebris === null || this.finaleHighestDebris.top > canvasBottom) {
             this.running = false;
             console.log("THE END");
         }
@@ -391,13 +389,7 @@ class Tornado {
 
         this.sizeFactorAddition += this.growthRate;
         this.center.y = -this.height / 2;
-        this.elevator.setLimits(-this.height, this.bottom);
-        this.distancer.setLimits(
-            this.bottom,
-            this.bottom + this.height,
-            DISTANCER_MAX_LIMITS.minDistance * this.sizeFactor,
-            DISTANCER_MAX_LIMITS.maxDistance * this.sizeFactor,
-        );
+        this.refreshLimits();
 
         if (this.sizeFactor >= TORNADO_SIZE_FACTORS[this.level + 1]) {
             this.endGrowth();
@@ -420,5 +412,38 @@ class Tornado {
 
         this.noiseGen.increment();
         this.currentTick++;
+    }
+
+    refreshLimits() {
+        this.elevator.setLimits(-this.height, this.bottom);
+        this.distancer.setLimits(
+            this.bottom,
+            this.bottom + this.height,
+            DISTANCER_MAX_LIMITS.minDistance * this.sizeFactor,
+            DISTANCER_MAX_LIMITS.maxDistance * this.sizeFactor,
+        );
+    }
+
+    resetState() {
+        this.currentTick = 0;
+        this.level = 0;
+        this.center = createVector(0, -this.height / 2, 0);
+        this.sizeFactorAddition = 0;
+        this.growing = false;
+        this.debris = [];
+        this.pendingDebris = [];
+        this.movementDirection = 1;
+        this.ended = false;
+        this.inFinale = false;
+        this.finaleDebris = [];
+        this.finaleHighestDebris = null;
+
+        this.refreshLimits();
+    }
+
+    start() {
+        if (this.running) return;
+        this.resetState();
+        this.running = true;
     }
 }

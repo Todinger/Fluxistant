@@ -1,7 +1,7 @@
 
 class Elevator {
-    constructor(minElevation, maxElevation) {
-        this.setLimits(minElevation, maxElevation);
+    constructor() {
+        this.setLimits(0, 0);
     }
 
     setLimits(minElevation, maxElevation) {
