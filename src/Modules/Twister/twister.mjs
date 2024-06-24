@@ -10,7 +10,15 @@
 export function setProgress(progress) {
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
-    progressBar.style.width = `${progress}%`;
+    progressBar.style.clipPath = `inset(0% ${progress < 100 ? 100 - progress : -1}% 0% 0%)`;
+
+    // Adjust the position of the progress text
+    const progressContainer = document.getElementById('progress-container');
+    const containerWidth = progressContainer.offsetWidth;
+    const newRight = containerWidth * (1 - progress / 100) + 5; // 5px for margin
+    progressText.style.left = "";
+    progressText.style.right = `${Math.max(newRight, 5)}px`; // Ensure it doesn't go out of bounds
+
     progressText.textContent = `${progress}%`;
 }
 

@@ -76,7 +76,8 @@ function throwIn(skinName) {
 }
 
 function draw() {
-    background(120);
+    // background(120);
+    background(0, 0, 0, 0);
     mainCamera.camera(0, -height / 2, 800, 0, -height / 2, 0, 0, 1, 0);
     ambientLight(255);
     noStroke();

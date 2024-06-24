@@ -31,10 +31,11 @@ html, body {
 
 #title {
     margin-top: 20px;
-    font-weight: bold;
-    font-size: 2em;
+    font-family: "Black Ops One", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 4em;
     color: var(--title-color, black);
-    font-family: "Segoe UI Emoji", sans-serif;
     text-align: center;
     pointer-events: all;
 }
@@ -66,17 +67,23 @@ html, body {
 
 #progress-bar {
     height: 100%;
-    background-color: var(--progress-color, lightgreen);
-    width: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    background: linear-gradient(to right, #e75858, #d7ac5d, #fafa5d, #68ea68, #7474e7, #9057be, #d773d7);
+    width: 100%;
+    clip-path: inset(0% 100% 0% 0%);
+    position: relative;
     pointer-events: all;
+    transition: clip-path 0.3s;
 }
 
 #progress-text {
+    position: absolute;
+    right: 110%;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
     margin-right: 5px;
     color: black;
     white-space: nowrap;
     pointer-events: all;
+    transition: right 0.3s;
 }
