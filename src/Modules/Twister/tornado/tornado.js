@@ -1,4 +1,5 @@
 const MAX_TORNADO_LEVEL = 4;
+const TORNADO_STARTING_DISTANCE = 300;
 const TORNADO_SIZE_FACTORS = [
     0.2,
     0.4,
@@ -63,7 +64,6 @@ class Tornado {
         // noinspection DuplicatedCode
         this.currentTick = 0;
         this.level = 0;
-        this.center = createVector(0, -this.height / 2, 0);
         this.sizeFactorAddition = 0;
         this.growing = false;
         this.debris = [];
@@ -73,6 +73,7 @@ class Tornado {
         this.inFinale = false;
         this.finaleDebris = [];
         this.finaleHighestDebris = null;
+        this.center = createVector(canvasLeft - this.width / 2 - TORNADO_STARTING_DISTANCE, -this.height / 2, 0);
 
         this.running = false;
     }
@@ -433,9 +434,12 @@ class Tornado {
     }
 
     resetState() {
+        // This is intentional duplication - the logic should be in resetState(),
+        // but I want the variables and initial values here too for visibility of
+        // the properties of the class instance
+        // noinspection DuplicatedCode
         this.currentTick = 0;
         this.level = 0;
-        this.center = createVector(0, -this.height / 2, 0);
         this.sizeFactorAddition = 0;
         this.growing = false;
         this.debris = [];
@@ -445,6 +449,7 @@ class Tornado {
         this.inFinale = false;
         this.finaleDebris = [];
         this.finaleHighestDebris = null;
+        this.center = createVector(canvasLeft - this.width / 2 - TORNADO_STARTING_DISTANCE, -this.height / 2, 0);
 
         this.refreshLimits();
     }
