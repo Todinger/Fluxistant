@@ -29,6 +29,7 @@ class Timer {
 	
 	_setImpl(duration, callback) {
 		Errors.abstract();
+		return null;
 	}
 	
 	// Starts the timer, calling callback() in <duration> milliseconds.
