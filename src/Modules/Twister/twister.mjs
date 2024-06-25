@@ -1,94 +1,113 @@
-// import { ModuleClient } from "/common/moduleClient.mjs";
-
-
-// const TRANSPARENT_PIXEL_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-// const NO_IMAGE = TRANSPARENT_PIXEL_IMAGE;
-// const NO_IMAGE_OBJECT = {url: NO_IMAGE};
-
-
-// Function to set the progress of the progress bar
-export function setProgress(progress) {
-    const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
-    progressBar.style.clipPath = `inset(0% ${progress < 100 ? 100 - progress : -1}% 0% 0%)`;
-
-    // Adjust the position of the progress text
-    const progressContainer = document.getElementById('progress-container');
-    const containerWidth = progressContainer.offsetWidth;
-    const newRight = containerWidth * (1 - progress / 100) + 5; // 5px for margin
-    progressText.style.left = "";
-    progressText.style.right = `${Math.max(newRight, 5)}px`; // Ensure it doesn't go out of bounds
-
-    progressText.textContent = `${progress}%`;
-}
-
-const iframe = document.getElementById('frame');
-
-function send(eventName, arg) {
-    iframe.contentWindow.postMessage([eventName, arg], "*");
-}
-
-
-let currentLevel = 1;
-const levelElement = document.getElementById('level');
-const timerElement = document.getElementById('timer');
-const titleElement = document.getElementById('title');
-
-
-function grow() {
-    send("grow");
-    levelElement.classList.remove(`ef${currentLevel}`);
-    timerElement.classList.remove(`timer-ef${currentLevel}`);
-    currentLevel = Math.min(currentLevel + 1, 5);
-    levelElement.classList.add(`ef${currentLevel}`);
-    timerElement.classList.add(`timer-ef${currentLevel}`);
-    levelElement.textContent = `EF${currentLevel}`;
-}
-
-window.send = send;
-
-window.t = {
-    start: () => send("start"),
-    end: () => send("end"),
-    throwIn: (skinName) => send("throwIn", skinName),
-    grow,
-};
-
-window.sp = setProgress;
-
-window.g = function() {
-    const level = document.getElementById('level');
-    level.classList.add("glowy");
-}
+import { ModuleClient } from "/common/moduleClient.mjs";
 
 const WATCH_TEXT = "🌪️ TORNADO WATCH! 🌪️";
 const WARNING_TEXT = "⚠️ TORNADO WARNING! ⚠️";
 
-window.watch = function () {
-    titleElement.textContent = WATCH_TEXT;
-    titleElement.classList.add("watch");
-    titleElement.classList.remove("warn");
-}
-
-window.warn = function () {
-    titleElement.textContent = WARNING_TEXT;
-    titleElement.classList.add("warn");
-    titleElement.classList.remove("watch");
-}
+const FADE_DURATION = 500;
 
 
-/*
 class Twister extends ModuleClient {
     constructor() {
         super('Twister');
+
+        this.currentLevel = 1;
+
+        this.elements = {
+            jMain: $("#main"),
+            iframe: document.getElementById('frame'),
+            level: document.getElementById('level'),
+            timer: document.getElementById('timer'),
+            title: document.getElementById('title'),
+            progressBar: document.getElementById('progress-bar'),
+            progressText: document.getElementById('progress-text'),
+            progressContainer: document.getElementById('progress-container'),
+        };
     }
 
-    windowLoaded() {
-        this.toIdle();
+    sendToChild(eventName, arg) {
+        this.elements.iframe.contentWindow.postMessage([eventName, arg], "*");
+    }
+
+    toWatch() {
+        this.elements.title.textContent = WATCH_TEXT;
+        this.elements.title.classList.add("watch");
+        this.elements.title.classList.remove("warn");
+    }
+
+    showWatch() {
+        this.toWatch();
+        this.show();
+    }
+
+    toWarn() {
+        this.elements.title.textContent = WARNING_TEXT;
+        this.elements.title.classList.add("warn");
+        this.elements.title.classList.remove("watch");
+    }
+
+    showWarn() {
+        this.toWarn();
+        this.show();
+    }
+
+    startTornado() {
+        this.sendToChild("start");
+        this.toWarn();
+    }
+
+    throwIn(skinName) {
+        this.sendToChild("throwIn", skinName);
+    }
+
+    setProgress(progress) {
+        progress = Math.max(0, Math.min(progress, 100));
+        this.elements.progressBar.style.clipPath = `inset(0% ${progress < 100 ? 100 - progress : -1}% 0% 0%)`;
+
+        // Adjust the position of the progress text
+        const containerWidth = this.elements.progressContainer.offsetWidth;
+        const newRight = containerWidth * (1 - progress / 100) + 5; // 5px for margin
+        this.elements.progressText.style.left = "";
+        this.elements.progressText.style.right = `${Math.max(newRight, 5)}px`; // Ensure it doesn't go out of bounds
+
+        this.elements.progressText.textContent = `${progress}%`;
+    }
+
+    grow() {
+        this.sendToChild("grow");
+        this.elements.level.classList.remove(`ef${this.currentLevel}`);
+        this.elements.timer.classList.remove(`timer-ef${this.currentLevel}`);
+        this.currentLevel = Math.min(this.currentLevel + 1, 5);
+        this.elements.level.classList.add(`ef${this.currentLevel}`);
+        this.elements.timer.classList.add(`timer-ef${this.currentLevel}`);
+        this.elements.level.textContent = `EF${this.currentLevel}`;
+    }
+
+    endTornado() {
+        this.sendToChild("end");
+    }
+
+    _onTornadoFinaleDone() {
+        this.hide();
+        this.toWatch();
+    }
+
+    show() {
+        this.elements.jMain.fadeIn(FADE_DURATION);
+    }
+
+    hide() {
+        this.elements.jMain.fadeOut(FADE_DURATION);
     }
 
     start() {
-        // this.server.on('setData', (data) => this.setData(data));
+        this.server.on('watch', () => this.showWatch());
+        this.server.on('warn', () => this.showWarn());
+        this.server.on('startTornado', () => this.startTornado());
+        this.server.on('throwIn', (skinName) => this.throwIn(skinName));
+        this.server.on('grow', () => this.grow());
+        this.server.on('endTornado', () => this.endTornado());
+        this.server.on('show', () => this.show());
+        this.server.on('hide', () => this.hide());
         this.server.attach();
     }
 }
@@ -96,4 +115,3 @@ class Twister extends ModuleClient {
 const t = new Twister();
 t.start();
 window.t = t;
-*/
