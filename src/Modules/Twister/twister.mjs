@@ -7,6 +7,14 @@ const TORNADO_WARNING_FLASHES = 5;
 const FADE_DURATION = 500;
 
 
+function formatTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const secondsString = `${seconds < 10 ? "0" : ""}${seconds}`;
+    return `${minutes}:${secondsString}`;
+}
+
+
 class Twister extends ModuleClient {
     constructor() {
         super('Twister');
@@ -17,7 +25,7 @@ class Twister extends ModuleClient {
             jMain: $("#main"),
             iframe: document.getElementById('frame'),
             level: document.getElementById('level'),
-            timer: document.getElementById('timer'),
+            jTimer: $('#timer'),
             jTitle: $('#title'),
             progressBar: document.getElementById('progress-bar'),
             progressText: document.getElementById('progress-text'),
@@ -25,6 +33,9 @@ class Twister extends ModuleClient {
         };
 
         window.addEventListener('message', (e) => this._onChildEventMessage(e), false);
+
+        this.timerHandle = null;
+        this.timeLeft = 0;
     }
 
     sendToChild(eventName, arg) {
@@ -53,7 +64,7 @@ class Twister extends ModuleClient {
         this.show();
     }
 
-    startTornado() {
+    startTornado(duration) {
         let jCombo = this.elements.jTitle;
         jCombo = jCombo.fadeOut(FADE_DURATION, () => this.toWarn());
         jCombo = jCombo.fadeIn(FADE_DURATION);
@@ -61,7 +72,12 @@ class Twister extends ModuleClient {
             jCombo = jCombo.fadeOut(FADE_DURATION);
             jCombo = jCombo.fadeIn(FADE_DURATION);
         }
-        $.when(jCombo).then(() => this.sendToChild("start"));
+        $.when(jCombo).then(() => this._activateTornado(duration));
+    }
+
+    _activateTornado(duration) {
+        this.setTimer(duration);
+        this.sendToChild("start");
     }
 
     throwIn(skinName) {
@@ -81,18 +97,39 @@ class Twister extends ModuleClient {
         this.elements.progressText.textContent = `${progress}%`;
     }
 
-    grow() {
+    grow(newDuration) {
         this.sendToChild("grow");
         this.elements.level.classList.remove(`ef${this.currentLevel}`);
-        this.elements.timer.classList.remove(`timer-ef${this.currentLevel}`);
+        this.elements.jTimer.removeClass(`timer-ef${this.currentLevel}`);
         this.currentLevel = Math.min(this.currentLevel + 1, 5);
         this.elements.level.classList.add(`ef${this.currentLevel}`);
-        this.elements.timer.classList.add(`timer-ef${this.currentLevel}`);
+        this.elements.jTimer.addClass(`timer-ef${this.currentLevel}`);
         this.elements.level.textContent = `EF${this.currentLevel}`;
+
+        this.setTimer(newDuration);
     }
 
     endTornado() {
         this.sendToChild("end");
+    }
+
+    setTimer(time) {
+        this.timeLeft = time;
+        this._updateTimeText();
+        if (this.timerHandle !== null) {
+            clearInterval(this.timerHandle);
+        }
+
+        this.timerHandle = setInterval(() => this._timerTick(), 1000);
+    }
+
+    _timerTick() {
+        this.timeLeft = Math.max(0, this.timeLeft - 1);
+        this._updateTimeText();
+    }
+
+    _updateTimeText() {
+        this.elements.jTimer.text(formatTime(this.timeLeft));
     }
 
     _onChildEventMessage(e) {
@@ -103,7 +140,16 @@ class Twister extends ModuleClient {
     }
 
     _onTornadoFinaleDone() {
-        this.hide(() => this.toWatch());
+        this.hide(() => this._clearState());
+    }
+
+    _clearState() {
+        this.toWatch();
+        this.elements.jTimer.text("");
+        if (this.timerHandle !== null) {
+            clearInterval(this.timerHandle);
+            this.timerHandle = null;
+        }
     }
 
     show() {
@@ -117,9 +163,9 @@ class Twister extends ModuleClient {
     start() {
         this.server.on('watch', () => this.showWatch());
         this.server.on('warn', () => this.showWarn());
-        this.server.on('startTornado', () => this.startTornado());
+        this.server.on('startTornado', (duration) => this.startTornado(duration));
         this.server.on('throwIn', (skinName) => this.throwIn(skinName));
-        this.server.on('grow', () => this.grow());
+        this.server.on('grow', (newDuration) => this.grow(newDuration));
         this.server.on('endTornado', () => this.endTornado());
         this.server.on('show', () => this.show());
         this.server.on('hide', () => this.hide());
