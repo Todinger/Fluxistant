@@ -33,7 +33,7 @@ function setup() {
     canvasBottom = 0;
     createCanvas(canvasWidth, canvasHeight, WEBGL);
     alphaShader = createShader(vert, frag);
-    tornado = new Tornado(assets.tornado, alphaShader);
+    tornado = new Tornado(assets.tornado, alphaShader, tornadoFinaleDone);
     center = tornado.center;
 
     for (let i = 0; i < DEBRIS_COUNT; i++) {
@@ -83,7 +83,9 @@ function draw() {
     tornado.tick();
 }
 
-
+function tornadoFinaleDone() {
+    window.parent.postMessage(["finaleDone", null], "*");
+}
 
 const eventHandlers = {
     start: () => tornado.start(),

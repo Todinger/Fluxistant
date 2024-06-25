@@ -26,10 +26,11 @@ const FINALE_BASE_ROTATION_SPEED = 0.2;
 
 
 class Tornado {
-    constructor(image, shader) {
-        // --- Assets ---
+    constructor(image, shader, onFinaleDone) {
+        // --- Assets and "Globals" ---
         this.image = image;
         this.shader = shader;
+        this.onFinaleDone = onFinaleDone;
 
         // --- "Constants" (well, configuration we don't change) ---
         this.movementEdges = {
@@ -307,7 +308,13 @@ class Tornado {
 
         if (this.finaleHighestDebris === null || this.finaleHighestDebris.top > canvasBottom) {
             this.running = false;
-            console.log("THE END");
+            this.finaleDone();
+        }
+    }
+
+    finaleDone() {
+        if (this.onFinaleDone) {
+            this.onFinaleDone();
         }
     }
 

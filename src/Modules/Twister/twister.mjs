@@ -22,6 +22,8 @@ class Twister extends ModuleClient {
             progressText: document.getElementById('progress-text'),
             progressContainer: document.getElementById('progress-container'),
         };
+
+        window.addEventListener('message', (e) => this._onChildEventMessage(e), false);
     }
 
     sendToChild(eventName, arg) {
@@ -86,17 +88,23 @@ class Twister extends ModuleClient {
         this.sendToChild("end");
     }
 
+    _onChildEventMessage(e) {
+        let event = e.data[0];
+        if (event !== "finaleDone") return;
+
+        this._onTornadoFinaleDone();
+    }
+
     _onTornadoFinaleDone() {
-        this.hide();
-        this.toWatch();
+        this.hide(() => this.toWatch());
     }
 
     show() {
         this.elements.jMain.fadeIn(FADE_DURATION);
     }
 
-    hide() {
-        this.elements.jMain.fadeOut(FADE_DURATION);
+    hide(onDone) {
+        this.elements.jMain.fadeOut(FADE_DURATION, onDone);
     }
 
     start() {
