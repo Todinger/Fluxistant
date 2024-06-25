@@ -18,7 +18,6 @@ class Twister extends ModuleClient {
             iframe: document.getElementById('frame'),
             level: document.getElementById('level'),
             timer: document.getElementById('timer'),
-            title: document.getElementById('title'),
             jTitle: $('#title'),
             progressBar: document.getElementById('progress-bar'),
             progressText: document.getElementById('progress-text'),
@@ -33,9 +32,9 @@ class Twister extends ModuleClient {
     }
 
     toWatch() {
-        this.elements.title.textContent = WATCH_TEXT;
-        this.elements.title.classList.add("watch");
-        this.elements.title.classList.remove("warn");
+        this.elements.jTitle.text(WATCH_TEXT);
+        this.elements.jTitle.addClass("watch");
+        this.elements.jTitle.removeClass("warn");
     }
 
     showWatch() {
@@ -44,9 +43,9 @@ class Twister extends ModuleClient {
     }
 
     toWarn() {
-        this.elements.title.textContent = WARNING_TEXT;
-        this.elements.title.classList.add("warn");
-        this.elements.title.classList.remove("watch");
+        this.elements.jTitle.text(WARNING_TEXT);
+        this.elements.jTitle.addClass("warn");
+        this.elements.jTitle.removeClass("watch");
     }
 
     showWarn() {
