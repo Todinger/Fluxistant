@@ -78,6 +78,7 @@ class Twister extends ModuleClient {
     _activateTornado(duration) {
         this.setTimer(duration);
         this.sendToChild("start");
+        this._showTornadoDetails();
     }
 
     throwIn(skinName) {
@@ -160,7 +161,18 @@ class Twister extends ModuleClient {
         this.hide(() => this._clearState());
     }
 
+    _showTornadoDetails() {
+        this.elements.jLevel.show();
+        this.elements.jTimer.show();
+    }
+
+    _hideTornadoDetails() {
+        this.elements.jLevel.hide();
+        this.elements.jTimer.hide();
+    }
+
     _clearState() {
+        this._hideTornadoDetails();
         this.toWatch();
         this.elements.jTimer.text("");
         if (this.timerHandle !== null) {
