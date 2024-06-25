@@ -28,17 +28,37 @@ function send(eventName, arg) {
     iframe.contentWindow.postMessage([eventName, arg], "*");
 }
 
+
+let currentLevel = 1;
+const levelElement = document.getElementById('level');
+const timerElement = document.getElementById('timer');
+
+
+function grow() {
+    send("grow");
+    levelElement.classList.remove(`ef${currentLevel}`);
+    timerElement.classList.remove(`timer-ef${currentLevel}`);
+    currentLevel = Math.min(currentLevel + 1, 5);
+    levelElement.classList.add(`ef${currentLevel}`);
+    timerElement.classList.add(`timer-ef${currentLevel}`);
+    levelElement.textContent = `EF${currentLevel}`;
+}
+
 window.send = send;
 
 window.t = {
     start: () => send("start"),
     end: () => send("end"),
     throwIn: (skinName) => send("throwIn", skinName),
+    grow,
 };
 
 window.sp = setProgress;
 
-
+window.g = function() {
+    const level = document.getElementById('level');
+    level.classList.add("glowy");
+}
 
 
 

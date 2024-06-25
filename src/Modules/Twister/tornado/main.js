@@ -90,6 +90,7 @@ function draw() {
 const eventHandlers = {
     start: () => tornado.start(),
     end: () => tornado.end(),
+    grow: () => tornado.grow(),
     throwIn,
 };
 
