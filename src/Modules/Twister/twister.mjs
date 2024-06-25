@@ -36,6 +36,9 @@ class Twister extends ModuleClient {
 
         this.timerHandle = null;
         this.timeLeft = 0;
+
+        // This is true only when the tornado event is active (and isn't on its way out)
+        this.active = false;
     }
 
     sendToChild(eventName, arg) {
@@ -79,6 +82,7 @@ class Twister extends ModuleClient {
         this.setTimer(duration);
         this.sendToChild("start");
         this._showTornadoDetails();
+        this.active = true;
     }
 
     throwIn(skinName) {
@@ -116,6 +120,7 @@ class Twister extends ModuleClient {
     }
 
     grow(newDuration) {
+        console.log("Grow!");
         this.sendToChild("grow");
         this.elements.jLevel.removeClass(`ef${this.currentLevel}`);
         this.elements.jTimer.removeClass(`timer-ef${this.currentLevel}`);
@@ -129,6 +134,7 @@ class Twister extends ModuleClient {
 
     endTornado() {
         this.sendToChild("end");
+        this.active = false;
     }
 
     setTimer(time) {
@@ -193,10 +199,10 @@ class Twister extends ModuleClient {
         this.server.on('watch', () => this.showWatch());
         this.server.on('warn', () => this.showWarn());
         this.server.on('startTornado', (duration) => this.startTornado(duration));
-        this.server.on('throwIn', (skinName) => this.throwIn(skinName));
-        this.server.on('setProgress', (progressData) => this.setProgress(progressData));
-        this.server.on('grow', (newDuration) => this.grow(newDuration));
-        this.server.on('endTornado', () => this.endTornado());
+        this.server.on('throwIn', (skinName) => this.active && this.throwIn(skinName));
+        this.server.on('setProgress', (progressData) => this.active && this.setProgress(progressData));
+        this.server.on('grow', (newDuration) => this.active && this.grow(newDuration));
+        this.server.on('endTornado', () => this.active && this.endTornado());
         this.server.on('show', () => this.show());
         this.server.on('hide', () => this.hide());
         this.server.attach();
