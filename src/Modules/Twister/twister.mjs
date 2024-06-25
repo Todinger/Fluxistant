@@ -32,6 +32,7 @@ function send(eventName, arg) {
 let currentLevel = 1;
 const levelElement = document.getElementById('level');
 const timerElement = document.getElementById('timer');
+const titleElement = document.getElementById('title');
 
 
 function grow() {
@@ -60,7 +61,20 @@ window.g = function() {
     level.classList.add("glowy");
 }
 
+const WATCH_TEXT = "🌪️ TORNADO WATCH! 🌪️";
+const WARNING_TEXT = "⚠️ TORNADO WARNING! ⚠️";
 
+window.watch = function () {
+    titleElement.textContent = WATCH_TEXT;
+    titleElement.classList.add("watch");
+    titleElement.classList.remove("warn");
+}
+
+window.warn = function () {
+    titleElement.textContent = WARNING_TEXT;
+    titleElement.classList.add("warn");
+    titleElement.classList.remove("watch");
+}
 
 
 /*

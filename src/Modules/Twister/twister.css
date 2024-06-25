@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-    background-color: gray;
+    background-color: black;
 }
 
 #frame {
@@ -39,10 +39,18 @@ body {
     font-weight: 400;
     font-style: normal;
     font-size: 4em;
-    color: var(--title-color, black);
     text-align: center;
     pointer-events: all;
 }
+
+.watch {
+    color: #afafaf;
+}
+
+.warn {
+    color: #f7ad32;
+}
+
 
 #content {
     display: flex;
@@ -58,7 +66,7 @@ body {
     text-align: center;
     align-items: center;
     justify-content: center;
-    color: var(--text-color, black);
+    color: white;
     /*outline: var(--text-outline-width, 2px) solid var(--text-outline-color, black);*/
     pointer-events: all;
     height: 100%;
@@ -87,7 +95,7 @@ body {
 #progress-container {
     width: 600px;
     height: 100%;
-    border: 2px solid var(--progress-border-color, black);
+    border: 2px solid deeppink;
     margin: 0 10px;
     position: relative;
     overflow: hidden;
@@ -158,25 +166,25 @@ body {
 .ef1 {
     font-weight: 400;
     font-size: 2em;
-    color: black;
+    color: #ff6ae1;
 }
 
 .ef2 {
     font-weight: 525;
     font-size: 2.5em;
-    color: blue;
+    color: #ffdd00;
 }
 
 .ef3 {
     font-weight: 650;
     font-size: 3em;
-    color: orange;
+    color: #2fff00;
 }
 
 .ef4 {
     font-weight: 775;
     font-size: 3.5em;
-    color: deeppink;
+    color: #14ffd4;
 }
 
 
