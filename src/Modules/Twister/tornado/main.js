@@ -2,7 +2,6 @@ let angle = 0;
 let kitten;
 
 let tornado;
-let tornadoImage;
 
 const DEBRIS_COUNT = 0;
 
@@ -61,7 +60,10 @@ function whee() {
 }
 
 function throwIn(skinName) {
-    if (!(skinName in assets.skins)) return;
+    if (!(skinName in assets.skins)) {
+        assets.skins[skinName] = loadImage(`assets/skins/${skinName}.gif`);
+    }
+
     tornado.throwIn(new Debris(
         tornado,
         assets.skins[skinName],
