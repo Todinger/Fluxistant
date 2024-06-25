@@ -24,7 +24,7 @@ class Twister extends ModuleClient {
         this.elements = {
             jMain: $("#main"),
             iframe: document.getElementById('frame'),
-            level: document.getElementById('level'),
+            jLevel: $('#level'),
             jTimer: $('#timer'),
             jTitle: $('#title'),
             progressBar: document.getElementById('progress-bar'),
@@ -116,12 +116,12 @@ class Twister extends ModuleClient {
 
     grow(newDuration) {
         this.sendToChild("grow");
-        this.elements.level.classList.remove(`ef${this.currentLevel}`);
+        this.elements.jLevel.removeClass(`ef${this.currentLevel}`);
         this.elements.jTimer.removeClass(`timer-ef${this.currentLevel}`);
         this.currentLevel = Math.min(this.currentLevel + 1, 5);
-        this.elements.level.classList.add(`ef${this.currentLevel}`);
+        this.elements.jLevel.addClass(`ef${this.currentLevel}`);
         this.elements.jTimer.addClass(`timer-ef${this.currentLevel}`);
-        this.elements.level.textContent = `EF${this.currentLevel}`;
+        this.elements.jLevel.text(`EF${this.currentLevel}`);
 
         this.setTimer(newDuration);
     }
