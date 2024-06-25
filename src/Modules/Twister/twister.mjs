@@ -3,6 +3,7 @@ import { ModuleClient } from "/common/moduleClient.mjs";
 const WATCH_TEXT = "🌪️ TORNADO WATCH! 🌪️";
 const WARNING_TEXT = "⚠️ TORNADO WARNING! ⚠️";
 
+const TORNADO_WARNING_FLASHES = 5;
 const FADE_DURATION = 500;
 
 
@@ -18,6 +19,7 @@ class Twister extends ModuleClient {
             level: document.getElementById('level'),
             timer: document.getElementById('timer'),
             title: document.getElementById('title'),
+            jTitle: $('#title'),
             progressBar: document.getElementById('progress-bar'),
             progressText: document.getElementById('progress-text'),
             progressContainer: document.getElementById('progress-container'),
@@ -53,8 +55,14 @@ class Twister extends ModuleClient {
     }
 
     startTornado() {
-        this.sendToChild("start");
-        this.toWarn();
+        let jCombo = this.elements.jTitle;
+        jCombo = jCombo.fadeOut(FADE_DURATION, () => this.toWarn());
+        jCombo = jCombo.fadeIn(FADE_DURATION);
+        for (let i = 0; i < TORNADO_WARNING_FLASHES - 1; i++) {
+            jCombo = jCombo.fadeOut(FADE_DURATION);
+            jCombo = jCombo.fadeIn(FADE_DURATION);
+        }
+        $.when(jCombo).then(() => this.sendToChild("start"));
     }
 
     throwIn(skinName) {
