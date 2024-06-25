@@ -22,11 +22,7 @@ let canvasBottom = 0;
 let assets;
 
 function preload() {
-    assets = {
-        rogue: loadImage('tmp/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif'),
-        barbarian: loadImage('tmp/skinFullBarbarianYecatsmailbox_attack.8fce65e213f2.gif'),
-    }
-    tornadoImage = loadImage('assets/pixel-tornado.gif');
+    assets = loadAssets();
 }
 
 function setup() {
@@ -38,7 +34,7 @@ function setup() {
     canvasBottom = 0;
     createCanvas(canvasWidth, canvasHeight, WEBGL);
     alphaShader = createShader(vert, frag);
-    tornado = new Tornado(tornadoImage, alphaShader);
+    tornado = new Tornado(assets.tornado, alphaShader);
     center = tornado.center;
 
     for (let i = 0; i < DEBRIS_COUNT; i++) {
@@ -57,7 +53,7 @@ function setup() {
 function whee() {
     tornado.throwIn(new Debris(
         tornado,
-        assets.rogue,
+        assets.skins.skinFullRogueYecatsmailbox,
         100,
         100,
         alphaShader,
@@ -65,10 +61,10 @@ function whee() {
 }
 
 function throwIn(skinName) {
-    if (!(skinName in assets)) return;
+    if (!(skinName in assets.skins)) return;
     tornado.throwIn(new Debris(
         tornado,
-        assets[skinName],
+        assets.skins[skinName],
         100,
         100,
         alphaShader,
