@@ -84,7 +84,7 @@ class Twister extends ModuleClient {
         this.sendToChild("throwIn", skinName);
     }
 
-    setProgress(progress) {
+    setProgressDisplay(progress) {
         progress = Math.max(0, Math.min(progress, 100));
         this.elements.progressBar.style.clipPath = `inset(0% ${progress < 100 ? 100 - progress : -1}% 0% 0%)`;
 
@@ -93,8 +93,25 @@ class Twister extends ModuleClient {
         const newRight = containerWidth * (1 - progress / 100) + 5; // 5px for margin
         this.elements.progressText.style.left = "";
         this.elements.progressText.style.right = `${Math.max(newRight, 5)}px`; // Ensure it doesn't go out of bounds
+    }
 
+    setProgressPercentage(progress) {
+        this.setProgressDisplay(progress);
         this.elements.progressText.textContent = `${progress}%`;
+    }
+
+    setProgressSP(current, total) {
+        current = Math.min(current, total);
+        this.setProgressDisplay(100 * current / total);
+        this.elements.progressText.textContent = `${current} / ${total}`;
+    }
+
+    setProgress(progressData) {
+        if (progressData["percentage"]) {
+            this.setProgressPercentage(progressData["percentage"]);
+        } else {
+            this.setProgressSP(progressData["currentSP"], progressData["maxSP"]);
+        }
     }
 
     grow(newDuration) {
@@ -165,6 +182,7 @@ class Twister extends ModuleClient {
         this.server.on('warn', () => this.showWarn());
         this.server.on('startTornado', (duration) => this.startTornado(duration));
         this.server.on('throwIn', (skinName) => this.throwIn(skinName));
+        this.server.on('setProgress', (progressData) => this.setProgress(progressData));
         this.server.on('grow', (newDuration) => this.grow(newDuration));
         this.server.on('endTornado', () => this.endTornado());
         this.server.on('show', () => this.show());
