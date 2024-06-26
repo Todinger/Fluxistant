@@ -149,6 +149,7 @@ const entities = {
 	TriviaGameType_BaseEntity: require('./WebEntities/triviaGameType_BaseEntity.js'),
 	TriviaGameType_LettersEntity: require('./WebEntities/triviaGameType_LettersEntity.js'),
 	TriviaGameType_MultipleChoiceEntity: require('./WebEntities/triviaGameType_MultipleChoiceEntity.js'),
+	TwisterLevelEntity: require('./WebEntities/twisterLevelEntity.js'),
 	WelcomeEntity: require('./WebEntities/welcomeEntity.js'),
 	WheelEntity: require('./WebEntities/wheelEntity.js'),
 	WheelSegmentEntity: require('./WebEntities/wheelSegmentEntity.js'),

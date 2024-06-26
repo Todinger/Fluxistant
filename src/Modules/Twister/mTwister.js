@@ -1,6 +1,8 @@
 const Module = requireMain('module');
-const TwisterLevelEntity = require("./Config/twisterLevelEntity");
 const ConfigSourceManager = requireMain('configSourceManager');
+const StreamRaidersManager = requireMain('streamRaidersManager');
+const TwisterLevelEntity = require("./Config/twisterLevelEntity");
+const TimedEventQueue = requireMain("timedEventQueue");
 
 
 const TWISTER_ACTIVATION_METHODS_SOURCE_NAME = "Twister.ActivationMethods";
@@ -11,6 +13,15 @@ const ActivationMethods = {
 }
 
 const NUM_LEVELS = 5;
+const EVENT_QUEUE_CHECK_INTERVAL = 1000;
+
+
+const TwisterState = {
+	Inactive: "Inactive",
+	Watch: "Watch",
+	Active: "Active",
+	Ending: "Ending",
+};
 
 
 class Twister extends Module {
@@ -20,6 +31,11 @@ class Twister extends Module {
 			webname: 'twister',
 			source: 'twister.html',
 		});
+
+		this.eventQueue = new TimedEventQueue(0, EVENT_QUEUE_CHECK_INTERVAL);
+		this.skinPurchaseHandler = (purchaseDetails) => this._skinPurchase(purchaseDetails);
+
+		this.state = TwisterState.Inactive;
 
 		this.data = {};
 	}
@@ -51,6 +67,16 @@ class Twister extends Module {
 		}
 	}
 
+	enable() {
+		this._enableEventHandlers();
+		this.eventQueue.start();
+	}
+
+	disable() {
+		this._disableEventHandlers();
+		this.eventQueue.end();
+	}
+
 	load() {
 		ConfigSourceManager.setSourceOptions(
 			TWISTER_ACTIVATION_METHODS_SOURCE_NAME,
@@ -58,11 +84,64 @@ class Twister extends Module {
 		);
 	}
 
+	loadModConfig(conf) {
+		this.eventQueue.expirationTime = conf.activationTimeLimit;
+		this.eventQueue.clearThresholds();
+		this.eventQueue.addThreshold(conf.watchThreshold, () => this.startWatch());
+		this.eventQueue.addThreshold(conf.activationThreshold, () => this.startTornado());
+		if (conf.activationMethod === ActivationMethods.Users) {
+			this.eventQueue.setValueCounter(this._countUniqueUsers);
+		} else {
+			this.eventQueue.clearValueCounter();
+		}
+
+		this.eventQueue.expirationTime = conf.activationTimeLimit;
+		if (conf.activationTimeLimit > 0) {
+			this.eventQueue.start();
+		} else {
+			this.eventQueue.end();
+		}
+	}
+
+
+	_enableEventHandlers() {
+		StreamRaidersManager.onAnySkinPurchase(this.skinPurchaseHandler);
+	}
+
+	_disableEventHandlers() {
+		StreamRaidersManager.removeAnySkinPurchaseCallback(this.skinPurchaseHandler);
+	}
+
+	_countUniqueUsers(purchases) {
+		let users = [];
+		for (let purchaseDetails of purchases) {
+			if (!users.includes(purchaseDetails.playerUsername)) {
+				users.push(purchaseDetails.playerUsername);
+			}
+		}
+
+		return users.length;
+	}
+
+	_skinPurchase(purchaseDetails) {
+		if (this.config.activationMethod === ActivationMethods.SP) {
+			this.eventQueue.addEvent(purchaseDetails, purchaseDetails.sp);
+		} else if (this.config.activationMethod === ActivationMethods.Purchases) {
+			this.eventQueue.addEvent(purchaseDetails);
+		} else if (this.config.activationMethod === ActivationMethods.Users) {
+			this.eventQueue.addEvent(purchaseDetails);
+		}
+	}
+
+
 	startWatch() {
+		this.state = TwisterState.Watch;
 		this.broadcastEvent("watch");
 	}
 
 	startTornado() {
+		this.state = TwisterState.Active;
+		this.eventQueue.end();
 		this.broadcastEvent("startTornado", 20);
 	}
 
@@ -82,9 +161,9 @@ class Twister extends Module {
 		// 	description: "Stop the game if it's running",
 		// 	action: () => this.stop(),
 		// },
-		watch: {
-			name: 'Watch',
-			description: "Tornado Watch!",
+		forceWatch: {
+			name: 'Force Watch',
+			description: "Starts the Tornado Watch directly (doesn't work if the tornado is already active)",
 			triggers: [
 				this.trigger.cli({
 					cmdname: 'twatch',
@@ -93,8 +172,8 @@ class Twister extends Module {
 			action: () => this.startWatch(),
 		},
 		start: {
-			name: 'Start',
-			description: "Tornado!!!",
+			name: 'Force Start',
+			description: "Starts the Tornado itself directly (doesn't work if the tornado is already active)",
 			triggers: [
 				this.trigger.cli({
 					cmdname: 'tstart',
@@ -103,8 +182,8 @@ class Twister extends Module {
 			action: () => this.startTornado(),
 		},
 		grow: {
-			name: 'Grow',
-			description: "Grow!",
+			name: 'Force Grow',
+			description: "Grows the Tornado level immediately (doesn't work if the tornado is already active)",
 			triggers: [
 				this.trigger.cli({
 					cmdname: 'tgrow',
