@@ -13,6 +13,7 @@ class TimedEventQueue {
         this.totalValue = 0;
 
         this.valueCounter = null;
+        this.active = false;
     }
 
     get events() {
@@ -43,9 +44,11 @@ class TimedEventQueue {
         if (this.checkInterval === 0) return;
 
         this.timer.set(this.checkInterval);
+        this.active = true;
     }
 
     end() {
+        this.active = false;
         this.timer.clear();
         this.queue = [];
         this.totalValue = 0;
@@ -55,6 +58,8 @@ class TimedEventQueue {
     }
 
     addEvent(event, value = 1) {
+        if (!this.active) return;
+
         this.queue.push({
             time: Date.now(),
             event,

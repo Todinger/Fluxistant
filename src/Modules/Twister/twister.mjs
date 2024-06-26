@@ -85,8 +85,10 @@ class Twister extends ModuleClient {
         this.active = true;
     }
 
-    throwIn(skinName) {
-        this.sendToChild("throwIn", skinName);
+    throwIn(skinNames) {
+        for (let skinName of skinNames) {
+            this.sendToChild("throwIn", skinName);
+        }
     }
 
     setProgressDisplay(progress) {
@@ -199,7 +201,7 @@ class Twister extends ModuleClient {
         this.server.on('watch', () => this.showWatch());
         this.server.on('warn', () => this.showWarn());
         this.server.on('startTornado', (duration) => this.startTornado(duration));
-        this.server.on('throwIn', (skinName) => this.active && this.throwIn(skinName));
+        this.server.on('throwIn', (skinNames) => this.active && this.throwIn(skinNames));
         this.server.on('setProgress', (progressData) => this.active && this.setProgress(progressData));
         this.server.on('grow', (newDuration) => this.active && this.grow(newDuration));
         this.server.on('endTornado', () => this.active && this.endTornado());

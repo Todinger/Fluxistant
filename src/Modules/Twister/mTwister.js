@@ -3,6 +3,7 @@ const ConfigSourceManager = requireMain('configSourceManager');
 const StreamRaidersManager = requireMain('streamRaidersManager');
 const TwisterLevelEntity = require("./Config/twisterLevelEntity");
 const TimedEventQueue = requireMain("timedEventQueue");
+const Utils = requireMain('utils');
 
 
 const TWISTER_ACTIVATION_METHODS_SOURCE_NAME = "Twister.ActivationMethods";
@@ -22,6 +23,58 @@ const TwisterState = {
 	Active: "Active",
 	Ending: "Ending",
 };
+
+
+const SUPPORTED_SKIN_NAMES = [
+	"skinFlagBearerYecatsmailbox",
+	"skinFlagBearerYecatsx",
+	"skinFullAmazonYecatsx",
+	"skinFullArcherYecatsmailbox",
+	"skinFullArcherYecatsmailboxHalloween",
+	"skinFullArtilleryYecatsx",
+	"skinFullBarbarianYecatsmailbox",
+	"skinFullBarbarianYecatsmailboxGold",
+	"skinFullBarbarianYecatsxSpring23",
+	"skinFullBerserkerYecatsx",
+	"skinFullBlobYecatsx",
+	"skinFullBomberYecatsx",
+	"skinFullBusterYecatsX",
+	"SkinFullBusterYecatsxHoloP",
+	"skinFullCenturionYecatsx",
+	"skinFullFairyYecatsx",
+	"skinFullFlyingRogueYecatsmailbox",
+	"skinFullGladiatorYecatsmailbox",
+	"skinFullHealerYecatsx",
+	"skinFullLancerYecatsX",
+	"skinFullMonkYecatsx",
+	"skinFullMusketeerYecatsx",
+	"skinFullNecromancerYecatsx",
+	"skinFullPaladinYecatsx",
+	"skinFullRogueYecatsmailbox",
+	"skinFullRogueYecatsmailboxWinter",
+	"skinFullSaintYecatsx",
+	"skinFullShinobiYecatsx",
+	"skinFullShinobiYecatsxFall23",
+	"skinFullTankYecatsmailbox",
+	"skinFullTemplarYecatsmailbox",
+	"skinFullVampireYecatsX",
+	"skinFullWarBeastYecatsmailbox",
+	"skinFullWarriorYecatsmailbox",
+	"skinHeadArcherYecatsmailbox",
+	"skinHeadBarbarianYecatsmailbox",
+	"skinHeadBerserkerYecatsmailbox",
+	"skinHeadBomberYecatsmailbox",
+	"skinHeadCenturionYecatsmailbox",
+	"skinHeadFlyingRogueYecatsmailbox",
+	"skinHeadHealerYecatsmailbox",
+	"skinHeadMageYecatsmailbox",
+	"skinHeadMonkYecatsmailbox",
+	"skinHeadMusketeerYecatsmailbox",
+	"skinHeadPaladinYecatsmailbox",
+	"skinHeadRogueYecatsmailbox",
+	"skinHeadTankYecatsmailbox",
+	"skinHeadWarriorYecatsmailbox",
+];
 
 
 class Twister extends Module {
@@ -124,30 +177,97 @@ class Twister extends Module {
 	}
 
 	_skinPurchase(purchaseDetails) {
-		if (this.config.activationMethod === ActivationMethods.SP) {
-			this.eventQueue.addEvent(purchaseDetails, purchaseDetails.sp);
-		} else if (this.config.activationMethod === ActivationMethods.Purchases) {
-			this.eventQueue.addEvent(purchaseDetails);
-		} else if (this.config.activationMethod === ActivationMethods.Users) {
-			this.eventQueue.addEvent(purchaseDetails);
+		if (this.state === TwisterState.Inactive || this.state === TwisterState.Watch) {
+			if (this.config.activationMethod === ActivationMethods.SP) {
+				this.eventQueue.addEvent(purchaseDetails, purchaseDetails.sp);
+			} else if (this.config.activationMethod === ActivationMethods.Purchases) {
+				this.eventQueue.addEvent(purchaseDetails);
+			} else if (this.config.activationMethod === ActivationMethods.Users) {
+				this.eventQueue.addEvent(purchaseDetails);
+			}
 		}
+
+		if (this.state === TwisterState.Watch || this.state === TwisterState.Active) {
+			this._addTornadoPurchaseData(purchaseDetails);
+		}
+	}
+
+
+	_createNewTornadoData() {
+		this.data = {
+			level: 0,		// Current tornado level
+			sp: 0,			// SP accumulated in current level
+			skins: [],		// List of skins added to the tornado so far
+			players: {},	// Mapping of player -> SP purchased during tornado
+			totalSP: 0,		// Total SP throughout the entire tornado
+		};
+
+		this.saveData();
+	}
+
+	_ensureTornadoUserData(username) {
+		if (!this.data) return;
+		if (!(username in this.data.players)) {
+			this.data.players[username] = 0;
+		}
+	}
+
+	_addSkinToTornado(purchaseDetails) {
+		let skinName;
+		if (purchaseDetails.skinName in SUPPORTED_SKIN_NAMES) {
+			skinName = purchaseDetails.skinName;
+		} else {
+			skinName = Utils.randomElement(SUPPORTED_SKIN_NAMES);
+		}
+
+		this.data.skins.push(skinName);
+		if (this.state === TwisterState.Active) {
+			this.throwIn([skinName]);
+		}
+	}
+
+	_addSkinsToTornado(listOfPurchaseDetails) {
+		for (let purchaseDetails of listOfPurchaseDetails) {
+			this._addSkinToTornado(purchaseDetails);
+		}
+	}
+
+	_addTornadoPurchaseData(purchaseDetails) {
+		if (this.state !== TwisterState.Watch && this.state !== TwisterState.Active) return;
+		this._ensureTornadoUserData(purchaseDetails.playerUsername);
+		this.data.players[purchaseDetails.playerUsername] += purchaseDetails.sp;
+		this._addSkinToTornado(purchaseDetails);
 	}
 
 
 	startWatch() {
 		this.state = TwisterState.Watch;
+		this._createNewTornadoData();
+		this._addSkinsToTornado(this.eventQueue.events);
 		this.broadcastEvent("watch");
 	}
 
 	startTornado() {
-		this.state = TwisterState.Active;
 		this.eventQueue.end();
 		this.broadcastEvent("startTornado", 20);
+		setTimeout(() => {
+			this.state = TwisterState.Active;
+			this.broadcastEvent("throwIn", this.data.skins);
+		}, 6000);
+	}
+
+	throwIn(skinNames) {
+		this.broadcastEvent("throwIn", skinNames);
 	}
 
 	grow() {
 		this.broadcastEvent("grow", 20);
 	}
+
+	// broadcastEvent(event, ...p) {
+	// 	this.print(`Event: ${event}`);
+	// 	super.broadcastEvent(event, ...p);
+	// }
 
 
 	functions = {
