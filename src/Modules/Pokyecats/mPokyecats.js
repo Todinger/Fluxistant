@@ -411,7 +411,7 @@ class Pokyecats extends Module {
 				let catchData = this.data.catches[username];
 				let number = `${currPlayerNum.toString().padStart(maxPlayerNumLength)}. `;
 				let name = `${this.getDisplayName(username)}: `;
-				let yarn = `${catchData.yarn}, `;
+				let yarn = `${catchData.yarn} yarn, `;
 				let yarnBalls = `${catchData.balls[BALLS.YARN]} yarn balls, `;
 				let goldBalls = `${catchData.balls[BALLS.GOLD]} gold balls, `;
 				let catches = `${catchData.catches} catches, and `;

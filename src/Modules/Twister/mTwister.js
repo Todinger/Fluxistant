@@ -91,6 +91,7 @@ function range(min, max) {
 
 
 const PRIZE_OPTIONS = [
+	// EF 1
 	{
 		main: {},
 		consolation: {
@@ -98,6 +99,7 @@ const PRIZE_OPTIONS = [
 			yarnBall: range(1),
 		},
 	},
+	// EF 2
 	{
 		main: {},
 		consolation: {
@@ -106,6 +108,7 @@ const PRIZE_OPTIONS = [
 			goldBall: range(1),
 		},
 	},
+	// EF 3
 	{
 		main: {},
 		consolation: {
@@ -114,6 +117,7 @@ const PRIZE_OPTIONS = [
 			goldBall: range(2),
 		},
 	},
+	// EF 4
 	{
 		main: {},
 		consolation: {
@@ -123,6 +127,7 @@ const PRIZE_OPTIONS = [
 			catches: range(1, 2),
 		},
 	},
+	// EF 5
 	{
 		main: {},
 		consolation: {
