@@ -200,9 +200,11 @@ class StreamRaidersManager extends EventNotifier {
 				return;
 			}
 		}
+	}
 
+	_checkNamedPurchasesInText(text) {
 		let namedPurchases = [];
-		for (match of message.matchAll(NAMED_PURCHASE_REGEX)) {
+		for (match of text.matchAll(NAMED_PURCHASE_REGEX)) {
 			if (!this.processedNamedPurchasesIDs.includes(match.groups['eventId'])) {
 				namedPurchases.push(new NamedPurchase(match.groups));
 				this.processedNamedPurchasesIDs.push(match.groups['eventId']);
