@@ -466,6 +466,7 @@ class Tornado {
         this.resetState();
         if (startingLevel) {
             this.level = min(startingLevel, MAX_TORNADO_LEVEL);
+            this.targetGrowthLevel = this.level;
             this.updateParametersBySize();
         }
 

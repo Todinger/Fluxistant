@@ -40,6 +40,7 @@ class Twister extends ModuleClient {
         this.delayedSkins = [];
         this.tornadoStartingLevel = 1;
         this.tornadoStartingTime = 0;
+        this.delayedProgressData = null;
 
         // This is true only when the tornado event is active (and isn't on its way out)
         this.active = false;
@@ -72,7 +73,7 @@ class Twister extends ModuleClient {
     }
 
     startTornado(levelSettings) {
-        this.setProgress(levelSettings["progress"]);
+        this.delayedProgressData = this.delayedProgressData || levelSettings.progress;
         let jCombo = this.elements.jTitle;
         jCombo = jCombo.fadeOut(FADE_DURATION, () => this.toWarn());
         jCombo = jCombo.fadeIn(FADE_DURATION);
@@ -80,12 +81,13 @@ class Twister extends ModuleClient {
             jCombo = jCombo.fadeOut(FADE_DURATION);
             jCombo = jCombo.fadeIn(FADE_DURATION);
         }
-        $.when(jCombo).then(() => this._activateTornado(this.tornadoStartingTime || levelSettings["duration"]));
+        $.when(jCombo).then(() => this._activateTornado(this.tornadoStartingTime || levelSettings.duration));
     }
 
     _activateTornado(duration) {
         this.setTimer(duration);
         this.sendToChild("start", this.tornadoStartingLevel - 1);
+        this._setProgress(this.delayedProgressData);
         this._showTornadoDetails();
         this._addIn(this.delayedSkins);
         this.delayedSkins = [];
@@ -114,7 +116,6 @@ class Twister extends ModuleClient {
     }
 
     setProgressDisplay(progress) {
-        progress = Math.max(0, Math.min(progress, 100));
         this.elements.progressBar.style.clipPath = `inset(0% ${progress < 100 ? 100 - progress : -1}% 0% 0%)`;
 
         // Adjust the position of the progress text
@@ -124,22 +125,31 @@ class Twister extends ModuleClient {
         this.elements.progressText.style.right = `${Math.max(newRight, 5)}px`; // Ensure it doesn't go out of bounds
     }
 
-    setProgressPercentage(progress) {
+    setProgressPercentage(progress, allowOverflow) {
+        progress = Math.max(0, progress);
+        if (!allowOverflow) {
+            progress = Math.min(progress, 100);
+        }
+
         this.setProgressDisplay(progress);
         this.elements.progressText.textContent = `${progress}%`;
     }
 
-    setProgressSP(current, total) {
-        current = Math.min(current, total);
+    setProgressSP(current, total, allowOverflow) {
+        current = Math.max(0, current);
+        if (!allowOverflow) {
+            current = Math.min(current, total);
+        }
+
         this.setProgressDisplay(100 * current / total);
         this.elements.progressText.textContent = `${current} / ${total}`;
     }
 
-    setProgress(progressData) {
+    _setProgress(progressData) {
         if (progressData["percentage"]) {
-            this.setProgressPercentage(progressData["percentage"]);
+            this.setProgressPercentage(progressData["percentage"], progressData["allowOverflow"]);
         } else {
-            this.setProgressSP(progressData["currentSP"], progressData["maxSP"]);
+            this.setProgressSP(progressData["currentSP"], progressData["maxSP"], progressData["allowOverflow"]);
         }
     }
 
@@ -150,6 +160,7 @@ class Twister extends ModuleClient {
         this.elements.jLevel.addClass(`ef${this.currentLevel}`);
         this.elements.jTimer.addClass(`timer-ef${this.currentLevel}`);
         this.elements.jLevel.text(`EF${this.currentLevel}`);
+        console.log(`Curren level set to ${this.currentLevel}`);
     }
 
     _grow(newDuration) {
@@ -161,12 +172,26 @@ class Twister extends ModuleClient {
         }
     }
 
-    requestGrow(duration) {
+    requestGrow(growthDetails) {
         if (this.active) {
-            this._grow(duration);
+            for (let i = 0; i < growthDetails.levels - 1; i++) {
+                this._grow();
+            }
+
+            this._grow(growthDetails.duration);
+            this._setProgress(growthDetails.progress);
         } else {
-            this.tornadoStartingLevel++;
-            this.tornadoStartingTime = duration;
+            this.tornadoStartingLevel += growthDetails.levels;
+            this.tornadoStartingTime = growthDetails.duration;
+            this.delayedProgressData = growthDetails.progress;
+        }
+    }
+
+    requestProgress(progressData) {
+        if (this.active) {
+            this._setProgress(progressData);
+        } else {
+            this.delayedProgressData = progressData;
         }
     }
 
@@ -243,8 +268,8 @@ class Twister extends ModuleClient {
         this.server.on('warn', () => this.showWarn());
         this.server.on('startTornado', (levelSettings) => this.startTornado(levelSettings));
         this.server.on('throwIn', (skinNames) => this.requestThrowIn(skinNames));
-        this.server.on('setProgress', (progressData) => this.active && this.setProgress(progressData));
-        this.server.on('grow', (newDuration) => this.requestGrow(newDuration));
+        this.server.on('setProgress', (progressData) => this.requestProgress(progressData));
+        this.server.on('grow', (growthDetails) => this.requestGrow(growthDetails));
         this.server.on('endTornado', () => this.active && this.endTornado());
         this.server.on('show', () => this.show());
         this.server.on('hide', () => this.hide());

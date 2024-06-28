@@ -156,6 +156,10 @@ class Twister extends Module {
 		}
 	}
 
+	get currentLevel() {
+		return this.config.levels[this.data.level];
+	}
+
 
 	_enableEventHandlers() {
 		StreamRaidersManager.onAnySkinPurchase(this.skinPurchaseHandler);
@@ -188,7 +192,7 @@ class Twister extends Module {
 		}
 
 		if (this.state === TwisterState.Watch || this.state === TwisterState.Active) {
-			this._addTornadoPurchaseData(purchaseDetails);
+			this._processTornadoPurchaseData(purchaseDetails);
 		}
 	}
 
@@ -226,42 +230,110 @@ class Twister extends Module {
 		}
 	}
 
-	_addSkinsToTornado(listOfPurchaseDetails) {
-		for (let purchaseDetails of listOfPurchaseDetails) {
-			this._addSkinToTornado(purchaseDetails);
+	_increaseLevel() {
+		let levelsGained = 0;
+		while (this.data.level < NUM_LEVELS - 1 && this.data.sp >= this.currentLevel.spToClear) {
+			this.data.sp -= this.currentLevel.spToClear;
+			this.data.level++;
+			levelsGained++;
 		}
+
+		return levelsGained;
 	}
 
-	_addTornadoPurchaseData(purchaseDetails) {
-		if (this.state !== TwisterState.Watch && this.state !== TwisterState.Active) return;
+	_addPurchaseDetailsToData(purchaseDetails) {
 		this._ensureTornadoUserData(purchaseDetails.playerUsername);
 		this.data.players[purchaseDetails.playerUsername] += purchaseDetails.sp;
 		this._addSkinToTornado(purchaseDetails);
+		this.data.sp += purchaseDetails.sp;
+		this.data.totalSP += purchaseDetails.sp;
+	}
+
+	_addPurchasesToTornado(listOfPurchaseDetails) {
+		let levelsGained = 0;
+		for (let purchaseDetails of listOfPurchaseDetails) {
+			this._addPurchaseDetailsToData(purchaseDetails);
+			levelsGained += this._increaseLevel();
+		}
+
+		this.saveData();
+
+		if (levelsGained) {
+			this.grow(levelsGained);
+		} else {
+			this.sendProgress();
+		}
+	}
+
+	_processTornadoPurchaseData(purchaseDetails) {
+		if (this.state !== TwisterState.Watch && this.state !== TwisterState.Active) return;
+
+		this._addPurchasesToTornado([purchaseDetails]);
 	}
 
 
 	startWatch() {
 		this.state = TwisterState.Watch;
 		this._createNewTornadoData();
-		this._addSkinsToTornado(this.eventQueue.events);
 		this.broadcastEvent("watch");
 	}
 
 	startTornado() {
 		this.eventQueue.end();
-		this.broadcastEvent("startTornado", 20);
-		setTimeout(() => {
-			this.state = TwisterState.Active;
-			this.broadcastEvent("throwIn", this.data.skins);
-		}, 6000);
+		this.broadcastEvent("startTornado", {
+			duration: this.config.levels[0].timeLimit,
+			progress: this._makeProgress(),
+		});
+		setTimeout(() => this._tornadoStarted(), 6000);
+	}
+
+	_tornadoStarted() {
+		this.state = TwisterState.Active;
+		this.broadcastEvent("throwIn", this.data.skins);
+	}
+
+	_makeProgress() {
+		let currentSP = this.data.sp;
+		let maxSP = this.currentLevel.spToClear;
+		let allowOverflow = this.data.level === NUM_LEVELS - 1;
+		if (this.config.percentageDisplay) {
+			return {
+				percentage: 100 * currentSP / maxSP,
+				allowOverflow,
+			};
+		} else {
+			return {
+				currentSP,
+				maxSP,
+				allowOverflow,
+			};
+		}
 	}
 
 	throwIn(skinNames) {
 		this.broadcastEvent("throwIn", skinNames);
 	}
 
-	grow() {
-		this.broadcastEvent("grow", 20);
+	sendProgress() {
+		this.broadcastEvent("setProgress", this._makeProgress());
+	}
+
+	forceGrow() {
+		if (this.state !== TwisterState.Active || this.data.level >= MAX_TORNADO_LEVEL - 1) {
+			return false;
+		}
+
+		this.data.level++;
+		this.data.sp = 0;
+		this.grow(1);
+	}
+
+	grow(levels) {
+		this.broadcastEvent("grow", {
+			levels,
+			duration: this.currentLevel.timeLimit,
+			progress: this._makeProgress(),
+		});
 	}
 
 	// broadcastEvent(event, ...p) {
@@ -309,7 +381,7 @@ class Twister extends Module {
 					cmdname: 'tgrow',
 				}),
 			],
-			action: () => this.grow(),
+			action: () => this.forceGrow(),
 		},
 	}
 }
