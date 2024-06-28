@@ -258,16 +258,27 @@ class Twister extends Module {
 	}
 
 	_addSkinToTornado(purchaseDetails) {
-		let skinName;
-		if (purchaseDetails.skinName in SUPPORTED_SKIN_NAMES) {
-			skinName = purchaseDetails.skinName;
-		} else {
-			skinName = Utils.randomElement(SUPPORTED_SKIN_NAMES);
+		// Named purchases are not supported right now - ALL SKINS ARE RANDOM!
+		// if (purchaseDetails.skinName in SUPPORTED_SKIN_NAMES) {
+		// 	skinName = purchaseDetails.skinName;
+		// } else {
+		// 	skinName = Utils.randomElement(SUPPORTED_SKIN_NAMES);
+		// }
+
+		let amount = purchaseDetails.amount;
+		if (!amount) {
+			amount = 1;
 		}
 
-		this.data.skins.push(skinName);
+		let skinNames = [];
+		for (let i = 0; i < amount; i++) {
+			let skinName = Utils.randomElement(SUPPORTED_SKIN_NAMES);
+			skinNames.push(skinName);
+			this.data.skins.push(skinName);
+		}
+
 		if (this.state === TwisterState.Active) {
-			this.throwIn([skinName]);
+			this.throwIn(skinNames);
 		}
 	}
 
