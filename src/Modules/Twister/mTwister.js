@@ -3,6 +3,8 @@ const ConfigSourceManager = requireMain('configSourceManager');
 const StreamRaidersManager = requireMain('streamRaidersManager');
 const TwisterLevelEntity = require("./Config/twisterLevelEntity");
 const TimedEventQueue = requireMain("timedEventQueue");
+const Timers = requireMain('timers');
+const { ONE_SECOND, SECONDS } = requireMain('constants');
 const Utils = requireMain('utils');
 
 
@@ -14,7 +16,9 @@ const ActivationMethods = {
 }
 
 const NUM_LEVELS = 5;
-const EVENT_QUEUE_CHECK_INTERVAL = 1000;
+const EVENT_QUEUE_CHECK_INTERVAL = ONE_SECOND;
+
+const DISPLAY_COOLDOWN_BETWEEN_TORNADOES = 20 * SECONDS;
 
 
 const TwisterState = {
@@ -90,6 +94,9 @@ class Twister extends Module {
 		this.namedSkinPurchaseHandler = (purchaseDetails) => this._namedSkinPurchase(purchaseDetails);
 
 		this.state = TwisterState.Inactive;
+		this.stateAfterEnding = TwisterState.Inactive;
+		this.levelTimer = Timers.oneShot(() => this.endTornado());
+		this.cooldownTimer = Timers.oneShot(() => this._cooldownEnded());
 
 		this.data = {};
 	}
@@ -141,8 +148,16 @@ class Twister extends Module {
 	loadModConfig(conf) {
 		this.eventQueue.expirationTime = conf.activationTimeLimit;
 		this.eventQueue.clearThresholds();
-		this.eventQueue.addThreshold(conf.watchThreshold, () => this.startWatch(), () => this.stopWatch());
-		this.eventQueue.addThreshold(conf.activationThreshold, () => this.startTornado());
+		this.eventQueue.addThreshold(
+			conf.watchThreshold,
+			() => this.triggerWatch(),
+			() => this.untriggerWatch(),
+		);
+		this.eventQueue.addThreshold(
+			conf.activationThreshold,
+			() => this.triggerTornado(),
+			() => this.untriggerTornado(),
+		);
 		if (conf.activationMethod === ActivationMethods.Users) {
 			this.eventQueue.setValueCounter(this._countUniqueUsers);
 		} else {
@@ -184,7 +199,7 @@ class Twister extends Module {
 	}
 
 	_skinPurchase(purchaseDetails) {
-		if (this.state === TwisterState.Inactive || this.state === TwisterState.Watch) {
+		if (this.eventQueue.active) {
 			if (this.config.activationMethod === ActivationMethods.SP) {
 				this.eventQueue.addEvent(purchaseDetails, purchaseDetails.sp);
 			} else if (this.config.activationMethod === ActivationMethods.Purchases) {
@@ -249,6 +264,10 @@ class Twister extends Module {
 			levelsGained++;
 		}
 
+		if (levelsGained > 0) {
+			this._resetLevelTimer();
+		}
+
 		return levelsGained;
 	}
 
@@ -283,16 +302,36 @@ class Twister extends Module {
 	}
 
 
-	startWatch() {
+	triggerWatch() {
+		if (this.state === TwisterState.Inactive) {
+			this.startWatch();
+		} else if (this.state === TwisterState.Ending) {
+			this.stateAfterEnding = TwisterState.Watch;
+		}
+	}
+
+	startWatch(includeLastEvent = false) {
 		this.state = TwisterState.Watch;
 		this._createNewTornadoData();
 
-		const purchaseEvents = this.eventQueue.events;
-		// Removing the last one because it'll be handled separately by the last part of _skinPurchase
-		// (which should run shortly after this)
-		this._addPurchasesToTornado(purchaseEvents.slice(0, purchaseEvents.length - 1));
+		let purchaseEvents = this.eventQueue.events;
+		if (!includeLastEvent) {
+			// Removing the last one because it'll be handled separately by the last part of _skinPurchase
+			// (which should run shortly after this)
+			purchaseEvents = purchaseEvents.slice(0, purchaseEvents.length - 1);
+		}
+
+		this._addPurchasesToTornado(purchaseEvents);
 
 		this.broadcastEvent("watch");
+	}
+
+	untriggerWatch() {
+		if (this.state === TwisterState.Watch) {
+			this.stopWatch();
+		} else if (this.state === TwisterState.Ending) {
+			this.stateAfterEnding = TwisterState.Inactive;
+		}
 	}
 
 	stopWatch() {
@@ -302,17 +341,48 @@ class Twister extends Module {
 		this.hide();
 	}
 
+	triggerTornado() {
+		if (this.state === TwisterState.Watch) {
+			this.startTornado();
+		} else if (this.state === TwisterState.Ending) {
+			this.stateAfterEnding = TwisterState.Active;
+		}
+	}
+
 	startTornado() {
 		this.eventQueue.end();
 		this.broadcastEvent("startTornado", {
 			duration: this.config.levels[0].timeLimit,
 			progress: this._makeProgress(),
 		});
-		setTimeout(() => this._tornadoStarted(), 6000);
+		setTimeout(() => this._tornadoStarted(), 6 * SECONDS);
+	}
+
+	untriggerTornado() {
+		if (this.state === TwisterState.Inactive) {
+			this.stateAfterEnding = TwisterState.Watch;
+		}
+	}
+
+	_cooldownEnded() {
+		this.state = TwisterState.Inactive;
+		if (this.stateAfterEnding === TwisterState.Watch) {
+			this.startWatch(true);
+		} else if (this.stateAfterEnding === TwisterState.Active) {
+			this.startWatch(true);
+			this.startTornado();
+		}
+
+		this.stateAfterEnding = TwisterState.Inactive;
+	}
+
+	_resetLevelTimer() {
+		this.levelTimer.set(this.currentLevel.timeLimit * SECONDS);
 	}
 
 	_tornadoStarted() {
 		this.state = TwisterState.Active;
+		this._resetLevelTimer();
 		this.broadcastEvent("throwIn", this.data.skins);
 	}
 
@@ -362,6 +432,15 @@ class Twister extends Module {
 
 	hide() {
 		this.broadcastEvent("hide");
+	}
+
+	endTornado() {
+		this.state = TwisterState.Ending;
+		this.stateAfterEnding = TwisterState.Inactive;
+		this.eventQueue.start();
+		this.broadcastEvent("endTornado");
+
+		this.cooldownTimer.set(DISPLAY_COOLDOWN_BETWEEN_TORNADOES);
 	}
 
 	// broadcastEvent(event, ...p) {
