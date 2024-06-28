@@ -480,7 +480,28 @@ class Twister extends Module {
 		}
 	}
 
+	_announceResults() {
+		let efLevel = this.data.level + 1;
+		let maxSP = 0, mvps = [];
+		Object.values(this.data.players).forEach(({displayName, sp}) => {
+			if (sp > maxSP) {
+				mvps = [displayName];
+				maxSP = sp;
+			} else if (sp === maxSP) {
+				mvps.push(displayName);
+			}
+		});
+
+		if (mvps.length === 1) {
+			this.print(`Phew! The tornado, rated EF${efLevel} is over! Stormchaser ${mvps[0]} contributed the most with ${maxSP} SP! The tornado left debris all over!`);
+		} else {
+			this.print(`Phew! The tornado, rated EF${efLevel} is over! Stormchasers ${Utils.makeEnglishAndList(mvps)} contributed the most with ${maxSP} SP! The tornado left debris all over!`);
+		}
+	}
+
 	_cooldownEnded() {
+		this._announceResults();
+
 		this.state = TwisterState.Inactive;
 		if (this.stateAfterEnding === TwisterState.Watch) {
 			this.startWatch(true);
