@@ -42,6 +42,13 @@ class Twister extends ModuleClient {
         this.tornadoStartingTime = 0;
         this.delayedProgressData = null;
 
+        this.sounds.loadSounds({
+            bgm: {
+                location: 'audio/bgm.mp3',
+                loop: true,
+            },
+        });
+
         // This is true only when the tornado event is active (and isn't on its way out)
         this.active = false;
     }
@@ -93,6 +100,7 @@ class Twister extends ModuleClient {
         this.delayedSkins = [];
         this.active = true;
         this._setLevel(this.tornadoStartingLevel);
+        this.sounds.play("bgm");
     }
 
     _addIn(skinNames) {
@@ -229,6 +237,7 @@ class Twister extends ModuleClient {
     }
 
     _onTornadoFinaleDone() {
+        this.sounds.fadeOutAndStop(FADE_DURATION);
         this.hide(() => this._clearState());
     }
 
