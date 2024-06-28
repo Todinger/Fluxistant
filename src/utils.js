@@ -135,7 +135,7 @@ class Utils {
 		return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
 	}
 	
-	// Returns a random key from an object, with each value having a differet
+	// Returns a random key from an object, with each value having a different
 	// chance of being selected based on weight.
 	// A weight can be any positive number. If one value has the weight of X and
 	// another has the weight of 2X, the odds of the latter being chosen are
