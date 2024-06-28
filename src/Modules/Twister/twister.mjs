@@ -27,7 +27,7 @@ class Twister extends ModuleClient {
             jLevel: $('#level'),
             jTimer: $('#timer'),
             jTitle: $('#title'),
-            progressBar: document.getElementById('progress-bar'),
+            jProgressBar: $('#progress-bar'),
             progressText: document.getElementById('progress-text'),
             progressContainer: document.getElementById('progress-container'),
         };
@@ -116,7 +116,7 @@ class Twister extends ModuleClient {
     }
 
     setProgressDisplay(progress) {
-        this.elements.progressBar.style.clipPath = `inset(0% ${progress < 100 ? 100 - progress : -1}% 0% 0%)`;
+        this.elements.jProgressBar.css({clipPath: `inset(0% ${progress < 100 ? 100 - progress : -1}% 0% 0%)`});
 
         // Adjust the position of the progress text
         const containerWidth = this.elements.progressContainer.offsetWidth;
