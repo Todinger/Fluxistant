@@ -6,6 +6,9 @@ const WARNING_TEXT = "⚠️ TORNADO WARNING! ⚠️";
 const TORNADO_WARNING_FLASHES = 5;
 const FADE_DURATION = 500;
 
+const BGM_SOUND_NAME = "bgm";
+const WARNING_SOUND_NAME = "warning";
+
 
 function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
@@ -74,6 +77,7 @@ class Twister extends ModuleClient {
 
     startTornado(levelSettings) {
         this.delayedProgressData = this.delayedProgressData || levelSettings.progress;
+        this._playSoundIfExists(WARNING_SOUND_NAME);
         let jCombo = this.elements.jTitle;
         jCombo = jCombo.fadeOut(FADE_DURATION, () => this.toWarn());
         jCombo = jCombo.fadeIn(FADE_DURATION);
@@ -82,6 +86,12 @@ class Twister extends ModuleClient {
             jCombo = jCombo.fadeIn(FADE_DURATION);
         }
         $.when(jCombo).then(() => this._activateTornado(this.tornadoStartingTime || levelSettings.duration));
+    }
+
+    _playSoundIfExists(name) {
+        if (this.sounds.hasSound(name)) {
+            this.sounds.play(name);
+        }
     }
 
     _activateTornado(duration) {
@@ -93,9 +103,7 @@ class Twister extends ModuleClient {
         this.delayedSkins = [];
         this.active = true;
         this._setLevel(this.tornadoStartingLevel);
-        if (this.sounds.hasSound("bgm")) {
-            this.sounds.play("bgm");
-        }
+        this._playSoundIfExists(BGM_SOUND_NAME);
     }
 
     _addIn(skinNames) {
@@ -268,21 +276,26 @@ class Twister extends ModuleClient {
         this.elements.jMain.fadeOut(FADE_DURATION, onDone);
     }
 
-    setup(setupData) {
-        if (this.sounds.hasSound("bgm")) {
-            this.sounds.unloadSound("bgm");
+    _setupSound(name, data, loop) {
+        if (this.sounds.hasSound(name)) {
+            this.sounds.unloadSound(name);
         }
 
-        if (setupData.bgm) {
+        if (data) {
             this.sounds.loadSounds({
-                bgm: {
-                    location: setupData.bgm.url,
-                    loop: true,
+                [name]: {
+                    location: data.url,
+                    loop,
                 },
             });
 
-            this.sounds.getSound("bgm").volumeFactor = setupData.bgm.volume / 100;
+            this.sounds.getSound(name).volumeFactor = data.volume / 100;
         }
+    }
+
+    setup(setupData) {
+        this._setupSound(BGM_SOUND_NAME, setupData.bgm, true);
+        this._setupSound(WARNING_SOUND_NAME, setupData.warningSound, false);
     }
 
     start() {

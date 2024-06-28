@@ -134,6 +134,9 @@ class Twister extends Module {
 		modConfig.add('backgroundMusic', 'Sound')
 			.setName("Background Music")
 			.setDescription("Music to be played while the twister is ongoing");
+		modConfig.add('warningSound', 'Sound')
+			.setName("Warning Sound")
+			.setDescription("Sound to be played when the tornado warning flashes");
 	}
 
 	enable() {
@@ -456,13 +459,21 @@ class Twister extends Module {
 	}
 
 	async _setupClient(socket) {
-		let soundConf = this.config.backgroundMusic;
+		let bgmConf = this.config.backgroundMusic;
 		let setupData = {};
-		if (soundConf) {
-			let soundFileConf = soundConf.file;
+		if (bgmConf && bgmConf.file.fileKey) {
+			let soundFileConf = bgmConf.file;
 			let soundFile = await this.assets.getFileWeb(soundFileConf);
-			setupData.bgm = soundConf.makeDisplayData(soundFile);
+			setupData.bgm = bgmConf.makeDisplayData(soundFile);
 		}
+
+		let warningSoundConf = this.config.warningSound;
+		if (warningSoundConf && warningSoundConf.file.fileKey) {
+			let warningSoundFileConf = warningSoundConf.file;
+			let soundFile = await this.assets.getFileWeb(warningSoundFileConf);
+			setupData.warningSound = warningSoundConf.makeDisplayData(soundFile);
+		}
+
 		socket.emit("setup", setupData);
 	}
 
