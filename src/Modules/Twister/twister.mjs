@@ -280,6 +280,8 @@ class Twister extends ModuleClient {
                     loop: true,
                 },
             });
+
+            this.sounds.getSound("bgm").volumeFactor = setupData.bgm.volume / 100;
         }
     }
 
