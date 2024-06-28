@@ -82,8 +82,9 @@ const SUPPORTED_SKIN_NAMES = [
 ];
 
 
-function range(min, max) {
+function wRange(weight, min, max) {
 	return {
+		weight,
 		min,
 		max: max || min,
 	};
@@ -95,47 +96,57 @@ const PRIZE_OPTIONS = [
 	{
 		main: {},
 		consolation: {
-			yarn: range(5, 10),
-			yarnBall: range(1),
+			yarn: wRange(1, 5, 10),
+			yarnBall: wRange(1, 1),
 		},
 	},
 	// EF 2
 	{
 		main: {},
 		consolation: {
-			yarn: range(10, 20),
-			yarnBall: range(2, 4),
-			goldBall: range(1),
+			yarn: wRange(1, 10, 20),
+			yarnBall: wRange(1, 2, 4),
+			goldBall: wRange(1, 1),
 		},
 	},
 	// EF 3
 	{
 		main: {},
 		consolation: {
-			yarn: range(21, 30),
-			yarnBall: range(6, 8),
-			goldBall: range(2),
+			yarn: wRange(1, 21, 30),
+			yarnBall: wRange(1, 6, 8),
+			goldBall: wRange(1, 2),
 		},
 	},
 	// EF 4
 	{
 		main: {},
 		consolation: {
-			yarn: range(31, 45),
-			yarnBall: range(10, 15),
-			goldBall: range(3),
-			catches: range(1, 2),
+			yarn: wRange(1, 31, 45),
+			yarnBall: wRange(1, 10, 15),
+			goldBall: wRange(1, 3),
+			catches: wRange(1, 1, 2),
 		},
 	},
 	// EF 5
 	{
 		main: {},
 		consolation: {
-			yarn: range(50, 75),
-			yarnBall: range(20, 30),
-			goldBall: range(5),
-			catches: range(3, 5),
-			shinyCatches: range(1),
+			yarn: wRange(1, 50, 75),
+			yarnBall: wRange(1, 20, 30),
+			goldBall: wRange(1, 5),
+			catches: wRange(1, 3, 5),
+		},
+	},
+	// EF 5 CLEARED
+	{
+		main: {},
+		consolation: {
+			yarn: wRange(1, 76, 100),
+			yarnBall: wRange(1, 35, 50),
+			goldBall: wRange(1, 3, 7),
+			catches: wRange(1, 4, 6),
+			shinyCatches: wRange(1, 1),
 		},
 	},
 ];
@@ -569,7 +580,12 @@ class Twister extends Module {
 	}
 
 	_grantConsolationPrize(username, displayName) {
-		let options = PRIZE_OPTIONS[this.data.level].consolation;
+		let level = this.data.level;
+		if (level === NUM_LEVELS - 1 && this.data.sp >= this.currentLevel.spToClear) {
+			level++;
+		}
+
+		let options = PRIZE_OPTIONS[level].consolation;
 		let selection = Utils.randomKey(options);
 		let prize = this.prizes[selection];
 		return prize.grant(username, displayName, options[selection]);
