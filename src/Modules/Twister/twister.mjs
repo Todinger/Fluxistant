@@ -235,11 +235,13 @@ class Twister extends ModuleClient {
     _showTornadoDetails() {
         this.elements.jLevel.show();
         this.elements.jTimer.show();
+        this.elements.jProgressContainer.show();
     }
 
     _hideTornadoDetails() {
         this.elements.jLevel.hide();
         this.elements.jTimer.hide();
+        this.elements.jProgressContainer.hide();
     }
 
     _clearState() {
