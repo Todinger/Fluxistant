@@ -59,18 +59,26 @@ function whee() {
     ));
 }
 
-function throwIn(skinName) {
+function makeDebris(skinName) {
     if (!(skinName in assets.skins)) {
         assets.skins[skinName] = loadImage(`assets/skins/${skinName}.gif`);
     }
 
-    tornado.throwIn(new Debris(
+    return new Debris(
         tornado,
         assets.skins[skinName],
         100,
         100,
         alphaShader,
-    ));
+    );
+}
+
+function throwIn(skinName) {
+    tornado.throwIn(makeDebris(skinName));
+}
+
+function addIn(skinName) {
+    tornado.addDebris(makeDebris(skinName));
 }
 
 function draw() {
@@ -88,10 +96,11 @@ function tornadoFinaleDone() {
 }
 
 const eventHandlers = {
-    start: () => tornado.start(),
+    start: (level) => tornado.start(level),
     end: () => tornado.end(),
     grow: () => tornado.grow(),
     throwIn,
+    addIn,
 };
 
 

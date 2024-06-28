@@ -66,6 +66,7 @@ class Tornado {
         this.level = 0;
         this.sizeFactorAddition = 0;
         this.growing = false;
+        this.targetGrowthLevel = 0;
         this.debris = [];
         this.pendingDebris = [];
         this.movementDirection = 1;
@@ -381,10 +382,11 @@ class Tornado {
         if (this.ended || this.level >= MAX_TORNADO_LEVEL) return;
 
         this.growing = true;
+        this.targetGrowthLevel = min(this.targetGrowthLevel + 1, MAX_TORNADO_LEVEL);
     }
 
     endGrowth() {
-        this.level++;
+        this.level = this.targetGrowthLevel;
         this.sizeFactorAddition = 0;
         this.growing = false;
     }
@@ -393,14 +395,18 @@ class Tornado {
         this.ended = true;
     }
 
+    updateParametersBySize() {
+        this.center.y = -this.height / 2;
+        this.refreshLimits();
+    }
+
     updateSize() {
         if (!this.growing) return;
 
         this.sizeFactorAddition += this.growthRate;
-        this.center.y = -this.height / 2;
-        this.refreshLimits();
+        this.updateParametersBySize();
 
-        if (this.sizeFactor >= TORNADO_SIZE_FACTORS[this.level + 1]) {
+        if (this.sizeFactor >= TORNADO_SIZE_FACTORS[this.targetGrowthLevel]) {
             this.endGrowth();
         }
     }
@@ -442,6 +448,7 @@ class Tornado {
         this.level = 0;
         this.sizeFactorAddition = 0;
         this.growing = false;
+        this.targetGrowthLevel = 0;
         this.debris = [];
         this.pendingDebris = [];
         this.movementDirection = 1;
@@ -454,9 +461,14 @@ class Tornado {
         this.refreshLimits();
     }
 
-    start() {
+    start(startingLevel) {
         if (this.running) return;
         this.resetState();
+        if (startingLevel) {
+            this.level = min(startingLevel, MAX_TORNADO_LEVEL);
+            this.updateParametersBySize();
+        }
+
         this.running = true;
     }
 }

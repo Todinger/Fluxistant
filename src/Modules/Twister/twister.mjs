@@ -37,6 +37,10 @@ class Twister extends ModuleClient {
         this.timerHandle = null;
         this.timeLeft = 0;
 
+        this.delayedSkins = [];
+        this.tornadoStartingLevel = 1;
+        this.tornadoStartingTime = 0;
+
         // This is true only when the tornado event is active (and isn't on its way out)
         this.active = false;
     }
@@ -67,7 +71,8 @@ class Twister extends ModuleClient {
         this.show();
     }
 
-    startTornado(duration) {
+    startTornado(levelSettings) {
+        this.setProgress(levelSettings["progress"]);
         let jCombo = this.elements.jTitle;
         jCombo = jCombo.fadeOut(FADE_DURATION, () => this.toWarn());
         jCombo = jCombo.fadeIn(FADE_DURATION);
@@ -75,19 +80,36 @@ class Twister extends ModuleClient {
             jCombo = jCombo.fadeOut(FADE_DURATION);
             jCombo = jCombo.fadeIn(FADE_DURATION);
         }
-        $.when(jCombo).then(() => this._activateTornado(duration));
+        $.when(jCombo).then(() => this._activateTornado(this.tornadoStartingTime || levelSettings["duration"]));
     }
 
     _activateTornado(duration) {
         this.setTimer(duration);
-        this.sendToChild("start");
+        this.sendToChild("start", this.tornadoStartingLevel - 1);
         this._showTornadoDetails();
+        this._addIn(this.delayedSkins);
+        this.delayedSkins = [];
         this.active = true;
+        this._setLevel(this.tornadoStartingLevel);
     }
 
-    throwIn(skinNames) {
+    _addIn(skinNames) {
+        for (let skinName of skinNames) {
+            this.sendToChild("addIn", skinName);
+        }
+    }
+
+    _throwIn(skinNames) {
         for (let skinName of skinNames) {
             this.sendToChild("throwIn", skinName);
+        }
+    }
+
+    requestThrowIn(skinNames) {
+        if (this.active) {
+            this._throwIn(skinNames);
+        } else {
+            this.delayedSkins.push(...skinNames);
         }
     }
 
@@ -121,21 +143,38 @@ class Twister extends ModuleClient {
         }
     }
 
-    grow(newDuration) {
-        console.log("Grow!");
-        this.sendToChild("grow");
+    _setLevel(level) {
         this.elements.jLevel.removeClass(`ef${this.currentLevel}`);
         this.elements.jTimer.removeClass(`timer-ef${this.currentLevel}`);
-        this.currentLevel = Math.min(this.currentLevel + 1, 5);
+        this.currentLevel = Math.min(level, 5);
         this.elements.jLevel.addClass(`ef${this.currentLevel}`);
         this.elements.jTimer.addClass(`timer-ef${this.currentLevel}`);
         this.elements.jLevel.text(`EF${this.currentLevel}`);
+    }
 
-        this.setTimer(newDuration);
+    _grow(newDuration) {
+        this.sendToChild("grow");
+        this._setLevel(this.currentLevel + 1);
+
+        if (newDuration) {
+            this.setTimer(newDuration);
+        }
+    }
+
+    requestGrow(duration) {
+        if (this.active) {
+            this._grow(duration);
+        } else {
+            this.tornadoStartingLevel++;
+            this.tornadoStartingTime = duration;
+        }
     }
 
     endTornado() {
         this.sendToChild("end");
+        this.delayedSkins = [];
+        this.tornadoStartingLevel = 1;
+        this.tornadoStartingTime = 0;
         this.active = false;
     }
 
@@ -187,6 +226,8 @@ class Twister extends ModuleClient {
             clearInterval(this.timerHandle);
             this.timerHandle = null;
         }
+
+        this._setLevel(1);
     }
 
     show() {
@@ -200,10 +241,10 @@ class Twister extends ModuleClient {
     start() {
         this.server.on('watch', () => this.showWatch());
         this.server.on('warn', () => this.showWarn());
-        this.server.on('startTornado', (duration) => this.startTornado(duration));
-        this.server.on('throwIn', (skinNames) => this.active && this.throwIn(skinNames));
+        this.server.on('startTornado', (levelSettings) => this.startTornado(levelSettings));
+        this.server.on('throwIn', (skinNames) => this.requestThrowIn(skinNames));
         this.server.on('setProgress', (progressData) => this.active && this.setProgress(progressData));
-        this.server.on('grow', (newDuration) => this.active && this.grow(newDuration));
+        this.server.on('grow', (newDuration) => this.requestGrow(newDuration));
         this.server.on('endTornado', () => this.active && this.endTornado());
         this.server.on('show', () => this.show());
         this.server.on('hide', () => this.hide());
