@@ -28,10 +28,11 @@ class TimedEventQueue {
         this.valueCounter = null;
     }
 
-    addThreshold(count, callback) {
+    addThreshold(count, callback, declinationCallback) {
         this.thresholds.push({
             count,
             callback,
+            declinationCallback,
             cleared: false,
         });
     }
@@ -85,6 +86,8 @@ class TimedEventQueue {
             this.totalValue -= this.queue[0].value;
             this.queue.shift();
         }
+
+        this._declineThresholds();
     }
 
     _activateHitThresholds() {
@@ -98,7 +101,27 @@ class TimedEventQueue {
         for (let threshold of this.thresholds) {
             if (totalValue >= threshold.count && !threshold.cleared) {
                 threshold.cleared = true;
-                threshold.callback();
+                if (threshold.callback) {
+                    threshold.callback();
+                }
+            }
+        }
+    }
+
+    _declineThresholds() {
+        let totalValue;
+        if (this.valueCounter) {
+            totalValue = this.valueCounter(this.events);
+        } else {
+            totalValue = this.totalValue;
+        }
+
+        for (let threshold of [...this.thresholds].reverse()) {
+            if (totalValue < threshold.count && threshold.cleared) {
+                threshold.cleared = false;
+                if (threshold.declinationCallback) {
+                    threshold.declinationCallback();
+                }
             }
         }
     }

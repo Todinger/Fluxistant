@@ -141,7 +141,7 @@ class Twister extends Module {
 	loadModConfig(conf) {
 		this.eventQueue.expirationTime = conf.activationTimeLimit;
 		this.eventQueue.clearThresholds();
-		this.eventQueue.addThreshold(conf.watchThreshold, () => this.startWatch());
+		this.eventQueue.addThreshold(conf.watchThreshold, () => this.startWatch(), () => this.stopWatch());
 		this.eventQueue.addThreshold(conf.activationThreshold, () => this.startTornado());
 		if (conf.activationMethod === ActivationMethods.Users) {
 			this.eventQueue.setValueCounter(this._countUniqueUsers);
@@ -295,6 +295,13 @@ class Twister extends Module {
 		this.broadcastEvent("watch");
 	}
 
+	stopWatch() {
+		if (this.state !== TwisterState.Watch) return;
+
+		this.state = TwisterState.Inactive;
+		this.hide();
+	}
+
 	startTornado() {
 		this.eventQueue.end();
 		this.broadcastEvent("startTornado", {
@@ -351,6 +358,10 @@ class Twister extends Module {
 			duration: this.currentLevel.timeLimit,
 			progress: this._makeProgress(),
 		});
+	}
+
+	hide() {
+		this.broadcastEvent("hide");
 	}
 
 	// broadcastEvent(event, ...p) {
