@@ -101,6 +101,10 @@ class Twister extends Module {
 		this.data = {};
 	}
 
+	defineModAssets(modData) {
+		modData.addNamedCollection('Sounds');
+	}
+
 	defineModConfig(modConfig) {
 		modConfig.addBoolean('percentageDisplay', false)
 			.setName("Percentage Display")
@@ -126,6 +130,10 @@ class Twister extends Module {
 		for (let i = 0; i < NUM_LEVELS; i++) {
 			levels.addElement(new TwisterLevelEntity());
 		}
+
+		modConfig.add('backgroundMusic', 'Sound')
+			.setName("Background Music")
+			.setDescription("Music to be played while the twister is ongoing");
 	}
 
 	enable() {
@@ -143,6 +151,10 @@ class Twister extends Module {
 			TWISTER_ACTIVATION_METHODS_SOURCE_NAME,
 			Object.values(ActivationMethods)
 		);
+
+		this.onClientAttached(async socket => {
+			await this._setupClient(socket);
+		});
 	}
 
 	loadModConfig(conf) {
@@ -441,6 +453,17 @@ class Twister extends Module {
 		this.broadcastEvent("endTornado");
 
 		this.cooldownTimer.set(DISPLAY_COOLDOWN_BETWEEN_TORNADOES);
+	}
+
+	async _setupClient(socket) {
+		let soundConf = this.config.backgroundMusic;
+		let setupData = {};
+		if (soundConf) {
+			let soundFileConf = soundConf.file;
+			let soundFile = await this.assets.getFileWeb(soundFileConf);
+			setupData.bgm = soundConf.makeDisplayData(soundFile);
+		}
+		socket.emit("setup", setupData);
 	}
 
 	// broadcastEvent(event, ...p) {

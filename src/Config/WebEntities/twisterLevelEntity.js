@@ -6,10 +6,10 @@ class TwisterLevelEntity extends StaticObjectEntity {
 	
 	constructor() {
 		super();
-		this.addNaturalNumber('spToClear', 0)
+		this.addNaturalNumber('spToClear', 20)
 			.setName('SP to Clear')
 			.setDescription('How many SP are needed in order to clear this level');
-		this.addDuration('timeLimit', 0)
+		this.addNaturalNumber('timeLimit', 600)
 			.setName('Time Limit')
 			.setDescription('Maximum time (in seconds) that the level continues before the twister ends');
 	}

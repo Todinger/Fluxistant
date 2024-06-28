@@ -42,13 +42,6 @@ class Twister extends ModuleClient {
         this.tornadoStartingTime = 0;
         this.delayedProgressData = null;
 
-        this.sounds.loadSounds({
-            bgm: {
-                location: 'audio/bgm.mp3',
-                loop: true,
-            },
-        });
-
         // This is true only when the tornado event is active (and isn't on its way out)
         this.active = false;
     }
@@ -100,7 +93,9 @@ class Twister extends ModuleClient {
         this.delayedSkins = [];
         this.active = true;
         this._setLevel(this.tornadoStartingLevel);
-        this.sounds.play("bgm");
+        if (this.sounds.hasSound("bgm")) {
+            this.sounds.play("bgm");
+        }
     }
 
     _addIn(skinNames) {
@@ -273,6 +268,21 @@ class Twister extends ModuleClient {
         this.elements.jMain.fadeOut(FADE_DURATION, onDone);
     }
 
+    setup(setupData) {
+        if (this.sounds.hasSound("bgm")) {
+            this.sounds.unloadSound("bgm");
+        }
+
+        if (setupData.bgm) {
+            this.sounds.loadSounds({
+                bgm: {
+                    location: setupData.bgm.url,
+                    loop: true,
+                },
+            });
+        }
+    }
+
     start() {
         this.server.on('watch', () => this.showWatch());
         this.server.on('warn', () => this.showWarn());
@@ -283,6 +293,7 @@ class Twister extends ModuleClient {
         this.server.on('endTornado', () => this.active && this.endTornado());
         this.server.on('show', () => this.show());
         this.server.on('hide', () => this.hide());
+        this.server.on('setup', (setupData) => this.setup(setupData));
         this.server.attach();
     }
 }

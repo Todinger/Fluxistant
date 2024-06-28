@@ -101,6 +101,11 @@ class SoundManager {
 		
 		return this._sounds[name];
 	}
+
+	// Sound check!
+	hasSound(name) {
+		return name in this._sounds;
+	}
 	
 	// Gets the duration of the sound with the given name.
 	// Only works after the sound has been loaded (returns 0 otherwise).
