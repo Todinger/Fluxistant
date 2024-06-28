@@ -160,7 +160,6 @@ class Twister extends ModuleClient {
         this.elements.jLevel.addClass(`ef${this.currentLevel}`);
         this.elements.jTimer.addClass(`timer-ef${this.currentLevel}`);
         this.elements.jLevel.text(`EF${this.currentLevel}`);
-        console.log(`Curren level set to ${this.currentLevel}`);
     }
 
     _grow(newDuration) {

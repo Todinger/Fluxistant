@@ -286,6 +286,12 @@ class Twister extends Module {
 	startWatch() {
 		this.state = TwisterState.Watch;
 		this._createNewTornadoData();
+
+		const purchaseEvents = this.eventQueue.events;
+		// Removing the last one because it'll be handled separately by the last part of _skinPurchase
+		// (which should run shortly after this)
+		this._addPurchasesToTornado(purchaseEvents.slice(0, purchaseEvents.length - 1));
+
 		this.broadcastEvent("watch");
 	}
 
