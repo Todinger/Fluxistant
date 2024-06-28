@@ -155,12 +155,16 @@ class Twister extends Module {
 			Object.values(ActivationMethods)
 		);
 
-		this.onClientAttached(async socket => {
-			await this._setupClient(socket);
+		this.onClientAttached(async () => {
+			await this._setupClients();
 		});
 	}
 
 	loadModConfig(conf) {
+		if (this.clientsAreConnected) {
+			setTimeout(async () => await this._setupClients(), 200);
+		}
+
 		this.eventQueue.expirationTime = conf.activationTimeLimit;
 		this.eventQueue.clearThresholds();
 		this.eventQueue.addThreshold(
@@ -469,7 +473,7 @@ class Twister extends Module {
 		this.cooldownTimer.set(DISPLAY_COOLDOWN_BETWEEN_TORNADOES);
 	}
 
-	async _setupClient(socket) {
+	async _setupClients() {
 		let bgmConf = this.config.backgroundMusic;
 		let setupData = {};
 		if (bgmConf && bgmConf.file.fileKey) {
@@ -485,7 +489,7 @@ class Twister extends Module {
 			setupData.warningSound = warningSoundConf.makeDisplayData(soundFile);
 		}
 
-		socket.emit("setup", setupData);
+		this.broadcastEvent("setup", setupData);
 	}
 
 	// broadcastEvent(event, ...p) {
