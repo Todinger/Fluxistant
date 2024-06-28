@@ -35,6 +35,27 @@ const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $normals = norm
 const YARN_PER_THROW = 1;
 
 class Pokyecats extends Module {
+	static Interface = class ImageDropperInterface extends Module.Interface {
+		constructor(inst) {
+			super(inst);
+		}
+
+		defineMethods() {
+			return {
+				addYarn: (conf, username, displayName, amount) =>
+					this.inst.addYarn(username, displayName, amount),
+				addYarnBall: (conf, username, displayName, amount) =>
+					this.inst.addBall(username, displayName, BALLS.YARN, amount),
+				addGoldBall: (conf, username, displayName, amount) =>
+					this.inst.addBall(username, displayName, BALLS.GOLD, amount),
+				addCatches: (conf, username, displayName, amount) =>
+					this.inst.addCatches(username, displayName, amount),
+				addShinyCatches: (conf, username, displayName, amount) =>
+					this.inst.addShinyCatches(username, displayName, amount),
+			};
+		}
+	};
+
 	constructor() {
 		super({
 			name: 'Pokyecats',
@@ -192,12 +213,13 @@ class Pokyecats extends Module {
 		};
 	}
 	
-	getUserCatchData(user) {
-		if (!(user.name in this.data.catches)) {
-			this.data.catches[user.name] = this.newCatchData();
+	getUserCatchData(username, displayName) {
+		if (!(username in this.data.catches)) {
+			this.data.catches[username] = this.newCatchData();
+			this.data.catches[username].displayName = displayName;
 		}
 		
-		return this.data.catches[user.name];
+		return this.data.catches[username];
 	}
 	
 	variableValuesFromCatchData(catchData) {
@@ -280,7 +302,7 @@ class Pokyecats extends Module {
 	}
 	
 	tryCatch(data) {
-		let catchData = this.getUserCatchData(data.user);
+		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
 		
 		let ball = this.getBall(data);
 		if (!this.consumeUserBall(catchData, ball.name)) {
@@ -345,7 +367,7 @@ class Pokyecats extends Module {
 	}
 	
 	getCatches(data) {
-		let catchData = this.getUserCatchData(data.user);
+		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
 		return {
 			success:   true,
 			variables: this.variableValuesFromCatchData(catchData),
@@ -387,7 +409,15 @@ class Pokyecats extends Module {
 			let currPlayerNum = 1;
 			playerUserNames.forEach(username => {
 				let catchData = this.data.catches[username];
-				this.print(`${currPlayerNum.toString().padStart(maxPlayerNumLength)}. ${this.getDisplayName(username)}: ${catchData.yarn}`);
+				let number = `${currPlayerNum.toString().padStart(maxPlayerNumLength)}. `;
+				let name = `${this.getDisplayName(username)}: `;
+				let yarn = `${catchData.yarn}, `;
+				let yarnBalls = `${catchData.balls[BALLS.YARN]} yarn balls, `;
+				let goldBalls = `${catchData.balls[BALLS.GOLD]} gold balls, `;
+				let catches = `${catchData.catches} catches, and `;
+				let shiny = `${catchData.shinyCatches} shiny catches.`;
+				let all = number + name + yarn + yarnBalls + goldBalls + catches + shiny;
+				this.print(all);
 				currPlayerNum++;
 			})
 		}
@@ -412,7 +442,32 @@ class Pokyecats extends Module {
 			this.tell(data.user, "Sorry, you don't have any yarn yet. Try catching Pokyecats to get some!");
 		}
 	}
-	
+
+	addYarn(username, displayName, amount) {
+		let catchData = this.getUserCatchData(username, displayName);
+		catchData.yarn += amount;
+		this.saveData();
+	}
+
+	addBall(username, displayName, ballName, amount) {
+		let catchData = this.getUserCatchData(username, displayName);
+		catchData.balls[ballName] += amount;
+		this.saveData();
+	}
+
+	addCatches(username, displayName, amount) {
+		let catchData = this.getUserCatchData(username, displayName);
+		catchData.catches += amount;
+		this.saveData();
+	}
+
+	addShinyCatches(username, displayName, amount) {
+		let catchData = this.getUserCatchData(username, displayName);
+		catchData.shinyCatches += amount;
+		this.saveData();
+	}
+
+
 	functions = {
 		sellSoul: {
 			name: 'Try Catch',

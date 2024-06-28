@@ -1,5 +1,6 @@
 const Module = requireMain('module');
 const ConfigSourceManager = requireMain('configSourceManager');
+const Prizes = require('./prizes');
 const StreamRaidersManager = requireMain('streamRaidersManager');
 const TwisterLevelEntity = require("./Config/twisterLevelEntity");
 const TimedEventQueue = requireMain("timedEventQueue");
@@ -81,6 +82,60 @@ const SUPPORTED_SKIN_NAMES = [
 ];
 
 
+function range(min, max) {
+	return {
+		min,
+		max: max || min,
+	};
+}
+
+
+const PRIZE_OPTIONS = [
+	{
+		main: {},
+		consolation: {
+			yarn: range(5, 10),
+			yarnBall: range(1),
+		},
+	},
+	{
+		main: {},
+		consolation: {
+			yarn: range(10, 20),
+			yarnBall: range(2, 4),
+			goldBall: range(1),
+		},
+	},
+	{
+		main: {},
+		consolation: {
+			yarn: range(21, 30),
+			yarnBall: range(6, 8),
+			goldBall: range(2),
+		},
+	},
+	{
+		main: {},
+		consolation: {
+			yarn: range(31, 45),
+			yarnBall: range(10, 15),
+			goldBall: range(3),
+			catches: range(1, 2),
+		},
+	},
+	{
+		main: {},
+		consolation: {
+			yarn: range(50, 75),
+			yarnBall: range(20, 30),
+			goldBall: range(5),
+			catches: range(3, 5),
+			shinyCatches: range(1),
+		},
+	},
+];
+
+
 class Twister extends Module {
 	constructor() {
 		super({
@@ -97,6 +152,14 @@ class Twister extends Module {
 		this.stateAfterEnding = TwisterState.Inactive;
 		this.levelTimer = Timers.oneShot(() => this.endTornado());
 		this.cooldownTimer = Timers.oneShot(() => this._cooldownEnded());
+
+		this.prizes = {
+			yarn: Prizes.pokyecats.yarn(this),
+			yarnBall: Prizes.pokyecats.yarnBall(this),
+			goldBall: Prizes.pokyecats.goldBall(this),
+			catches: Prizes.pokyecats.catches(this),
+			shinyCatches: Prizes.pokyecats.shinyCatches(this),
+		};
 
 		this.data = {};
 	}
@@ -137,6 +200,10 @@ class Twister extends Module {
 		modConfig.add('warningSound', 'Sound')
 			.setName("Warning Sound")
 			.setDescription("Sound to be played when the tornado warning flashes");
+	}
+
+	defineModDependencies() {
+		this.pokyecats = this.use('Pokyecats');
 	}
 
 	enable() {
@@ -254,10 +321,13 @@ class Twister extends Module {
 		this.saveData();
 	}
 
-	_ensureTornadoUserData(username) {
+	_ensureTornadoUserData(username, displayName) {
 		if (!this.data) return;
 		if (!(username in this.data.players)) {
-			this.data.players[username] = 0;
+			this.data.players[username] = {
+				displayName,
+				sp: 0,
+			};
 		}
 	}
 
@@ -302,8 +372,8 @@ class Twister extends Module {
 	}
 
 	_addPurchaseDetailsToData(purchaseDetails) {
-		this._ensureTornadoUserData(purchaseDetails.playerUsername);
-		this.data.players[purchaseDetails.playerUsername] += purchaseDetails.sp;
+		this._ensureTornadoUserData(purchaseDetails.playerUsername, purchaseDetails.player);
+		this.data.players[purchaseDetails.playerUsername].sp += purchaseDetails.sp;
 		this._addSkinToTornado(purchaseDetails);
 		this.data.sp += purchaseDetails.sp;
 		this.data.totalSP += purchaseDetails.sp;
@@ -469,8 +539,9 @@ class Twister extends Module {
 		this.stateAfterEnding = TwisterState.Inactive;
 		this.eventQueue.start();
 		this.broadcastEvent("endTornado");
-
 		this.cooldownTimer.set(DISPLAY_COOLDOWN_BETWEEN_TORNADOES);
+
+		this.grantPrizes();
 	}
 
 	async _setupClients() {
@@ -490,6 +561,28 @@ class Twister extends Module {
 		}
 
 		this.broadcastEvent("setup", setupData);
+	}
+
+	_grantConsolationPrize(username, displayName) {
+		let options = PRIZE_OPTIONS[this.data.level].consolation;
+		let selection = Utils.randomKey(options);
+		let prize = this.prizes[selection];
+		return prize.grant(username, displayName, options[selection]);
+	}
+
+	grantPrizes() {
+		let prizes = {};
+		this.print("+--------+");
+		this.print("| PRIZES |");
+		this.print("+--------+");
+		Utils.objectForEach(this.data.players, (username, userDetails) => {
+			prizes[username] = this._grantConsolationPrize(username, userDetails.displayName);
+			this.print(`${userDetails.displayName} got ${prizes[username]}`);
+		});
+
+		setTimeout(() => this.saveAllData(true), 500);
+
+		return prizes;
 	}
 
 	// broadcastEvent(event, ...p) {

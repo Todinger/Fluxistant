@@ -143,7 +143,7 @@ class Twister extends ModuleClient {
         }
 
         this.setProgressDisplay(progress);
-        this.elements.progressText.textContent = `${progress}%`;
+        this.elements.progressText.textContent = `${Math.round(progress)}%`;
     }
 
     setProgressSP(current, total, allowOverflow) {

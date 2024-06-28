@@ -141,6 +141,7 @@ class ModuleManager {
 		// Initialize the external values the Module needs before letting it
 		// perform its own loading
 		mod.moduleManager = this;
+		mod.saveAllData = (...p) => this.saveAllData(...p);
 		mod.workdir = modDir;
 		
 		// Save the module and announce it to show initial success
@@ -358,9 +359,15 @@ class ModuleManager {
 		});
 	}
 
-	saveAllData() {
+	saveAllData(short) {
+		if (short) {
+			console.log("Saving all data...");
+		}
 		Utils.objectForEach(this.modules, (modName, mod) => {
-			console.log(`Saving data for ${modName}...`);
+			if (!short) {
+				console.log(`Saving data for ${modName}...`);
+			}
+
 			try {
 				mod.saveData();
 			} catch (ex) {
