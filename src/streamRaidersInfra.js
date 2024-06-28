@@ -18,6 +18,8 @@ const CTV_BOT_MESSAGES = {
 	},
 };
 
+const NAMED_PURCHASE_REGEX = /eventId\\":\\"(?<eventId>[^\\"]*).*(?<skinName>skin[a-zA-Z0-9]*)_/gi;
+
 /*
 Input Examples
 --------------
@@ -50,6 +52,10 @@ Multi-Bomb:
 	20: 24Slevin gifted 20 Fluxistence skins to chairbreakerm8, NotedBinkie9727, piripia, 3aglesdwm, go_licpgm, and 15 more people!  All recipients will be notified on the skins tab at https://www.streamraiders.com/
 	50: YecatsX gifted 50 Fluxistence skins to JQ_GOC, klayre_and_cat, BlasianIvy, ladyjessica84, Jersey_ci92, and 45 more people!  All recipients will be notified on the skins tab at https://www.streamraiders.com/
 	100: AeroGarfield29 gifted 100 Fluxistence skins to GroverMonster, bethleves, MYKLMantis, Anzelagt, Deeztructor, and 95 more people!  All recipients will be notified on the skins tab at https://www.streamraiders.com/
+
+Named Purchase:
+	"{\"eventId\":\"666f0e6970a66\",\"eventType\":\"purchase-self\",\"twitchUserImage\":\"https:\\/\\/static-cdn.jtvnw.net\\/jtv_user_pictures\\/194e0ff8-8e59-4c7c-a5f3-d6e24ba64107-profile_image-300x300.png\",\"messageArgs\":[\"WitchyWoman503\",\"Full\",\"YecatsX Barbarian\"],\"messageImage\":\"https:\\/\\/d2k2g0zg1te1mr.cloudfront.net\\/overlays\\/battle-box\\/assets\\/units\\/skinFullBarbarianYecatsmailbox_walk.8fce65e213f2.gif\"}": "1718554217",
+	"{\"eventId\":\"6670d539a1ae1\",\"eventType\":\"gift-targeted\",\"twitchUserImage\":\"https:\\/\\/static-cdn.jtvnw.net\\/jtv_user_pictures\\/c6ee5ca3-119f-4797-9260-f3fca5cb9a84-profile_image-300x300.png\",\"messageArgs\":[\"dezL0rd\",\"Full\",\"CrimsonK19\",\"YecatsX Rogue\"],\"messageImage\":\"https:\\/\\/d2k2g0zg1te1mr.cloudfront.net\\/overlays\\/battle-box\\/assets\\/units\\/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif\"}": "1718670649"
 */
 
 const API_URL = "https://www.streamraiders.com/api/game/?ss=$TOKEN&cn=$CN&command=$COMMAND";
@@ -399,10 +405,18 @@ class SkinBombMultiDetails extends SkinPurchaseDetailsBase {
 	}
 }
 
+class NamedPurchase {
+	constructor(details) {
+		this.eventId = details['eventId'];
+		this.skinName = details['skinName'];
+	}
+}
+
 
 module.exports = {
 	CTV_BOT_USER,
 	CTV_BOT_MESSAGES,
+	NAMED_PURCHASE_REGEX,
 	API_SETTINGS,
 	API,
 	SkinathonState,
@@ -411,4 +425,5 @@ module.exports = {
 	SkinGiftDetails,
 	SkinBombSingleDetails,
 	SkinBombMultiDetails,
+	NamedPurchase,
 };

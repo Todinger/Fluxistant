@@ -87,6 +87,7 @@ class Twister extends Module {
 
 		this.eventQueue = new TimedEventQueue(0, EVENT_QUEUE_CHECK_INTERVAL);
 		this.skinPurchaseHandler = (purchaseDetails) => this._skinPurchase(purchaseDetails);
+		this.namedSkinPurchaseHandler = (purchaseDetails) => this._namedSkinPurchase(purchaseDetails);
 
 		this.state = TwisterState.Inactive;
 
@@ -163,10 +164,12 @@ class Twister extends Module {
 
 	_enableEventHandlers() {
 		StreamRaidersManager.onAnySkinPurchase(this.skinPurchaseHandler);
+		StreamRaidersManager.onNamedPurchases(this.namedSkinPurchaseHandler);
 	}
 
 	_disableEventHandlers() {
 		StreamRaidersManager.removeAnySkinPurchaseCallback(this.skinPurchaseHandler);
+		StreamRaidersManager.removeNamedPurchasesCallback(this.namedSkinPurchaseHandler);
 	}
 
 	_countUniqueUsers(purchases) {
@@ -193,6 +196,14 @@ class Twister extends Module {
 
 		if (this.state === TwisterState.Watch || this.state === TwisterState.Active) {
 			this._processTornadoPurchaseData(purchaseDetails);
+		}
+	}
+
+	_namedSkinPurchase(namedPurchases) {
+		let skinNames = namedPurchases.map(namedPurchaseDetails => namedPurchaseDetails.skinName);
+		this.data.skins.push(...skinNames);
+		if (this.state === TwisterState.Active) {
+			this.throwIn(skinNames);
 		}
 	}
 

@@ -9,6 +9,7 @@ const { SECONDS, ONE_SECOND } = require('./constants');
 const {
 	CTV_BOT_USER,
 	CTV_BOT_MESSAGES,
+	NAMED_PURCHASE_REGEX,
 	API_SETTINGS,
 	API,
 	SkinathonState,
@@ -17,6 +18,7 @@ const {
 	SkinGiftDetails,
 	SkinBombSingleDetails,
 	SkinBombMultiDetails,
+	NamedPurchase,
 } = require('./streamRaidersInfra');
 
 // Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
@@ -82,6 +84,7 @@ class StreamRaidersManager extends EventNotifier {
 		this._addEvent('skinGift');
 		this._addEvent('singleSkinBomb');
 		this._addEvent('multiSkinBomb');
+		this._addEvent('namedPurchases');
 
 
 		cli.on('sr-mock', () => this.mockData());
@@ -103,6 +106,8 @@ class StreamRaidersManager extends EventNotifier {
 
 		// When activated, the streamer's messages are used instead of the CaptainTV bot
 		this.testMode = true;
+
+		this.processedNamedPurchasesIDs = [];
 	}
 
 	_apiError(apiName, err) {
@@ -195,20 +200,36 @@ class StreamRaidersManager extends EventNotifier {
 				return;
 			}
 		}
+
+		let namedPurchases = [];
+		for (match of message.matchAll(NAMED_PURCHASE_REGEX)) {
+			if (!this.processedNamedPurchasesIDs.includes(match.groups['eventId'])) {
+				namedPurchases.push(new NamedPurchase(match.groups));
+				this.processedNamedPurchasesIDs.push(match.groups['eventId']);
+			}
+		}
+
+		this._emitNamedSkinPurchases(namedPurchases);
+	}
+
+	_emitNamedSkinPurchases(namedPurchases) {
+		if (namedPurchases.length > 0) {
+			this._notifyNamedPurchases(namedPurchases);
+		}
 	}
 
 	_emitSkinPurchase(details) {
 		console.log(`Skin purchase: ${JSON.stringify(details)}`);
 		const purchaseDetails = new SkinPurchaseDetails(details);
-		this._notifySingleSkinPurchaseCallback(purchaseDetails);
-		this._notifyAnySkinPurchaseCallback(purchaseDetails);
+		this._notifySingleSkinPurchase(purchaseDetails);
+		this._notifyAnySkinPurchase(purchaseDetails);
 	}
 
 	_emitSkinGifted(details) {
 		console.log(`Skin gift: ${JSON.stringify(details)}`);
 		const purchaseDetails = new SkinGiftDetails(details);
-		this._notifySkinGiftCallback(purchaseDetails);
-		this._notifyAnySkinPurchaseCallback(purchaseDetails);
+		this._notifySkinGift(purchaseDetails);
+		this._notifyAnySkinPurchase(purchaseDetails);
 	}
 
 	_onSkinBombSinglePurchase(details) {
@@ -234,20 +255,20 @@ class StreamRaidersManager extends EventNotifier {
 	_emitSkinBombSingle(details) {
 		console.log(`[S] Skin bomb single emitted: ${JSON.stringify(details)}`);
 		const purchaseDetails = new SkinBombSingleDetails(details);
-		this._notifySingleSkinBombCallback(purchaseDetails);
-		this._notifyMultiSkinBombCallback(new SkinBombMultiDetails({
+		this._notifySingleSkinBomb(purchaseDetails);
+		this._notifyMultiSkinBomb(new SkinBombMultiDetails({
 			player: purchaseDetails.player,
 			captain: purchaseDetails.captain,
 			amount: 1,
 		}));
-		this._notifyAnySkinPurchaseCallback(purchaseDetails);
+		this._notifyAnySkinPurchase(purchaseDetails);
 	}
 
 	_emitSkinBombMulti(details) {
 		console.log(`[M] Skin bomb multi: ${JSON.stringify(details)}`);
 		const purchaseDetails = new SkinBombMultiDetails(details);
-		this._notifyMultiSkinBombCallback(purchaseDetails);
-		this._notifyAnySkinPurchaseCallback(purchaseDetails);
+		this._notifyMultiSkinBomb(purchaseDetails);
+		this._notifyAnySkinPurchase(purchaseDetails);
 	}
 
 	_onAggregationTick() {
@@ -457,7 +478,7 @@ class StreamRaidersManager extends EventNotifier {
 		return this.removeCallback('anySkinPurchase', callback);
 	}
 
-	_notifyAnySkinPurchaseCallback(details) {
+	_notifyAnySkinPurchase(details) {
 		this._notify('anySkinPurchase', details);
 	}
 
@@ -469,7 +490,7 @@ class StreamRaidersManager extends EventNotifier {
 		return this.removeCallback('singleSkinPurchase', callback);
 	}
 
-	_notifySingleSkinPurchaseCallback(details) {
+	_notifySingleSkinPurchase(details) {
 		this._notify('singleSkinPurchase', details);
 	}
 
@@ -481,7 +502,7 @@ class StreamRaidersManager extends EventNotifier {
 		return this.removeCallback('skinGift', callback);
 	}
 
-	_notifySkinGiftCallback(details) {
+	_notifySkinGift(details) {
 		this._notify('skinGift', details);
 	}
 
@@ -493,7 +514,7 @@ class StreamRaidersManager extends EventNotifier {
 		return this.removeCallback('singleSkinBomb', callback);
 	}
 
-	_notifySingleSkinBombCallback(details) {
+	_notifySingleSkinBomb(details) {
 		this._notify('singleSkinBomb', details);
 	}
 
@@ -505,8 +526,20 @@ class StreamRaidersManager extends EventNotifier {
 		return this.removeCallback('multiSkinBomb', callback);
 	}
 
-	_notifyMultiSkinBombCallback(details) {
+	_notifyMultiSkinBomb(details) {
 		this._notify('multiSkinBomb', details);
+	}
+
+	onNamedPurchases(callback) {
+		return this.on('namedPurchases', callback);
+	}
+
+	removeNamedPurchasesCallback(callback) {
+		return this.removeCallback('namedPurchases', callback);
+	}
+
+	_notifyNamedPurchases(namedPurchases) {
+		this._notify('namedPurchases', namedPurchases);
 	}
 }
 
