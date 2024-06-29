@@ -323,6 +323,14 @@ class Twister extends ModuleClient {
         this.elements.jPrizeList.empty();
     }
 
+    _showPrizes() {
+        this.elements.jPrizeListContainer.fadeIn(FADE_DURATION, () => this._adjustScrollDuration());
+    }
+
+    _hidePrizes() {
+        this.elements.jPrizeListContainer.fadeOut(FADE_DURATION);
+    }
+
     show() {
         this.elements.jMain.fadeIn(FADE_DURATION);
     }
