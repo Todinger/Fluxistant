@@ -133,11 +133,6 @@ body {
 
 
 
-/*.ef1 {*/
-/*    font-weight: 900;*/
-/*    font-size: 3em;*/
-/*}*/
-
 .timer-ef1 {
     font-weight: 400;
     font-size: 2em;
@@ -220,4 +215,36 @@ svg[height="0"] {
     to {
         --k: 1 ;
     }
+}
+
+
+
+.prize-list-container {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    flex-grow: 1;
+    overflow: hidden;
+    margin: 5%;
+    width: 80%;
+    position: relative;
+}
+
+.prize-list-container .prize-list {
+    position: absolute;
+    width: 100%;
+    animation: scrollEntries 20s linear infinite;
+}
+
+.prize-list .entry {
+    color: white; /* Centralized text color for all entries */
+    text-align: left; /* All lines left-justified by default */
+    font-size: 2em;
+    font-family: "Orbitron", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+/* To center the text instead of left-justifying it, use the following class */
+.prize-list .entry.center {
+    text-align: center;
 }

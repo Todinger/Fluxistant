@@ -8,6 +8,8 @@ const FADE_DURATION = 500;
 
 const BGM_SOUND_NAME = "bgm";
 const WARNING_SOUND_NAME = "warning";
+const SCROLL_PAUSE_DURATION = 2;
+const SCROLL_SPEED = 50;
 
 
 function formatTime(totalSeconds) {
@@ -33,6 +35,9 @@ class Twister extends ModuleClient {
             jProgressBar: $('#progress-bar'),
             progressText: document.getElementById('progress-text'),
             jProgressContainer: $('#progress-container'),
+            jPrizeListContainer: $('#prize-list-container'),
+            jPrizeList: $('#prize-list'),
+            jScrollingAnimationKeyframes: $('#scrolling-animation-keyframes'),
         };
 
         window.addEventListener('message', (e) => this._onChildEventMessage(e), false);
@@ -266,6 +271,56 @@ class Twister extends ModuleClient {
         }
 
         this._setLevel(1);
+    }
+
+    _addPrizeEntry(htmlContent) {
+        const entry = $('<div></div>')
+            .addClass('entry')
+            .html(htmlContent);
+
+        this.elements.jPrizeList.append(entry);
+        this._adjustScrollDuration();
+    }
+
+    _disableScrolling() {
+        this.elements.jPrizeList.css('animation', 'none');
+        this.elements.jScrollingAnimationKeyframes.empty();
+    }
+
+    _adjustScrollDuration() {
+        const entries = $('.entry');
+        const entryHeight = entries.outerHeight();
+        const containerHeight = this.elements.jPrizeListContainer.height();
+        const numEntries = entries.length;
+        const totalHeight = entryHeight * numEntries;
+        const scrollHeight = totalHeight - containerHeight;
+
+        if (scrollHeight > 0) {
+            const scrollDuration = scrollHeight / SCROLL_SPEED; // Duration to scroll through all entries
+            const totalDuration = 2 * (SCROLL_PAUSE_DURATION + scrollDuration); // Total animation duration (pause at both ends)
+
+            // Create dynamic keyframes for the scrolling animation
+            const keyframes = `
+              @keyframes scrollEntries {
+                0% { top: 0; }
+                ${((SCROLL_PAUSE_DURATION / totalDuration) * 100).toFixed(2)}% { top: 0; }
+                ${(((SCROLL_PAUSE_DURATION + scrollDuration) / totalDuration) * 100).toFixed(2)}% { top: -${scrollHeight}px; }
+                ${(((SCROLL_PAUSE_DURATION + scrollDuration + SCROLL_PAUSE_DURATION) / totalDuration) * 100).toFixed(2)}% { top: -${scrollHeight}px; }
+                100% { top: 0; }
+              }
+            `;
+
+            // Apply the dynamic keyframes to the style tag
+            this.elements.jScrollingAnimationKeyframes.text(keyframes);
+            this.elements.jPrizeList.css('animation', `scrollEntries ${totalDuration}s linear infinite`);
+        } else {
+            this._disableScrolling();
+        }
+    }
+
+    _clearPrizes() {
+        this._disableScrolling();
+        this.elements.jPrizeList.empty();
     }
 
     show() {
