@@ -66,6 +66,8 @@ class Twister extends ModuleClient {
 
     showWatch() {
         this.toWatch();
+        this._hideTornadoDetails();
+        this.hidePrizes();
         this.show();
     }
 
@@ -77,6 +79,8 @@ class Twister extends ModuleClient {
 
     showWarn() {
         this.toWarn();
+        this._hideTornadoDetails();
+        this.hidePrizes();
         this.show();
     }
 
