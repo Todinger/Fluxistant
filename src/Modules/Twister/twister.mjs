@@ -157,7 +157,7 @@ class Twister extends ModuleClient {
     }
 
     _setProgress(progressData) {
-        if (progressData["percentage"]) {
+        if ("percentage" in progressData) {
             this.setProgressPercentage(progressData["percentage"], progressData["allowOverflow"]);
         } else {
             this.setProgressSP(progressData["currentSP"], progressData["maxSP"], progressData["allowOverflow"]);
