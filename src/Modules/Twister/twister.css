@@ -194,13 +194,13 @@ svg[height="0"] {
     position: absolute;
 }
 
-.ef5 {
+.ef5, .prize-omg {
     /* no pseudo needed */
     --k: 0;
     place-self: center;
     background: linear-gradient(90deg, hsl(calc(var(--k)*1turn), 95%, 65%), hsl(calc(var(--k)*1turn + 90deg), 95%, 65%)) text;
     color: transparent;
-    font: 900 clamp(.875em, 7.25vw, 4em) "Orbitron", sans-serif;
+    /*font: 900 clamp(.875em, 7.25vw, 4em) "Orbitron", sans-serif;*/
     filter: url(#f);
     text-align: center;
     text-transform: uppercase;
@@ -209,6 +209,14 @@ svg[height="0"] {
     /* needs support for animating custom properties */
     /* Firefox not quite there yet, but it's coming */
     animation: k 4s linear infinite;
+}
+
+.ef5 {
+    font: 900 clamp(.875em, 7.25vw, 4em) "Orbitron", sans-serif;
+}
+
+.prize-omg {
+    font: 900 clamp(.875em, 7.25vw, 1.2em) "Orbitron", sans-serif;
 }
 
 @keyframes k {
@@ -247,4 +255,31 @@ svg[height="0"] {
 /* To center the text instead of left-justifying it, use the following class */
 .prize-list .entry.center {
     text-align: center;
+}
+
+.prize-nice {
+    color: springgreen;
+}
+
+.prize-good {
+    color: deepskyblue;
+    font-weight: bold;
+}
+
+.prize-great {
+    color: deeppink;
+    font-weight: bold;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: lightpink;
+}
+
+.prize-amazing {
+    color: gold;
+    font-weight: bolder;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: orange;
+}
+
+.username {
+    color: yellow;
 }

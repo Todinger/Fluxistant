@@ -617,14 +617,22 @@ class Twister extends Module {
 		this.print("+--------+");
 		this.print("| PRIZES |");
 		this.print("+--------+");
+		let htmlEntries = [];
 		Utils.objectForEach(this.data.players, (username, userDetails) => {
-			prizes[username] = this._grantConsolationPrize(username, userDetails.displayName);
-			this.print(`${userDetails.displayName} got ${prizes[username]}`);
+			let prize = this._grantConsolationPrize(username, userDetails.displayName);
+			this.print(`${userDetails.displayName} got ${prize.text}`);
+			htmlEntries.push(`<span class="username">${userDetails.displayName}</span> got <span class="${prize.quality}">${prize.html}</span>`);
+			prizes[username] = prize;
 		});
 
 		setTimeout(() => this.saveAllData(true), 500);
+		this.broadcastEvent("showPrizes", [...htmlEntries, ...htmlEntries, ...htmlEntries]);
 
 		return prizes;
+	}
+
+	hidePrizes() {
+		this.broadcastEvent("hidePrizes");
 	}
 
 	// broadcastEvent(event, ...p) {
@@ -673,6 +681,16 @@ class Twister extends Module {
 				}),
 			],
 			action: () => this.forceGrow(),
+		},
+		hidePrizes: {
+			name: 'Hide Prizes',
+			description: "Hides the prize list shown after a tornado on the screen",
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'hide',
+				}),
+			],
+			action: () => this.hidePrizes(),
 		},
 	}
 }

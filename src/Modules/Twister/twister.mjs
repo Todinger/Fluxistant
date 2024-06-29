@@ -246,7 +246,7 @@ class Twister extends ModuleClient {
 
     _onTornadoFinaleDone() {
         this.sounds.fadeOutAndStop(FADE_DURATION);
-        this.hide(() => this._clearState());
+        // this.hide(() => this._clearState());
     }
 
     _showTornadoDetails() {
@@ -279,7 +279,6 @@ class Twister extends ModuleClient {
             .html(htmlContent);
 
         this.elements.jPrizeList.append(entry);
-        this._adjustScrollDuration();
     }
 
     _disableScrolling() {
@@ -289,7 +288,7 @@ class Twister extends ModuleClient {
 
     _adjustScrollDuration() {
         const entries = $('.entry');
-        const entryHeight = entries.outerHeight();
+        const entryHeight = entries.outerHeight() + 20; // A little extra to avoid anything cutting off
         const containerHeight = this.elements.jPrizeListContainer.height();
         const numEntries = entries.length;
         const totalHeight = entryHeight * numEntries;
@@ -323,11 +322,17 @@ class Twister extends ModuleClient {
         this.elements.jPrizeList.empty();
     }
 
-    _showPrizes() {
+    showPrizes(prizeList) {
+        this._clearPrizes();
+        for (let prize of prizeList) {
+            this._addPrizeEntry(prize);
+        }
+
+        this._adjustScrollDuration();
         this.elements.jPrizeListContainer.fadeIn(FADE_DURATION, () => this._adjustScrollDuration());
     }
 
-    _hidePrizes() {
+    hidePrizes() {
         this.elements.jPrizeListContainer.fadeOut(FADE_DURATION);
     }
 
@@ -372,6 +377,8 @@ class Twister extends ModuleClient {
         this.server.on('show', () => this.show());
         this.server.on('hide', () => this.hide());
         this.server.on('setup', (setupData) => this.setup(setupData));
+        this.server.on('showPrizes', (prizeList) => this.showPrizes(prizeList));
+        this.server.on('hidePrizes', () => this.hidePrizes());
         this.server.attach();
     }
 }
@@ -379,3 +386,17 @@ class Twister extends ModuleClient {
 const t = new Twister();
 t.start();
 window.t = t;
+
+// setTimeout(() => {
+//     const prizes = [
+//         `<span class="username">Bloop!</span> This is a <span class="prize-nice">nice</span> prize.`,
+//         `<span class="username">Bloop!</span> This is a <span class="prize-good">good</span> prize.`,
+//         `<span class="username">Bloop!</span> This is a <span class="prize-great">great</span> prize!`,
+//         `<span class="username">Bloop!</span> This is an <span class="prize-amazing">AMAZING</span> prize!`,
+//         `<span class="username">Bloop!</span> This is an <span class="prize-omg">OMG I CAN'T BELIEVE I GOT THIS</span> prize!!! =O`
+//     ];
+//
+//     t.showWarn();
+//     t._showTornadoDetails();
+//     t.showPrizes(prizes);
+// }, 500);
