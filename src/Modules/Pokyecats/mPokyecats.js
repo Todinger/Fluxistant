@@ -443,28 +443,36 @@ class Pokyecats extends Module {
 		}
 	}
 
-	addYarn(username, displayName, amount) {
+	addYarn(username, displayName, amount, save = false) {
 		let catchData = this.getUserCatchData(username, displayName);
 		catchData.yarn += amount;
-		this.saveData();
+		if (save) {
+			this.saveData();
+		}
 	}
 
-	addBall(username, displayName, ballName, amount) {
+	addBall(username, displayName, ballName, amount, save = false) {
 		let catchData = this.getUserCatchData(username, displayName);
 		catchData.balls[ballName] += amount;
-		this.saveData();
+		if (save) {
+			this.saveData();
+		}
 	}
 
-	addCatches(username, displayName, amount) {
+	addCatches(username, displayName, amount, save = false) {
 		let catchData = this.getUserCatchData(username, displayName);
 		catchData.catches += amount;
-		this.saveData();
+		if (save) {
+			this.saveData();
+		}
 	}
 
-	addShinyCatches(username, displayName, amount) {
+	addShinyCatches(username, displayName, amount, save = false) {
 		let catchData = this.getUserCatchData(username, displayName);
 		catchData.shinyCatches += amount;
-		this.saveData();
+		if (save) {
+			this.saveData();
+		}
 	}
 
 
