@@ -16,6 +16,7 @@ class ScriptedModules extends Module {
 			'Image Dropper',
 			'Text Display',
 			'Wheel',
+			'Yippies',
 			// 'Stream Raiders',
 			// 'Censor',
 			// 'Parrot Mate',

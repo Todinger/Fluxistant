@@ -153,6 +153,8 @@ const entities = {
 	WelcomeEntity: require('./WebEntities/welcomeEntity.js'),
 	WheelEntity: require('./WebEntities/wheelEntity.js'),
 	WheelSegmentEntity: require('./WebEntities/wheelSegmentEntity.js'),
+	YippieEntity: require('./WebEntities/yippieEntity.js'),
+	YippieTierEntity: require('./WebEntities/yippieTierEntity.js'),
 };
 
 const factory = require('./entityFactory');
