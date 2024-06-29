@@ -288,7 +288,7 @@ class Twister extends ModuleClient {
 
     _adjustScrollDuration() {
         const entries = $('.entry');
-        const entryHeight = entries.outerHeight() + 20; // A little extra to avoid anything cutting off
+        const entryHeight = entries.outerHeight();
         const containerHeight = this.elements.jPrizeListContainer.height();
         const numEntries = entries.length;
         const totalHeight = entryHeight * numEntries;

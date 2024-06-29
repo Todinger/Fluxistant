@@ -626,7 +626,7 @@ class Twister extends Module {
 		});
 
 		setTimeout(() => this.saveAllData(true), 500);
-		this.broadcastEvent("showPrizes", [...htmlEntries, ...htmlEntries, ...htmlEntries]);
+		this.broadcastEvent("showPrizes", htmlEntries);
 
 		return prizes;
 	}
