@@ -23,12 +23,19 @@ class MyModule extends Module {
 	}
 
 	defineModConfig(modConfig) {
+		modConfig.addDuration('displayDuration', 10)
+			.setName('Display Duration')
+			.setDescription('Number of seconds to display the sticker on the screen');
 		modConfig.addDynamicArray('tiers', 'YippieTier')
 			.setName('Tiers')
 			.setDescription('All Yippie tiers');
 	}
 
 	loadModConfig(conf) {
+		if (this.clientsAreConnected) {
+			this._setupClients();
+		}
+
 		this.yippies = {};
 		this.tiers = [];
 		for (let i = 0; i < conf.tiers.length; i++) {
@@ -40,6 +47,16 @@ class MyModule extends Module {
 
 			this.tiers.push(tier);
 		}
+	}
+
+	load() {
+		this.onClientAttached(() => {
+			this._setupClients();
+		});
+	}
+
+	_setupClients() {
+		this.broadcastEvent("configure", {displayDuration: this.config.displayDuration});
 	}
 
 

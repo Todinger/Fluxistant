@@ -65,6 +65,7 @@ class MultiAssetEntity extends AssetEntity {
 		let conf = super.toConf();
 		let keyedFiles = {};
 		conf.files.forEach(file => {
+			file.collection = this.getCollectionID();
 			keyedFiles[file.fileKey] = file;
 		});
 		

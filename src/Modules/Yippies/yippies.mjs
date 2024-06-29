@@ -1,12 +1,16 @@
 import { ModuleClient } from "/common/moduleClient.mjs";
 
 
+const FADE_DURATION = 500;
+const DEFAULT_DISPLAY_DURATION = 5000;
+
+
 class Yippies extends ModuleClient {
     static get FADE_TIME() { return 500; }
 
     constructor() {
         super('Yippies');
-        this.scripts = {};
+        this.displayDuration = DEFAULT_DISPLAY_DURATION;
     }
 
     stick(url) {
@@ -42,6 +46,12 @@ class Yippies extends ModuleClient {
             img.style.top = `${randomY}px`;
             img.style.transform = `scale(1) rotate(${randomRotation}deg)`;
         }, 0); // Timeout of 0 to ensure the transition applies
+
+        // Remove the sticker after the configured duration
+        setTimeout(() => {
+            let jImg = $(img);
+            jImg.fadeOut(FADE_DURATION, () => jImg.remove());
+        }, this.displayDuration);
     }
 
     activate(parameters) {
@@ -51,7 +61,12 @@ class Yippies extends ModuleClient {
     }
 
 
+    configure(config) {
+        this.displayDuration = config.displayDuration;
+    }
+
     start() {
+        this.server.on('configure', (config) => this.configure(config));
         this.server.on('activate', (parameters) => this.activate(parameters));
 
         this.server.attach();
