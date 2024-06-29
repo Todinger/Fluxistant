@@ -247,9 +247,6 @@ svg[height="0"] {
     color: white; /* Centralized text color for all entries */
     text-align: left; /* All lines left-justified by default */
     font-size: 2em;
-    font-family: "Orbitron", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
 }
 
 /* To center the text instead of left-justifying it, use the following class */
