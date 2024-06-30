@@ -94,7 +94,7 @@ class RandomTieredYippiePrize extends Prize {
             return false;
         }
 
-        let text = `the ${yd} Yippie Debris!`;
+        let text = `the ${yd} Debris!`;
         let html = text;
         let quality = QUALITY_BY_LEVEL[details.tier];
         let yippie = await this.mod.yippies.getYippieFile(yd);
