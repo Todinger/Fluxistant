@@ -19,6 +19,7 @@ const ActivationMethods = {
 const NUM_LEVELS = 5;
 const EVENT_QUEUE_CHECK_INTERVAL = ONE_SECOND;
 
+const DELAY_BEFORE_TORNADO_RESULTS = 15 * SECONDS;
 const DISPLAY_COOLDOWN_BETWEEN_TORNADOES = 50 * SECONDS;
 
 
@@ -204,6 +205,7 @@ class Twister extends Module {
 		this.stateAfterEnding = TwisterState.Inactive;
 		this.levelTimer = Timers.oneShot(() => this.endTornado());
 		this.cooldownTimer = Timers.oneShot(() => this._cooldownEnded());
+		this.resultDisplayTimer = Timers.oneShot(() => this._announceResults());
 
 		this.prizes = {
 			yarn: Prizes.pokyecats.yarn(this),
@@ -532,8 +534,6 @@ class Twister extends Module {
 	}
 
 	_cooldownEnded() {
-		this._announceResults();
-
 		this.state = TwisterState.Inactive;
 		if (this.stateAfterEnding === TwisterState.Watch) {
 			this.startWatch(true);
@@ -608,6 +608,7 @@ class Twister extends Module {
 		this.stateAfterEnding = TwisterState.Inactive;
 		this.eventQueue.start();
 		this.broadcastEvent("endTornado");
+		this.resultDisplayTimer.set(DELAY_BEFORE_TORNADO_RESULTS);
 		this.cooldownTimer.set(DISPLAY_COOLDOWN_BETWEEN_TORNADOES);
 
 		this.grantPrizes().then().catch();
