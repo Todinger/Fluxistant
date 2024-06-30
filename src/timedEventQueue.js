@@ -14,6 +14,7 @@ class TimedEventQueue {
 
         this.valueCounter = null;
         this.active = false;
+        this.paused = false;
     }
 
     get events() {
@@ -46,10 +47,17 @@ class TimedEventQueue {
 
         this.timer.set(this.checkInterval);
         this.active = true;
+        this.paused = false;
+    }
+
+    pauseClearing() {
+        this.paused = true;
+        this.timer.clear();
     }
 
     end() {
         this.active = false;
+        this.paused = false;
         this.timer.clear();
         this.queue = [];
         this.totalValue = 0;

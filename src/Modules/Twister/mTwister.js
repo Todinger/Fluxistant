@@ -296,7 +296,6 @@ class Twister extends Module {
 		this.eventQueue.addThreshold(
 			conf.activationThreshold,
 			() => this.triggerTornado(),
-			() => this.untriggerTornado(),
 		);
 		if (conf.activationMethod === ActivationMethods.Users) {
 			this.eventQueue.setValueCounter(this._countUniqueUsers);
@@ -500,6 +499,7 @@ class Twister extends Module {
 			this.startTornado();
 		} else if (this.state === TwisterState.Ending) {
 			this.stateAfterEnding = TwisterState.Active;
+			this.eventQueue.pauseClearing();
 		}
 	}
 
@@ -510,12 +510,6 @@ class Twister extends Module {
 			progress: this._makeProgress(),
 		});
 		setTimeout(() => this._tornadoStarted(), 6 * SECONDS);
-	}
-
-	untriggerTornado() {
-		if (this.state === TwisterState.Inactive) {
-			this.stateAfterEnding = TwisterState.Watch;
-		}
 	}
 
 	_announceResults() {
