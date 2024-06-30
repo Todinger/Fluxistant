@@ -17,8 +17,12 @@ class NamedCollection extends UserAssets {
 	}
 	
 	_getFileKeys(params) {
-		this._ensurePresence(params.fileKey);
-		return [ params.fileKey ];
+		if (params.fileKey === undefined) {
+			return Object.keys(this.savedFiles);
+		} else {
+			this._ensurePresence(params.fileKey);
+			return [params.fileKey];
+		}
 	}
 	
 	selectFileKey(fileKey) {
