@@ -49,9 +49,13 @@ class Twister extends ModuleClient {
         this.tornadoStartingLevel = 1;
         this.tornadoStartingTime = 0;
         this.delayedProgressData = null;
+        this.prizeList = [];
 
         // This is true only when the tornado event is active (and isn't on its way out)
         this.active = false;
+
+        // This is true when the tornado is visible on the screen (while active and while exiting, until the finale)
+        this.visible = false;
     }
 
     sendToChild(eventName, arg) {
@@ -85,6 +89,8 @@ class Twister extends ModuleClient {
     }
 
     startTornado(levelSettings) {
+        this.prizeList = [];
+
         this.delayedProgressData = this.delayedProgressData || levelSettings.progress;
         this._playSoundIfExists(WARNING_SOUND_NAME);
         let jCombo = this.elements.jTitle;
@@ -95,6 +101,7 @@ class Twister extends ModuleClient {
             jCombo = jCombo.fadeIn(FADE_DURATION);
         }
         $.when(jCombo).then(() => this._activateTornado(this.tornadoStartingTime || levelSettings.duration));
+        this.visible = true;
     }
 
     _playSoundIfExists(name) {
@@ -250,7 +257,8 @@ class Twister extends ModuleClient {
 
     _onTornadoFinaleDone() {
         this.sounds.fadeOutAndStop(FADE_DURATION);
-        // this.hide(() => this._clearState());
+        this.visible = false;
+        this._showPrizesOnDisplay();
     }
 
     _showTornadoDetails() {
@@ -322,19 +330,28 @@ class Twister extends ModuleClient {
         }
     }
 
-    _clearPrizes() {
+    _clearPrizeDisplay() {
         this._disableScrolling();
         this.elements.jPrizeList.empty();
     }
 
-    showPrizes(prizeList) {
-        this._clearPrizes();
-        for (let prize of prizeList) {
+    _showPrizesOnDisplay() {
+        if (this.prizeList.length === 0) return;
+
+        this._clearPrizeDisplay();
+        for (let prize of this.prizeList) {
             this._addPrizeEntry(prize);
         }
 
         this._adjustScrollDuration();
         this.elements.jPrizeListContainer.fadeIn(FADE_DURATION, () => this._adjustScrollDuration());
+    }
+
+    showPrizes(prizeList) {
+        this.prizeList = prizeList;
+        if (!this.visible) {
+            this._showPrizesOnDisplay();
+        }
     }
 
     hidePrizes() {
