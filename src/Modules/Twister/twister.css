@@ -228,7 +228,7 @@ svg[height="0"] {
 
 
 .prize-list-container {
-    background-color: rgba(0, 0, 0, 0.5);
+    /*background-color: rgba(0, 0, 0, 0.5);*/
     padding: 10px;
     flex-grow: 1;
     overflow: hidden;
