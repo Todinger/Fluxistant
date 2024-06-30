@@ -241,6 +241,12 @@ class Twister extends Module {
 		modConfig.addDuration('activationTimeLimit')
 			.setName("Activation Time Limit")
 			.setDescription("Time window in which the activation threshold must be met in order for the twister to start (set to 0 to disable)");
+		modConfig.addDuration('prizeScrollDelay', 2)
+			.setName("Prize List Scroll Delay")
+			.setDescription("Amount of seconds to pause on either end of the prize list before the scrolling starts");
+		modConfig.addPositiveNumber('prizeScrollSpeed', 50)
+			.setName("Prize List Scroll Speed")
+			.setDescription("The rate at which the prize list scrolls up/down when it doesn't all fit on the screen");
 
 		let levels = modConfig.addFixedArray('levels', 'TwisterLevel')
 			.setName("Twister Levels")
@@ -616,7 +622,11 @@ class Twister extends Module {
 
 	async _setupClients() {
 		let bgmConf = this.config.backgroundMusic;
-		let setupData = {};
+		let setupData = {
+			prizeScrollDelay: this.config.prizeScrollDelay / 1000,
+			prizeScrollSpeed: this.config.prizeScrollSpeed,
+		};
+
 		if (bgmConf && bgmConf.file.fileKey) {
 			let soundFileConf = bgmConf.file;
 			let soundFile = await this.assets.getFileWeb(soundFileConf);

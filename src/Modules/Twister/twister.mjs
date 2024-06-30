@@ -8,8 +8,8 @@ const FADE_DURATION = 500;
 
 const BGM_SOUND_NAME = "bgm";
 const WARNING_SOUND_NAME = "warning";
-const SCROLL_PAUSE_DURATION = 2;
-const SCROLL_SPEED = 50;
+const DEFAULT_PRIZE_SCROLL_DELAY = 2;
+const DEFAULT_SCROLL_SPEED = 50;
 
 
 function formatTime(totalSeconds) {
@@ -23,6 +23,11 @@ function formatTime(totalSeconds) {
 class Twister extends ModuleClient {
     constructor() {
         super('Twister');
+        
+        this.config = {
+            prizeScrollDelay: DEFAULT_PRIZE_SCROLL_DELAY,
+            prizeScrollSpeed: DEFAULT_SCROLL_SPEED,
+        };
 
         this.currentLevel = 1;
 
@@ -308,16 +313,16 @@ class Twister extends ModuleClient {
         const scrollHeight = totalHeight - containerHeight;
 
         if (scrollHeight > 0) {
-            const scrollDuration = scrollHeight / SCROLL_SPEED; // Duration to scroll through all entries
-            const totalDuration = 2 * (SCROLL_PAUSE_DURATION + scrollDuration); // Total animation duration (pause at both ends)
+            const scrollDuration = scrollHeight / this.config.prizeScrollSpeed; // Duration to scroll through all entries
+            const totalDuration = 2 * (this.config.prizeScrollDelay + scrollDuration); // Total animation duration (pause at both ends)
 
             // Create dynamic keyframes for the scrolling animation
             const keyframes = `
               @keyframes scrollEntries {
                 0% { top: 0; }
-                ${((SCROLL_PAUSE_DURATION / totalDuration) * 100).toFixed(2)}% { top: 0; }
-                ${(((SCROLL_PAUSE_DURATION + scrollDuration) / totalDuration) * 100).toFixed(2)}% { top: -${scrollHeight}px; }
-                ${(((SCROLL_PAUSE_DURATION + scrollDuration + SCROLL_PAUSE_DURATION) / totalDuration) * 100).toFixed(2)}% { top: -${scrollHeight}px; }
+                ${((this.config.prizeScrollDelay / totalDuration) * 100).toFixed(2)}% { top: 0; }
+                ${(((this.config.prizeScrollDelay + scrollDuration) / totalDuration) * 100).toFixed(2)}% { top: -${scrollHeight}px; }
+                ${(((this.config.prizeScrollDelay + scrollDuration + this.config.prizeScrollDelay) / totalDuration) * 100).toFixed(2)}% { top: -${scrollHeight}px; }
                 100% { top: 0; }
               }
             `;
@@ -384,6 +389,9 @@ class Twister extends ModuleClient {
     }
 
     setup(setupData) {
+        this.config.prizeScrollDelay = setupData.prizeScrollDelay || this.config.prizeScrollDelay;
+        this.config.prizeScrollSpeed = setupData.prizeScrollSpeed || this.config.prizeScrollSpeed;
+
         this._setupSound(BGM_SOUND_NAME, setupData.bgm, true);
         this._setupSound(WARNING_SOUND_NAME, setupData.warningSound, false);
     }
