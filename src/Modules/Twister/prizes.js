@@ -16,14 +16,14 @@ class Prize {
         this.mod = mod;
     }
 
-    grant(username, displayName, details) {
+    async grant(username, displayName, details) {
         Errors.abstract();
         return {};
     }
 }
 
 class PokyecatsYarnPrize extends Prize {
-    grant(username, displayName, details) {
+    async grant(username, displayName, details) {
         let amount = Utils.randomInt(details.min, details.max + 1);
         this.mod.pokyecats.addYarn(username, displayName, amount);
         let text = `${amount} ${Utils.plurality(amount, "piece")} of yarn.`;
@@ -34,7 +34,7 @@ class PokyecatsYarnPrize extends Prize {
 }
 
 class PokyecatsYarnBallPrize extends Prize {
-    grant(username, displayName, details) {
+    async grant(username, displayName, details) {
         let amount = Utils.randomInt(details.min, details.max + 1);
         this.mod.pokyecats.addYarnBall(username, displayName, amount);
         let text = `${amount} ${Utils.plurality(amount, "yarn ball")}.`;
@@ -45,7 +45,7 @@ class PokyecatsYarnBallPrize extends Prize {
 }
 
 class PokyecatsGoldBallPrize extends Prize {
-    grant(username, displayName, details) {
+    async grant(username, displayName, details) {
         let amount = Utils.randomInt(details.min, details.max + 1);
         this.mod.pokyecats.addGoldBall(username, displayName, amount);
         let text = `${amount} ${Utils.plurality(amount, "gold ball")}.`;
@@ -56,7 +56,7 @@ class PokyecatsGoldBallPrize extends Prize {
 }
 
 class PokyecatsCatchesPrize extends Prize {
-    grant(username, displayName, details) {
+    async grant(username, displayName, details) {
         let amount = Utils.randomInt(details.min, details.max + 1);
         this.mod.pokyecats.addCatches(username, displayName, amount);
         let text = `${amount} ${Utils.plurality(amount, "Pokyecats", "Pokyecatses")}!`;
@@ -67,9 +67,25 @@ class PokyecatsCatchesPrize extends Prize {
 }
 
 class PokyecatsShinyCatchesPrize extends Prize {
-    grant(username, displayName, details) {
+    async grant(username, displayName, details) {
         let amount = Utils.randomInt(details.min, details.max + 1);
         this.mod.pokyecats.addShinyCatches(username, displayName, amount);
+        let text = `${amount} SHINY ${Utils.plurality(amount, "POKYECATS", "POKYECATSES")}!!!`;
+        let html = text;
+        let quality = PRIZE_QUALITY_CLASSES.OMG;
+        return {text, html, quality};
+    }
+}
+
+
+class RandomTieredYippiePrize extends Prize {
+    async grant(username, displayName, details) {
+        let tier = details.tier;
+        let result = this.mod.yippies.giveRandomTieredYippie(username, tier, false);
+        if (!result) {
+            return false;
+        }
+
         let text = `${amount} SHINY ${Utils.plurality(amount, "POKYECATS", "POKYECATSES")}!!!`;
         let html = text;
         let quality = PRIZE_QUALITY_CLASSES.OMG;

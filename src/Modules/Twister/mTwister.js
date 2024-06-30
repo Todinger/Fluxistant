@@ -246,6 +246,7 @@ class Twister extends Module {
 
 	defineModDependencies() {
 		this.pokyecats = this.use('Pokyecats');
+		this.yippies = this.use('Yippies');
 	}
 
 	enable() {
@@ -604,7 +605,7 @@ class Twister extends Module {
 		this.broadcastEvent("endTornado");
 		this.cooldownTimer.set(DISPLAY_COOLDOWN_BETWEEN_TORNADOES);
 
-		this.grantPrizes();
+		this.grantPrizes().then().catch();
 	}
 
 	async _setupClients() {
@@ -626,7 +627,7 @@ class Twister extends Module {
 		this.broadcastEvent("setup", setupData);
 	}
 
-	_grantConsolationPrize(limitedPrizesGiven, username, displayName) {
+	async _grantConsolationPrize(limitedPrizesGiven, username, displayName) {
 		let level = this.data.level;
 		if (level === NUM_LEVELS - 1 && this.data.sp >= this.currentLevel.spToClear) {
 			level++;
@@ -646,18 +647,18 @@ class Twister extends Module {
 		}
 
 		let prize = this.prizes[selection];
-		return prize.grant(username, displayName, options[selection]);
+		return await prize.grant(username, displayName, options[selection]);
 	}
 
-	grantPrizes() {
+	async grantPrizes() {
 		let prizes = {};
 		this.print("+--------+");
 		this.print("| PRIZES |");
 		this.print("+--------+");
 		let htmlEntries = [];
 		let limitedPrizesGiven = {};
-		Utils.objectForEach(this.data.players, (username, userDetails) => {
-			let prize = this._grantConsolationPrize(limitedPrizesGiven, username, userDetails.displayName);
+		await Utils.objectForEachAsync(this.data.players, async (username, userDetails) => {
+			let prize = await this._grantConsolationPrize(limitedPrizesGiven, username, userDetails.displayName);
 			this.print(`${userDetails.displayName} got ${prize.text}`);
 			htmlEntries.push(`<span class="username">${userDetails.displayName}</span> got <span class="${prize.quality}">${prize.html}</span>`);
 			prizes[username] = prize;

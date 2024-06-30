@@ -52,7 +52,14 @@ class Utils {
 	static objectForEach(obj, func) {
 		Object.entries(obj).forEach(entry => func(entry[0], entry[1]));
 	}
-	
+
+	static async objectForEachAsync(obj, func) {
+		let entries = Object.entries(obj);
+		for (const entry of entries) {
+			await func(entry[0], entry[1]);
+		}
+	}
+
 	// Splits two collections into three lists of "things to add," "things
 	// to remove" and "things to keep".
 	// Values that have the same keys in the old and the new are checked for
@@ -120,7 +127,7 @@ class Utils {
 	static randomElement(arr) {
 		return arr[Utils.randomInt(0, arr.length)];
 	}
-	
+
 	// Returns a random real number in the range:
 	// 	base - variance <= num < base + variance
 	static randomInRadius(base, variance) {
@@ -507,7 +514,11 @@ class Utils {
 		
 		return arr;
 	}
-	
+
+	static arrayDifference(left, right) {
+		return left.filter(element => !right.includes(element));
+	}
+
 	static objectMap(obj, func) {
 		let result = {};
 		Object.keys(obj).forEach(key => {

@@ -1,7 +1,23 @@
 const Module = requireMain('module');
 const Utils = requireMain('utils');
 
-class MyModule extends Module {
+class Yippies extends Module {
+	static Interface = class YippieInterface extends Module.Interface {
+		constructor(inst) {
+			super(inst);
+		}
+
+		defineMethods() {
+			return {
+				giveYippie: (conf, username, yd, save) =>
+					this.inst.giveYippie(username, yd, save),
+				giveRandomTieredYippie: (conf, username, tier, save) =>
+					this.inst.giveRandomTieredYippie(username, tier, save),
+				getYippieFile: async (conf, yd) => await this.inst.getYippieFile(yd),
+			};
+		}
+	};
+
 	constructor() {
 		super({
 			name: 'Yippies',
@@ -96,12 +112,33 @@ class MyModule extends Module {
 
 	giveYippie(username, yd, save = true) {
 		this._ensureUser(username);
-		if (!this._userOwnsYippie(username, yd)) {
-			this._inventory(username).push(yd);
-			if (save) {
-				this.saveData();
-			}
+		if (this._userOwnsYippie(username, yd)) {
+			return false;
 		}
+
+		this._inventory(username).push(yd);
+		if (save) {
+			this.saveData();
+		}
+
+		return true;
+	}
+
+	giveRandomTieredYippie(username, tier, save = true) {
+		this._ensureUser(username);
+		if (tier < 0 || tier >= this.tiers.length) {
+			this.error(`Tier ${tier} reward requested, but only tiers 0 - ${this.tiers.length - 1} exist!`);
+			return false;
+		}
+
+		let tierYds = this.tiers[tier];
+		let userInventory = this._inventory(username);
+		let missingYds = Utils.arrayDifference(tierYds, userInventory);
+		if (missingYds.length === 0) {
+			return false;
+		}
+
+		return this.giveYippie(username, Utils.randomElement(missingYds), save);
 	}
 
 	_give(data) {
@@ -120,6 +157,16 @@ class MyModule extends Module {
 		}
 
 		this.giveYippie(targetUser, yd);
+	}
+
+	async getYippieFile(yd) {
+		let yippie = this.yippies[yd];
+		if (yippie && yippie.fileKey) {
+			let yippieFile = await this.assets.getFileWeb(yippie);
+			return yippie.makeDisplayData(yippieFile);
+		}
+
+		return null;
 	}
 
 	async use(data) {
@@ -142,11 +189,11 @@ class MyModule extends Module {
 		}
 
 
-		let yippie = this.yippies[yd];
-		let parameters = {};
-		if (yippie && yippie.fileKey) {
-			let yippieFile = await this.assets.getFileWeb(yippie);
-			parameters.image = yippie.makeDisplayData(yippieFile);
+		let yippieFile = await this.getYippieFile(yd);
+		if (yippieFile) {
+			let parameters = {
+				image: yippieFile,
+			};
 
 			this.broadcastEvent("activate", parameters);
 		}
@@ -177,4 +224,4 @@ class MyModule extends Module {
 	}
 }
 
-module.exports = new MyModule();
+module.exports = new Yippies();

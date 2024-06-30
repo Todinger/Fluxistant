@@ -35,7 +35,7 @@ const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $normals = norm
 const YARN_PER_THROW = 1;
 
 class Pokyecats extends Module {
-	static Interface = class ImageDropperInterface extends Module.Interface {
+	static Interface = class PokyecatsInterface extends Module.Interface {
 		constructor(inst) {
 			super(inst);
 		}
