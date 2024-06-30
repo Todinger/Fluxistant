@@ -73,6 +73,10 @@ class Yippies extends Module {
 		for (let i = 0; i < conf.tiers.length; i++) {
 			let tier = [];
 			Object.values(conf.tiers[i].images.files).forEach(file => {
+				if (file.yd in this.yippies) {
+					throw `Duplicate Yippie ID: ${file.yd}`;
+				}
+
 				this.yippies[file.yd] = file;
 				tier.push(file.yd);
 			});
