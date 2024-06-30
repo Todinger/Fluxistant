@@ -10,6 +10,14 @@ const PRIZE_QUALITY_CLASSES = {
     OMG: "prize-omg",
 }
 
+const QUALITY_BY_LEVEL = [
+    PRIZE_QUALITY_CLASSES.NICE,
+    PRIZE_QUALITY_CLASSES.GOOD,
+    PRIZE_QUALITY_CLASSES.GREAT,
+    PRIZE_QUALITY_CLASSES.AMAZING,
+    PRIZE_QUALITY_CLASSES.OMG,
+]
+
 
 class Prize {
     constructor(mod) {
@@ -81,15 +89,16 @@ class PokyecatsShinyCatchesPrize extends Prize {
 class RandomTieredYippiePrize extends Prize {
     async grant(username, displayName, details) {
         let tier = details.tier;
-        let result = this.mod.yippies.giveRandomTieredYippie(username, tier, false);
-        if (!result) {
+        let yd = this.mod.yippies.giveRandomTieredYippie(username, tier, false);
+        if (!yd) {
             return false;
         }
 
-        let text = `${amount} SHINY ${Utils.plurality(amount, "POKYECATS", "POKYECATSES")}!!!`;
+        let text = `the ${yd} Yippie Debris!`;
         let html = text;
-        let quality = PRIZE_QUALITY_CLASSES.OMG;
-        return {text, html, quality};
+        let quality = QUALITY_BY_LEVEL[details.tier];
+        let yippie = await this.mod.yippies.getYippieFile(yd);
+        return {text, html, quality, imageURL: yippie.url};
     }
 }
 
@@ -102,4 +111,7 @@ module.exports = {
         catches: (mod) => new PokyecatsCatchesPrize(mod),
         shinyCatches: (mod) => new PokyecatsShinyCatchesPrize(mod),
     },
+    yippies: {
+        randomTiered: (mod) => new RandomTieredYippiePrize(mod),
+    }
 }

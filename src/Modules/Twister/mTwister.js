@@ -90,13 +90,13 @@ function range(min, max) {
 	};
 }
 
-function wRange(weight, min, max) {
-	return {
-		weight,
-		min,
-		max: max || min,
-	};
-}
+// function wRange(weight, min, max) {
+// 	return {
+// 		weight,
+// 		min,
+// 		max: max || min,
+// 	};
+// }
 
 function lRange(limit, min, max) {
 	return {
@@ -107,20 +107,20 @@ function lRange(limit, min, max) {
 	}
 }
 
-function cRange(limit, weight, min, max) {
-	return {
-		weight,
-		min,
-		max: max || min,
-		limit,
-	}
-}
+// function cRange(limit, weight, min, max) {
+// 	return {
+// 		weight,
+// 		min,
+// 		max: max || min,
+// 		limit,
+// 	}
+// }
 
 
 const PRIZE_OPTIONS = [
 	// EF 1
 	{
-		main: {},
+		main: null,  // No rewards unless level 1 is completed
 		consolation: {
 			yarn: range(5, 10),
 			yarnBall: range(1),
@@ -128,7 +128,9 @@ const PRIZE_OPTIONS = [
 	},
 	// EF 2
 	{
-		main: {},
+		main: {
+			randomYippie: {tier: 0},
+		},
 		consolation: {
 			yarn: range(10, 20),
 			yarnBall: range(2, 4),
@@ -137,7 +139,9 @@ const PRIZE_OPTIONS = [
 	},
 	// EF 3
 	{
-		main: {},
+		main: {
+			randomYippie: {tier: 1},
+		},
 		consolation: {
 			yarn: range(21, 30),
 			yarnBall: range(6, 8),
@@ -146,7 +150,9 @@ const PRIZE_OPTIONS = [
 	},
 	// EF 4
 	{
-		main: {},
+		main: {
+			randomYippie: {tier: 2},
+		},
 		consolation: {
 			yarn: range(31, 45),
 			yarnBall: range(10, 15),
@@ -156,7 +162,9 @@ const PRIZE_OPTIONS = [
 	},
 	// EF 5
 	{
-		main: {},
+		main: {
+			randomYippie: {tier: 3},
+		},
 		consolation: {
 			yarn: range(50, 75),
 			yarnBall: range(20, 30),
@@ -166,7 +174,9 @@ const PRIZE_OPTIONS = [
 	},
 	// EF 5 CLEARED
 	{
-		main: {},
+		main: {
+			randomYippie: {tier: 4},
+		},
 		consolation: {
 			yarn: range(76, 100),
 			yarnBall: range(35, 50),
@@ -201,6 +211,7 @@ class Twister extends Module {
 			goldBall: Prizes.pokyecats.goldBall(this),
 			catches: Prizes.pokyecats.catches(this),
 			shinyCatches: Prizes.pokyecats.shinyCatches(this),
+			randomYippie: Prizes.yippies.randomTiered(this),
 		};
 
 		this.data = {};
@@ -650,6 +661,23 @@ class Twister extends Module {
 		return await prize.grant(username, displayName, options[selection]);
 	}
 
+	async _grantMainPrize(username, displayName) {
+		let level = this.data.level;
+		if (level === NUM_LEVELS - 1 && this.data.sp >= this.currentLevel.spToClear) {
+			level++;
+		}
+
+		let options = PRIZE_OPTIONS[level].main;
+		if (!options) {
+			return false;
+		}
+
+		let selection = Utils.randomKey(options);
+
+		let prize = this.prizes[selection];
+		return await prize.grant(username, displayName, options[selection]);
+	}
+
 	async grantPrizes() {
 		let prizes = {};
 		this.print("+--------+");
@@ -658,9 +686,19 @@ class Twister extends Module {
 		let htmlEntries = [];
 		let limitedPrizesGiven = {};
 		await Utils.objectForEachAsync(this.data.players, async (username, userDetails) => {
-			let prize = await this._grantConsolationPrize(limitedPrizesGiven, username, userDetails.displayName);
-			this.print(`${userDetails.displayName} got ${prize.text}`);
-			htmlEntries.push(`<span class="username">${userDetails.displayName}</span> got <span class="${prize.quality}">${prize.html}</span>`);
+			const displayName = userDetails.displayName;
+			let prize = await this._grantMainPrize(username, displayName);
+			if (!prize) {
+				prize = await this._grantConsolationPrize(limitedPrizesGiven, username, displayName);
+			}
+
+			this.print(`${displayName} got ${prize.text}`);
+			let html = `<span class="username">${displayName}</span> got <span class="${prize.quality}">${prize.html}</span>`;
+			if (prize.imageURL) {
+				html += ` <img src="${prize.imageURL}" alt="" class="prize-image">`;
+			}
+
+			htmlEntries.push(html);
 			prizes[username] = prize;
 		});
 

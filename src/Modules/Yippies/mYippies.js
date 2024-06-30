@@ -138,7 +138,12 @@ class Yippies extends Module {
 			return false;
 		}
 
-		return this.giveYippie(username, Utils.randomElement(missingYds), save);
+		const yd = Utils.randomElement(missingYds);
+		if (this.giveYippie(username, yd, save)) {
+			return yd;
+		} else {
+			return false;
+		}
 	}
 
 	_give(data) {
