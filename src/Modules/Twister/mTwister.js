@@ -678,6 +678,14 @@ class Twister extends Module {
 		return await prize.grant(username, displayName, options[selection]);
 	}
 
+	_formatPrizeHTML(prize) {
+		let html = `<span class="${prize.quality}">${prize.html}</span>`;
+		if (prize.imageURL) {
+			html += ` <img src="${prize.imageURL}" alt="" class="prize-image">`;
+		}
+		return html;
+	}
+
 	async grantPrizes() {
 		let prizes = {};
 		this.print("+--------+");
@@ -687,19 +695,24 @@ class Twister extends Module {
 		let limitedPrizesGiven = {};
 		await Utils.objectForEachAsync(this.data.players, async (username, userDetails) => {
 			const displayName = userDetails.displayName;
-			let prize = await this._grantMainPrize(username, displayName);
-			if (!prize) {
-				prize = await this._grantConsolationPrize(limitedPrizesGiven, username, displayName);
+			let mainPrize = await this._grantMainPrize(username, displayName);
+			let consolationPrize = await this._grantConsolationPrize(limitedPrizesGiven, username, displayName);
+			let text, html;
+			let consolationPrizeHtml = this._formatPrizeHTML(consolationPrize);
+
+			if (mainPrize) {
+				text = `${displayName} got ${mainPrize.text} and ${consolationPrize.text}`;
+				let mainPrizeHtml = this._formatPrizeHTML(mainPrize);
+				html = `<span class="username">${displayName}</span> got ${mainPrizeHtml} and ${consolationPrizeHtml}`;
+			} else {
+				text = `${displayName} got ${consolationPrize.text}`;
+				html = `<span class="username">${displayName}</span> got ${consolationPrizeHtml}`;
 			}
 
-			this.print(`${displayName} got ${prize.text}`);
-			let html = `<span class="username">${displayName}</span> got <span class="${prize.quality}">${prize.html}</span>`;
-			if (prize.imageURL) {
-				html += ` <img src="${prize.imageURL}" alt="" class="prize-image">`;
-			}
+			this.print(text);
 
 			htmlEntries.push(html);
-			prizes[username] = prize;
+			prizes[username] = {main: mainPrize, consolation: consolationPrize};
 		});
 
 		setTimeout(() => this.saveAllData(true), 500);
