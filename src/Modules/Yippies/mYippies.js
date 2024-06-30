@@ -45,6 +45,22 @@ class Yippies extends Module {
 		modConfig.addDynamicArray('tiers', 'YippieTier')
 			.setName('Tiers')
 			.setDescription('All Yippie tiers');
+
+		let messages = modConfig.addGroup('messages')
+			.setName("Messages")
+			.setDescription("Various messages sent by the bot");
+		messages.addString('yippieDoesNotExist', "We never had that in our house when the tornado took it.")
+			.setName("Missing Yippie")
+			.setDescription("Message sent when the specified Yippie ID does not exist");
+		messages.addString('yippieNotOwned', "Sorry, you haven't collected that debris yet.")
+			.setName("Yippie Not Owned")
+			.setDescription("Message sent when the user does not own the specified Yippie");
+		messages.addString('noYippiesOwned', "Sorry, you haven't collected any debris yet.")
+			.setName("No Yippies Owned")
+			.setDescription("Message sent when the user does not own any Yippies");
+		messages.addString('yippieListHeader', "Your collected debris:")
+			.setName("Yippie List Header")
+			.setDescription("Message sent to tell a user what Yippies they have (the list will follow at the end)");
 	}
 
 	loadModConfig(conf) {
@@ -149,7 +165,7 @@ class Yippies extends Module {
 	_give(data) {
 		let params = data.params;
 		if (params.length !== 2) {
-			this.tellError(data.user, "Please specify a target user and a Yippie.");
+			this.tellError(data.user, "Please specify a target user and an ID.");
 			return false;
 		}
 
@@ -157,7 +173,7 @@ class Yippies extends Module {
 		let yd = params[1].toLowerCase();
 
 		if (!this._yippieExists(yd)) {
-			this.tellError(data.user, "That Yippie doesn't exist!");
+			this.tellError(data.user, this.config.messages.yippieDoesNotExist);
 			return false;
 		}
 
@@ -179,20 +195,19 @@ class Yippies extends Module {
 		if (data.firstParam) {
 			yd = data.firstParam;
 			if (!this._yippieExists(yd)) {
-				this.tellError(data.user, "That Yippie doesn't exist!");
+				this.tellError(data.user, this.config.messages.yippieDoesNotExist);
 				return false;
 			}
 			if (!this._userOwnsYippie(data.user.name, yd)) {
-				this.tellError(data.user, "Sorry, you don't own that Yippie yet...");
+				this.tellError(data.user, this.config.messages.yippieNotOwned);
 				return false;
 			}
 		} else if (!this._userOwnsYippies(data.user.name)) {
-			this.tellError(data.user, "Sorry, you don't own any Yippies yet...");
+			this.tellError(data.user, this.config.messages.noYippiesOwned);
 			return false;
 		} else {
 			yd = this._getRandomUserYippie(data.user.name);
 		}
-
 
 		let yippieFile = await this.getYippieFile(yd);
 		if (yippieFile) {
@@ -204,14 +219,26 @@ class Yippies extends Module {
 		}
 	}
 
+	show(data) {
+		if (!this._userOwnsYippies(data.user.name)) {
+			this.tellError(data.user, this.config.messages.noYippiesOwned);
+			return false;
+		}
+
+		let message = this.config.messages.yippieListHeader.trim();
+		let inventory = this._inventory(data.user.name);
+		message += " " + inventory.join(", ");
+		this.tell(data.user, message);
+	}
+
 
 	functions = {
 		use: {
 			name: 'Use',
 			description: "Uses a Yippie",
 			triggers: [
-				this.trigger.cli({
-					cmdname: 'y',
+				this.trigger.command({
+					cmdname: 's',
 				}),
 			],
 			action: async (data) => this.use(data),
@@ -225,6 +252,16 @@ class Yippies extends Module {
 				}),
 			],
 			action: (data) => this._give(data),
+		},
+		show: {
+			name: 'Show Inventory',
+			description: "List all the Yippies the user owns",
+			triggers: [
+				this.trigger.command({
+					cmdname: 'debris',
+				}),
+			],
+			action: async (data) => this.show(data),
 		},
 	}
 }
