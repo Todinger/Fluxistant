@@ -73,12 +73,15 @@ class Yippies extends Module {
 		for (let i = 0; i < conf.tiers.length; i++) {
 			let tier = [];
 			Object.values(conf.tiers[i].images.files).forEach(file => {
-				if (file.yd in this.yippies) {
+				let displayYD = file.yd;
+				file.displayYD = displayYD;
+				let yd = displayYD.toLowerCase();
+				if (yd in this.yippies) {
 					throw `Duplicate Yippie ID: ${file.yd}`;
 				}
 
-				this.yippies[file.yd] = file;
-				tier.push(file.yd);
+				this.yippies[yd] = file;
+				tier.push(yd);
 			});
 
 			this.tiers.push(tier);
@@ -115,7 +118,7 @@ class Yippies extends Module {
 	}
 
 	_userOwnsYippie(username, yd) {
-		return this._userExists(username) && this._inventory(username).includes(yd);
+		return this._userExists(username) && this._inventory(username).includes(yd.toLowerCase());
 	}
 
 	_getRandomUserYippie(username) {
@@ -132,6 +135,7 @@ class Yippies extends Module {
 
 	giveYippie(username, yd, save = true) {
 		this._ensureUser(username);
+		yd = yd.toLowerCase();
 		if (this._userOwnsYippie(username, yd)) {
 			return false;
 		}
@@ -160,7 +164,7 @@ class Yippies extends Module {
 
 		const yd = Utils.randomElement(missingYds);
 		if (this.giveYippie(username, yd, save)) {
-			return yd;
+			return this.yippies[yd].displayYD;
 		} else {
 			return false;
 		}
@@ -185,6 +189,7 @@ class Yippies extends Module {
 	}
 
 	async getYippieFile(yd) {
+		yd = yd.toLowerCase();
 		let yippie = this.yippies[yd];
 		if (yippie && yippie.fileKey) {
 			let yippieFile = await this.assets.getFileWeb(yippie);
@@ -197,7 +202,7 @@ class Yippies extends Module {
 	async use(data) {
 		let yd;
 		if (data.firstParam) {
-			yd = data.firstParam;
+			yd = data.firstParam.toLowerCase();
 			if (!this._yippieExists(yd)) {
 				this.tellError(data.user, this.config.messages.yippieDoesNotExist);
 				return false;
