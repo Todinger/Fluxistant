@@ -72,8 +72,13 @@ class Yippies extends Module {
 		this.tiers = [];
 		for (let i = 0; i < conf.tiers.length; i++) {
 			let tier = [];
+			let fileCount = 0;
 			Object.values(conf.tiers[i].images.files).forEach(file => {
 				let displayYD = file.yd;
+				if (!displayYD) {
+					throw `A Yippie with an empty IDs found in Tier #${i + 1} (possibly file #${fileCount + 1}).`;
+				}
+
 				file.displayYD = displayYD;
 				let yd = displayYD.toLowerCase();
 				if (yd in this.yippies) {
@@ -82,6 +87,8 @@ class Yippies extends Module {
 
 				this.yippies[yd] = file;
 				tier.push(yd);
+
+				fileCount++;
 			});
 
 			this.tiers.push(tier);
