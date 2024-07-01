@@ -727,7 +727,11 @@ class Twister extends Module {
 	}
 
 	hidePrizes() {
-		this.broadcastEvent("hidePrizes");
+		if (this.state === TwisterState.Inactive || this.state === TwisterState.Ending) {
+			this.broadcastEvent("hide");
+		} else {
+			this.broadcastEvent("hidePrizes");
+		}
 	}
 
 	// broadcastEvent(event, ...p) {

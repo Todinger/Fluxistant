@@ -367,8 +367,11 @@ class Twister extends ModuleClient {
         this.elements.jMain.fadeIn(FADE_DURATION);
     }
 
-    hide(onDone) {
-        this.elements.jMain.fadeOut(FADE_DURATION, onDone);
+    hide() {
+        this.elements.jMain.fadeOut(FADE_DURATION, () => {
+            this._hideTornadoDetails();
+            this.elements.jPrizeListContainer.hide();
+        });
     }
 
     _setupSound(name, data, loop) {
@@ -429,4 +432,11 @@ window.t = t;
 //     t.showWarn();
 //     t._showTornadoDetails();
 //     t.showPrizes(prizes);
+// }, 500);
+
+// setTimeout(() => {
+//     t.showWarn();
+//     t._showTornadoDetails();
+//     t._setLevel(5);
+//     t.elements.jTimer.text("1:23");
 // }, 500);
