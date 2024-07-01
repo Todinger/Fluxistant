@@ -55,7 +55,7 @@ body {
 #content {
     display: flex;
     align-items: center;
-    margin-top: 20px;
+    margin-top: -20px;
     pointer-events: all;
     height: 60px;
 }
