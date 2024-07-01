@@ -74,8 +74,7 @@ body {
     font-family: "Orbitron", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
-    /*font-weight: 900;*/
-    /*font-size: 3em;*/
+    -webkit-text-stroke-color: black;
 }
 
 #level {
@@ -90,6 +89,7 @@ body {
     font-family: "Orbitron", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+    -webkit-text-stroke-color: black;
 }
 
 #progress-container {
@@ -134,52 +134,61 @@ body {
 
 
 .timer-ef1 {
-    font-weight: 400;
-    font-size: 2em;
+    font-weight: 600;
+    font-size: 2.5em;
+    -webkit-text-stroke-width: 3px;
 }
 
 .timer-ef2 {
-    font-weight: 525;
-    font-size: 2.5em;
+    font-weight: 675;
+    font-size: 3em;
+    -webkit-text-stroke-width: 3px;
 }
 
 .timer-ef3 {
-    font-weight: 650;
-    font-size: 3em;
+    font-weight: 750;
+    font-size: 3.5em;
+    -webkit-text-stroke-width: 3px;
 }
 
 .timer-ef4 {
-    font-weight: 775;
-    font-size: 3.5em;
+    font-weight: 825;
+    font-size: 4em;
+    -webkit-text-stroke-width: 3px;
 }
 
 .timer-ef5 {
     font-weight: 900;
-    font-size: 4em;
+    font-size: 4.5em;
+    -webkit-text-stroke-width: 4px;
 }
 
 .ef1 {
-    font-weight: 400;
-    font-size: 2em;
+    font-weight: 600;
+    font-size: 2.5em;
     color: #ff6ae1;
+    -webkit-text-stroke-width: 3px;
 }
 
 .ef2 {
-    font-weight: 525;
-    font-size: 2.5em;
+    font-weight: 675;
+    font-size: 3em;
     color: #ffdd00;
+    -webkit-text-stroke-width: 3px;
 }
 
 .ef3 {
-    font-weight: 650;
-    font-size: 3em;
+    font-weight: 750;
+    font-size: 3.5em;
     color: #2fff00;
+    -webkit-text-stroke-width: 3px;
 }
 
 .ef4 {
-    font-weight: 775;
-    font-size: 3.5em;
+    font-weight: 825;
+    font-size: 4em;
     color: #14ffd4;
+    -webkit-text-stroke-width: 3px;
 }
 
 
@@ -204,7 +213,6 @@ svg[height="0"] {
     filter: url(#f);
     text-align: center;
     text-transform: uppercase;
-    -webkit-text-stroke-width: 3px;
     -webkit-text-stroke-color: black;
     /* needs support for animating custom properties */
     /* Firefox not quite there yet, but it's coming */
@@ -212,10 +220,12 @@ svg[height="0"] {
 }
 
 .ef5 {
-    font: 900 clamp(.875em, 7.25vw, 4em) "Orbitron", sans-serif;
+    -webkit-text-stroke-width: 4px;
+    font: 900 clamp(.875em, 7.25vw, 4.5em) "Orbitron", sans-serif;
 }
 
 .prize-omg {
+    -webkit-text-stroke-width: 3px;
     font: 900 clamp(.875em, 7.25vw, 1.2em) "Orbitron", sans-serif;
 }
 
