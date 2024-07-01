@@ -56,7 +56,6 @@ class StreamRaiders extends Module {
 		});
 
 		this.sortedMilestones = [];
-		this.currentSP = 0;
 		this.currentPixelProgress = 0;
 		this.nextMilestoneIndex = 0;
 
@@ -64,6 +63,7 @@ class StreamRaiders extends Module {
 			purchases: [],
 			users: {},
 			skinathons: {},
+			currentSP: 0,
 		};
 
 		this.eventHandlers = {
@@ -139,6 +139,15 @@ class StreamRaiders extends Module {
 		}
 	}
 
+	get currentSP() {
+		return this.data.currentSP;
+	}
+
+	set currentSP(sp) {
+		this.data.currentSP = sp;
+		this.saveData();
+	}
+
 	_enableEventHandlers() {
 		StreamRaidersManager.onSkinathonPointsChanged(this.eventHandlers.skinathonPointsChanged);
 		StreamRaidersManager.onAnySkinPurchase(this.eventHandlers.skinPurchase);
@@ -169,6 +178,7 @@ class StreamRaiders extends Module {
 
 	persistentDataLoaded() {
 		this.tracker.dataLoaded();
+		this.setSP(this.currentSP || 0);
 	}
 
 
@@ -462,6 +472,18 @@ class StreamRaiders extends Module {
 		this.print("----------------\n" + report);
 	}
 
+	endSkinathon() {
+		this.data = {
+			purchases: [],
+			users: {},
+			skinathons: {},
+			currentSP: 0,
+		};
+
+		this.saveData();
+		this.sendState();
+	}
+
 	functions = {
 		setSP: {
 			name: 'Get / Set SP',
@@ -502,6 +524,11 @@ class StreamRaiders extends Module {
 				}),
 			],
 			action: () => this.printSkinathonReport(),
+		},
+		endSkinathon: {
+			name: 'End Skinathon',
+			description: 'Ands the skinathon currently in progress and resets all data',
+			action: () => this.endSkinathon(),
 		},
 	}
 
