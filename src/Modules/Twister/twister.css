@@ -198,9 +198,9 @@ svg[height="0"] {
     /* no pseudo needed */
     --k: 0;
     place-self: center;
-    background: linear-gradient(90deg, hsl(calc(var(--k)*1turn), 95%, 65%), hsl(calc(var(--k)*1turn + 90deg), 95%, 65%)) text;
+    background: linear-gradient(90deg, hsl(calc(var(--k)*1turn), 95%, 65%), hsl(calc(var(--k)*1turn + 90deg), 95%, 65%));
+    -webkit-background-clip: text;
     color: transparent;
-    /*font: 900 clamp(.875em, 7.25vw, 4em) "Orbitron", sans-serif;*/
     filter: url(#f);
     text-align: center;
     text-transform: uppercase;
