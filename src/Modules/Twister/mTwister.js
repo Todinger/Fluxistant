@@ -588,7 +588,7 @@ class Twister extends Module {
 	}
 
 	forceGrow() {
-		if (this.state !== TwisterState.Active || this.data.level >= MAX_TORNADO_LEVEL - 1) {
+		if (this.state !== TwisterState.Active || this.data.level >= NUM_LEVELS - 1) {
 			return false;
 		}
 
@@ -734,6 +734,28 @@ class Twister extends Module {
 		}
 	}
 
+	forceStart() {
+		switch (this.state) {
+			case TwisterState.Inactive:
+			case TwisterState.Ending:
+				this.triggerWatch();
+				this.triggerTornado();
+				break;
+			case TwisterState.Watch:
+				this.triggerTornado();
+				break;
+			default:
+				break;
+		}
+	}
+
+	forceEnd() {
+		if (this.state !== TwisterState.Active) return;
+
+		this.levelTimer.set(0);
+		this.broadcastEvent("setTimer", 0);
+	}
+
 	// broadcastEvent(event, ...p) {
 	// 	this.print(`Event: ${event}`);
 	// 	super.broadcastEvent(event, ...p);
@@ -769,7 +791,7 @@ class Twister extends Module {
 					cmdname: 'tstart',
 				}),
 			],
-			action: () => this.startTornado(),
+			action: () => this.forceStart(),
 		},
 		grow: {
 			name: 'Force Grow',
@@ -780,6 +802,16 @@ class Twister extends Module {
 				}),
 			],
 			action: () => this.forceGrow(),
+		},
+		stop: {
+			name: 'Force Stop',
+			description: "Ends the Tornado immediately (doesn't work if the tornado isn't active)",
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'tstop',
+				}),
+			],
+			action: () => this.forceEnd(),
 		},
 		hidePrizes: {
 			name: 'Hide Prizes',

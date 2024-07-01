@@ -412,6 +412,7 @@ class Twister extends ModuleClient {
         this.server.on('setup', (setupData) => this.setup(setupData));
         this.server.on('showPrizes', (prizeList) => this.showPrizes(prizeList));
         this.server.on('hidePrizes', () => this.hidePrizes());
+        this.server.on('setTimer', (duration) => this.setTimer(duration));
         this.server.attach();
     }
 }
