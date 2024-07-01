@@ -535,7 +535,7 @@ class Module {
 		}
 		
 		// Update the module itself about the configuration changes
-		this.loadModConfig(conf);
+		this.loadModConfig(conf, prevConf);
 		
 		if ((!prevConf.enabled || !this.active) && conf.enabled) {
 			// Module activation - happens when switching 'enabled' value

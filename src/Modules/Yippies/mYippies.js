@@ -63,7 +63,7 @@ class Yippies extends Module {
 			.setDescription("Message sent to tell a user what Yippies they have (the list will follow at the end)");
 	}
 
-	loadModConfig(conf) {
+	loadModConfig(conf, prevConf) {
 		if (this.clientsAreConnected) {
 			this._setupClients();
 		}
@@ -88,6 +88,14 @@ class Yippies extends Module {
 				this.yippies[yd] = file;
 				tier.push(yd);
 
+				let previousSettings = this._findFileInConf(prevConf, file.fileKey);
+				if (previousSettings !== null) {
+					let oldYD = previousSettings.yd.toLowerCase();
+					if (oldYD !== yd) {
+						this._renameYippie(oldYD, yd);
+					}
+				}
+
 				fileCount++;
 			});
 
@@ -99,6 +107,26 @@ class Yippies extends Module {
 		this.onClientAttached(() => {
 			this._setupClients();
 		});
+	}
+
+	_findFileInConf(conf, fileKey) {
+		for (let tier of conf.tiers) {
+			if (fileKey in tier.images.files) {
+				return tier.images.files[fileKey];
+			}
+		}
+
+		return null;
+	}
+
+	_renameYippie(oldYD, newYD) {
+		Object.keys(this.data.inventories).forEach(username => {
+			const index = this.data.inventories[username].indexOf(oldYD);
+			if (index >= 0) {
+				this.data.inventories[username][index] = newYD;
+			}
+		});
+		this.saveData();
 	}
 
 	_setupClients() {
