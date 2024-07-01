@@ -227,6 +227,7 @@ svg[height="0"] {
 .prize-omg {
     -webkit-text-stroke-width: 3px;
     font: 900 clamp(.875em, 7.25vw, 1.2em) "Orbitron", sans-serif;
+    text-shadow: none;
 }
 
 @keyframes k {
@@ -256,7 +257,22 @@ svg[height="0"] {
 .prize-list .entry {
     color: white; /* Centralized text color for all entries */
     text-align: left; /* All lines left-justified by default */
-    font-size: 2em;
+    font-size: 3em;
+    font-weight: 600;
+    /*-webkit-text-stroke-color: black;*/
+    /*-webkit-text-stroke-width: 4px;*/
+}
+
+.entry {
+    text-shadow:
+            -3px -3px 0 #000,
+            0   -3px 0 #000,
+            3px -3px 0 #000,
+            3px  0   0 #000,
+            3px  3px 0 #000,
+            0    3px 0 #000,
+            -3px  3px 0 #000,
+            -3px  0   0 #000;
 }
 
 /* To center the text instead of left-justifying it, use the following class */
