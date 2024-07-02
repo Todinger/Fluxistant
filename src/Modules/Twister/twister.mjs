@@ -397,6 +397,17 @@ class Twister extends ModuleClient {
 
         this._setupSound(BGM_SOUND_NAME, setupData.bgm, true);
         this._setupSound(WARNING_SOUND_NAME, setupData.warningSound, false);
+
+        if (setupData.state === "Watch") {
+            this.showWatch();
+        } else if (setupData.state === "Active") {
+            this.delayedSkins = setupData.skins || [];
+            this.delayedProgressData = setupData.progress;
+            this.tornadoStartingLevel = setupData.level + 1;
+            this.showWarn();
+            this.visible = true;
+            setTimeout(() => this._activateTornado(setupData.remainingTime), 500);
+        }
     }
 
     start() {

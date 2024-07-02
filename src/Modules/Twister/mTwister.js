@@ -235,6 +235,7 @@ class Twister extends Module {
 			randomYippie: Prizes.yippies.randomTiered(this),
 		};
 
+		this.levelStartTime = null;
 		this.data = {};
 	}
 
@@ -576,6 +577,7 @@ class Twister extends Module {
 
 	_resetLevelTimer() {
 		this.levelTimer.set(this.currentLevel.timeLimit * SECONDS);
+		this.levelStartTime = Date.now();
 	}
 
 	_tornadoStarted() {
@@ -639,6 +641,7 @@ class Twister extends Module {
 		this.broadcastEvent("endTornado");
 		this.resultDisplayTimer.set(DELAY_BEFORE_TORNADO_RESULTS);
 		this.cooldownTimer.set(DISPLAY_COOLDOWN_BETWEEN_TORNADOES);
+		this.levelStartTime = null;
 
 		this.grantPrizes().then().catch();
 	}
@@ -648,7 +651,20 @@ class Twister extends Module {
 		let setupData = {
 			prizeScrollDelay: this.config.prizeScrollDelay / 1000,
 			prizeScrollSpeed: this.config.prizeScrollSpeed,
+			state: this.state,
 		};
+
+		if (this.state === TwisterState.Active) {
+			setupData.level = this.data.level;
+			setupData.skins = this.data.skins;
+			setupData.progress = this._makeProgress();
+			if (this.levelStartTime === null) {
+				setupData.remainingTime = this.currentLevel.timeLimit;
+			} else {
+				let timeElapsed = Date.now() - this.levelStartTime;
+				setupData.remainingTime = Math.round(this.currentLevel.timeLimit - timeElapsed / SECONDS);
+			}
+		}
 
 		if (bgmConf && bgmConf.file.fileKey) {
 			let soundFileConf = bgmConf.file;
