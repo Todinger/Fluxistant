@@ -195,6 +195,7 @@ class Twister extends Module {
 			name: 'Twister',
 			webname: 'twister',
 			source: 'twister.html',
+			debug: true,
 		});
 
 		this.eventQueue = new TimedEventQueue(0, EVENT_QUEUE_CHECK_INTERVAL);
@@ -232,13 +233,13 @@ class Twister extends Module {
 		})
 			.setName('Activation Method')
 			.setDescription('How the twister starts');
-		modConfig.addInteger('watchThreshold')
+		modConfig.addInteger('watchThreshold', 2)
 			.setName("Watch Threshold")
 			.setDescription("The amount for the chosen method (i.e. how much SP / how many (unique) user purchases) needed to start a pre-twister tornado watch");
-		modConfig.addInteger('activationThreshold')
+		modConfig.addInteger('activationThreshold', 4)
 			.setName("Activation Threshold")
 			.setDescription("The amount for the chosen method (i.e. how much SP / how many (unique) user purchases) needed to start the twister");
-		modConfig.addDuration('activationTimeLimit')
+		modConfig.addDuration('activationTimeLimit', 30)
 			.setName("Activation Time Limit")
 			.setDescription("Time window in which the activation threshold must be met in order for the twister to start (set to 0 to disable)");
 		modConfig.addDuration('prizeScrollDelay', 2)
@@ -247,6 +248,9 @@ class Twister extends Module {
 		modConfig.addPositiveNumber('prizeScrollSpeed', 50)
 			.setName("Prize List Scroll Speed")
 			.setDescription("The rate at which the prize list scrolls up/down when it doesn't all fit on the screen");
+		modConfig.addString('watchMessage', "The wind is picking up! Look out, Kansas!")
+			.setName("Watch Message")
+			.setDescription("Message written to the chat when a Tornado Watch starts");
 
 		let levels = modConfig.addFixedArray('levels', 'TwisterLevel')
 			.setName("Twister Levels")
@@ -473,6 +477,7 @@ class Twister extends Module {
 
 	startWatch(includeLastEvent = false) {
 		this.state = TwisterState.Watch;
+		this.say(this.config.watchMessage);
 		this._createNewTornadoData();
 
 		let purchaseEvents = this.eventQueue.events;
