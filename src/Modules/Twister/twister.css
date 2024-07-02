@@ -311,3 +311,37 @@ svg[height="0"] {
     width: 48px;
     height: 48px;
 }
+
+
+
+
+
+.yemote-tier-1 {
+    color: springgreen;
+}
+
+.yemote-tier-2 {
+    color: deepskyblue;
+    font-weight: bold;
+}
+
+.yemote-tier-3 {
+    color: deeppink;
+    font-weight: bold;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: lightpink;
+}
+
+.yemote-tier-4 {
+    color: gold;
+    font-weight: bolder;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: orange;
+}
+
+.yemote-tier-5 {
+    color: purple;
+    font-weight: bolder;
+    -webkit-text-stroke-width: 3px;
+    -webkit-text-stroke-color: rebeccapurple;
+}

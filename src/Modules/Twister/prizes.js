@@ -10,12 +10,12 @@ const PRIZE_QUALITY_CLASSES = {
     OMG: "prize-omg",
 }
 
-const QUALITY_BY_LEVEL = [
-    PRIZE_QUALITY_CLASSES.NICE,
-    PRIZE_QUALITY_CLASSES.GOOD,
-    PRIZE_QUALITY_CLASSES.GREAT,
-    PRIZE_QUALITY_CLASSES.AMAZING,
-    PRIZE_QUALITY_CLASSES.OMG,
+const YEMOTE_QUALITY_BY_TIER = [
+    "yemote-tier-1",
+    "yemote-tier-2",
+    "yemote-tier-3",
+    "yemote-tier-4",
+    "yemote-tier-5",
 ]
 
 
@@ -116,9 +116,9 @@ class RandomTieredYippiePrize extends Prize {
             return false;
         }
 
-        let text = `the ${yd} Debris`;
+        let text = `the ${yd} Yemote`;
         let html = text;
-        let quality = QUALITY_BY_LEVEL[details.tier];
+        let quality = YEMOTE_QUALITY_BY_TIER[details.tier];
         let yippie = await this.mod.yippies.getYippieFile(yd);
         return {text, html, quality, imageURL: yippie.url};
     }
