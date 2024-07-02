@@ -63,6 +63,28 @@ class PokyecatsGoldBallPrize extends Prize {
     }
 }
 
+class PokyecatsRainbowBallPrize extends Prize {
+    async grant(username, displayName, details) {
+        let amount = Utils.randomInt(details.min, details.max + 1);
+        this.mod.pokyecats.addRainbowBall(username, displayName, amount);
+        let text = `${amount} ${Utils.plurality(amount, "rainbow ball")}.`;
+        let html = text;
+        let quality = PRIZE_QUALITY_CLASSES.GREAT;
+        return {text, html, quality};
+    }
+}
+
+class PokyecatsDarkBallPrize extends Prize {
+    async grant(username, displayName, details) {
+        let amount = Utils.randomInt(details.min, details.max + 1);
+        this.mod.pokyecats.addDarkBall(username, displayName, amount);
+        let text = `${amount} ${Utils.plurality(amount, "dark ball")}.`;
+        let html = text;
+        let quality = PRIZE_QUALITY_CLASSES.GREAT;
+        return {text, html, quality};
+    }
+}
+
 class PokyecatsCatchesPrize extends Prize {
     async grant(username, displayName, details) {
         let amount = Utils.randomInt(details.min, details.max + 1);
@@ -108,6 +130,8 @@ module.exports = {
         yarn: (mod) => new PokyecatsYarnPrize(mod),
         yarnBall: (mod) => new PokyecatsYarnBallPrize(mod),
         goldBall: (mod) => new PokyecatsGoldBallPrize(mod),
+        rainbowBall: (mod) => new PokyecatsRainbowBallPrize(mod),
+        darkBall: (mod) => new PokyecatsDarkBallPrize(mod),
         catches: (mod) => new PokyecatsCatchesPrize(mod),
         shinyCatches: (mod) => new PokyecatsShinyCatchesPrize(mod),
     },
