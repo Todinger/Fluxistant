@@ -6,6 +6,7 @@ const PLACEHOLDERS = {
 	CATCHES: '$caught',
 	NORMALS: '$normals',
 	SHINIES: '$shinies',
+	SEPIAS: '$sepias',
 	BALLS: {
 		YARN: '$yarnballs',
 		GOLD: '$goldballs',
@@ -28,8 +29,9 @@ const NORMAL_BALL = {
 }
 
 const SHINY_CATCHERS_MESSAGE_PREFIX = "✨ You gotta be kitten me! Look who caught a rare shiny Yecats! ✨ ";
-const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $normals = normal catches, $shinies = shiny catches, ' +
-	'$yarnballs = yarn balls, $goldballs = gold balls, $prettyballs = pretty (rainbow) balls, $numyarn = current yarn';
+const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $normals = normal catches, ' +
+	'$shinies = shiny catches, $sepias = sepia catches, $yarnballs = yarn balls, $goldballs = gold balls, ' +
+	'$prettyballs = pretty (rainbow) balls, $numyarn = current yarn';
 
 // Amount of yarn a user gets for each catch attempt
 const YARN_PER_THROW = 1;
@@ -101,7 +103,11 @@ class Pokyecats extends Module {
 			.setName('Catch Message: Shiny')
 			.setDescription('Message to send when a *shiny* Yecats is caught ' +
 							`(${CATCH_VARIABLE_HITS})`);
-		
+		modConfig.addString('sepiaCatchMessage', "You caught a vintage sepia-tone Yecats! That's $caught in total: $normals Yecats(es), $sepias sepia Yecats(es) and $shinies SHINY Yecats(es)!")
+			.setName('Catch Message: Sepia')
+			.setDescription('Message to send when a *sepia* Yecats is caught ' +
+							`(${CATCH_VARIABLE_HITS})`);
+
 		let mediaConfig = modConfig.addGroup('media')
 			.setName('Media Files')
 			.setDescription('The images, sounds and videos to show for the various Yecats types');
@@ -182,12 +188,7 @@ class Pokyecats extends Module {
 	
 	persistentDataLoaded() {
 		Object.keys(this.data.catches).forEach(user => {
-			if (this.data.catches[user].balls === undefined) {
-				this.data.catches[user].balls = this.newBallData();
-			}
-			if (this.data.catches[user].yarn === undefined) {
-				this.data.catches[user].yarn = 0;
-			}
+			this.migrateCatchData(this.data.catches[user]);
 		});
 	}
 	
@@ -202,6 +203,12 @@ class Pokyecats extends Module {
 			[BALLS.RAINBOW]: 0,
 		};
 	}
+
+	newExtraCatchesData() {
+		return {
+			sepia: 0,
+		};
+	}
 	
 	newCatchData() {
 		return {
@@ -210,7 +217,22 @@ class Pokyecats extends Module {
 			displayName: '',
 			balls: this.newBallData(),
 			yarn: 0,
+			extraCatches: this.newExtraCatchesData(),
 		};
+	}
+
+	migrateCatchData(catchData) {
+		if (catchData.balls === undefined) {
+			catchData.balls = this.newBallData();
+		}
+
+		if (catchData.yarn === undefined) {
+			catchData.yarn = 0;
+		}
+
+		if (catchData.extraCatches === undefined) {
+			catchData.extraCatches = this.newExtraCatchesData();
+		}
 	}
 	
 	getUserCatchData(username, displayName) {
@@ -242,6 +264,7 @@ class Pokyecats extends Module {
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.GOLD, catchData.balls[BALLS.GOLD]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.RAINBOW, catchData.balls[BALLS.RAINBOW]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.YARN, catchData.yarn);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.SEPIAS, catchData.extraCatches.sepia);
 		this.tell(user, message);
 	}
 	
