@@ -67,7 +67,7 @@ class PokyecatsRainbowBallPrize extends Prize {
     async grant(username, displayName, details) {
         let amount = Utils.randomInt(details.min, details.max + 1);
         this.mod.pokyecats.addRainbowBall(username, displayName, amount);
-        let text = `${amount} ${Utils.plurality(amount, "rainbow ball")}.`;
+        let text = `${amount} ${Utils.plurality(amount, "pretty ball")}.`;
         let html = text;
         let quality = PRIZE_QUALITY_CLASSES.GREAT;
         return {text, html, quality};

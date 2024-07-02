@@ -501,9 +501,11 @@ class Pokyecats extends Module {
 				let yarn = `${catchData.yarn} yarn, `;
 				let yarnBalls = `${catchData.balls[BALLS.YARN]} yarn balls, `;
 				let goldBalls = `${catchData.balls[BALLS.GOLD]} gold balls, `;
+				let darkBalls = `${catchData.balls[BALLS.DARK]} dark balls, `;
+				let rainbowBalls = `${catchData.balls[BALLS.RAINBOW]} pretty balls, `;
 				let catches = `${catchData.catches} catches, and `;
 				let shiny = `${catchData.shinyCatches} shiny catches.`;
-				let all = number + name + yarn + yarnBalls + goldBalls + catches + shiny;
+				let all = number + name + yarn + yarnBalls + goldBalls + darkBalls + rainbowBalls + catches + shiny;
 				this.print(all);
 				currPlayerNum++;
 			})
