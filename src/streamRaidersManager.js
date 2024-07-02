@@ -312,7 +312,8 @@ class StreamRaidersManager extends EventNotifier {
 		this.logging = srSettings.logging;
 		this.testMode = srSettings.testMode;
 		if (srSettings.enabled) {
-			this.start();
+			this.start(srSettings);
+			this.toggleAPIs(srSettings);
 		} else {
 			this.stop();
 		}
@@ -336,15 +337,25 @@ class StreamRaidersManager extends EventNotifier {
 			return;
 		}
 
-		Object.keys(this.apis).forEach(apiName => {
-			this.apis[apiName].start();
-		});
-
 		this._singleBombQueues = {};
 		TwitchManager.on('message', this._onMessageHandler);
 		this._bombAggregationTimer = setInterval(() => this._onAggregationTick(), SKIN_BOMB_AGGREGATION_INTERVAL);
 
 		this.active = true;
+	}
+
+	toggleAPIs(srSettings) {
+		if (srSettings.enableBattleBoxAPI) {
+			this.apis.battleBox.start();
+		} else {
+			this.apis.battleBox.stop();
+		}
+
+		if (srSettings.enableSkinathonAPI) {
+			this.apis.skinathon.start();
+		} else {
+			this.apis.skinathon.stop();
+		}
 	}
 
 	stop() {

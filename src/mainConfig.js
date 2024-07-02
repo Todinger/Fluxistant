@@ -67,22 +67,28 @@ You can find it on your [StreamElements account details page](https://streamelem
 			.setDescription('Settings for Stream Raiders interactions');
 		sr.addBoolean('enabled', false)
 			.setName('Enable Stream Raiders Integration')
-			.setDescription('Enables/disables getting events and triggers from Stream Raiders.');
+			.setDescription('Enables/disables getting events and triggers from Stream Raiders');
 		sr.addBoolean('testMode', false)
 			.setName('Test Mode')
-			.setDescription("When enabled, the streamer's messages are used instead of CaptainTVBot's for detecting events.");
+			.setDescription("When enabled, the streamer's messages are used instead of CaptainTVBot's for detecting events");
 		sr.addHiddenString('token')
 			.setName('Account Token')
 			.setDescription('Secret (?) token used to get information about your account and battles')
 			.setHelp(`This might be sensitive information (not sure about that), so probably best not to give it out to people.
 To find it, go to your [Battle Box overlay page](https://www.streamraiders.com/game/streamer-tools/overlays/battle-box/).
 The link it shows there has a part at the end that says "?ss=" - everything after that is the "token".`);
+		sr.addBoolean('enableBattleBoxAPI', true)
+			.setName('Enable Battle Box API')
+			.setDescription('Enable performing API requests for the SR Battle Box overlay and using retrieved data');
+		sr.addBoolean('enableSkinathonAPI', true)
+			.setName('Enable Skinathon API')
+			.setDescription('Enable performing API requests for the SR Skinathon overlay and using retrieved data');
 		sr.addBoolean('logging', false)
 			.setName('Enable Logging')
-			.setDescription('When enabled, information will be logged to the console with every change of state.');
+			.setDescription('When enabled, information will be logged to the console with every change of state');
 		sr.addBoolean('errorLogging', true)
 			.setName('Enable Error Logging')
-			.setDescription('When enabled, information will be logged to the console whenever an error occurs communicating with the SR servers.');
+			.setDescription('When enabled, information will be logged to the console whenever an error occurs communicating with the SR servers');
 
 		this.addDynamicArray('channelRewards', 'ChannelReward')
 			.setName('Channel Rewards')
