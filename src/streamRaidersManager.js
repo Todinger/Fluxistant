@@ -194,7 +194,12 @@ class StreamRaidersManager extends EventNotifier {
 				// (e.g. "Flag Bearer" would be recognized as "Flag" being the captain and "Bearer"
 				// being the skin)
 				let captain = match.groups['captain'];
-				if (captain && captain.toLowerCase() !== Globals.StreamerUser.name.toLowerCase()) continue;
+				if (captain) {
+					captain = captain.toLowerCase();
+					let streamer = Globals.StreamerUser.name.toLowerCase();
+					let allowedNames = [streamer, "yecatsx", "yecatsmailbox"];
+					if (!allowedNames.includes(captain)) continue;
+				}
 
 				handlerDesc.handler(match.groups);
 				return;
