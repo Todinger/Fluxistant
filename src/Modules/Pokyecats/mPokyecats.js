@@ -11,6 +11,7 @@ const PLACEHOLDERS = {
 		YARN: '$yarnballs',
 		GOLD: '$goldballs',
 		RAINBOW: '$prettyballs',
+		DARK: '$darkballs',
 	},
 	YARN: '$numyarn',
 };
@@ -20,18 +21,26 @@ const BALLS = {
 	YARN: 'yarnball',
 	GOLD: 'goldball',
 	RAINBOW: 'prettyball',
+	DARK: 'darkball',
 }
+
+// These either do not have a function yet or it is present but not usable yet
+const SECRET_BALLS = [
+	BALLS.RAINBOW,
+	BALLS.DARK,
+];
 
 const NORMAL_BALL = {
 	name: BALLS.NORMAL,
 	catchMultiplier: 1,
 	shinyMultiplier: 1,
+	secret: false,
 }
 
 const SHINY_CATCHERS_MESSAGE_PREFIX = "✨ You gotta be kitten me! Look who caught a rare shiny Yecats! ✨ ";
 const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $normals = normal catches, ' +
 	'$shinies = shiny catches, $sepias = sepia catches, $yarnballs = yarn balls, $goldballs = gold balls, ' +
-	'$prettyballs = pretty (rainbow) balls, $numyarn = current yarn';
+	'$prettyballs = pretty (rainbow) balls, $darkballs = dark balls, $numyarn = current yarn';
 
 // Amount of yarn a user gets for each catch attempt
 const YARN_PER_THROW = 1;
@@ -50,6 +59,10 @@ class Pokyecats extends Module {
 					this.inst.addBall(username, displayName, BALLS.YARN, amount),
 				addGoldBall: (conf, username, displayName, amount) =>
 					this.inst.addBall(username, displayName, BALLS.GOLD, amount),
+				addRainbowBall: (conf, username, displayName, amount) =>
+					this.inst.addBall(username, displayName, BALLS.RAINBOW, amount),
+				addDarkBall: (conf, username, displayName, amount) =>
+					this.inst.addBall(username, displayName, BALLS.DARK, amount),
 				addCatches: (conf, username, displayName, amount) =>
 					this.inst.addCatches(username, displayName, amount),
 				addShinyCatches: (conf, username, displayName, amount) =>
@@ -212,6 +225,7 @@ class Pokyecats extends Module {
 			[BALLS.YARN]: 0,
 			[BALLS.GOLD]: 0,
 			[BALLS.RAINBOW]: 0,
+			[BALLS.DARK]: 0,
 		};
 	}
 
@@ -235,6 +249,14 @@ class Pokyecats extends Module {
 	migrateCatchData(catchData) {
 		if (catchData.balls === undefined) {
 			catchData.balls = this.newBallData();
+		} else {
+			Object.values(BALLS).forEach((ballName) => {
+				if (ballName === BALLS.NORMAL) return;
+
+				if (catchData.balls[ballName] === undefined) {
+					catchData.balls[ballName] = 0;
+				}
+			});
 		}
 
 		if (catchData.yarn === undefined) {
@@ -279,6 +301,7 @@ class Pokyecats extends Module {
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.YARN, catchData.balls[BALLS.YARN]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.GOLD, catchData.balls[BALLS.GOLD]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.RAINBOW, catchData.balls[BALLS.RAINBOW]);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.DARK, catchData.balls[BALLS.DARK]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.YARN, catchData.yarn);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.SEPIAS, catchData.extraCatches.sepia);
 		this.tell(user, message);
@@ -330,8 +353,9 @@ class Pokyecats extends Module {
 		
 		return {
 			name: ballName,
-			catchMultiplier: config.catchMultiplier,
-			shinyMultiplier: config.shinyMultiplier,
+			catchMultiplier: config && config.catchMultiplier || 0,
+			shinyMultiplier: config && config.shinyMultiplier || 0,
+			secret: SECRET_BALLS.includes(ballName),
 		};
 	}
 	
@@ -344,6 +368,14 @@ class Pokyecats extends Module {
 		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
 		
 		let ball = this.getBall(data);
+		if (ball.secret) {
+			this.tellError(data.user, "The purpose of that ball has yet to be revealed...");
+
+			return {
+				success:   null, // Means not to send any responses at all
+			};
+		}
+
 		if (!this.consumeUserBall(catchData, ball.name)) {
 			this.tellError(data.user, "Sorry, you don't own that ball.")
 			
