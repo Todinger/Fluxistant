@@ -14,6 +14,10 @@ class PersistentData {
 		this.data[name] = value;
 		this.save();
 	}
+
+	setAll(data) {
+		this.data = data;
+	}
 	
 	get(name) {
 		if (name === undefined) {
@@ -22,7 +26,7 @@ class PersistentData {
 			return this.data[name];
 		}
 	}
-	
+
 	save() {
 		Utils.ensureDirExists(path.dirname(this.filename));
 		safeWriteFile(this.filename, JSON.stringify(this.data, null, '\t'), (err) => {

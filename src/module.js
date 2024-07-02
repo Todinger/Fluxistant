@@ -148,8 +148,7 @@ class Module {
 		
 		// Persistent data
 		this.persistentData = new PersistentData(path.join(Globals.getModuleUserDir(this.name), 'data.json'));
-		this.data = this.persistentData.get();
-		
+
 		// This is set to true once the configuration has been loaded for
 		// the first time - it's used to invoke the enabled() function
 		// on startup, in case we don't switch from enabled=false to
@@ -159,6 +158,14 @@ class Module {
 	
 	get enabled() {
 		return this.config && this.config.enabled;
+	}
+
+	get data() {
+		return this.persistentData.get();
+	}
+
+	set data(newData) {
+		this.persistentData.setAll(newData);
 	}
 	
 	getModule(modName) {
