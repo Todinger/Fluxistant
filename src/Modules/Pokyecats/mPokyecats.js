@@ -83,6 +83,9 @@ class Pokyecats extends Module {
 		modConfig.addPercentageNumber('shinyChance', 5)
 			.setName('Shiny Chance')
 			.setDescription('The odds of Yecats being shiny *if caught* (0-100)');
+		modConfig.addPercentageNumber('sepiaChance', 50)
+			.setName('Sepia Chance')
+			.setDescription('The odds of Yecats being sepia *if caught while a tornado is active* (0-100)');
 		modConfig.addString('normalCatchMessage', "You caught a Yecats! That's $caught so far!")
 			.setName('Catch Message: Normal')
 			.setDescription('Message to send when a *non-shiny* Yecats is caught and no past shinies have been caught ' +
@@ -120,7 +123,10 @@ class Pokyecats extends Module {
 		mediaConfig.add('legendary', 'SingleMedia')
 			.setName('Legendary Pokyecats')
 			.setDescription('Media for the legendary Pokyecats form');
-		
+		mediaConfig.add('sepia', 'SingleMedia')
+			.setName('Sepia Pokyecats')
+			.setDescription('Media for the sepia-toned Pokyecats form');
+
 		let ballConfig = modConfig.addGroup('ballConfig')
 			.setName('Ball Settings')
 			.setDescription('Yarn ball-related settings');
@@ -136,7 +142,11 @@ class Pokyecats extends Module {
 			.setName('Rainbow Yarn Ball')
 			.setDescription('Settings for the Rainbow Yarn Ball');
 	}
-	
+
+	defineModDependencies() {
+		this.twister = this.use('Twister');
+	}
+
 	_sendToDisplay(mediaDesc) {
 		let imageConf = mediaDesc.image;
 		let soundConf = mediaDesc.sound;
@@ -184,6 +194,7 @@ class Pokyecats extends Module {
 	loadModConfig(conf) {
 		this.catchChance = conf.catchChance / 100;
 		this.shinyChance = conf.shinyChance / 100;
+		this.sepiaChance = conf.sepiaChance / 100;
 	}
 	
 	persistentDataLoaded() {
@@ -243,12 +254,17 @@ class Pokyecats extends Module {
 		
 		return this.data.catches[username];
 	}
+
+	getNormalCatches(catchData) {
+		return catchData.catches - catchData.shinyCatches - catchData.extraCatches.sepia;
+	}
 	
 	variableValuesFromCatchData(catchData) {
 		return {
 			catches: catchData.catches,
 			shinyCatches: catchData.shinyCatches,
-			normalCatches: catchData.catches - catchData.shinyCatches,
+			normalCatches: this.getNormalCatches(catchData),
+			sepiaCatches: catchData.extraCatches.sepia,
 			yarnballs: catchData.balls[BALLS.YARN],
 			goldballs: catchData.balls[BALLS.GOLD],
 			prettyballs: catchData.balls[BALLS.RAINBOW],
@@ -259,7 +275,7 @@ class Pokyecats extends Module {
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.USER, this.getDisplayName(user.name));
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.CATCHES, catchData.catches);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.SHINIES, catchData.shinyCatches);
-		message = Utils.stringReplaceAll(message, PLACEHOLDERS.NORMALS, catchData.catches - catchData.shinyCatches);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.NORMALS, this.getNormalCatches(catchData));
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.YARN, catchData.balls[BALLS.YARN]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.GOLD, catchData.balls[BALLS.GOLD]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.RAINBOW, catchData.balls[BALLS.RAINBOW]);
@@ -365,10 +381,26 @@ class Pokyecats extends Module {
 		}
 		
 		catchData.catches++;
-		
-		let shinyChance = this.shinyChance * ball.shinyMultiplier;
-		let shiny = Math.random() < shinyChance;
-		if (shiny) {
+
+		let shiny = false, sepia = false;
+
+		if (this.twister.isActive()) {
+			sepia = Math.random() < this.sepiaChance;
+		}
+
+		if (!sepia) {
+			let shinyChance = this.shinyChance * ball.shinyMultiplier;
+			shiny = Math.random() < shinyChance;
+		}
+
+		let media = this.config.media.regular;
+
+		if (sepia) {
+			media = this.config.media.sepia;
+			catchData.extraCatches.sepia++;
+			this.tellMessage(data.user, this.config.sepiaCatchMessage, catchData);
+		} else if (shiny) {
+			media = this.config.media.shiny;
 			catchData.shinyCatches++;
 			this.tellMessage(data.user, this.config.shinyCatchMessage, catchData);
 		} else if (catchData.shinyCatches > 0) {
@@ -377,8 +409,8 @@ class Pokyecats extends Module {
 			this.tellMessage(data.user, this.config.normalCatchMessage, catchData);
 		}
 		
-		this._sendToDisplay(shiny ? this.config.media.shiny : this.config.media.regular);
-		
+		this._sendToDisplay(media);
+
 		this.saveCatchData(data.user, catchData);
 		
 		this.saveData();

@@ -190,6 +190,18 @@ const PRIZE_OPTIONS = [
 
 
 class Twister extends Module {
+	static Interface = class TwisterInterface extends Module.Interface {
+		constructor(inst) {
+			super(inst);
+		}
+
+		defineMethods() {
+			return {
+				isActive: () => this.inst.state === TwisterState.Active,
+			};
+		}
+	};
+
 	constructor() {
 		super({
 			name: 'Twister',
