@@ -526,6 +526,8 @@ class Pokyecats extends Module {
 			contents.push(`${catchData.yarn} yarn`);
 			this.addBallCountString(contents, catchData, BALLS.YARN, "yarn");
 			this.addBallCountString(contents, catchData, BALLS.GOLD, "gold");
+			this.addBallCountString(contents, catchData, BALLS.DARK, "dark");
+			this.addBallCountString(contents, catchData, BALLS.RAINBOW, "pretty");
 			this.tell(data.user, `You currently have ${Utils.makeEnglishAndList(contents)}.`);
 		} else {
 			this.tell(data.user, "Sorry, you don't have any yarn yet. Try catching Pokyecats to get some!");
