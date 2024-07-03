@@ -6,4 +6,5 @@ module.exports = {
 	SECONDS: 1000,
 	MINUTES: 60 * 1000,
 	ONE_SECOND: 1000,
+	ONE_MINUTE: 60 * 1000,
 }

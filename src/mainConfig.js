@@ -15,6 +15,9 @@ class MainConfig extends Configuration {
 			.setName('# of Config Backups')
 			.setDescription('How many previous good configurations should be saved as backup')
 			.setHelp('Configuration files and backups are stored under %APPDATA%\\Fluxbot.');
+		this.addBoolean('enableAutoSave', true)
+			.setName("Enable Auto-save")
+			.setDescription("When enabled, all module persistent data will be saved regularly (every one minute)");
 		
 		let twitch = this.addGroup('twitch')
 			.setName('Twitch')
@@ -122,6 +125,10 @@ The link it shows there has a part at the end that says "?ss=" - everything afte
 	
 	getConfigBackupLimit() {
 		return this.getValue('configBackupLimit');
+	}
+
+	getAutoSaveEnabled() {
+		return this.getValue('enableAutoSave');
 	}
 	
 	getTwitchParams() {

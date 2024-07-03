@@ -8,6 +8,8 @@ const KeyboardManager = require('./keyboardManager');
 const ConfigManager = require('./configManager');
 const EntityFileManager = require('./entityFileManager');
 const AssetManager = require('./assetManager');
+const Timers = require('./timers');
+const { ONE_MINUTE } = require('./constants');
 const Utils = require('./utils');
 
 // Every Module needs to have a file by this name in its root directory
@@ -16,6 +18,8 @@ const MODULE_MAIN_FILENAME = "module.js";
 // If a module has any custom configuration entities, they should all be in this
 // subdirectory and the filenames should all end in 'Entity.js'
 const MODULE_CONFIG_DIRNAME = "Config";
+
+const AUTO_SAVE_INTERVAL = ONE_MINUTE;
 
 // Loads, holds and manages all the various Modules in the system.
 class ModuleManager {
@@ -53,6 +57,7 @@ class ModuleManager {
 		});
 
 		cli.on('save', () => this.saveAllData());
+		this.autoSaveTimer = Timers.repeating(() => this.saveAllDataSilent());
 	}
 	
 	getModule(modName) {
@@ -375,6 +380,22 @@ class ModuleManager {
 			}
 		});
 		console.log("Done.");
+	}
+
+	saveAllDataSilent() {
+		Utils.objectForEach(this.modules, (modName, mod) => {
+			try {
+				mod.saveData();
+			} catch (ex) { }
+		});
+	}
+
+	toggleAutoSave(enable) {
+		if (enable) {
+			this.autoSaveTimer.set(AUTO_SAVE_INTERVAL);
+		} else {
+			this.autoSaveTimer.clear();
+		}
 	}
 }
 

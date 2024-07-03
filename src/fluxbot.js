@@ -422,6 +422,7 @@ class FluxBot {
 		this.twitchManager.connect(this.mainConfig.getTwitchParams());
 		this.seManager.connect(this.mainConfig.getStreamElementsParams());
 		this.streamRaidersManager.applyConfig(this.mainConfig.getStreamRaidersParams());
+		this.moduleManager.toggleAutoSave(this.mainConfig.getAutoSaveEnabled());
 
 		// this.logger.init(this.mainConfig.getLoggerParams());
 	}
