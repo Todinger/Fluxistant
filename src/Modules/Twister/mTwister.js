@@ -22,6 +22,13 @@ const EVENT_QUEUE_CHECK_INTERVAL = ONE_SECOND;
 const DELAY_BEFORE_TORNADO_RESULTS = 15 * SECONDS;
 const DISPLAY_COOLDOWN_BETWEEN_TORNADOES = 50 * SECONDS;
 
+const PLACEHOLDERS = {
+	MVP: "$mvp",
+	MVPS: "$mvps",
+	LEVEL: "$level",
+	SP: "$sp",
+};
+
 
 const TwisterState = {
 	Inactive: "Inactive",
@@ -270,6 +277,12 @@ class Twister extends Module {
 		modConfig.addString('watchMessage', "The wind is picking up! Look out, Kansas!")
 			.setName("Watch Message")
 			.setDescription("Message written to the chat when a Tornado Watch starts");
+		modConfig.addString('singleMVPEndingMessage', "yecatsTwister Phew! The tornado, rated EF$level is over! Stormchaser $mvp contributed the most with $sp SP! The tornado left debris all over! yecatsTwister")
+			.setName("Ending Message: Single MVP")
+			.setDescription("Message written to the chat when the twister ends and there's only one MVP ($level = tornado level number (1-5), $mvp = MVP's name)");
+		modConfig.addString('multipleMVPsEndingMessage', "yecatsTwister Phew! The tornado, rated EF$level is over! Stormchasers $mvps contributed the most with $sp SP! The tornado left debris all over! yecatsTwister")
+			.setName("Ending Message: Multiple MVPs")
+			.setDescription("Message written to the chat when the twister ends and there are multiple MVPs ($level = tornado level number (1-5), $mvps = list of MVP names, e.g. 'Apple, Banana and Cranberry')");
 
 		let levels = modConfig.addFixedArray('levels', 'TwisterLevel')
 			.setName("Twister Levels")
@@ -544,6 +557,20 @@ class Twister extends Module {
 		setTimeout(() => this._tornadoStarted(), 6 * SECONDS);
 	}
 
+	sayMessage(message, variables) {
+		if (variables.mvp) {
+			message = Utils.stringReplaceAll(message, PLACEHOLDERS.MVP, variables.mvp);
+		}
+
+		if (variables.mvps) {
+			message = Utils.stringReplaceAll(message, PLACEHOLDERS.MVPS, Utils.makeEnglishAndList(variables.mvps));
+		}
+
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.SP, variables.sp);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.LEVEL, variables.level);
+		this.say(message);
+	}
+
 	_announceResults() {
 		let efLevel = this.data.level + 1;
 		let maxSP = 0, mvps = [];
@@ -556,10 +583,17 @@ class Twister extends Module {
 			}
 		});
 
+		let messageVariables = {
+			sp: maxSP,
+			level: efLevel,
+		}
+
 		if (mvps.length === 1) {
-			this.print(`yecatsTwister Phew! The tornado, rated EF${efLevel} is over! Stormchaser ${mvps[0]} contributed the most with ${maxSP} SP! The tornado left debris all over! yecatsTwister`);
+			messageVariables.mvp = mvps[0];
+			this.sayMessage(this.config.singleMVPEndingMessage, messageVariables);
 		} else {
-			this.print(`yecatsTwister Phew! The tornado, rated EF${efLevel} is over! Stormchasers ${Utils.makeEnglishAndList(mvps)} contributed the most with ${maxSP} SP! The tornado left debris all over! yecatsTwister`);
+			messageVariables.mvps = mvps;
+			this.sayMessage(this.config.multipleMVPsEndingMessage, messageVariables);
 		}
 	}
 
