@@ -218,7 +218,6 @@ class Twister extends Module {
 			name: 'Twister',
 			webname: 'twister',
 			source: 'twister.html',
-			debug: true,
 		});
 
 		this.eventQueue = new TimedEventQueue(0, EVENT_QUEUE_CHECK_INTERVAL);
