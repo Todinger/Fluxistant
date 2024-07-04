@@ -119,7 +119,7 @@ function lRange(limit, min, max) {
 
 
 const PRIZE_OPTIONS = [
-	// EF 1
+	// Didn't clear
 	{
 		main: null,  // No rewards unless level 1 is completed
 		consolation: {
@@ -127,7 +127,7 @@ const PRIZE_OPTIONS = [
 			yarnBall: range(1),
 		},
 	},
-	// EF 2
+	// Cleared EF 1
 	{
 		main: {
 			randomYippie: {tier: 0},
@@ -138,7 +138,7 @@ const PRIZE_OPTIONS = [
 			goldBall: range(1),
 		},
 	},
-	// EF 3
+	// Cleared EF 2
 	{
 		main: {
 			randomYippie: {tier: 1},
@@ -149,7 +149,7 @@ const PRIZE_OPTIONS = [
 			goldBall: range(2),
 		},
 	},
-	// EF 4
+	// Cleared EF 3
 	{
 		main: {
 			randomYippie: {tier: 2},
@@ -162,7 +162,7 @@ const PRIZE_OPTIONS = [
 			catches: range(1, 2),
 		},
 	},
-	// EF 5
+	// Cleared EF 4
 	{
 		main: {
 			randomYippie: {tier: 3},
@@ -175,7 +175,7 @@ const PRIZE_OPTIONS = [
 			catches: range(3, 5),
 		},
 	},
-	// EF 5 CLEARED
+	// Cleared EF 5
 	{
 		main: {
 			randomYippie: {tier: 4},
@@ -187,7 +187,7 @@ const PRIZE_OPTIONS = [
 			darkBall: range(2, 3),
 			rainbowBall: range(1),
 			catches: range(4, 6),
-			shinyCatches: lRange(3, 1),
+			shinyCatches: lRange(1, 1),
 		},
 	},
 ];
@@ -557,9 +557,9 @@ class Twister extends Module {
 		});
 
 		if (mvps.length === 1) {
-			this.print(`Phew! The tornado, rated EF${efLevel} is over! Stormchaser ${mvps[0]} contributed the most with ${maxSP} SP! The tornado left debris all over!`);
+			this.print(`yecatsTwister Phew! The tornado, rated EF${efLevel} is over! Stormchaser ${mvps[0]} contributed the most with ${maxSP} SP! The tornado left debris all over! yecatsTwister`);
 		} else {
-			this.print(`Phew! The tornado, rated EF${efLevel} is over! Stormchasers ${Utils.makeEnglishAndList(mvps)} contributed the most with ${maxSP} SP! The tornado left debris all over!`);
+			this.print(`yecatsTwister Phew! The tornado, rated EF${efLevel} is over! Stormchasers ${Utils.makeEnglishAndList(mvps)} contributed the most with ${maxSP} SP! The tornado left debris all over! yecatsTwister`);
 		}
 	}
 
