@@ -152,9 +152,14 @@ class Twister extends ModuleClient {
 
         // Adjust the position of the progress text
         const containerWidth = this.elements.jProgressContainer.outerWidth();
-        const newRight = containerWidth * (1 - progress / 100) + 5; // 5px for margin
+        const barWidth = this.elements.jProgressBar.outerWidth();
+        const margin = (containerWidth - barWidth) / 2;
+        const textWidth = this.elements.progressText.offsetWidth;
+        let newRight = containerWidth * (1 - progress / 100) + 5; // 5px for margin
+        newRight = Math.max(newRight, 5);
+        newRight = Math.min(newRight, containerWidth - textWidth - margin - 10);
         this.elements.progressText.style.left = "";
-        this.elements.progressText.style.right = `${Math.max(newRight, 5)}px`; // Ensure it doesn't go out of bounds
+        this.elements.progressText.style.right = `${newRight}px`; // Ensure it doesn't go out of bounds
     }
 
     setProgressPercentage(progress, allowOverflow) {
@@ -163,8 +168,8 @@ class Twister extends ModuleClient {
             progress = Math.min(progress, 100);
         }
 
-        this.setProgressDisplay(progress);
         this.elements.progressText.textContent = `${Math.round(progress)}%`;
+        this.setProgressDisplay(progress);
     }
 
     setProgressSP(current, total, allowOverflow) {
@@ -173,8 +178,8 @@ class Twister extends ModuleClient {
             current = Math.min(current, total);
         }
 
-        this.setProgressDisplay(100 * current / total);
         this.elements.progressText.textContent = `${current} / ${total}`;
+        this.setProgressDisplay(100 * current / total);
     }
 
     _setProgress(progressData) {
@@ -452,3 +457,11 @@ window.t = t;
 //     t._setLevel(5);
 //     t.elements.jTimer.text("1:23");
 // }, 500);
+//
+// setTimeout(() => {
+//     t.showWarn();
+//     t._showTornadoDetails();
+//     t.setProgressSP(10, 25);
+// }, 500);
+//
+// window.s = (sp) => t.setProgressSP(sp, 25, true);
