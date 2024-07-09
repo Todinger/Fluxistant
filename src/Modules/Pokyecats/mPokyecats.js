@@ -24,6 +24,13 @@ const BALLS = {
 	DARK: 'darkball',
 }
 
+const CATCH_TYPES = {
+	normal: "normal",
+	sepia: "sepia",
+	shiny: "shiny",
+	all: "all",
+};
+
 // These either do not have a function yet or it is present but not usable yet
 const SECRET_BALLS = [
 	BALLS.RAINBOW,
@@ -503,13 +510,64 @@ class Pokyecats extends Module {
 				let goldBalls = `${catchData.balls[BALLS.GOLD]} gold balls, `;
 				let darkBalls = `${catchData.balls[BALLS.DARK]} dark balls, `;
 				let rainbowBalls = `${catchData.balls[BALLS.RAINBOW]} pretty balls, `;
-				let catches = `${catchData.catches} catches, and `;
+				let catches = `${this.getNormalCatches(catchData)} normal catches, `;
+				let sepiaCatches = `${catchData.extraCatches.sepia} sepia catches, and `;
 				let shiny = `${catchData.shinyCatches} shiny catches.`;
-				let all = number + name + yarn + yarnBalls + goldBalls + darkBalls + rainbowBalls + catches + shiny;
+				let all = number + name + yarn + yarnBalls + goldBalls + darkBalls + rainbowBalls + catches + sepiaCatches + shiny;
 				this.print(all);
 				currPlayerNum++;
-			})
+			});
 		}
+	}
+
+	_getCatchCount(catchData, type) {
+		switch (type) {
+			case CATCH_TYPES.normal:
+				return this.getNormalCatches(catchData);
+			case CATCH_TYPES.sepia:
+				return catchData.extraCatches.sepia;
+			case CATCH_TYPES.shiny:
+				return catchData.shinyCatches;
+			case CATCH_TYPES.all:
+				return catchData.catches;
+			default:
+				return 0;
+		}
+	}
+
+	_getCatchSummary(catchData, type) {
+		let count = this._getCatchCount(catchData, type);
+		if (count === 0) return null;
+
+		if (type === "all") {
+			let normalCatches = `${this.getNormalCatches(catchData)} normal catches, `;
+			let sepiaCatches = `${catchData.extraCatches.sepia} sepia catches and `;
+			let shinyCatches = `${catchData.shinyCatches} shiny catches`;
+			return normalCatches + sepiaCatches + shinyCatches;
+		}
+
+		return `${count} ${type} catches`;
+	}
+
+	showCatches(data) {
+		let playerUserNames = [...Object.keys(this.data.catches)].sort();
+		let numPlayers = playerUserNames.length;
+		let maxPlayerNumLength = Math.log(numPlayers) * Math.LOG10E + 1 | 0;
+		this.print("Requested current nonzero catches data for all Pokyecats players:");
+		let currPlayerNum = 1;
+		playerUserNames.forEach(username => {
+			let catchData = this.data.catches[username];
+			let number = `${currPlayerNum.toString().padStart(maxPlayerNumLength)}. `;
+			let name = `${this.getDisplayName(username)}: `;
+
+			let selection = data.firstParam || CATCH_TYPES.all;
+			if (!(selection in CATCH_TYPES)) selection = CATCH_TYPES.all;
+			let catchSummary = this._getCatchSummary(catchData, selection);
+			if (catchSummary) {
+				this.print(number + name + this._getCatchSummary(catchData, selection));
+				currPlayerNum++;
+			}
+		})
 	}
 
 	addBallCountString(targetArray, catchData, ballName, ballTitle) {
@@ -605,6 +663,17 @@ class Pokyecats extends Module {
 				}),
 			],
 			action: (data) => this.showYarn(data),
+		},
+
+		showCatches: {
+			name: 'Show Catches',
+			description: "Shows current non-zero catches for all users, of a specific type (normal / shiny / sepia / all), or all if not specified.",
+			triggers: [
+				this.trigger.cli({
+					cmdname: 'catches',
+				}),
+			],
+			action: (data) => this.showCatches(data),
 		},
 
 		showUserInventory: {
