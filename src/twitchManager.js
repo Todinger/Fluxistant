@@ -255,8 +255,8 @@ class TwitchManager extends EventNotifier {
 	
 	_simulateUserMessage(username, message) {
 		let userstate = {
-			["username"]: username,
-			["display-name"]: _.capitalize(username),
+			["username"]: username.toLowerCase(),
+			["display-name"]: username,
 			['message-type']: 'chat',
 		}
 		
