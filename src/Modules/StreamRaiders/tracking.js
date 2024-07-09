@@ -121,8 +121,7 @@ class StreamRaidersPurchaseTracker {
     }
 
     _formatReport(userDisplayName, report) {
-        let text = `${userDisplayName}:\n`;
-        text += `Total SP: ${report.totalSP}\n`;
+        let text = `${userDisplayName}: ${report.totalSP}\n`;
         for (let purchase of report.purchases) {
             text += `- [${purchase.time}] ${purchase.details}\n`;
         }
@@ -194,9 +193,18 @@ class StreamRaidersPurchaseTracker {
     getFormattedLatestSkinathonReport() {
         let report = this.getLatestSkinathonReport();
         if (report === null) return null;
-        let text = "";
+        let texts = {};
         Utils.objectForEach(report, (userDisplayName, userReport) => {
-            text += this._formatReport(userDisplayName, userReport);
+            texts[userDisplayName] = this._formatReport(userDisplayName, userReport);
+        });
+
+        let text = "";
+        let names = Object.keys(texts);
+        names.sort(function (a, b) {
+            return a.toLowerCase().localeCompare(b.toLowerCase());
+        });
+        names.forEach(name => {
+            text += texts[name];
         });
 
         return text;
