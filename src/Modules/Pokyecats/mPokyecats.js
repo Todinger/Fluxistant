@@ -1,3 +1,4 @@
+const schedule = require('node-schedule');
 const Module = requireMain('module');
 const Utils = requireMain('utils');
 
@@ -88,6 +89,8 @@ class Pokyecats extends Module {
 		this.data.catches = {};
 		this.catchChance = 0;
 		this.shinyChance = 0;
+
+		this.announceGalaxyecatsJob = null;
 	}
 	
 	defineModAssets(modData) {
@@ -215,6 +218,18 @@ class Pokyecats extends Module {
 		this.catchChance = conf.catchChance / 100;
 		this.shinyChance = conf.shinyChance / 100;
 		this.sepiaChance = conf.sepiaChance / 100;
+
+		if (this.announceGalaxyecatsJob !== null) {
+			this.announceGalaxyecatsJob.cancel();
+		}
+
+		this.announceGalaxyecatsJob = schedule.scheduleJob({hour: 11}, () => this._announceGalaxyecats());
+	}
+
+	_announceGalaxyecats() {
+		if (this.enabled) {
+			// Not implemented yet
+		}
 	}
 	
 	persistentDataLoaded() {
