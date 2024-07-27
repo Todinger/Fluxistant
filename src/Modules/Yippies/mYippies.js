@@ -233,15 +233,41 @@ class Yippies extends Module {
 		return null;
 	}
 
+	_usageParametersFromNameAndCountArgs(nameArg, countArg) {
+		let count = Utils.isNaturalNumberString(countArg) ? Number(countArg) : 1;
+		return {
+			name: nameArg,
+			count,
+		}
+	}
+
+	_extractUsageParameters(params) {
+		let normalizedParams = params;
+		if (params.length === 0) {
+			normalizedParams = [undefined, undefined];
+		} else if (params.length === 1) {
+			normalizedParams = [params[0], undefined];
+		}
+
+		if (isNaN(normalizedParams[0])) {
+			return this._usageParametersFromNameAndCountArgs(normalizedParams[0], normalizedParams[1]);
+		}
+
+		return this._usageParametersFromNameAndCountArgs(normalizedParams[1], normalizedParams[0]);
+	}
+
 	async use(data) {
-		let yd;
-		if (data.firstParam) {
-			yd = data.firstParam.toLowerCase();
-			if (!this._yippieExists(yd)) {
+		let ydFromUser = undefined;
+		let { name, count } = this._extractUsageParameters(data.params);
+		let randomize = false;
+
+		if (name) {
+			ydFromUser = name.toLowerCase();
+			if (!this._yippieExists(ydFromUser)) {
 				this.tellError(data.user, this.config.messages.yippieDoesNotExist);
 				return false;
 			}
-			if (!this._userOwnsYippie(data.user.name, yd)) {
+			if (!this._userOwnsYippie(data.user.name, ydFromUser)) {
 				this.tellError(data.user, this.config.messages.yippieNotOwned);
 				return false;
 			}
@@ -249,16 +275,20 @@ class Yippies extends Module {
 			this.tellError(data.user, this.config.messages.noYippiesOwned);
 			return false;
 		} else {
-			yd = this._getRandomUserYippie(data.user.name);
+			randomize = true;
 		}
 
-		let yippieFile = await this.getYippieFile(yd);
-		if (yippieFile) {
-			let parameters = {
-				image: yippieFile,
-			};
+		for (let i = 0; i < count; i++) {
+			let yd = randomize ? this._getRandomUserYippie(data.user.name) : ydFromUser;
 
-			this.broadcastEvent("activate", parameters);
+			let yippieFile = await this.getYippieFile(yd);
+			if (yippieFile) {
+				let parameters = {
+					image: yippieFile,
+				};
+
+				this.broadcastEvent("activate", parameters);
+			}
 		}
 	}
 
