@@ -1,6 +1,10 @@
 const Module = requireMain('module');
 const Utils = requireMain('utils');
 
+
+const ABSOLUTE_MAX_COUNT = 5000;
+
+
 class Yippies extends Module {
 	static Interface = class YippieInterface extends Module.Interface {
 		constructor(inst) {
@@ -23,6 +27,7 @@ class Yippies extends Module {
 			name: 'Yippies',
 			webname: 'yippies',
 			source: 'yippies.html',
+			debug: true,
 		});
 
 		this.yippies = {};
@@ -31,6 +36,8 @@ class Yippies extends Module {
 		this.data = {
 			inventories: {},
 		}
+
+		this.maxCount = ABSOLUTE_MAX_COUNT;
 	}
 
 	defineModAssets(modData) {
@@ -41,6 +48,11 @@ class Yippies extends Module {
 		modConfig.addDuration('displayDuration', 10)
 			.setName('Display Duration')
 			.setDescription('Number of seconds to display the sticker on the screen');
+
+		modConfig.addNaturalNumber('maxCount', 10)
+			.setName('Maximum Count')
+			.setDescription('Maximum amount that of Yippies that can be used (as a count argument) in a single command');
+
 		modConfig.addDynamicArray('tiers', 'YippieTier')
 			.setName('Tiers')
 			.setDescription('All Yippie tiers');
@@ -100,6 +112,8 @@ class Yippies extends Module {
 
 			this.tiers.push(tier);
 		}
+
+		this.maxCount = conf.maxCount ? Utils.clamp(0, conf.maxCount, ABSOLUTE_MAX_COUNT) : ABSOLUTE_MAX_COUNT;
 	}
 
 	load() {
@@ -277,6 +291,8 @@ class Yippies extends Module {
 		} else {
 			randomize = true;
 		}
+
+		count = Math.min(count, this.maxCount);
 
 		for (let i = 0; i < count; i++) {
 			let yd = randomize ? this._getRandomUserYippie(data.user.name) : ydFromUser;
