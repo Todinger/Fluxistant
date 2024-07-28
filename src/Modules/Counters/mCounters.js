@@ -1,4 +1,5 @@
 const Module = requireMain('module');
+const Utils = requireMain('./utils');
 
 class Counters extends Module {
 	constructor() {
@@ -31,6 +32,7 @@ class Counters extends Module {
 			'Global',
 			(name) => this.incrementGlobal(name),
 			(name) => this.showGlobal(name),
+			(name) => this.reportGlobal(name),
 		);
 
 		this.loadCountersFromConfig(
@@ -39,13 +41,16 @@ class Counters extends Module {
 			'User',
 			(name, data) => this.incrementUser(name, data),
 			(name, data) => this.showUser(name, data),
+			(name, data) => this.reportUser(name, data),
 		);
 
 		this.extraFuncObjects = {
 			...this.globalCounterFunctions.incrementFunctionObjects,
 			...this.globalCounterFunctions.showFunctionObjects,
+			...this.globalCounterFunctions.reportFunctionObjects,
 			...this.userCounterFunctions.incrementFunctionObjects,
 			...this.userCounterFunctions.showFunctionObjects,
+			...this.userCounterFunctions.reportFunctionObjects,
 		};
 	}
 
@@ -60,14 +65,16 @@ class Counters extends Module {
 		return funcObject;
 	}
 	
-	loadCountersFromConfig(counters, objectCollection, idPrefix, incrementAction, showAction) {
+	loadCountersFromConfig(counters, objectCollection, idPrefix, incrementAction, showAction, reportAction) {
 		if (objectCollection) {
 			this.deactivateFunctions(objectCollection.incrementFunctionObjects || {});
 			this.deactivateFunctions(objectCollection.showFunctionObjects || {});
+			this.deactivateFunctions(objectCollection.reportFunctionObjects || {});
 		}
 
 		objectCollection.incrementFunctionObjects = {};
 		objectCollection.showFunctionObjects = {};
+		objectCollection.reportFunctionObjects = {};
 
 		if (counters) {
 			for (let i = 0; i < counters.length; i++) {
@@ -86,11 +93,20 @@ class Counters extends Module {
 					`${idPrefix}CounterShowFunc[${i}]`,
 				);
 				objectCollection.showFunctionObjects[showFuncObject.funcID] = showFuncObject;
+
+				let reportFuncObject = this.makeCounterFunction(
+					counters[i].name,
+					counters[i].reportFunction,
+					reportAction,
+					`${idPrefix}CounterReportFunc[${i}]`,
+				);
+				objectCollection.reportFunctionObjects[reportFuncObject.funcID] = reportFuncObject;
 			}
 		}
 
 		this.activateFunctions(objectCollection.incrementFunctionObjects);
 		this.activateFunctions(objectCollection.showFunctionObjects);
+		this.activateFunctions(objectCollection.reportFunctionObjects);
 	}
 
 	incrementCounter(counterCollection, counterName) {
@@ -111,6 +127,14 @@ class Counters extends Module {
 		}
 	}
 
+	getUserCounter(counterName, username) {
+		if (counterName in this.data.user) {
+			return this.getCounter(this.data.user[counterName], username);
+		}
+
+		return 0;
+	}
+
 	actionResultForCounter(newValue) {
 		return {
 			success:   true,
@@ -121,7 +145,7 @@ class Counters extends Module {
 	}
 
 	incrementGlobal(counterName) {
-		let newValue = this.incrementCounter(this.data.global, counterName);
+		const newValue = this.incrementCounter(this.data.global, counterName);
 
 		return this.actionResultForCounter(newValue);
 	}
@@ -131,24 +155,47 @@ class Counters extends Module {
 			this.data.user[counterName] = {};
 		}
 
-		let newValue = this.incrementCounter(this.data.user[counterName], data.user.name);
+		const newValue = this.incrementCounter(this.data.user[counterName], data.user.name);
 
 		return this.actionResultForCounter(newValue);
 	}
 
 	showGlobal(counterName) {
-		let value = this.getCounter(this.data.global, counterName);
+		const value = this.getCounter(this.data.global, counterName);
 
 		return this.actionResultForCounter(value);
 	}
 
 	showUser(counterName, data) {
-		let value = 0;
-		if (counterName in this.data.user) {
-			value = this.getCounter(this.data.user[counterName], data.user.name);
-		}
-		
+		const value = this.getUserCounter(counterName, data.user.name);
 		return this.actionResultForCounter(value);
+	}
+
+	reportGlobal(counterName) {
+		const value = this.getCounter(this.data.global, counterName);
+		this.print(`Counter <${counterName}> value: ${value}`);
+
+		return this.actionResultForCounter(value);
+	}
+
+	_reportUserSingle(counterName, username) {
+		const value = this.getUserCounter(counterName, username);
+		this.print(`Counter <${counterName}> value for user ${username}: ${value}`)
+	}
+
+	_reportUserMulti(counterName) {
+		this.print(`Counter <${counterName}> values for all saved users:`);
+		Utils.objectForEach(this.data.user[counterName], (username, value) => {
+			this.print(`  ${username}: ${value}`);
+		});
+	}
+
+	reportUser(counterName, data) {
+		if (data.firstParam) {
+			this._reportUserSingle(counterName, data.firstParam);
+		} else {
+			this._reportUserMulti(counterName);
+		}
 	}
 
 	variables = [

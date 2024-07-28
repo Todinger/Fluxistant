@@ -20,6 +20,11 @@ class CounterEntity extends NamedEntity {
 			name: 'Show Function',
 			description: 'Show the current value of the counter',
 		});
+
+		this.add('reportFunction', 'Function', {
+			name: 'Report Function',
+			description: 'Print a report about the counter in the console',
+		});
 	}
 
 	getNameOverride() {
