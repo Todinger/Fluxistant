@@ -379,7 +379,7 @@ class Utils {
 		
 		// Now we add "item, " for each item, so we get something that
 		// looks like "A, B, C, X and Y"
-		for (let i = 0; i < items.length - 2; i++) {
+		for (let i = items.length - 3; i >= 0; i--) {
 			result = `${items[i]}, ${result}`;
 		}
 		

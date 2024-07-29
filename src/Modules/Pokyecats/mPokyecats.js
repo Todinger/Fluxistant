@@ -1,5 +1,7 @@
 const schedule = require('node-schedule');
 const Module = requireMain('module');
+const { MINUTES } = requireMain('constants');
+const Timers = requireMain('./timers');
 const Utils = requireMain('utils');
 
 const PLACEHOLDERS = {
@@ -8,13 +10,16 @@ const PLACEHOLDERS = {
 	NORMALS: '$normals',
 	SHINIES: '$shinies',
 	SEPIAS: '$sepias',
+	GALAXIES: '$galaxies',
 	BALLS: {
 		YARN: '$yarnballs',
 		GOLD: '$goldballs',
 		RAINBOW: '$prettyballs',
 		DARK: '$darkballs',
+		STAR: '$starballs',
 	},
 	YARN: '$numyarn',
+	STARDUST_YARN: '$stardust',
 };
 
 const BALLS = {
@@ -23,12 +28,14 @@ const BALLS = {
 	GOLD: 'goldball',
 	RAINBOW: 'prettyball',
 	DARK: 'darkball',
+	STAR: 'starball',
 }
 
 const CATCH_TYPES = {
 	normal: "normal",
 	sepia: "sepia",
 	shiny: "shiny",
+	galaxy: "galaxy",
 	all: "all",
 };
 
@@ -48,10 +55,38 @@ const NORMAL_BALL = {
 const SHINY_CATCHERS_MESSAGE_PREFIX = "✨ You gotta be kitten me! Look who caught a rare shiny Yecats! ✨ ";
 const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $normals = normal catches, ' +
 	'$shinies = shiny catches, $sepias = sepia catches, $yarnballs = yarn balls, $goldballs = gold balls, ' +
-	'$prettyballs = pretty (rainbow) balls, $darkballs = dark balls, $numyarn = current yarn';
+	'$prettyballs = pretty (rainbow) balls, $darkballs = dark balls, $numyarn = current yarn, ' +
+	'$stardust = current stardust yarn, $starballs = star balls, $galaxies = Galaxyecats catches';
 
 // Amount of yarn a user gets for each catch attempt
 const YARN_PER_THROW = 1;
+
+const WISH_ACTIVE_TIME = 5 * MINUTES;
+const WISH_INTERVAL = {
+	min: 45 * MINUTES,
+	max: 60 * MINUTES,
+};
+
+const WISH_REWARD_WEIGHTS = {
+	yarn: 80,
+	ball: 18,
+	guarantee: 2,
+};
+
+const STARDUST_YARN_PER_THROW = 1;
+const STARDUST_YARN_PER_WISH = 2;
+const AMOUNT_OF_STARDUST_TO_WEAVE_STAR_BALL = 2;
+
+const GALAXYECATS_APPEARANCE_TIME = {
+	hour: 11,
+	minute: 0,
+}
+
+const EXTRA_CATCHES_POKYECATS_NAMES = [
+	'sepia',
+	'galaxy',
+];
+
 
 class Pokyecats extends Module {
 	static Interface = class PokyecatsInterface extends Module.Interface {
@@ -89,8 +124,21 @@ class Pokyecats extends Module {
 		this.data.catches = {};
 		this.catchChance = 0;
 		this.shinyChance = 0;
+		this.galaxyCatchChance = 0;
 
+		this.wishRewards = {
+			yarn: (...p) => this.giveStardustYarn(...p),
+			ball: (...p) => this.giveStarBall(...p),
+			guarantee: (...p) => this.giveGalaxyecatsCatchGuarantee(...p),
+		}
+
+		this.galaxyecatsStarActive = false;
+		this.galaxyecatsAppearanceTime = null;
 		this.announceGalaxyecatsJob = null;
+		this.galaxyecatsStarTimer = Timers.oneShot(() => this._activateStar());
+		this._scheduleNextStar();
+
+		this.currentWishMakers = [];
 	}
 	
 	defineModAssets(modData) {
@@ -149,6 +197,9 @@ class Pokyecats extends Module {
 		mediaConfig.add('sepia', 'SingleMedia')
 			.setName('Sepia Pokyecats')
 			.setDescription('Media for the sepia-toned Pokyecats form');
+		mediaConfig.add('galaxy', 'SingleMedia')
+			.setName('Galaxyecats')
+			.setDescription('Media for the Galaxyecats form');
 
 		let ballConfig = modConfig.addGroup('ballConfig')
 			.setName('Ball Settings')
@@ -164,6 +215,33 @@ class Pokyecats extends Module {
 		ballConfig.add(BALLS.RAINBOW, 'BallConfig')
 			.setName('Rainbow Yarn Ball')
 			.setDescription('Settings for the Rainbow Yarn Ball');
+
+		let galaxyecats = modConfig.addGroup('galaxyecats')
+			.setName('Galaxyecats Settings')
+			.setDescription('Settings for the Galaxyecats form');
+		galaxyecats.addBoolean('active', false)
+			.setName('Galaxyecats Active')
+			.setDescription('When enabled, Galaxyecats will approach our planet after dark');
+		galaxyecats.addPercentageNumber('catchChance', 50)
+			.setName('Galaxyecats Catch Chance')
+			.setDescription('The odds of catching Galaxyecats with a star ball when she is near (0-100)');
+		galaxyecats.addString('starArrivesMessage', "A shooting star crosses the sky! Quick, make a !wish before it goes away!")
+			.setName('Star Arrives Message')
+			.setDescription('Message to send when the shooting star arrives');
+		galaxyecats.addString('starLeavesMessage', "The shooting star fades into the vast reaches of space...")
+			.setName('Star Leaves Message')
+			.setDescription('Message to send when the shooting star leaves');
+		galaxyecats.addString('galaxyecatsArrivesMessage', "The planets align! A cosmic wonder approaches the Earth!")
+			.setName('Galaxyecats Arrives Message')
+			.setDescription('Message to send when it becomes possible to catch Galaxyecats');
+		galaxyecats.addString('catchMessage', "You've managed to pluck a galactic kitty out of the sky! You have caught $galaxies Galaxyecats(es) so far!")
+			.setName('Catch Message: Galaxyecats')
+			.setDescription('Message to send when a Galaxyecats is caught ' +
+				`(${CATCH_VARIABLE_HITS})`);
+		galaxyecats.addString('missMessage', `Your ${BALLS.STAR} couldn't reach her! It disappears into the endless black...`)
+			.setName('Miss Message: Galaxyecats')
+			.setDescription('Message to send when a Galaxyecats is failed to be caught ' +
+				`(${CATCH_VARIABLE_HITS})`);
 	}
 
 	defineModDependencies() {
@@ -218,20 +296,79 @@ class Pokyecats extends Module {
 		this.catchChance = conf.catchChance / 100;
 		this.shinyChance = conf.shinyChance / 100;
 		this.sepiaChance = conf.sepiaChance / 100;
+		this.galaxyCatchChance = conf.galaxyecats.catchChance / 100;
 
 		if (this.announceGalaxyecatsJob !== null) {
 			this.announceGalaxyecatsJob.cancel();
 		}
 
-		this.announceGalaxyecatsJob = schedule.scheduleJob({hour: 11}, () => this._announceGalaxyecats());
+		this.galaxyecatsAppearanceTime = new Date();
+		this.galaxyecatsAppearanceTime.setHours(
+			GALAXYECATS_APPEARANCE_TIME.hour,
+			GALAXYECATS_APPEARANCE_TIME.minute,
+			0,
+			0
+		);
+		this.announceGalaxyecatsJob = schedule.scheduleJob(
+			GALAXYECATS_APPEARANCE_TIME,
+			() => this._announceGalaxyecats()
+		);
 	}
 
 	_announceGalaxyecats() {
-		if (this.enabled) {
-			// Not implemented yet
+		if (this.enabled && this.config.galaxyecats.active) {
+			this.say(this.config.galaxyecats.galaxyecatsArrivesMessage);
 		}
 	}
-	
+
+	_scheduleNextStar() {
+		this.galaxyecatsStarTimer.set(Utils.randomRange(WISH_INTERVAL.min, WISH_INTERVAL.max));
+	}
+
+	_activateStar() {
+		this.galaxyecatsStarActive = true;
+		setTimeout(() => this._deactivateStar(), WISH_ACTIVE_TIME);
+
+		if (this.enabled) {
+			this.say(this.config.galaxyecats.starArrivesMessage);
+		}
+	}
+
+	_deactivateStar() {
+		this.galaxyecatsStarActive = false;
+		this.currentWishMakers = [];
+		this._scheduleNextStar();
+
+		if (this.enabled) {
+			this.say(this.config.galaxyecats.starLeavesMessage);
+		}
+	}
+
+	_grantStardustYarn(catchData, amount) {
+		let normalizedAmount = catchData.stardustYarn % AMOUNT_OF_STARDUST_TO_WEAVE_STAR_BALL;
+		catchData.stardustYarn += amount;
+		normalizedAmount += amount;
+
+		if (normalizedAmount >= AMOUNT_OF_STARDUST_TO_WEAVE_STAR_BALL) {
+			catchData.balls[BALLS.STAR]++;
+		}
+	}
+
+	giveStardustYarn(user, catchData) {
+		this._grantStardustYarn(catchData, STARDUST_YARN_PER_WISH);
+		this.tell(user, `You got some stardust yarn! You now have ${catchData.stardustYarn} pieces!`)
+	}
+
+	giveStarBall(user, catchData) {
+		catchData.balls[BALLS.STAR]++;
+		this.tell(user, `You got a ${BALLS.STAR}! You now have ${catchData.balls[BALLS.STAR]} of them!`)
+	}
+
+	giveGalaxyecatsCatchGuarantee(user, catchData) {
+		catchData.galaxyecatsGuarantee = true;
+		this.tell(user, "You hear a faint meow and feel empowered by feline galactic forces!")
+	}
+
 	persistentDataLoaded() {
 		Object.keys(this.data.catches).forEach(user => {
 			this.migrateCatchData(this.data.catches[user]);
@@ -248,13 +385,17 @@ class Pokyecats extends Module {
 			[BALLS.GOLD]: 0,
 			[BALLS.RAINBOW]: 0,
 			[BALLS.DARK]: 0,
+			[BALLS.STAR]: 0,
 		};
 	}
 
 	newExtraCatchesData() {
-		return {
-			sepia: 0,
-		};
+		let data = {};
+		for (let name of EXTRA_CATCHES_POKYECATS_NAMES) {
+			data[name] = 0;
+		}
+
+		return data;
 	}
 	
 	newCatchData() {
@@ -265,6 +406,8 @@ class Pokyecats extends Module {
 			balls: this.newBallData(),
 			yarn: 0,
 			extraCatches: this.newExtraCatchesData(),
+			stardustYarn: 0,
+			galaxyecatsGuarantee: false,
 		};
 	}
 
@@ -285,8 +428,18 @@ class Pokyecats extends Module {
 			catchData.yarn = 0;
 		}
 
+		if (catchData.stardustYarn === undefined) {
+			catchData.stardustYarn = 0;
+		}
+
 		if (catchData.extraCatches === undefined) {
 			catchData.extraCatches = this.newExtraCatchesData();
+		}
+
+		for (let name of EXTRA_CATCHES_POKYECATS_NAMES) {
+			if (!catchData.extraCatches[name]) {
+				catchData.extraCatches[name] = 0;
+			}
 		}
 	}
 	
@@ -326,6 +479,10 @@ class Pokyecats extends Module {
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.DARK, catchData.balls[BALLS.DARK]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.YARN, catchData.yarn);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.SEPIAS, catchData.extraCatches.sepia);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.SEPIAS, catchData.extraCatches.sepia);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.GALAXIES, catchData.extraCatches.galaxy);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.STAR, catchData.balls[BALLS.STAR]);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.STARDUST_YARN, catchData.stardustYarn);
 		this.tell(user, message);
 	}
 	
@@ -385,7 +542,70 @@ class Pokyecats extends Module {
 		this.data.catches[user.name] = catchData;
 		this.data.catches[user.name].displayName = user.displayName;
 	}
-	
+
+	get galaxyecatsIsNear() {
+		return this.config.galaxyecats.active && new Date() >= this.galaxyecatsAppearanceTime;
+	}
+
+	tryCatchGalaxyecats(data) {
+		if (!this.galaxyecatsIsNear) {
+			this.tellError(data.user, "The sky is empty and devoid of any galactic kittens in sight.");
+			return {
+				success:   null, // Means not to send any responses at all
+			};
+		}
+
+		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
+
+		if (!this.consumeUserBall(catchData, BALLS.STAR)) {
+			this.tellError(data.user, "Sorry, you don't own that ball.")
+
+			return {
+				success:   null, // Means not to send any responses at all
+			};
+		}
+
+		this._grantStardustYarn(catchData, STARDUST_YARN_PER_THROW);
+
+		let media = this.config.media.galaxy;
+		let caught;
+		if (catchData.galaxyecatsGuarantee) {
+			caught = true;
+			catchData.galaxyecatsGuarantee = false;
+		} else {
+			caught = Math.random() < this.galaxyCatchChance;
+		}
+
+		if (!caught) {
+			this.tellMessage(data.user, this.config.galaxyecats.missMessage, catchData);
+			this.saveCatchData(data.user, catchData);
+			this.saveData();
+
+			this._sendToDisplay(media);
+
+			return {
+				success:   false,
+				variables: this.variableValuesFromCatchData(catchData),
+			};
+		}
+
+		catchData.catches++;
+
+		catchData.extraCatches.galaxy++;
+		this.tellMessage(data.user, this.config.galaxyecats.catchMessage, catchData);
+
+		this._sendToDisplay(media);
+
+		this.saveCatchData(data.user, catchData);
+
+		this.saveData();
+
+		return {
+			success:   true,
+			variables: this.variableValuesFromCatchData(catchData),
+		};
+	}
+
 	tryCatch(data) {
 		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
 		
@@ -396,6 +616,10 @@ class Pokyecats extends Module {
 			return {
 				success:   null, // Means not to send any responses at all
 			};
+		}
+
+		if (ball.name === BALLS.STAR) {
+			return this.tryCatchGalaxyecats(data);
 		}
 
 		if (!this.consumeUserBall(catchData, ball.name)) {
@@ -474,7 +698,24 @@ class Pokyecats extends Module {
 			variables: this.variableValuesFromCatchData(catchData),
 		};
 	}
-	
+
+	wish(data) {
+		if (!this.galaxyecatsStarActive) {
+			return false;
+		}
+
+		if (this.currentWishMakers.includes(data.user.name)) {
+			return false;
+		}
+
+		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
+		let reward = Utils.weightedRandomKey(WISH_REWARD_WEIGHTS);
+		this.wishRewards[reward](data.user, catchData);
+		this.saveCatchData(data.user, catchData);
+		this.saveData();
+		this.currentWishMakers.push(data.user.name);
+	}
+
 	getCatches(data) {
 		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
 		return {
@@ -521,6 +762,7 @@ class Pokyecats extends Module {
 				let number = `${currPlayerNum.toString().padStart(maxPlayerNumLength)}. `;
 				let name = `${this.getDisplayName(username)}: `;
 				let yarn = `${catchData.yarn} yarn, `;
+				let stardustYarn = `${catchData.stardustYarn} stardust yarn, `;
 				let yarnBalls = `${catchData.balls[BALLS.YARN]} yarn balls, `;
 				let goldBalls = `${catchData.balls[BALLS.GOLD]} gold balls, `;
 				let darkBalls = `${catchData.balls[BALLS.DARK]} dark balls, `;
@@ -528,7 +770,7 @@ class Pokyecats extends Module {
 				let catches = `${this.getNormalCatches(catchData)} normal catches, `;
 				let sepiaCatches = `${catchData.extraCatches.sepia} sepia catches, and `;
 				let shiny = `${catchData.shinyCatches} shiny catches.`;
-				let all = number + name + yarn + yarnBalls + goldBalls + darkBalls + rainbowBalls + catches + sepiaCatches + shiny;
+				let all = number + name + yarn + stardustYarn + yarnBalls + goldBalls + darkBalls + rainbowBalls + catches + sepiaCatches + shiny;
 				this.print(all);
 				currPlayerNum++;
 			});
@@ -541,6 +783,8 @@ class Pokyecats extends Module {
 				return this.getNormalCatches(catchData);
 			case CATCH_TYPES.sepia:
 				return catchData.extraCatches.sepia;
+			case CATCH_TYPES.galaxy:
+				return catchData.extraCatches.galaxy;
 			case CATCH_TYPES.shiny:
 				return catchData.shinyCatches;
 			case CATCH_TYPES.all:
@@ -556,9 +800,10 @@ class Pokyecats extends Module {
 
 		if (type === "all") {
 			let normalCatches = `${this.getNormalCatches(catchData)} normal catches, `;
-			let sepiaCatches = `${catchData.extraCatches.sepia} sepia catches and `;
+			let sepiaCatches = `${catchData.extraCatches.sepia} sepia catches, `;
+			let galaxyCatches = `${catchData.extraCatches.sepia} galaxy catches and `;
 			let shinyCatches = `${catchData.shinyCatches} shiny catches`;
-			return normalCatches + sepiaCatches + shinyCatches;
+			return normalCatches + sepiaCatches + galaxyCatches + shinyCatches;
 		}
 
 		return `${count} ${type} catches`;
@@ -597,10 +842,15 @@ class Pokyecats extends Module {
 			let catchData = this.data.catches[data.user.name];
 			let contents = [];
 			contents.push(`${catchData.yarn} yarn`);
+			if (catchData.stardustYarn > 0) {
+				contents.push(`${catchData.stardustYarn} stardust yarn`);
+			}
+
 			this.addBallCountString(contents, catchData, BALLS.YARN, "yarn");
 			this.addBallCountString(contents, catchData, BALLS.GOLD, "gold");
 			this.addBallCountString(contents, catchData, BALLS.DARK, "dark");
 			this.addBallCountString(contents, catchData, BALLS.RAINBOW, "pretty");
+			this.addBallCountString(contents, catchData, BALLS.STAR, "star");
 			this.tell(data.user, `You currently have ${Utils.makeEnglishAndList(contents)}.`);
 		} else {
 			this.tell(data.user, "Sorry, you don't have any yarn yet. Try catching Pokyecats to get some!");
@@ -700,6 +950,17 @@ class Pokyecats extends Module {
 				}),
 			],
 			action: (data) => this.showUserInventory(data),
+		},
+
+		wish: {
+			name: 'Wish',
+			description: "Makes a wish upon a star (if one is present)",
+			triggers: [
+				this.trigger.command({
+					cmdname: 'wish',
+				}),
+			],
+			action: (data) => this.wish(data),
 		},
 	}
 }
