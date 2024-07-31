@@ -27,6 +27,8 @@ const Utils = require('./utils');
 
 const KEYCODES = require('./enums').KEYCODES;
 
+const MAXIMUM_MESSAGE_SIZE_FROM_CLIENT = 1e8; // 100 MB
+
 
 
 class FluxBot {
@@ -34,7 +36,9 @@ class FluxBot {
 		// Basic server setup
 		this.app = express();
 		this.server = require('http').createServer(this.app);
-		this.io = require('socket.io')(this.server);
+		this.io = require('socket.io')(this.server, {
+			maxHttpBufferSize: MAXIMUM_MESSAGE_SIZE_FROM_CLIENT,
+		});
 	}
 	
 	debug(msg) {
@@ -346,7 +350,7 @@ class FluxBot {
 				let data = this.configManager.exportAll();
 				socket.emit('loadConfig', data);
 			});
-			
+
 			socket.on('saveConfig', async config => {
 				this.debug('Received configuration for saving.');
 				try {
@@ -413,7 +417,7 @@ class FluxBot {
 	// Starts the server. Do this last.
 	startServer() {
 		let port = this.mainConfig.getPort();
-		this.server.listen(port, 'localhost');
+		this.server.listen(port);
 		this.log(`Listening on port ${port}...`);
 		this.cli.start();
 	}
