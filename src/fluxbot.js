@@ -413,7 +413,7 @@ class FluxBot {
 	// Starts the server. Do this last.
 	startServer() {
 		let port = this.mainConfig.getPort();
-		this.server.listen(port);
+		this.server.listen(port, 'localhost');
 		this.log(`Listening on port ${port}...`);
 		this.cli.start();
 	}
