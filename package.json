@@ -25,7 +25,6 @@
     "js-base64": "^3.6.0",
     "lodash": "^4.17.20",
     "mime-types": "^2.1.29",
-    "node-db-logger": "^1.2.0",
     "node-schedule": "^2.1.1",
     "obs-websocket-js": "^4.0.2",
     "python-shell": "^3.0.0",
