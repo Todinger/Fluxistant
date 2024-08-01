@@ -61,21 +61,11 @@ const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $normals = norm
 // Amount of yarn a user gets for each catch attempt
 const YARN_PER_THROW = 1;
 
-const WISH_ACTIVE_TIME = 5 * MINUTES;
-const WISH_INTERVAL = {
-	min: 45 * MINUTES,
-	max: 60 * MINUTES,
-};
-
 const WISH_REWARD_WEIGHTS = {
 	yarn: 80,
 	ball: 18,
 	guarantee: 2,
 };
-
-const STARDUST_YARN_PER_THROW = 1;
-const STARDUST_YARN_PER_WISH = 2;
-const AMOUNT_OF_STARDUST_TO_WEAVE_STAR_BALL = 2;
 
 const GALAXYECATS_APPEARANCE_TIME = {
 	hour: 11,
@@ -136,7 +126,6 @@ class Pokyecats extends Module {
 		this.galaxyecatsAppearanceTime = null;
 		this.announceGalaxyecatsJob = null;
 		this.galaxyecatsStarTimer = Timers.oneShot(() => this._activateStar());
-		this._scheduleNextStar();
 
 		this.currentWishMakers = [];
 	}
@@ -225,6 +214,24 @@ class Pokyecats extends Module {
 		galaxyecats.addPercentageNumber('catchChance', 50)
 			.setName('Galaxyecats Catch Chance')
 			.setDescription('The odds of catching Galaxyecats with a star ball when she is near (0-100)');
+		galaxyecats.addNaturalNumber('yarnPerThrow', 1)
+			.setName('Stardust Yarn Per Throw')
+			.setDescription('How many pieces of stardust yarn viewers obtain each time they use a star ball');
+		galaxyecats.addNaturalNumber('yarnPerWish', 1)
+			.setName('Stardust in Wishes')
+			.setDescription('How many pieces of stardust yarn viewers may obtain from wishing upon a star');
+		galaxyecats.addNaturalNumber('yarnToWeaveStarBall', 1)
+			.setName('Yarn to Weave Star Ball')
+			.setDescription('How many pieces of stardust yarn are required to weave a star ball');
+		galaxyecats.addNaturalNumber('starMinInterval', 45)
+			.setName('Star: Minimum Interval')
+			.setDescription('The minimum amount of time between star appearances (in minutes)');
+		galaxyecats.addNaturalNumber('starMaxInterval', 60)
+			.setName('Star: Maximum Interval')
+			.setDescription('The minimum amount of time between star appearances (in minutes)');
+		galaxyecats.addDuration('starDuration', 90)
+			.setName('Star Duration')
+			.setDescription('The amount of time the star remains active (in seconds)');
 		galaxyecats.addString('starArrivesMessage', "A shooting star crosses the sky! Quick, make a !wish before it goes away!")
 			.setName('Star Arrives Message')
 			.setDescription('Message to send when the shooting star arrives');
@@ -293,6 +300,10 @@ class Pokyecats extends Module {
 	}
 	
 	loadModConfig(conf) {
+		if (conf.galaxyecats.yarnToWeaveStarBall < 1) {
+			throw "The amount of yarn to weave a star ball must be at least 1.";
+		}
+
 		this.catchChance = conf.catchChance / 100;
 		this.shinyChance = conf.shinyChance / 100;
 		this.sepiaChance = conf.sepiaChance / 100;
@@ -313,6 +324,8 @@ class Pokyecats extends Module {
 			GALAXYECATS_APPEARANCE_TIME,
 			() => this._announceGalaxyecats()
 		);
+
+		this._scheduleNextStar();
 	}
 
 	_announceGalaxyecats() {
@@ -322,12 +335,15 @@ class Pokyecats extends Module {
 	}
 
 	_scheduleNextStar() {
-		this.galaxyecatsStarTimer.set(Utils.randomRange(WISH_INTERVAL.min, WISH_INTERVAL.max));
+		this.galaxyecatsStarTimer.set(Utils.randomRange(
+			this.config.galaxyecats.starMinInterval * MINUTES,
+			this.config.galaxyecats.starMaxInterval * MINUTES,
+		));
 	}
 
 	_activateStar() {
 		this.galaxyecatsStarActive = true;
-		setTimeout(() => this._deactivateStar(), WISH_ACTIVE_TIME);
+		setTimeout(() => this._deactivateStar(), this.config.galaxyecats.starDuration);
 
 		if (this.enabled) {
 			this.say(this.config.galaxyecats.starArrivesMessage);
@@ -345,17 +361,17 @@ class Pokyecats extends Module {
 	}
 
 	_grantStardustYarn(catchData, amount) {
-		let normalizedAmount = catchData.stardustYarn % AMOUNT_OF_STARDUST_TO_WEAVE_STAR_BALL;
+		let normalizedAmount = catchData.stardustYarn % this.config.galaxyecats.yarnToWeaveStarBall;
 		catchData.stardustYarn += amount;
 		normalizedAmount += amount;
 
-		if (normalizedAmount >= AMOUNT_OF_STARDUST_TO_WEAVE_STAR_BALL) {
+		if (normalizedAmount >= this.config.galaxyecats.yarnToWeaveStarBall) {
 			catchData.balls[BALLS.STAR]++;
 		}
 	}
 
 	giveStardustYarn(user, catchData) {
-		this._grantStardustYarn(catchData, STARDUST_YARN_PER_WISH);
+		this._grantStardustYarn(catchData, this.config.galaxyecats.yarnPerWish);
 		this.tell(user, `You got some stardust yarn! You now have ${catchData.stardustYarn} pieces!`)
 	}
 
@@ -565,7 +581,7 @@ class Pokyecats extends Module {
 			};
 		}
 
-		this._grantStardustYarn(catchData, STARDUST_YARN_PER_THROW);
+		this._grantStardustYarn(catchData, this.config.galaxyecats.yarnPerThrow);
 
 		let media = this.config.media.galaxy;
 		let caught;
