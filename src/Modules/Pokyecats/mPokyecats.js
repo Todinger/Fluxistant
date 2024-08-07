@@ -66,6 +66,10 @@ const WISH_REWARD_WEIGHTS = {
 	ball: 18,
 	guarantee: 2,
 };
+const WISH_REWARD_WEIGHTS_WITHOUT_GUARANTEE = {
+	yarn: 80,
+	ball: 18,
+};
 
 const GALAXYECATS_APPEARANCE_TIME = {
 	hour: 11,
@@ -725,7 +729,10 @@ class Pokyecats extends Module {
 		}
 
 		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
-		let reward = Utils.weightedRandomKey(WISH_REWARD_WEIGHTS);
+		const rewardWeights = catchData.galaxyecatsGuarantee ?
+			WISH_REWARD_WEIGHTS_WITHOUT_GUARANTEE :
+			WISH_REWARD_WEIGHTS;
+		let reward = Utils.weightedRandomKey(rewardWeights);
 		this.wishRewards[reward](data.user, catchData);
 		this.saveCatchData(data.user, catchData);
 		this.saveData();
