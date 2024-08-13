@@ -1,5 +1,4 @@
 const Module = requireMain('module');
-const Utils = requireMain('./utils');
 
 class Counters extends Module {
 	constructor() {
@@ -185,8 +184,11 @@ class Counters extends Module {
 
 	_reportUserMulti(counterName) {
 		this.print(`Counter <${counterName}> values for all saved users:`);
-		Utils.objectForEach(this.data.user[counterName], (username, value) => {
-			this.print(`  ${username}: ${value}`);
+		const counter = this.data.user[counterName];
+		let users = Object.keys(counter);
+		users.sort((user1, user2) => counter[user2] - counter[user1]);
+		users.forEach((username) => {
+			this.print(`  ${username}: ${counter[username]}`);
 		});
 	}
 
