@@ -1,4 +1,5 @@
 const Module = requireMain('module');
+const child_process = require('child_process');
 
 class Counters extends Module {
 	constructor() {
@@ -182,19 +183,33 @@ class Counters extends Module {
 		this.print(`Counter <${counterName}> value for user ${username}: ${value}`)
 	}
 
-	_reportUserMulti(counterName) {
+	_reportUserMulti(counterName, forExport = false) {
 		this.print(`Counter <${counterName}> values for all saved users:`);
 		const counter = this.data.user[counterName];
 		let users = Object.keys(counter);
-		users.sort((user1, user2) => counter[user2] - counter[user1]);
-		users.forEach((username) => {
-			this.print(`  ${username}: ${counter[username]}`);
-		});
+		if (forExport) {
+			users.sort((user1, user2) => user1.localeCompare(user2));
+			let exportedText = "";
+			users.forEach((username) => {
+				exportedText += `${username}\t${counter[username]}\n`;
+			});
+			child_process.spawn('clip').stdin.end(exportedText);
+			this.print(`Exported data copied to clipboard:\n${exportedText}`);
+		} else {
+			users.sort((user1, user2) => counter[user2] - counter[user1]);
+			users.forEach((username) => {
+				this.print(`  ${username}: ${counter[username]}`);
+			});
+		}
 	}
 
 	reportUser(counterName, data) {
 		if (data.firstParam) {
-			this._reportUserSingle(counterName, data.firstParam);
+			if (data.firstParam === "export") {
+				this._reportUserMulti(counterName, true);
+			} else {
+				this._reportUserSingle(counterName, data.firstParam);
+			}
 		} else {
 			this._reportUserMulti(counterName);
 		}
