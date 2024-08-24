@@ -27,10 +27,15 @@ class Yippies extends Module {
 			name: 'Yippies',
 			webname: 'yippies',
 			source: 'yippies.html',
+			debug: true,
 		});
 
 		this.yippies = {};
 		this.tiers = [];
+		this.collections = {
+			free: [],
+			manual: [],
+		};
 
 		this.data = {
 			inventories: {},
@@ -56,6 +61,13 @@ class Yippies extends Module {
 			.setName('Tiers')
 			.setDescription('All Yippie tiers');
 
+		modConfig.add('free', 'YippieTier')
+			.setName('Free Tier')
+			.setDescription('Yippies that everyone can use');
+		modConfig.add('manual', 'YippieTier')
+			.setName('Manual Tier')
+			.setDescription('Yippies that can only be granted manually');
+
 		let messages = modConfig.addGroup('messages')
 			.setName("Messages")
 			.setDescription("Various messages sent by the bot");
@@ -73,44 +85,70 @@ class Yippies extends Module {
 			.setDescription("Message sent to tell a user what Yippies they have (the list will follow at the end)");
 	}
 
+	loadYippieConfig(prevConf, file, collectionName, indexInCollection) {
+		let displayYD = file.yd;
+		if (!displayYD) {
+			throw `A Yippie with an empty IDs found in ${collectionName} (possibly file #${indexInCollection + 1}).`;
+		}
+
+		file.displayYD = displayYD;
+		let yd = displayYD.toLowerCase();
+		if (yd in this.yippies) {
+			throw `Duplicate Yippie ID: ${file.yd}`;
+		}
+
+		this.yippies[yd] = file;
+
+		let previousSettings = this._findFileInConf(prevConf, file.fileKey);
+		if (previousSettings !== null) {
+			let oldYD = previousSettings.yd.toLowerCase();
+			if (oldYD !== yd) {
+				this._renameYippie(oldYD, yd);
+			}
+		}
+
+		return yd;
+	}
+
+	loadCollectionConfig(prevConf, collectionConf, collectionName) {
+		if (!collectionConf) {
+			return null;
+		}
+
+		let collection = [];
+		let fileCount = 0;
+		Object.values(collectionConf.images.files).forEach(file => {
+			let yd = this.loadYippieConfig(prevConf, file, collectionName, fileCount);
+			collection.push(yd);
+			fileCount++;
+		});
+
+		return collection;
+	}
+
+	resetYippies() {
+		this.yippies = {};
+		this.tiers = [];
+		this.collections = {
+			free: [],
+			manual: [],
+		};
+	}
+
 	loadModConfig(conf, prevConf) {
 		if (this.clientsAreConnected) {
 			this._setupClients();
 		}
 
-		this.yippies = {};
-		this.tiers = [];
+		this.resetYippies();
+
 		for (let i = 0; i < conf.tiers.length; i++) {
-			let tier = [];
-			let fileCount = 0;
-			Object.values(conf.tiers[i].images.files).forEach(file => {
-				let displayYD = file.yd;
-				if (!displayYD) {
-					throw `A Yippie with an empty IDs found in Tier #${i + 1} (possibly file #${fileCount + 1}).`;
-				}
-
-				file.displayYD = displayYD;
-				let yd = displayYD.toLowerCase();
-				if (yd in this.yippies) {
-					throw `Duplicate Yippie ID: ${file.yd}`;
-				}
-
-				this.yippies[yd] = file;
-				tier.push(yd);
-
-				let previousSettings = this._findFileInConf(prevConf, file.fileKey);
-				if (previousSettings !== null) {
-					let oldYD = previousSettings.yd.toLowerCase();
-					if (oldYD !== yd) {
-						this._renameYippie(oldYD, yd);
-					}
-				}
-
-				fileCount++;
-			});
-
+			let tier = this.loadCollectionConfig(prevConf, conf.tiers[i], `Tier #${i + 1}`);
 			this.tiers.push(tier);
 		}
+
+		this.collections.free = this.loadCollectionConfig(prevConf, conf.free, "Free Tier");
+		this.collections.manual = this.loadCollectionConfig(prevConf, conf.manual, "Manual Tier");
 
 		this.maxCount = conf.maxCount ? Utils.clamp(0, conf.maxCount, ABSOLUTE_MAX_COUNT) : ABSOLUTE_MAX_COUNT;
 	}
@@ -147,7 +185,11 @@ class Yippies extends Module {
 
 
 	_inventory(username) {
-		return this.data.inventories[username];
+		if (this._userExists(username)) {
+			return this.data.inventories[username];
+		} else {
+			return [];
+		}
 	}
 
 	_userExists(username) {
@@ -155,7 +197,11 @@ class Yippies extends Module {
 	}
 
 	_userOwnsYippies(username) {
-		return this._userExists(username) && this._inventory(username).length > 0;
+		return this._inventory(username).length > 0;
+	}
+
+	_userHasYippiesAvailable(username) {
+		return this.collections.free.length > 0 || this._userOwnsYippies(username);
 	}
 
 	_ensureUser(username) {
@@ -164,16 +210,26 @@ class Yippies extends Module {
 		}
 	}
 
+	_isFree(yd) {
+		return this.collections.free.includes(yd);
+	}
+
 	_userOwnsYippie(username, yd) {
-		return this._userExists(username) && this._inventory(username).includes(yd.toLowerCase());
+		return this._isFree(yd) || (
+			this._userExists(username) && this._inventory(username).includes(yd.toLowerCase())
+		);
 	}
 
 	_getRandomUserYippie(username) {
-		if (!this._userOwnsYippies(username)) {
-			return null;
-		}
+		const userInventory = this._inventory(username);
+		const inventorySelection = Utils.weightedRandomKey({
+			free: this.collections.free.length,
+			user: userInventory.length,
+		});
 
-		return Utils.randomElement(this._inventory(username));
+		const inventory = inventorySelection === "free" ? this.collections.free : userInventory;
+
+		return Utils.randomElement(inventory);
 	}
 
 	_yippieExists(yd) {
@@ -224,7 +280,7 @@ class Yippies extends Module {
 			return false;
 		}
 
-		let targetUser = params[0];
+		let targetUser = params[0].toLowerCase();
 		let yd = params[1].toLowerCase();
 
 		if (!this._yippieExists(yd)) {
@@ -284,7 +340,7 @@ class Yippies extends Module {
 				this.tellError(data.user, this.config.messages.yippieNotOwned);
 				return false;
 			}
-		} else if (!this._userOwnsYippies(data.user.name)) {
+		} else if (!this._userHasYippiesAvailable(data.user.name)) {
 			this.tellError(data.user, this.config.messages.noYippiesOwned);
 			return false;
 		} else {
@@ -308,14 +364,16 @@ class Yippies extends Module {
 	}
 
 	show(data) {
-		if (!this._userOwnsYippies(data.user.name)) {
+		if (!this._userHasYippiesAvailable(data.user.name)) {
 			this.tellError(data.user, this.config.messages.noYippiesOwned);
 			return false;
 		}
 
 		let message = this.config.messages.yippieListHeader.trim();
 		let inventory = this._inventory(data.user.name);
-		message += " " + inventory.join(", ");
+		let freeInventory = this.collections.free;
+		message += " " + [...inventory, ...freeInventory].join(", ");
+
 		this.tell(data.user, message);
 	}
 
