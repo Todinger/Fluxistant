@@ -27,7 +27,6 @@ class Yippies extends Module {
 			name: 'Yippies',
 			webname: 'yippies',
 			source: 'yippies.html',
-			debug: true,
 		});
 
 		this.yippies = {};
