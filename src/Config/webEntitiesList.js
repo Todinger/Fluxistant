@@ -141,6 +141,7 @@ const entities = {
 	WeavableBallConfigEntity: require('./WebEntities/weavableBallConfigEntity.js'),
 	NumberChoiceEntity: require('./WebEntities/numberChoiceEntity.js'),
 	TextChoiceEntity: require('./WebEntities/textChoiceEntity.js'),
+	RandomMediaFunctionEntity: require('./WebEntities/randomMediaFunctionEntity.js'),
 	UserMediaEntity: require('./WebEntities/userMediaEntity.js'),
 	SkinathonCharacterEntity: require('./WebEntities/skinathonCharacterEntity.js'),
 	SkinathonMilestoneEntity: require('./WebEntities/skinathonMilestoneEntity.js'),
