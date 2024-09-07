@@ -18,6 +18,7 @@ class RandomImage extends Module {
 			name: 'Random Image',
 			tags: ['imgdisp'],
 			enabledByDefault: false,
+			configurable: false,
 			description: DESCRIPTION,
 		});
 	}
