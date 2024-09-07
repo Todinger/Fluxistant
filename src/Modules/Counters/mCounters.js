@@ -205,7 +205,7 @@ class Counters extends Module {
 
 	reportUser(counterName, data) {
 		if (data.firstParam) {
-			if (data.firstParam === "export") {
+			if (data.firstParam === "export" || data.firstParam === "report") {
 				this._reportUserMulti(counterName, true);
 			} else {
 				this._reportUserSingle(counterName, data.firstParam);
