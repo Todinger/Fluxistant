@@ -250,17 +250,21 @@ class Utils {
 			if (defs.hasOwnProperty(key)) {
 				// If the value here is another object, proceed recursively
 				// to apply the sub-object defaults
-				if (key in obj && obj[key] !== undefined) {
-					if (Utils.isObject(defs[key])) {
+				const exists = key in obj;
+				if (Utils.isObject(defs[key])) {
+					if (!exists) {
+						obj[key] = {};
+					}
+					if (Utils.isObject(obj[key])) {
 						Utils.applyDefaults(obj[key], defs[key]);
 					}
-				} else {
-					if (!Utils.isObject(defs[key])) {
-						obj[key] = defs[key];
-					}
+				} else if (!exists) {
+					obj[key] = defs[key];
 				}
 			}
 		});
+
+		return obj;
 	}
 	
 	// Gets a list of sub-directory names in the given directory.

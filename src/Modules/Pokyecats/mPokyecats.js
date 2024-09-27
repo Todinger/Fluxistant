@@ -6,11 +6,14 @@ const Utils = requireMain('utils');
 
 const PLACEHOLDERS = {
 	USER: '$user',
+	ALL_CATCHES: '$catches',
 	CATCHES: '$caught',
 	NORMALS: '$normals',
 	SHINIES: '$shinies',
 	SEPIAS: '$sepias',
 	GALAXIES: '$galaxies',
+	DARKS: '$darks',
+	SCARIES: '$scaries',
 	BALLS: {
 		YARN: '$yarnballs',
 		GOLD: '$goldballs',
@@ -20,6 +23,7 @@ const PLACEHOLDERS = {
 	},
 	YARN: '$numyarn',
 	STARDUST_YARN: '$stardust',
+	DARKYARN: '$darkyarn',
 };
 
 const BALLS = {
@@ -36,27 +40,30 @@ const CATCH_TYPES = {
 	sepia: "sepia",
 	shiny: "shiny",
 	galaxy: "galaxy",
+	dark: "dark",
+	scary: "scary",
 	all: "all",
 };
 
 // These either do not have a function yet or it is present but not usable yet
 const SECRET_BALLS = [
 	BALLS.RAINBOW,
-	BALLS.DARK,
 ];
 
 const NORMAL_BALL = {
 	name: BALLS.NORMAL,
 	catchMultiplier: 1,
 	shinyMultiplier: 1,
+	darkMultiplier: 1,
 	secret: false,
 }
 
 const SHINY_CATCHERS_MESSAGE_PREFIX = "✨ You gotta be kitten me! Look who caught a rare shiny Yecats! ✨ ";
-const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $normals = normal catches, ' +
+const CATCH_VARIABLE_HITS = '$user = user name, $caught = total, $catches = all catches, $normals = normal catches, ' +
 	'$shinies = shiny catches, $sepias = sepia catches, $yarnballs = yarn balls, $goldballs = gold balls, ' +
 	'$prettyballs = pretty (rainbow) balls, $darkballs = dark balls, $numyarn = current yarn, ' +
-	'$stardust = current stardust yarn, $starballs = star balls, $galaxies = Galaxyecats catches';
+	'$stardust = current stardust yarn, $starballs = star balls, $galaxies = Galaxyecats catches, ' +
+	'$darkyarn = current dark yarn, $darks = Darkyecats catches, $scaries = Scaryecats catches';
 
 // Amount of yarn a user gets for each catch attempt
 const YARN_PER_THROW = 1;
@@ -77,9 +84,14 @@ const GALAXYECATS_APPEARANCE_TIME = {
 }
 
 const EXTRA_CATCHES_POKYECATS_NAMES = [
-	'sepia',
-	'galaxy',
+	CATCH_TYPES.sepia,
+	CATCH_TYPES.galaxy,
+	CATCH_TYPES.dark,
+	CATCH_TYPES.scary,
 ];
+
+// const MIN_SANITY = 0;
+const MAX_SANITY = 100;
 
 
 class Pokyecats extends Module {
@@ -132,6 +144,8 @@ class Pokyecats extends Module {
 		this.galaxyecatsStarTimer = Timers.oneShot(() => this._activateStar());
 
 		this.currentWishMakers = [];
+
+		this.emptyCatchData = this.newCatchData();
 	}
 	
 	defineModAssets(modData) {
@@ -193,6 +207,12 @@ class Pokyecats extends Module {
 		mediaConfig.add('galaxy', 'SingleMedia')
 			.setName('Galaxyecats')
 			.setDescription('Media for the Galaxyecats form');
+		mediaConfig.add('dark', 'SingleMedia')
+			.setName('Darkyecats')
+			.setDescription('Media for the Darkyecats form');
+		mediaConfig.add('scary', 'SingleMedia')
+			.setName('Scaryecats')
+			.setDescription('Media for the Scaryecats form');
 
 		let ballConfig = modConfig.addGroup('ballConfig')
 			.setName('Ball Settings')
@@ -208,6 +228,9 @@ class Pokyecats extends Module {
 		ballConfig.add(BALLS.RAINBOW, 'BallConfig')
 			.setName('Rainbow Yarn Ball')
 			.setDescription('Settings for the Rainbow Yarn Ball');
+		ballConfig.add(BALLS.DARK, 'DarkBallConfig')
+			.setName('Dark Ball')
+			.setDescription('Settings for the Dark Ball');
 
 		let galaxyecats = modConfig.addGroup('galaxyecats')
 			.setName('Galaxyecats Settings')
@@ -252,6 +275,65 @@ class Pokyecats extends Module {
 		galaxyecats.addString('missMessage', `Your ${BALLS.STAR} couldn't reach her! It disappears into the endless black...`)
 			.setName('Miss Message: Galaxyecats')
 			.setDescription('Message to send when a Galaxyecats is failed to be caught ' +
+				`(${CATCH_VARIABLE_HITS})`);
+
+		let darkyecats = modConfig.addGroup('darkyecats')
+			.setName('Darkyecats Settings')
+			.setDescription('Settings for the Darkyecats form');
+		darkyecats.addBoolean('active', false)
+			.setName('Darkyecats Active')
+			.setDescription('When enabled, Darkyecats will occasionally show up instead of Pokyecats');
+		darkyecats.addPercentageNumber('appearanceChance', 30)
+			.setName('Darkyecats Appearance Chance')
+			.setDescription('The odds of Darkyecats showing up instead of Pokyecats (0-100)');
+		darkyecats.addPercentageNumber('catchChance', 50)
+			.setName('Darkyecats Catch Chance')
+			.setDescription('The odds of catching Darkyecats with a regular ball when she shows up (0-100)');
+		darkyecats.addNaturalNumber('scaryCadence', 13)
+			.setName('Scaryecats Cadence')
+			.setDescription('Every time this many Darkyecats are caught, a Scaryecats is caught instead');
+		darkyecats.addNaturalNumber('yarnPerThrow', 1)
+			.setName('Dark Yarn Per Throw')
+			.setDescription('How many pieces of dark yarn viewers obtain each time they use a ball ON LOW SANITY');
+		let sanity = darkyecats.addGroup('sanity')
+			.setName('Sanity')
+			.setDescription('Settings for the Darkyecats sanity system');
+		sanity.addNaturalNumber('insanityThreshold', 15)
+			.setName('Insanity Threshold')
+			.setDescription('Having this sanity or lower makes dark balls catch Scareyecats ' +
+				`(max & starting sanity is ${MAX_SANITY})`);
+		sanity.addInteger('slap', 1)
+			.setName('From Slaps')
+			.setDescription('Sanity change from slapping / getting slapped');
+		sanity.addInteger('kappa', 1)
+			.setName('From Kappa')
+			.setDescription('Sanity change from putting a Kappa in the chat');
+		sanity.addInteger('catching', 1)
+			.setName('From Catching')
+			.setDescription('Sanity change from catching a Pokyecats (of any kind)');
+		sanity.addInteger('missing', 1)
+			.setName('From Missing')
+			.setDescription('Sanity change from missing a Pokyecats (of any kind)');
+		sanity.addInteger('epic', 1)
+			.setName('From Epic')
+			.setDescription('Sanity change from placing an epic unit in a Stream Raiders battle');
+		sanity.addInteger('hugs', 1)
+			.setName('From Hugs')
+			.setDescription('Sanity change from hugging / getting hugged');
+		let darkyecatsMessages = darkyecats.addGroup('messages')
+			.setName('Messages')
+			.setDescription('Messages for various Darkyecats-related events');
+		darkyecatsMessages.addString('catchMessage', "Evil forces gather around you as the dark kitty creeps into the ball... You have caught $darks Darkyecats(es) so far!")
+			.setName('Darkyecats Catch Message')
+			.setDescription('Message to send when a Darkyecats is caught ' +
+				`(${CATCH_VARIABLE_HITS})`);
+		darkyecatsMessages.addString('missMessage', "Light fades as a black shadow with glowing pink eyes zooms past you... You're still at $caught: $catches.")
+			.setName('Darkyecats Miss Message')
+			.setDescription('Message to send when a Darkyecats is failed to be caught ' +
+				`(${CATCH_VARIABLE_HITS})`);
+		darkyecatsMessages.addString('scaryCatchMessage', "One, two, kitty's coming for you... Three, four, gotta catch her more... You have $scaries Scaryecats(es) under your bed...")
+			.setName('Scaryecats Catch Message')
+			.setDescription('Message to send when a Scaryecats is caught ' +
 				`(${CATCH_VARIABLE_HITS})`);
 	}
 
@@ -311,6 +393,8 @@ class Pokyecats extends Module {
 		this.catchChance = conf.catchChance / 100;
 		this.shinyChance = conf.shinyChance / 100;
 		this.sepiaChance = conf.sepiaChance / 100;
+		this.darkCatchChance = conf.darkyecats.catchChance / 100;
+		this.darkAppearanceChance = conf.darkyecats.appearanceChance / 100;
 		this.galaxyCatchChance = conf.galaxyecats.catchChance / 100;
 
 		if (this.announceGalaxyecatsJob !== null) {
@@ -427,40 +511,15 @@ class Pokyecats extends Module {
 			yarn: 0,
 			extraCatches: this.newExtraCatchesData(),
 			stardustYarn: 0,
+			darkYarn: 0,
 			galaxyecatsGuarantee: false,
+			sanity: MAX_SANITY,
+			scaryecatsNext: false,
 		};
 	}
 
 	migrateCatchData(catchData) {
-		if (catchData.balls === undefined) {
-			catchData.balls = this.newBallData();
-		} else {
-			Object.values(BALLS).forEach((ballName) => {
-				if (ballName === BALLS.NORMAL) return;
-
-				if (catchData.balls[ballName] === undefined) {
-					catchData.balls[ballName] = 0;
-				}
-			});
-		}
-
-		if (catchData.yarn === undefined) {
-			catchData.yarn = 0;
-		}
-
-		if (catchData.stardustYarn === undefined) {
-			catchData.stardustYarn = 0;
-		}
-
-		if (catchData.extraCatches === undefined) {
-			catchData.extraCatches = this.newExtraCatchesData();
-		}
-
-		for (let name of EXTRA_CATCHES_POKYECATS_NAMES) {
-			if (!catchData.extraCatches[name]) {
-				catchData.extraCatches[name] = 0;
-			}
-		}
+		Utils.applyDefaults(catchData, this.emptyCatchData);
 	}
 	
 	getUserCatchData(username, displayName) {
@@ -473,7 +532,12 @@ class Pokyecats extends Module {
 	}
 
 	getNormalCatches(catchData) {
-		return catchData.catches - catchData.shinyCatches - catchData.extraCatches.sepia;
+		let nonNormalCatches = catchData.shinyCatches;
+		for (let extraCatch of EXTRA_CATCHES_POKYECATS_NAMES) {
+			nonNormalCatches += catchData.extraCatches[extraCatch];
+		}
+
+		return catchData.catches - nonNormalCatches;
 	}
 	
 	variableValuesFromCatchData(catchData) {
@@ -486,6 +550,28 @@ class Pokyecats extends Module {
 			goldballs: catchData.balls[BALLS.GOLD],
 			prettyballs: catchData.balls[BALLS.RAINBOW],
 		};
+	}
+
+	addSingleCatchData(list, singular, plural, count) {
+		if (count === 0) return;
+		if (count === 1) {
+			list.push(`1 ${singular}`);
+		} else {
+			list.push(`${count} ${plural}`);
+		}
+	}
+
+	generateAllCatchesString(catchData) {
+		let parts = [];
+
+		this.addSingleCatchData(parts, "Yecats", "Yecatses", this.getNormalCatches(catchData));
+		this.addSingleCatchData(parts, "sepia Yecats", "sepia Yecatses", catchData.extraCatches.sepia);
+		this.addSingleCatchData(parts, "Galaxyecats", "Galaxyecatses", catchData.extraCatches.galaxy);
+		this.addSingleCatchData(parts, "Darkyecats", "Darkyecatses", catchData.extraCatches.dark);
+		this.addSingleCatchData(parts, "Scaryecats", "Scaryecatses", catchData.extraCatches.scary);
+		this.addSingleCatchData(parts, "SHINY Yecats", "SHINY Yecatses", catchData.shinyCatches);
+
+		return Utils.makeEnglishAndList(parts);
 	}
 	
 	tellMessage(user, message, catchData) {
@@ -503,6 +589,10 @@ class Pokyecats extends Module {
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.GALAXIES, catchData.extraCatches.galaxy);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.BALLS.STAR, catchData.balls[BALLS.STAR]);
 		message = Utils.stringReplaceAll(message, PLACEHOLDERS.STARDUST_YARN, catchData.stardustYarn);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.ALL_CATCHES, this.generateAllCatchesString(catchData));
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.DARKS, catchData.extraCatches.dark);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.SCARIES, catchData.extraCatches.scary);
+		message = Utils.stringReplaceAll(message, PLACEHOLDERS.DARKYARN, catchData.darkYarn);
 		this.tell(user, message);
 	}
 	
@@ -529,8 +619,8 @@ class Pokyecats extends Module {
 		return true;
 	}
 	
-	grantBall(catchData, ball) {
-		if ((this.config.ballConfig[ball].yarnToWeave > 0) && (catchData.yarn % this.config.ballConfig[ball].yarnToWeave === 0)) {
+	grantBall(catchData, ball, yarnName = "yarn") {
+		if ((this.config.ballConfig[ball].yarnToWeave > 0) && (catchData[yarnName] % this.config.ballConfig[ball].yarnToWeave === 0)) {
 			catchData.balls[ball]++;
 		}
 	}
@@ -539,7 +629,11 @@ class Pokyecats extends Module {
 		this.grantBall(catchData, BALLS.YARN);
 		this.grantBall(catchData, BALLS.GOLD);
 	}
-	
+
+	grantDarkBalls(catchData) {
+		this.grantBall(catchData, BALLS.DARK, "darkYarn");
+	}
+
 	getBall(data) {
 		let ballName = this.tryGetBall(data.firstParam) ||
 			this.tryGetBall(Utils.stringReplaceAll(data.allParams, ' ', '')) ||
@@ -552,8 +646,9 @@ class Pokyecats extends Module {
 		
 		return {
 			name: ballName,
-			catchMultiplier: config && config.catchMultiplier || 0,
-			shinyMultiplier: config && config.shinyMultiplier || 0,
+			catchMultiplier: config && (config.catchMultiplier !== undefined ? config.catchMultiplier : 1),
+			shinyMultiplier: config && (config.shinyMultiplier !== undefined ? config.shinyMultiplier : 1),
+			darkMultiplier: config && (config.darkMultiplier !== undefined ? config.darkMultiplier : 1),
 			secret: SECRET_BALLS.includes(ballName),
 		};
 	}
@@ -626,39 +721,60 @@ class Pokyecats extends Module {
 		};
 	}
 
-	tryCatch(data) {
-		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
-		
-		let ball = this.getBall(data);
-		if (ball.secret) {
-			this.tellError(data.user, "The purpose of that ball has yet to be revealed...");
+	isInsane(catchData) {
+		return catchData.sanity <= this.config.darkyecats.sanity.insanityThreshold;
+	}
+
+	get darkyecatsIsActive() {
+		return this.config.darkyecats.active;
+	}
+
+	tryCatchDark(data, catchData, ball) {
+		// Caught only if the result is < catch chance
+		let catchChance = this.darkCatchChance * ball.darkMultiplier;
+		if (Math.random() >= catchChance) {
+			this.tellMessage(data.user, this.config.darkyecats.messages.missMessage, catchData);
 
 			return {
-				success:   null, // Means not to send any responses at all
+				media: this.config.media.dark,
+				success: false,
 			};
 		}
 
-		if (ball.name === BALLS.STAR) {
-			return this.tryCatchGalaxyecats(data);
+		catchData.catches++;
+
+		let media;
+
+		let scaryCaught = false;
+		if (this.isInsane(catchData) && ball.name === BALLS.DARK) {
+			scaryCaught = true;
+		} else if (catchData.scaryecatsNext) {
+			scaryCaught = true;
+			catchData.scaryecatsNext = false;
 		}
 
-		if (!this.consumeUserBall(catchData, ball.name)) {
-			this.tellError(data.user, "Sorry, you don't own that ball.")
-			
-			return {
-				success:   null, // Means not to send any responses at all
-			};
+		if (scaryCaught) {
+			media = this.config.media.scary;
+			catchData.extraCatches.scary++;
+			this.tellMessage(data.user, this.config.darkyecats.messages.scaryCatchMessage, catchData);
+		} else {
+			media = this.config.media.dark;
+			catchData.extraCatches.dark++;
+			let scaryCadence = this.config.darkyecats.scaryCadence;
+			if (scaryCadence > 0 && (catchData.extraCatches.dark + 1) % scaryCadence === 0) {
+				catchData.scaryecatsNext = true;
+			}
+
+			this.tellMessage(data.user, this.config.darkyecats.messages.catchMessage, catchData);
 		}
-		
-		// Grant yarn for the attempt
-		catchData.yarn += YARN_PER_THROW;
-		
-		// Give any balls the viewer is entitled for
-		this.grantBalls(catchData);
 
-		this.saveCatchData(data.user, catchData);
-		this.saveData();
+		return {
+			media,
+			success: true,
+		};
+	}
 
+	tryCatchNormal(data, catchData, ball) {
 		// Caught only if the result is < catch chance
 		let catchChance = this.catchChance * ball.catchMultiplier;
 		if (Math.random() >= catchChance) {
@@ -667,17 +783,13 @@ class Pokyecats extends Module {
 			} else {
 				this.tellMessage(data.user, this.config.missMessage, catchData);
 			}
-			
-			this.saveCatchData(data.user, catchData);
-			
-			this._sendToDisplay(this.config.media.regular);
-			
+
 			return {
-				success:   false,
-				variables: this.variableValuesFromCatchData(catchData),
+				media: this.config.media.regular,
+				success: false,
 			};
 		}
-		
+
 		catchData.catches++;
 
 		let shiny = false, sepia = false;
@@ -706,15 +818,61 @@ class Pokyecats extends Module {
 		} else {
 			this.tellMessage(data.user, this.config.normalCatchMessage, catchData);
 		}
+
+		return {
+			media,
+			success: true,
+		};
+	}
+
+	tryCatch(data) {
+		let catchData = this.getUserCatchData(data.user.name, data.user.displayName);
 		
-		this._sendToDisplay(media);
+		let ball = this.getBall(data);
+		if (ball.secret) {
+			this.tellError(data.user, "The purpose of that ball has yet to be revealed...");
+
+			return {
+				success: null, // Means not to send any responses at all
+			};
+		}
+
+		if (ball.name === BALLS.STAR) {
+			return this.tryCatchGalaxyecats(data);
+		}
+
+		if (!this.consumeUserBall(catchData, ball.name)) {
+			this.tellError(data.user, "Sorry, you don't own that ball.")
+			
+			return {
+				success: null, // Means not to send any responses at all
+			};
+		}
+		
+		// Grant yarn for the attempt and give any balls the viewer is entitled for
+		if (this.darkyecatsIsActive && this.isInsane(catchData)) {
+			catchData.darkYarn += YARN_PER_THROW;
+			this.grantDarkBalls(catchData);
+		} else {
+			catchData.yarn += YARN_PER_THROW;
+			this.grantBalls(catchData);
+		}
+
+		let results;
+
+		if (this.darkyecatsIsActive && Math.random() < this.darkAppearanceChance) {
+			results = this.tryCatchDark(data, catchData, ball);
+		} else {
+			results = this.tryCatchNormal(data, catchData, ball);
+		}
 
 		this.saveCatchData(data.user, catchData);
-		
 		this.saveData();
-		
+
+		this._sendToDisplay(results.media);
+
 		return {
-			success:   true,
+			success:   results.success,
 			variables: this.variableValuesFromCatchData(catchData),
 		};
 	}
@@ -786,6 +944,7 @@ class Pokyecats extends Module {
 				let name = `${this.getDisplayName(username)}: `;
 				let yarn = `${catchData.yarn} yarn, `;
 				let stardustYarn = `${catchData.stardustYarn} stardust yarn, `;
+				let darkYarn = `${catchData.darkYarn} dark yarn, `;
 				let yarnBalls = `${catchData.balls[BALLS.YARN]} yarn balls, `;
 				let goldBalls = `${catchData.balls[BALLS.GOLD]} gold balls, `;
 				let darkBalls = `${catchData.balls[BALLS.DARK]} dark balls, `;
@@ -793,7 +952,7 @@ class Pokyecats extends Module {
 				let catches = `${this.getNormalCatches(catchData)} normal catches, `;
 				let sepiaCatches = `${catchData.extraCatches.sepia} sepia catches, and `;
 				let shiny = `${catchData.shinyCatches} shiny catches.`;
-				let all = number + name + yarn + stardustYarn + yarnBalls + goldBalls + darkBalls + rainbowBalls + catches + sepiaCatches + shiny;
+				let all = number + name + yarn + stardustYarn + darkYarn + yarnBalls + goldBalls + darkBalls + rainbowBalls + catches + sepiaCatches + shiny;
 				this.print(all);
 				currPlayerNum++;
 			});
@@ -867,6 +1026,9 @@ class Pokyecats extends Module {
 			contents.push(`${catchData.yarn} yarn`);
 			if (catchData.stardustYarn > 0) {
 				contents.push(`${catchData.stardustYarn} stardust yarn`);
+			}
+			if (catchData.darkYarn > 0) {
+				contents.push(`${catchData.darkYarn} dark yarn`);
 			}
 
 			this.addBallCountString(contents, catchData, BALLS.YARN, "yarn");

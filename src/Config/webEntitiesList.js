@@ -137,6 +137,7 @@ const entities = {
 	ObsFunctionDetails_SwitchToPreviousSceneEntity: require('./WebEntities/obsFunctionDetails_SwitchToPreviousSceneEntity.js'),
 	ObsFunctionEntity: require('./WebEntities/obsFunctionEntity.js'),
 	BallConfigEntity: require('./WebEntities/ballConfigEntity.js'),
+	DarkBallConfigEntity: require('./WebEntities/darkBallConfigEntity.js'),
 	SingleMediaEntity: require('./WebEntities/singleMediaEntity.js'),
 	WeavableBallConfigEntity: require('./WebEntities/weavableBallConfigEntity.js'),
 	NumberChoiceEntity: require('./WebEntities/numberChoiceEntity.js'),
