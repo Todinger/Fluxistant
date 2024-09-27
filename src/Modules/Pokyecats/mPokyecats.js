@@ -1,5 +1,7 @@
 const schedule = require('node-schedule');
 const Module = requireMain('module');
+const TwitchManager = requireMain('./twitchManager');
+const StreamRaidersManager = requireMain('streamRaidersManager');
 const { MINUTES } = requireMain('constants');
 const Timers = requireMain('./timers');
 const Utils = requireMain('utils');
@@ -90,7 +92,7 @@ const EXTRA_CATCHES_POKYECATS_NAMES = [
 	CATCH_TYPES.scary,
 ];
 
-// const MIN_SANITY = 0;
+const MIN_SANITY = 0;
 const MAX_SANITY = 100;
 
 
@@ -146,6 +148,22 @@ class Pokyecats extends Module {
 		this.currentWishMakers = [];
 
 		this.emptyCatchData = this.newCatchData();
+
+		this.sanityEventHandlers = {
+			giveSlap: (user) => this._handleSanityEvent("slap", false, user.name, user.displayName),
+			getSlap: (username) => this._handleSanityEvent("slap", true, username),
+			giveHug: (user) => this._handleSanityEvent("hug", false, user.name, user.displayName),
+			getHug: (username) => this._handleSanityEvent("hug", true, username),
+			kappa: (user) => this._handleSanityEvent("kappa", true, user.name, user.displayName),
+			catch: (user) => this._handleSanityEvent("catch", false, user.name, user.displayName),
+			miss: (user) => this._handleSanityEvent("miss", false, user.name, user.displayName),
+			epicPlacement: (epicPlacement) => this._handleSanityEvent("slap", true, epicPlacement.player),
+		};
+
+		this.eventHandlers = {
+			message: (user, message) => this._handleUserMessage(user, message),
+			epicPlacement: this.sanityEventHandlers.epicPlacement,
+		};
 	}
 	
 	defineModAssets(modData) {
@@ -286,7 +304,7 @@ class Pokyecats extends Module {
 		darkyecats.addPercentageNumber('appearanceChance', 30)
 			.setName('Darkyecats Appearance Chance')
 			.setDescription('The odds of Darkyecats showing up instead of Pokyecats (0-100)');
-		darkyecats.addPercentageNumber('catchChance', 50)
+		darkyecats.addPercentageNumber('catchChance', 20)
 			.setName('Darkyecats Catch Chance')
 			.setDescription('The odds of catching Darkyecats with a regular ball when she shows up (0-100)');
 		darkyecats.addNaturalNumber('scaryCadence', 13)
@@ -302,22 +320,22 @@ class Pokyecats extends Module {
 			.setName('Insanity Threshold')
 			.setDescription('Having this sanity or lower makes dark balls catch Scareyecats ' +
 				`(max & starting sanity is ${MAX_SANITY})`);
-		sanity.addInteger('slap', 1)
+		sanity.addInteger('slap', -2)
 			.setName('From Slaps')
 			.setDescription('Sanity change from slapping / getting slapped');
-		sanity.addInteger('kappa', 1)
+		sanity.addInteger('kappa', -1)
 			.setName('From Kappa')
 			.setDescription('Sanity change from putting a Kappa in the chat');
-		sanity.addInteger('catching', 1)
+		sanity.addInteger('catch', 5)
 			.setName('From Catching')
 			.setDescription('Sanity change from catching a Pokyecats (of any kind)');
-		sanity.addInteger('missing', 1)
+		sanity.addInteger('miss', -5)
 			.setName('From Missing')
 			.setDescription('Sanity change from missing a Pokyecats (of any kind)');
-		sanity.addInteger('epic', 1)
+		sanity.addInteger('epic', 3)
 			.setName('From Epic')
 			.setDescription('Sanity change from placing an epic unit in a Stream Raiders battle');
-		sanity.addInteger('hugs', 1)
+		sanity.addInteger('hug', 2)
 			.setName('From Hugs')
 			.setDescription('Sanity change from hugging / getting hugged');
 		let darkyecatsMessages = darkyecats.addGroup('messages')
@@ -339,6 +357,86 @@ class Pokyecats extends Module {
 
 	defineModDependencies() {
 		this.twister = this.use('Twister');
+	}
+
+	invokeCommand(user, command) {
+		let cmdname = command.cmdname.toLowerCase();
+		let args = command.args;
+		return this._handleUserCommand(user, cmdname, args);
+	}
+
+	enable() {
+		this._enableEventHandlers();
+	}
+
+	disable() {
+		this._disableEventHandlers();
+	}
+
+	_enableEventHandlers() {
+		TwitchManager.on('message', this.eventHandlers.message);
+		StreamRaidersManager.onEpicPlacement(this.eventHandlers.epicPlacement);
+	}
+
+	_disableEventHandlers() {
+		TwitchManager.removeCallback('message', this.eventHandlers.message);
+		StreamRaidersManager.removeEpicPlacementCallback(this.eventHandlers.epicPlacement);
+	}
+
+	_handleUserMessage(user, message) {
+		if (/^Kappa$|^Kappa\s.*|.*\sKappa$|.*\sKappa\s.*/.test(message)) {
+			this.sanityEventHandlers.kappa(user);
+		}
+	}
+
+	_handleUserCommandAction(user, action, args, giveHandler, getHandler) {
+		giveHandler(user);
+		if (args && args.length > 0) {
+			let target = args[0];
+			target = target.replace(/^@+/, "").toLowerCase();
+			if (target.length > 0 && user.name !== target) {
+				getHandler(target);
+			}
+		}
+	}
+
+	_handleUserCommand(user, cmdname, args) {
+		if (cmdname.toLowerCase() === "slap") {
+			this._handleUserCommandAction(
+				user,
+				"slap",
+				args,
+				this.sanityEventHandlers.giveSlap,
+				this.sanityEventHandlers.getSlap,
+			);
+			return true;
+		} else if (cmdname.toLowerCase() === "hug") {
+			this._handleUserCommandAction(
+				user,
+				"hug",
+				args,
+				this.sanityEventHandlers.giveHug,
+				this.sanityEventHandlers.getHug,
+			);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	_handleSanityEvent(eventName, existingPlayersOnly, username, displayName) {
+		if (existingPlayersOnly && !this.playerExists(username)) return;
+
+		displayName = displayName || username;
+		let catchData = this.getUserCatchData(username, displayName);
+		const sanityModification = this.config.darkyecats.sanity[eventName];
+		const newSanity = Utils.clamp(MIN_SANITY, catchData.sanity + sanityModification, MAX_SANITY);
+		this.print(`Changing sanity for ${displayName} by ${sanityModification > 0 ? "+" : ""}${sanityModification} from ${catchData.sanity} to ${newSanity}.`);
+		catchData.sanity = newSanity;
+
+		this.saveCatchDataByName(username, displayName, catchData);
+		this.saveData();
 	}
 
 	_sendToDisplay(mediaDesc) {
@@ -521,9 +619,13 @@ class Pokyecats extends Module {
 	migrateCatchData(catchData) {
 		Utils.applyDefaults(catchData, this.emptyCatchData);
 	}
+
+	playerExists(username) {
+		return username in this.data.catches;
+	}
 	
 	getUserCatchData(username, displayName) {
-		if (!(username in this.data.catches)) {
+		if (!this.playerExists(username)) {
 			this.data.catches[username] = this.newCatchData();
 			this.data.catches[username].displayName = displayName;
 		}
@@ -652,10 +754,14 @@ class Pokyecats extends Module {
 			secret: SECRET_BALLS.includes(ballName),
 		};
 	}
+
+	saveCatchDataByName(username, displayName, catchData) {
+		this.data.catches[username] = catchData;
+		this.data.catches[username].displayName = displayName;
+	}
 	
 	saveCatchData(user, catchData) {
-		this.data.catches[user.name] = catchData;
-		this.data.catches[user.name].displayName = user.displayName;
+		this.saveCatchDataByName(user.name, user.displayName, catchData);
 	}
 
 	get galaxyecatsIsNear() {
@@ -867,7 +973,13 @@ class Pokyecats extends Module {
 		}
 
 		this.saveCatchData(data.user, catchData);
-		this.saveData();
+		// this.saveData();   // <-- The data will be saved when modifying the sanity next
+
+		if (results.success) {
+			this.sanityEventHandlers.catch(data.user);
+		} else {
+			this.sanityEventHandlers.miss(data.user);
+		}
 
 		this._sendToDisplay(results.media);
 
@@ -1042,6 +1154,15 @@ class Pokyecats extends Module {
 		}
 	}
 
+	showSanity(data) {
+		let sanity = MAX_SANITY;
+		if (this.playerExists(data.user.name)) {
+			sanity = this.data.catches[data.user.name].sanity;
+		}
+
+		this.tell(data.user, `Your sanity is currently at ${sanity}.`);
+	}
+
 	addYarn(username, displayName, amount, save = false) {
 		let catchData = this.getUserCatchData(username, displayName);
 		catchData.yarn += amount;
@@ -1146,6 +1267,17 @@ class Pokyecats extends Module {
 				}),
 			],
 			action: (data) => this.wish(data),
+		},
+
+		sanity: {
+			name: 'Sanity',
+			description: "Show a user's sanity",
+			triggers: [
+				this.trigger.command({
+					cmdname: 'sanity',
+				}),
+			],
+			action: (data) => this.showSanity(data),
 		},
 	}
 }
