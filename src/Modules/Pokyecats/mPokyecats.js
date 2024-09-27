@@ -867,7 +867,7 @@ class Pokyecats extends Module {
 			media = this.config.media.dark;
 			catchData.extraCatches.dark++;
 			let scaryCadence = this.config.darkyecats.scaryCadence;
-			if (scaryCadence > 0 && (catchData.extraCatches.dark + 1) % scaryCadence === 0) {
+			if (scaryCadence === 1 || (scaryCadence > 1 && (catchData.extraCatches.dark) % (scaryCadence - 1) === 0)) {
 				catchData.scaryecatsNext = true;
 			}
 
