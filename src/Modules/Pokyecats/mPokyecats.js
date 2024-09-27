@@ -74,10 +74,12 @@ const WISH_REWARD_WEIGHTS = {
 	yarn: 80,
 	ball: 18,
 	guarantee: 2,
+	pokyecats: 1,
 };
 const WISH_REWARD_WEIGHTS_WITHOUT_GUARANTEE = {
 	yarn: 80,
 	ball: 18,
+	pokyecats: 1,
 };
 
 const GALAXYECATS_APPEARANCE_TIME = {
@@ -138,7 +140,8 @@ class Pokyecats extends Module {
 			yarn: (...p) => this.giveStardustYarn(...p),
 			ball: (...p) => this.giveStarBall(...p),
 			guarantee: (...p) => this.giveGalaxyecatsCatchGuarantee(...p),
-		}
+			pokyecats: (...p) => this.givePokyecatsFromWish(...p),
+		};
 
 		this.galaxyecatsStarActive = false;
 		this.galaxyecatsAppearanceTime = null;
@@ -157,7 +160,7 @@ class Pokyecats extends Module {
 			kappa: (user) => this._handleSanityEvent("kappa", true, user.name, user.displayName),
 			catch: (user) => this._handleSanityEvent("catch", false, user.name, user.displayName),
 			miss: (user) => this._handleSanityEvent("miss", false, user.name, user.displayName),
-			epicPlacement: (epicPlacement) => this._handleSanityEvent("slap", true, epicPlacement.player),
+			epicPlacement: (epicPlacement) => this._handleSanityEvent("epic", true, epicPlacement.player),
 		};
 
 		this.eventHandlers = {
@@ -431,9 +434,7 @@ class Pokyecats extends Module {
 		displayName = displayName || username;
 		let catchData = this.getUserCatchData(username, displayName);
 		const sanityModification = this.config.darkyecats.sanity[eventName];
-		const newSanity = Utils.clamp(MIN_SANITY, catchData.sanity + sanityModification, MAX_SANITY);
-		this.print(`Changing sanity for ${displayName} by ${sanityModification > 0 ? "+" : ""}${sanityModification} from ${catchData.sanity} to ${newSanity}.`);
-		catchData.sanity = newSanity;
+		catchData.sanity = Utils.clamp(MIN_SANITY, catchData.sanity + sanityModification, MAX_SANITY);
 
 		this.saveCatchDataByName(username, displayName, catchData);
 		this.saveData();
@@ -569,6 +570,11 @@ class Pokyecats extends Module {
 	giveGalaxyecatsCatchGuarantee(user, catchData) {
 		catchData.galaxyecatsGuarantee = true;
 		this.tell(user, "You hear a faint meow and feel empowered by feline galactic forces!")
+	}
+
+	givePokyecatsFromWish(user, catchData) {
+		catchData.catches++;
+		this.tell(user, "A cute Pokyecats falls down from the star and into your pocket!")
 	}
 
 	persistentDataLoaded() {
