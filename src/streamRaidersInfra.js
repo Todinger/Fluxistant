@@ -3,6 +3,7 @@ const { ApiPoller, AxiosRequestEngine, MockRequestEngine } = require('./apiPolle
 const _ = require('lodash');
 const { MINUTES, SECONDS } = require('./constants');
 const Errors = require('./errors');
+const Globals = require("./globals");
 
 // Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
 
@@ -16,6 +17,7 @@ const CTV_BOT_MESSAGES = {
 		SINGLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted a (?<captain>[a-zA-Z0-9][\w]{2,24}) (?<skin>(?:(?<epic>Epic) )?(?:(?<variant>Gold|Diamond) )?(?:(?<color>Pink|Blue|Green) (?<holo>Holo) )?(?<unit>[\w ]+)) skin to (?<recipient>[a-zA-Z0-9][\w]{2,24})!/,
 		MULTIPLE: /(?<player>[a-zA-Z0-9][\w]{2,24}) gifted (?<amount>\d+) (?<captain>[a-zA-Z0-9][\w]{2,24}) skins to .* and .* more people!.*/,
 	},
+	EPIC_PLACEMENT: /(?<player>[a-zA-Z0-9][\w]{2,24}) just placed an Epic (?<title>[^ ]+) (?<skin>.+) on the battlefield!/,
 };
 
 const NAMED_PURCHASE_REGEX = /eventId\\":\\"(?<eventId>[^\\"]*).*(?<skinName>skin[a-zA-Z0-9]*)_/gi;
@@ -56,6 +58,25 @@ Multi-Bomb:
 Named Purchase:
 	"{\"eventId\":\"666f0e6970a66\",\"eventType\":\"purchase-self\",\"twitchUserImage\":\"https:\\/\\/static-cdn.jtvnw.net\\/jtv_user_pictures\\/194e0ff8-8e59-4c7c-a5f3-d6e24ba64107-profile_image-300x300.png\",\"messageArgs\":[\"WitchyWoman503\",\"Full\",\"YecatsX Barbarian\"],\"messageImage\":\"https:\\/\\/d2k2g0zg1te1mr.cloudfront.net\\/overlays\\/battle-box\\/assets\\/units\\/skinFullBarbarianYecatsmailbox_walk.8fce65e213f2.gif\"}": "1718554217",
 	"{\"eventId\":\"6670d539a1ae1\",\"eventType\":\"gift-targeted\",\"twitchUserImage\":\"https:\\/\\/static-cdn.jtvnw.net\\/jtv_user_pictures\\/c6ee5ca3-119f-4797-9260-f3fca5cb9a84-profile_image-300x300.png\",\"messageArgs\":[\"dezL0rd\",\"Full\",\"CrimsonK19\",\"YecatsX Rogue\"],\"messageImage\":\"https:\\/\\/d2k2g0zg1te1mr.cloudfront.net\\/overlays\\/battle-box\\/assets\\/units\\/skinFullRogueYecatsmailbox_walk.b2bd5c05e8ab.gif\"}": "1718670649"
+
+Epic Placements:
+	u captaintvbot nutshellinchains just placed an Epic chiquik Bomber on the battlefield!
+	u captaintvbot scottacusb just placed an Epic BusyBeth Rogue on the battlefield!
+	u captaintvbot fluxyphi just placed an Epic Anima Barbarian on the battlefield!
+	u captaintvbot hairtrigger83 just placed an Epic Fluxistence Artillery on the battlefield!
+	u captaintvbot r0b0c0p_ just placed an Epic Fluxistence Barbarian on the battlefield!
+	u captaintvbot moondancing_unicorn just placed an Epic Fluxistence Lancer on the battlefield!
+	u captaintvbot moondancing_unicorn just placed an Epic Fluxistence Lancer on the battlefield!
+	u captaintvbot onywicked just placed an Epic Fluxistence Fairy on the battlefield!
+	u captaintvbot chickenslash just placed an Epic PaopuKomi Healer on the battlefield!
+	u captaintvbot nutshellinchains just placed an Epic Fluxistence Barbarian on the battlefield!
+	u captaintvbot hairtrigger83 just placed an Epic Fluxistence Epic Paladin on the battlefield!
+	u captaintvbot whuffless just placed an Epic Anne_Dyari Barbarian on the battlefield!
+	u captaintvbot fridays_child just placed an Epic Tank on the battlefield!
+	u captaintvbot endlesssky82 just placed an Epic Fluxistence Tank on the battlefield!
+	u captaintvbot hairtrigger83 just placed an Epic Fluxistence Gold Barbarian on the battlefield!
+	u captaintvbot moondancing_unicorn just placed an Epic fluxistence Barbarian on the battlefield!
+	u captaintvbot lady_il_toccano just placed an Epic Fluxistence Epic Paladin on the battlefield!
 */
 
 const API_URL = "https://www.streamraiders.com/api/game/?ss=$TOKEN&cn=$CN&command=$COMMAND";
@@ -412,6 +433,16 @@ class NamedPurchase {
 	}
 }
 
+class EpicPlacement {
+	constructor(details) {
+		this.player = details['player'];
+		this.title = details['title'];
+		this.skin = details['skin'];
+		this.fullSkinName = `${this.title} ${this.skin}`;
+		this.isStreamSkin = this.title.toLowerCase() === Globals.StreamerUser.name.toLowerCase();
+	}
+}
+
 
 module.exports = {
 	CTV_BOT_USER,
@@ -426,4 +457,5 @@ module.exports = {
 	SkinBombSingleDetails,
 	SkinBombMultiDetails,
 	NamedPurchase,
+	EpicPlacement,
 };

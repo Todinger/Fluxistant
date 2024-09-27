@@ -19,6 +19,7 @@ const {
 	SkinBombSingleDetails,
 	SkinBombMultiDetails,
 	NamedPurchase,
+	EpicPlacement,
 } = require('./streamRaidersInfra');
 
 // Twitch username regex: /[a-zA-Z0-9][\w]{2,24}/
@@ -85,6 +86,7 @@ class StreamRaidersManager extends EventNotifier {
 		this._addEvent('singleSkinBomb');
 		this._addEvent('multiSkinBomb');
 		this._addEvent('namedPurchases');
+		this._addEvent('epicPlacement');
 
 
 		cli.on('sr-mock', () => this.mockData());
@@ -97,6 +99,7 @@ class StreamRaidersManager extends EventNotifier {
 			{regex: CTV_BOT_MESSAGES.GIFT, handler: (details) => this._emitSkinGifted(details)},
 			{regex: CTV_BOT_MESSAGES.BOMB.SINGLE, handler: (details) => this._onSkinBombSinglePurchase(details)},
 			{regex: CTV_BOT_MESSAGES.BOMB.MULTIPLE, handler: (details) => this._emitSkinBombMulti(details)},
+			{regex: CTV_BOT_MESSAGES.EPIC_PLACEMENT, handler: (details) => this._emitEpicPlacement(details)},
 		];
 		this._singleBombQueues = {};
 		this._bombAggregationTimer = null;
@@ -276,6 +279,12 @@ class StreamRaidersManager extends EventNotifier {
 		const purchaseDetails = new SkinBombMultiDetails(details);
 		this._notifyMultiSkinBomb(purchaseDetails);
 		this._notifyAnySkinPurchase(purchaseDetails);
+	}
+
+	_emitEpicPlacement(details) {
+		const epicPlacement = new EpicPlacement(details);
+		// console.log(`[E] Epic placement: ${JSON.stringify(epicPlacement)}`);
+		this._notifyEpicPlacement(epicPlacement);
 	}
 
 	_onAggregationTick() {
@@ -558,6 +567,18 @@ class StreamRaidersManager extends EventNotifier {
 
 	_notifyNamedPurchases(namedPurchases) {
 		this._notify('namedPurchases', namedPurchases);
+	}
+
+	onEpicPlacement(callback) {
+		return this.on('epicPlacement', callback);
+	}
+
+	removeEpicPlacementCallback(callback) {
+		return this.removeCallback('epicPlacement', callback);
+	}
+
+	_notifyEpicPlacement(epicPlacement) {
+		this._notify('epicPlacement', epicPlacement);
 	}
 }
 
