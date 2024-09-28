@@ -796,7 +796,7 @@ class TwitchManager extends EventNotifier {
 		// Let every module examine the command and invoke it if it's one of
 		// its commands - if any of them did, then this is a command
 		Object.values(ModuleManager.modules).forEach(module => {
-			isCommand = isCommand || module.invokeCommand(user, command);
+			isCommand = module.invokeCommand(user, command) || isCommand;
 		});
 		
 		// The handlers registered with the commands and the dynamic invocations
