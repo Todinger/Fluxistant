@@ -1169,6 +1169,25 @@ class Pokyecats extends Module {
 		this.tell(data.user, `Your sanity is currently at ${sanity}.`);
 	}
 
+	giveGift(data) {
+		if (!Utils.isNonEmptyString(data.firstParam)) {
+			this.tellError(data.user, "Please specify a target user.");
+			return false;
+		}
+
+		let targetUser = data.firstParam.toLowerCase();
+		targetUser = targetUser.replace(/^@+/, "").toLowerCase();
+
+		if (!Utils.isNonEmptyString(targetUser)) {
+			this.tellError(data.user, "Please specify a target user.");
+			return false;
+		}
+
+		this.addBall(targetUser, targetUser, BALLS.GOLD, 1, true);
+		let catchData = this.getUserCatchData(targetUser, targetUser);
+		this.say(`One gold ball has been granted to ${catchData.displayName}!`);
+	}
+
 	addYarn(username, displayName, amount, save = false) {
 		let catchData = this.getUserCatchData(username, displayName);
 		catchData.yarn += amount;
@@ -1284,6 +1303,23 @@ class Pokyecats extends Module {
 				}),
 			],
 			action: (data) => this.showSanity(data),
+		},
+
+		gift: {
+			name: 'Grant Gift',
+			description: "Give someone a gift of Pokyecats thingies!",
+			filters: [
+				this.filter.oneOfUsers(['fluxistence', 'yecatsmailbox']),
+			],
+			triggers: [
+				this.trigger.command({
+					cmdname: 'pokyegive',
+				}),
+				this.trigger.cli({
+					cmdname: 'pokyegive',
+				}),
+			],
+			action: (data) => this.giveGift(data),
 		},
 	}
 }
