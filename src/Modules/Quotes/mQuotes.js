@@ -120,7 +120,7 @@ class Quotes extends Module {
 		
 		let quote = this.data.quotes[num - 1];
 		quote.category = data.params.slice(1).join(" ");
-		this.tell(data.user, `Set quote #${num} category to: ${category}`);
+		this.tell(data.user, `Set quote #${num} category to: ${quote.category}`);
 		
 		this.saveData();
 	}
